@@ -1,0 +1,64 @@
+<?php
+header("Content-type: text/css");
+header('Expires: ' . date('r',time() + 864000));
+header("Pragma: public");
+header("Cache-Control: public");
+/* @import url("http:#yui.yahooapis.com/2.6.0/build/reset-fonts-grids/reset-fonts-grids.css");  */
+
+/*
+ * Needed because for an unknown reason, GET variables do not
+ * pass on our live linode server.
+ */
+# Vars come from build_page controller
+if(!empty($_SERVER['PATH_INFO']))
+{
+	$pieces = explode('/', $_SERVER['PATH_INFO']);
+	$user 	= $pieces[1];
+	$theme 	= $pieces[2];
+	$tool	= $pieces[3];	
+}
+else
+{
+	$user 	= $_GET['u'];
+	$theme 	= $_GET['t'];
+	$tool	= $_GET['m'];
+}
+$tools	= explode('-', $tool);
+
+foreach($tools as $tool)
+{
+	$tool			= strtolower($tool);
+	$user_css		= "{$_SERVER[DOCUMENT_ROOT]}/data/$user/themes/$theme/modules/$tool/css.php";	
+	$user_images	= "http://{$_SERVER['HTTP_HOST']}/data/$user/themes/$theme/modules/$tool/";	
+
+	$theme_tool_css	= "{$_SERVER[DOCUMENT_ROOT]}/application/views/$theme/$tool/css.php";
+	$stock_tool_css	= "{$_SERVER[DOCUMENT_ROOT]}/modules/$tool/views/$tool/css.php";
+	$stock_backend	= "{$_SERVER[DOCUMENT_ROOT]}/modules/$tool/views/$tool/edit/css.php";
+
+	#  Load user custom css if available.
+	if (file_exists($user_css))
+		include_once("$user_css");
+	else
+	{	
+		# Load root css for tool.
+		if ( file_exists($theme_tool_css) )
+			include_once($theme_tool_css);
+		elseif( file_exists($stock_tool_css) )
+			include_once($stock_tool_css);
+	}
+
+	# Load backend css if logged in
+	# This might hurt the cache if pages don't change though ??
+	# Disable for now ...
+	#if(! empty($_SESSION['pAndA']) )
+	#{
+		if (file_exists($stock_backend))
+		{
+			echo "\n /* --- BACKEND - $tool --- */ \n";
+			include_once($stock_backend);
+		}
+	#}
+		
+}
+
+/*  end of tool.css*/

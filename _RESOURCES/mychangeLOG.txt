@@ -1,0 +1,2 @@
+/system/libraries/controller.php
+	added var $theme to pass theme to all classes

@@ -1,0 +1,36 @@
+Header unset ETag
+FileETag None
+
+# Turn on URL rewriting
+	RewriteEngine On
+
+# Installation directory
+# RewriteBase /kohana/
+
+# Protect application and system files from being viewed
+	#RewriteRule ^(application|modules|system) - [F,L]
+		# have to comment this out in order to access theme assets 
+
+# Allow any files or directories that exist to be displayed directly
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite all other URLs to index.php/URL
+# RewriteRule .* index.php/$0 [PT,L]
+
+	RewriteCond $1 !^(index\.php|images|robots\.txt|css|system|js|data)
+	RewriteRule ^(.*)$ /index.php/$1 [L]
+
+# friendly css links
+	RewriteRule ^css/global/([^/]+)/([^/]+) css/global.css?u=$1&t=$2 [NC]
+	RewriteRule ^css/tools/([^/]+)/([^/]+)/([^/]+) css/tools.css?u=$1&t=$2&m=$3 [NC]
+	
+	
+# this tells the server to parse .css file for php commands 
+	AddType application/x-httpd-php .css
+	
+<IfModule mod_deflate.c>
+	<FilesMatch "\.(js|css)$">
+		SetOutputFilter DEFLATE
+	</FilesMatch>
+</IfModule>

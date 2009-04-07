@@ -1,0 +1,1 @@
+<li><a href="/get/edit_text/edit/<?php echo $identifer?>" rel="facebox">Edit Text</a></li>
