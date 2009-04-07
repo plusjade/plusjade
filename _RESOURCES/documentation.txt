@@ -1,0 +1,25 @@
+How +Jade works
+
+1. get_user hook is initiliazed at system.ready
+	gets user from url (as subdomain or domain map)
+	queries db and returns site session (site_id, theme, custom files)
+
+2. build_page hook is initiliazed at system.ready after get_user
+	build_page gets page (1st controller in url)
+	if page = "e" this means we are in edit mode.
+		the routes.php routes to normal controller/method mode of our modules
+		(used to edit/configure modules)
+	else
+		queries db to retrieve relevent page layout prefences
+		if page not found = 404 error
+		else
+			if the page calls a module (one of our controllers)
+				create new controller instance
+				build the page around this controller
+				execute the controller instance
+			else
+				the page has no module
+				send to custom_page controller where page is displayed normally.
+				
+				
+				

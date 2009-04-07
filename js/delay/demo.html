@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>jQuery Delay | Evan Byrne</title>
+
+	<!-- NOTE: You need jQuery to use this! -->
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery.delay.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		
+		// Wait for #link to be clicked...
+		$("#link").click(function(){
+
+			// Delay 1 second...
+			$(this).delay(1000,function(){
+
+				// Then display #hello
+				$("#hello").css("display","block");
+
+				// Then delay another 3 seconds...
+				$(this).delay(3000,function(){
+
+					// Change text color to blue
+					$("#hello").css("color","blue");
+
+				});
+
+			});
+
+		});
+	});
+</script>
+</head>
+<body>
+
+<p><a href="#" id="link">Click Me!</a></p>
+
+<p style="display: none;" id="hello">A Delayed Hello!</p>
+
+</body>
+</html>
