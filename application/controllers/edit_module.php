@@ -11,7 +11,6 @@ abstract class Edit_Module_Controller extends Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		
 		# Require Login
 		if(!$this->client->logged_in()) url::redirect();	
 		
