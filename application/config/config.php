@@ -96,25 +96,16 @@ $config['extension_prefix'] = 'MY_';
  */
 $config['modules'] = array
 (
-	MODPATH.'slide_panel',     // +jade slide_panel
-	MODPATH.'text',     // +jade slide_panel
-	MODPATH.'product',      // +jade about
-	MODPATH.'reviews',      // +jade about
-	MODPATH.'faq',      // +jade about
-	MODPATH.'about',      // +jade about	
-	MODPATH.'contact',      // +jade about
-	MODPATH.'gallery',      // +jade about
-	MODPATH.'album',      // +jade about
-	MODPATH.'admin',      // +jade about
-	MODPATH.'auth',      // user Authentication
-	MODPATH.'showroom',      // +jade slide_panel
-	MODPATH.'calendar',      // +jade slide_panel
-	// MODPATH.'forge',     // Form generation
-	// MODPATH.'kodoc',     // Self-generating documentation
-	// MODPATH.'media',     // Media caching and compression
-	// MODPATH.'gmaps',     // Google Maps integration
-	// MODPATH.'archive',   // Archive utility
-	// MODPATH.'payment',   // Online payments
-	// MODPATH.'unit_test', // Unit testing
-	// MODPATH.'object_db', // New OOP Database library (testing only!)
+	MODPATH.'text',
+	MODPATH.'navigation',	
+	MODPATH.'showroom',
+	MODPATH.'calendar',	
+	MODPATH.'reviews',
+	MODPATH.'slide_panel',   
+	MODPATH.'contact',
+	MODPATH.'about',
+	MODPATH.'faq',
+	MODPATH.'album',
+	MODPATH.'admin',
+	MODPATH.'auth'
 );

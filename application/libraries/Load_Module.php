@@ -37,6 +37,9 @@ class Load_Module_Core {
 				break;
 			case 'Calendar':
 				$tool = new Calendar_Controller(); 			
+				break;
+			case 'Navigation':
+				$tool = new Navigation_Controller(); 			
 				break;					
 			default:
 				$tool = new Text_Controller();
