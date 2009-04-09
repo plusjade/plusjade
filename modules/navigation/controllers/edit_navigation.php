@@ -35,66 +35,11 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 		#if($_POST)
 		#{
 			$db = new Database;
+					
 			
-		function rebuild_tree($local_parent, $left)
-		{
-		   // the right value of this node is the left value + 1
-		   $right = $left+1;
-
-		   // get all children of this node
-		   $result = mysql_query("SELECT id FROM navigation_items WHERE local_parent='$local_parent' ORDER BY position");
-								  
-		   while ($row = mysql_fetch_array($result))
-		   {
-			   // recursive execution of this function for each
-			   // child of this node
-			   // $right is the current right value, which is
-			   // incremented by the rebuild_tree function
-			   $right = rebuild_tree($row['id'], $right);
-		   }
-
-		   // we've got the left value, and now that we've processed
-		   // the children of this node we also know the right value
-		   mysql_query('UPDATE navigation_items SET lft='.$left.', rgt='.
-						$right.' WHERE id="'.$local_parent.'";');
-
-		   // return the right value of this node + 1
-		   return $right+1;
-		} 
 			echo rebuild_tree(1,1);
 
 
-
-/*			
-			# update right values
-			$query = "UPDATE navigation_items SET rgt=rgt+2 
-				WHERE parent_id = '$tool_id' 
-				AND fk_site = '$this->site_id' 
-				AND rgt > $right_value
-			;";	
-			$db->query($query);
-			
-			# Update left values
-			$query = "UPDATE navigation_items SET lft=lft+2 
-				WHERE parent_id = '$tool_id' 
-				AND fk_site = '$this->site_id' 
-				AND lft > $right_value
-			;";
-			$db->query($query);
-			
-			
-			# Add new item
-			$data = array(			
-				'parent_id'		=> $tool_id,
-				'fk_site'		=> $this->site_id,
-				'lft'			=> $right_value+1,
-				'rgt'			=> $right_value+2,
-				'display_name'	=> 'grapes',
-			);	
-			$db->insert('navigation_items', $data);
-			
-			
-*/
 			echo 'Link added'; #status message
 			die();
 			
@@ -105,6 +50,82 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 		#}
 		#die();		
 	}
+
+	function save_sort()
+	{
+		$output	= rtrim($_POST['output'], '#');
+		$links	= explode('#', $output);
+		$db		= new Database;	
+		
+		
+		# Get all items so we can delete items not sent.
+		$items = $db->query("SELECT id FROM navigation_items WHERE parent_id = '1' AND local_parent != '0'");
+	
+		$all_items = array();
+		foreach($items as $item)
+		{
+			$all_items[$item->id] = $item->id;
+		}		
+		# Get the parent table and get the root_id
+		$root_id = 1;
+		
+		
+		/* Trouble shoot
+		echo '<div style="font-size:1.4em; width:300px; height:300px">';
+		echo '<pre>';print_r($links);echo'</pre>';echo '</div>';die();
+		*/
+		
+
+	
+		# Data Format is : "id:local_parent:position"
+		foreach($links as $link)
+		{
+			$pieces 	= explode(':', $link);
+			$id			= $pieces['0'];
+			$parent		= $pieces['1'];
+			$position	= $pieces['2'];
+			
+			# If no parent, assign to root id
+			if( '0' == $parent ) $parent = 1;
+			
+			# if id = -1 this means its new.
+			if( '-1' != $id)
+			{
+				$data = array(
+					'local_parent'	=> $parent,
+					'position'		=> $position
+				);
+				
+				$db->update('navigation_items', $data, "id = '$id' AND fk_site = $this->site_id"); 	
+				
+			}
+			else
+			{
+				$data = array(
+					'parent_id'		=> 1,
+					'fk_site'		=> $this->site_id,
+					'display_name'	=> 'NEW',
+					'local_parent'	=> $parent,
+					'position'		=> $position
+				);
+				
+				$db->insert('navigation_items', $data); 	
+			}
+			unset($all_items[$id]);
+		}
+
+		$id_string = implode(',', $all_items);
+		$db->delete('navigation_items', "id IN ($id_string) AND fk_site = '$this->site_id'" ); 
+
+
+		#echo '<pre>';print_r($all_items);echo '</pre>';	die();
+		
+		echo Navigation::rebuild_tree($root_id, '1');
+		
+		echo 'Sort Order Saved!!<br>Updating...'; # status response	
+	}
+
+
 	
 /*
  * Edit single Item

@@ -1,21 +1,15 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 	/* 
-	 *  Ryboe Ajax Calendar
 	 *
-	 *    Version: 0.03
 	 *
-	 *  
-	 *  Author: Sean Sullivan
-	 *  Website: www.ryboe.com
-	 *  Copyright 2008 Sean Sullivan under the GNU GENERAL PUBLIC [GPL] LICENSE: http://www.gnu.org/licenses/gpl.txt
-	 *
-	 *  Copyright 2008 Dave Brondsema http://brondsema.net
+	 *    
+	 * 
 	*/
 class Navigation_Core {
 
 	# Takes an array of list items from navigation_items
 	# and displays a neat nested ul/li list.
-	function display_tree($items)
+	function display_tree($items, $show_root=TRUE)
 	{	  
 		$db = new Database;
 				
@@ -33,8 +27,15 @@ class Navigation_Core {
 		
 		
 		ob_start();
-		echo '<div class="navigation_wrapper">';
 		
+		echo '<ul>';
+			echo '<li id="draggable" class="new">Drag me</li>';
+		echo '</ul>';
+		
+		echo '<div class="navigation_wrapper">';
+		echo '<div class="buttons"><button id="link_save_sort" class="jade_positive">Save Changes</button></div>';
+		
+
 		# display each row
 		foreach ($items as $item) 
 		{
@@ -66,7 +67,15 @@ class Navigation_Core {
 				if( '1' != $q )
 				{
 					echo "</li>\n";
-					echo '  <li id="item_' . $item->id . '" class="position_'.++$position_array[$list_id].'" >' . $item->display_name;
+					echo '  <li rel="'. $item->id .'" id="id:' . $item->id . '"><span>' . $item->display_name . '</span>';
+				}
+				elseif( TRUE === $show_root )
+				{
+					echo '
+					<ul class="simpleTree">
+						<li class="root" id="1"><span>Navigation Root</span>
+						<br><a href="#" id="DEL">Delete Element</a> - <a href="#" id="ADD">Add Element</a>
+					';				
 				}
 			}			
 			else
@@ -84,8 +93,8 @@ class Navigation_Core {
 					{
 						++$list_id;
 						$position_array[$list_id] = 1;
-						echo "\n".'<ul id="list_' . ++$global_list_id . '" class="depth_'.count($right).' sortable">'."\n";						
-						echo '  <li id="item_' . $item->id . '" class="position_1" >' . $item->display_name;
+						echo "\n".'<ul id="list_' . ++$global_list_id . '">'."\n";						
+						echo '  <li rel="'. $item->id .'" id="id:' . $item->id . '"><span>' . $item->display_name . '</span>';
 					}
 					
 				}
@@ -98,7 +107,7 @@ class Navigation_Core {
 						--$list_id;;
 					}			
 					
-					echo '  <li id="item_' . $item->id . '" class="position_'.++$position_array[$list_id].'">' . $item->display_name;
+					echo '  <li rel="'. $item->id .'" id="id:' . $item->id . '"><span>' . $item->display_name . '</span>';
 
 				}
 			}
@@ -115,10 +124,46 @@ class Navigation_Core {
 			echo "</li></ul>\n";
 		}
 		
+		if( TRUE === $show_root )
+			echo '</li></ul>';
+	
 		echo '</div>';
 		return ob_get_clean();
 	} 		
+
+	# Rebuilds the tree anytime updates are made.
+	# Needed to renew the left and right values.
+	# $local_parent starts with root_id,
+	# $left starts with 1
 	
+	public function rebuild_tree($local_parent, $left)
+	{
+	   # the right value of this node is the left value + 1
+	   $right = $left+1;
 
+	   # get all children of this node
+	   $result = mysql_query("SELECT id FROM navigation_items 
+			WHERE local_parent='$local_parent' 
+			AND fk_site = '$this->site_id' ORDER BY position");
+							  
+	   while ($row = mysql_fetch_array($result))
+	   {
+		   # recursive execution of this function for each
+		   # child of this node
+		   # $right is the current right value, which is
+		   # incremented by the rebuild_tree function
+		   $right = Navigation::rebuild_tree($row['id'], $right);
+	   }
 
-} // End Calendar
+	   # we've got the left value, and now that we've processed
+	   # the children of this node we also know the right value
+	   mysql_query("UPDATE navigation_items 
+		SET lft='$left', rgt='$right' 
+		WHERE id='$local_parent' AND fk_site = '$this->site_id'");
+
+	   # return the right value of this node + 1
+	   return $right+1;
+	} 
+		
+
+} # End Calendar
