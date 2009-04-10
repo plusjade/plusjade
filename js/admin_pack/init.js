@@ -114,8 +114,8 @@ $(document).ready(function()
 		$("textarea.render_html").wysiwyg();
 		
 		// Focus for input fields
-		$("form input").focus(function(){
-			$("form input").removeClass("input_focus");
+		$("form input, form select").focus(function(){
+			$("form input, form select").removeClass("input_focus");
 			$(this).addClass("input_focus");
 		});
 	});

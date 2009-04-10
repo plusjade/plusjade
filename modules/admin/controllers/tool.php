@@ -52,25 +52,24 @@ class Tool_Controller extends Admin_View_Controller {
 		{
 			(int) $id = $_POST['tool'];
 			
-			# Get the tool name
+			# GET tool name
 			$tool = $db->query("SELECT name FROM tools_list WHERE id='$id' ")->current();
 			$table = strtolower($tool->name).'s';
-			
-			
+				
 			# INSERT row in tool parent table
 			$data = array(
 				'fk_site'	=> $this->site_id
 			);			
 			$tool_insert = $db->insert($table, $data);
 					
-			# GET max position			
+			# GET max position of tools on page			
 			$tools = $db->query("SELECT MAX(position) as highest FROM pages_tools WHERE page_id ='$page_id' ")->current();			
 			if( empty($tools->highest) ) 
 				$highest = 1;
 			else
 				$highest = $tools->highest; 
 			
-			# Create pages_tools row inserting tool parent id
+			# INSERT pages_tools row inserting tool parent id
 			$data = array(
 				'page_id'	=> $page_id,
 				'fk_site'	=> $this->site_id,
@@ -79,7 +78,9 @@ class Tool_Controller extends Admin_View_Controller {
 				'position'	=> ++$highest
 			);
 			$pages_tools_insert = $db->insert('pages_tools', $data);
-					
+			
+
+			Load_Tool::after_add($tool->name, $tool_insert->insert_id() );
 			echo 'Tool has been added!<br>Updating...';
 			die();
 		}	

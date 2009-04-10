@@ -150,11 +150,11 @@ abstract class Edit_Module_Controller extends Controller {
  */
 	function _show_add_single($module, $tool_id)
 	{
-		# TODO: get a max count??
 		$primary = new View("$module/edit/new_item");
 		$primary->tool_id = $tool_id;			
 		$this->template->primary = $primary;
-		$this->template->render(TRUE);
+		
+		return $this->template;
 	}
 
 
