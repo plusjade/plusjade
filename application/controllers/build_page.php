@@ -41,9 +41,10 @@ class Build_Page_Controller extends Template_Controller {
 		
 		if( $tools->count() > 0 )
 		{
-			$css_array				= array();
-			$prepend				= '';
-			$append					= '';
+			$css_array	= array();
+			$all_tools	= array();
+			$prepend	= '';
+			$append		= '';
 			
 			# If Logged in wrap classes around tools for Javascript
 			if( $this->client->logged_in() )
@@ -56,10 +57,13 @@ class Build_Page_Controller extends Template_Controller {
 			foreach ($tools as $tool)
 			{
 				# Create unique Tool array for CSS			
-				$css_array[$tool->name] = $tool->name;	
-
+				$css_array[$tool->name] = strtolower($tool->name);	
+				$all_tools[] = "$tool->tool.$tool->tool_id";
+				
+				
 				# Throw tool into admin panel array
 				$tools_array[$tool->position] = $tool->guid.'|'.$tool->name.'|'.$tool->tool_id;
+				
 						
 				# Create Tool object
 				$tool_object = Load_Tool::factory($tool->name);			
@@ -71,8 +75,10 @@ class Build_Page_Controller extends Template_Controller {
 			}
 			
 			# Load Public CSS For Tools
-			$css_string = implode('-', $css_array);
-			$this->template->linkCSS("css/tools/$this->site_name/$this->theme/$css_string");		
+			$css_string		= implode('-', $css_array);
+			$tool_string	= implode('-', $all_tools);
+			
+			$this->template->linkCSS("get/css/tools/$css_string/$tool_string");		
 			
 		}
 		else
