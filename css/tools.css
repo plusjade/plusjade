@@ -28,12 +28,12 @@ $tools	= explode('-', $tool);
 foreach($tools as $tool)
 {
 	$tool			= strtolower($tool);
-	$user_css		= "{$_SERVER[DOCUMENT_ROOT]}/data/$user/themes/$theme/modules/$tool/css.php";	
-	$user_images	= "http://{$_SERVER['HTTP_HOST']}/data/$user/themes/$theme/modules/$tool/";	
+	$user_css		= "$_SERVER['DOCUMENT_ROOT']/data/$user/themes/$theme/modules/$tool/css.php";	
+	$user_images	= "http://$_SERVER['HTTP_HOST']/data/$user/themes/$theme/modules/$tool/";	
 
-	$theme_tool_css	= "{$_SERVER[DOCUMENT_ROOT]}/application/views/$theme/$tool/css.php";
-	$stock_tool_css	= "{$_SERVER[DOCUMENT_ROOT]}/modules/$tool/views/$tool/css.php";
-	$stock_backend	= "{$_SERVER[DOCUMENT_ROOT]}/modules/$tool/views/$tool/edit/css.php";
+	$theme_tool_css	= "$_SERVER['DOCUMENT_ROOT']/application/views/$theme/$tool/css.php";
+	$stock_tool_css	= "$_SERVER['DOCUMENT_ROOT']/modules/$tool/views/$tool/css.php";
+	$stock_backend	= "$_SERVER['DOCUMENT_ROOT']/modules/$tool/views/$tool/edit/css.php";
 
 	#  Load user custom css if available.
 	if (file_exists($user_css))
