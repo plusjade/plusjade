@@ -7,36 +7,25 @@
 	*/
 class Navigation_Core {
 
-	# Takes an array of list items from navigation_items
-	# and displays a neat nested ul/li list.
-	function display_tree($items, $show_root=TRUE)
+	/* 
+	 * Takes an object of list items from navigation_items
+	 * and displays a neat nested ul/li list.
+	 *    
+	 * 
+	*/
+	function display_tree($items, $show_root=FALSE)
 	{	  
 		$db = new Database;
-				
 		# start with an empty $right stack
-		(array) $items;
 		$right		= array();	
+		# compare prev and current item nest positions
 		$compare	= array(0); 
-		$q			= 1;
-	
+		$q			= 1;	
 		# count how many unique ul lists there are
 		$global_list_id	= 0;
-		# used to track current list id element belongs to
-		$list_id	= 0;
-		$position_array = array(0);
-		
 		
 		ob_start();
-		
-		echo '<ul>';
-			echo '<li id="draggable" class="new">Drag me</li>';
-		echo '</ul>';
-		
-		echo '<div class="navigation_wrapper">';
-		echo '<div class="buttons"><button id="link_save_sort" class="jade_positive">Save Changes</button></div>';
-		
-
-		# display each row
+		# Display each row
 		foreach ($items as $item) 
 		{
 			# only check stack if there is one
@@ -51,31 +40,63 @@ class Navigation_Core {
 		
 			# these vars are used to compare level of new row to level of old row
 			#so that we can built the ul/li list appropropriately. 
-			$new		= $compare[$q]	= count($right);
-			$old		= $compare[$q-1];
+			$new	= $compare[$q]	= count($right);
+			$old	= $compare[$q-1];
 			
-
 			/*
 			 * Output the list entries.
 			 * Case 1: New level = Old level OR is root level.
 			 *		element is a sibling
 			 * Case 2: New Level != old level
 			 */
+			
+			if( TRUE === $show_root )
+			{
+				$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span>'; 
+			
+			}
+			else
+			{
+				$type = ( empty($item->type) ) ? 'none' : $item->type;
+	
+				switch($type)
+				{
+					case 'none':
+						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span>'; 
+					break;
+
+					case 'page':
+						
+						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="'. url::site($item->data) .'">' . $item->display_name . '</a></span>'; 
+				
+					break;
+					
+					case 'url':
+						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="http://'. $item->data .'">' . $item->display_name . '</a></span>'; 
+				
+					break;	
+					
+					case 'email':
+						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="mailto:'.$item->data.'">' . $item->display_name . '</a></span>'; 
+				
+					break;					
+				}
+		
+			}
+			
+
+			
 			if($new == $old)
 			{
 				# First element is a root holder so we don't echo it.
 				if( '1' != $q )
 				{
 					echo "</li>\n";
-					echo '  <li rel="'. $item->id .'" id="id:' . $item->id . '"><span>' . $item->display_name . '</span>';
+					echo $entry;
 				}
 				elseif( TRUE === $show_root )
 				{
-					echo '
-					<ul class="simpleTree">
-						<li class="root" id="1"><span>Navigation Root</span>
-						<br><a href="#" id="DEL">Delete Element</a> - <a href="#" id="ADD">Add Element</a>
-					';				
+					echo '<ul class="simpleTree">',"\n",'<li class="root" id="1"><span>Navigation Root</span>';				
 				}
 			}			
 			else
@@ -91,24 +112,21 @@ class Navigation_Core {
 				{		
 					for($x = $old ; $x < $new; $x++)
 					{
-						++$list_id;
-						$position_array[$list_id] = 1;
 						echo "\n".'<ul id="list_' . ++$global_list_id . '">'."\n";						
-						echo '  <li rel="'. $item->id .'" id="id:' . $item->id . '"><span>' . $item->display_name . '</span>';
+						echo $entry;
 					}
 					
 				}
-				elseif($new < $old)
+				else
 				{
 					echo "</li>\n";
+					
 					for($x = $new ; $x < $old; $x++)
 					{
 						echo "\n</ul></li>\n";
-						--$list_id;;
-					}			
+					}
 					
-					echo '  <li rel="'. $item->id .'" id="id:' . $item->id . '"><span>' . $item->display_name . '</span>';
-
+					echo $entry;
 				}
 			}
 						
@@ -117,17 +135,17 @@ class Navigation_Core {
 			++$q;
 		}	
 	
-		# Get level of last "new" row
+		# Get level of last "NEW" row
 		# add that many closing tags for that many levels back to root
 		for($x = 0; $x < $new; $x++)
 		{
 			echo "</li></ul>\n";
 		}
 		
+		# Close the root holder
 		if( TRUE === $show_root )
 			echo '</li></ul>';
 	
-		echo '</div>';
 		return ob_get_clean();
 	} 		
 

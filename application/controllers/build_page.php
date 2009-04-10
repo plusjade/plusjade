@@ -62,7 +62,7 @@ class Build_Page_Controller extends Template_Controller {
 				$tools_array[$tool->position] = $tool->guid.'|'.$tool->name.'|'.$tool->tool_id;
 						
 				# Create Tool object
-				$tool_object = Load_Module::factory($tool->name);			
+				$tool_object = Load_Tool::factory($tool->name);			
 								
 				# Render tool output to page view
 				$primary .= $prepend;
