@@ -8,7 +8,7 @@
 # The path starts at the $GIT_DIR and not '/'
 
 application/logs/*
-data/*
+#data/*
 _CLIENTS/*
 _RESOURCES/*
 application/config/database.php
