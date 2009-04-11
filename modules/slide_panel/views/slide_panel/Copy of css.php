@@ -36,8 +36,18 @@
 
 #slide_panel_links li a{
 	display:block;
-	padding:10px;
+	margin:10px 0;
+	font-size:1.2em;
+	font-weight:bold;
+	text-decoration:none;
+	color:#669b31;
+	background:#ffffcc;
+	border-bottom:1px dashed #7ebd40;
+	/* green: 7ebd40 ; */
+	padding:10px 5px;
 }
 
 #slide_panel_links a:hover{
+	color:#fff;
+	background:#7ebd40;
 }

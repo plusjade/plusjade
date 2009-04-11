@@ -1,8 +1,11 @@
 <?php
 header("Content-type: text/css");
-header('Expires: ' . date('r',time() + 864000));
 header("Pragma: public");
-header("Cache-Control: public");
+
+header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+#header('Expires: ' . date('r',time() + 864000));
+#header("Cache-Control: public");
 
 /* @import url("http:#yui.yahooapis.com/2.6.0/build/reset-fonts-grids/reset-fonts-grids.css");  */
 
@@ -35,7 +38,7 @@ foreach($generic_tools as $tool)
 	# Load backend css if logged in
 	# This might hurt the cache if pages don't change though ??
 	# Disable for now ...
-	#if(! empty($_SESSION['pAndA']) )
+	#if($logged_in)
 	#{
 		if (file_exists($stock_backend))
 		{
@@ -50,9 +53,12 @@ foreach($generic_tools as $tool)
 foreach($all_tools as $tool)
 {
 	$tool_ids	= explode('.', $tool);
-	$folder		= $tool_ids['0'];
-	$file		= $tool_ids['1'];
-	$user_css	= DOCROOT . "/data/$user/tool_css/$folder/$file.css";	
+	$name_id	= $tool_ids['0'];
+	$tool_id	= $tool_ids['1'];
+	$name 		= $tools_list[$name_id];
+	
+	
+	$user_css	= DOCROOT . "/data/$user/tools_css/$name/$tool_id.css";	
 	//$user_images	= url::site() . "data/$user/themes/$theme/modules/$tool/";	
 	
 	

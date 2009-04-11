@@ -33,8 +33,11 @@ class Page_Controller extends Admin_View_Controller {
 		$this->template->rootJS = $rootJS;
 				
 		# Grab all site menu/pages
-		$result = $db->query("SELECT * FROM menus WHERE fk_site = '{$this->site_id}' ORDER BY position");			
-		$primary->menu_items = $result;
+		$pages = $db->query("SELECT * FROM pages 
+			WHERE fk_site = '$this->site_id' 
+			ORDER BY position
+		");			
+		$primary->pages = $pages;
 		$this->template->primary = $primary;	
 		
 	}
@@ -48,43 +51,34 @@ class Page_Controller extends Admin_View_Controller {
 		{
 			#sanitize data 
 			$post = new Validation($_POST);			
-			$post->add_rules('display_name', 'required');
+			$post->add_rules('label', 'required');
 			
 			if($post->validate())
 			{
 				$db = new Database;
 				# Sanitize display/link names
-				if(!empty($_POST['display_name']))
+				if(! empty($_POST['label']) )
 				{
 					$page_name = trim($_POST['page_name']);
-					if(empty($page_name))
-						$page_name = $_POST['display_name'];
+					if( empty($page_name) )
+						$page_name = $_POST['label'];
 					
 					# Make URL friendly
 					$pattern = "(\W)";					
 					$page_name = preg_replace($pattern, '_', $page_name);
 				}
 
-				# Get highest position
-				$max = $db->query("SELECT MAX(position) as highest FROM menus WHERE fk_site = '{$this->site_id}' ")->current();			
+				# Get highest page position
+				$max = $db->query("SELECT MAX(position) as highest FROM pages WHERE fk_site = '$this->site_id' ")->current();			
 			
-				# add to pages table
+				# Add to pages table
 				$data = array(
 					'fk_site'	=> $this->site_id,
 					'page_name'	=> $page_name,
+					'label'		=> $_POST['label'],
+					'position'	=> ++$max->highest,
 				);
-				$query = $db->insert('pages', $data);
-				$pages_insert_id = $query->insert_id();
-				
-				# add to menus table
-				$data = array(
-					'fk_site'		=> $this->site_id,
-					'page_id'		=> $pages_insert_id,
-					'page_name'		=> $page_name,
-					'display_name'	=> $_POST['display_name'],
-					'position'		=> ++$max->highest
-				);
-				$db->insert('menus', $data);
+				$db->insert('pages', $data);
 
 				#status message
 				echo 'Page Created!!<br>Updating...';			
@@ -105,15 +99,10 @@ class Page_Controller extends Admin_View_Controller {
 # DELETE single page from pages table
 # Note: does not delete any tools owned by this page.
 
-	function delete($page_id=NULL, $menu_id=NULL)
+	function delete($page_id=NULL)
 	{
 		tool_ui::validate_id($page_id);
-		tool_ui::validate_id($menu_id);
-		$db = new Database;
-		
-		# Delete page and menu instance
-		$db->delete('menus', array('id' => $menu_id));
-		
+		$db = new Database;		
 		$data = array(
 			'id'		=> $page_id,
 			'fk_site'	=> $this->site_id,		
@@ -201,7 +190,7 @@ class Page_Controller extends Admin_View_Controller {
 	{
 		$db = new Database;
 		foreach($_GET['page'] as $position => $id)
-			$db->update('menus', array('position' => "$position"), "id = '$id'"); 	
+			$db->update('pages', array('position' => "$position"), "id = '$id'"); 	
 			
 		echo '<div class="center">Sort Order Saved!</div>'; # status response	
 		die();
@@ -212,17 +201,16 @@ class Page_Controller extends Admin_View_Controller {
 	function settings($page_id=NULL)
 	{
 		tool_ui::validate_id($page_id);
-		
 		$db = new Database;
 
-		if(! empty($_POST) )
+		if($_POST)
 		{
-			if( !empty($_POST['display_name']) )
+			if(! empty($_POST['label']) )
 			{
 				# Sanitize display/link names
 				$page_name = trim($_POST['page_name']);
-				if(empty($page_name))
-					$page_name = $_POST['display_name'];
+				if( empty($page_name) )
+					$page_name = $_POST['label'];
 				
 				# Make URL friendly
 				$pattern = "(\W)";					
@@ -233,25 +221,17 @@ class Page_Controller extends Admin_View_Controller {
 					'page_name'	=> $page_name,
 					'title'		=> $_POST['title'],
 					'meta'		=> $_POST['meta'],
-					'enable'	=> $_POST['page_enable'],
+					'label'		=> $_POST['label'],
+					'menu'		=> $_POST['menu'],
+					'enable'	=> $_POST['enable'],
 				);
 				$db->update('pages', $data, "id = '$page_id' AND fk_site = '$this->site_id' "); 			
 
-				# Update Menus
-				if($_POST['page_enable'] == 'no') $_POST['menu_enable'] = 'no';
-					
-				$data = array(
-					'page_name'		=> $page_name,
-					'display_name'	=> $_POST['display_name'],
-					'enable'		=> $_POST['menu_enable'],
-				);
-				$db->update('menus', $data, "id = {$_POST['id']} AND fk_site = '$this->site_id' ");	
-			
 				#status message
 				echo 'Changes Saved!<br>Updating...';
 			}
 			else
-				echo 'Display Name is required';	
+				echo 'Label is required';	
 		
 		
 			# Delete page and menu instance
@@ -270,18 +250,15 @@ class Page_Controller extends Admin_View_Controller {
 		}
 		else
 		{
-			# Grab page row
-			$page = $db->query("SELECT * FROM pages WHERE id = '$page_id' AND fk_site = '{$this->site_id}' ");		
+			# Grab the page row
+			$page = $db->query("SELECT * FROM pages WHERE id = '$page_id' AND fk_site = '$this->site_id' ")->current();		
 			
-			if( $page->count() > 0 )
+			if( is_object($page) )
 			{
 				$primary = new View("page/page_settings");	
-				$primary->page = $page->current();	
+				$primary->page = $page;	
 
-				# get Menu entry for this page
-				$result = $db->query("SELECT * FROM menus WHERE page_id = '$page_id'");			
-				$primary->menu = $result->current();
-				$primary->render(TRUE);
+				echo $primary;
 			}
 			else
 			{

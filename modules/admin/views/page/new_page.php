@@ -9,7 +9,7 @@
 	</div>	
 	
 	<div class="fieldsets huge">
-		<b>Name</b> <input type="text" name="display_name" value="" rel="text_req" size="25" maxlength="40">
+		<b>Name</b> <input type="text" name="label" value="" rel="text_req" size="25" maxlength="40">
 	</div>
 		
 	<div class="fieldsets huge">

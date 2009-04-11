@@ -1,10 +1,10 @@
 
-$("#email_form_wrapper").hide();
+$(".email_form_wrapper").hide();
 
 // Initialize Inline View
 //------------------------	
 $(".inline_form").click(function(){
-	$("#email_form_wrapper").slideToggle("slow");
+	$(".email_form_wrapper").slideToggle("slow");
 	return false;	
 });
 

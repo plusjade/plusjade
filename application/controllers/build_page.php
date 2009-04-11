@@ -6,6 +6,8 @@ class Build_Page_Controller extends Template_Controller {
 	 * Accepts a valid page w/ data from the db sent from build_page HOOK.
 	 * Queries for all tools on this page and displays them accordingly.
 	 * Proceeds to build the page.
+	 * Main output is simply the $primary variable containing all the tool views.
+	 * $primary gets injected into the shell
 	 */
 	function __construct()
 	{
@@ -41,10 +43,10 @@ class Build_Page_Controller extends Template_Controller {
 		
 		if( $tools->count() > 0 )
 		{
-			$css_array	= array();
-			$all_tools	= array();
-			$prepend	= '';
-			$append		= '';
+			$generic_tools	= array();
+			$all_tools		= array();
+			$prepend		= '';
+			$append			= '';
 			
 			# If Logged in wrap classes around tools for Javascript
 			if( $this->client->logged_in() )
@@ -57,13 +59,17 @@ class Build_Page_Controller extends Template_Controller {
 			foreach ($tools as $tool)
 			{
 				# Create unique Tool array for CSS			
-				$css_array[$tool->name] = strtolower($tool->name);	
+				$generic_tools[$tool->name] = strtolower($tool->name);	
 				$all_tools[] = "$tool->tool.$tool->tool_id";
-				
-				
+						
 				# Throw tool into admin panel array
-				$tools_array[$tool->position] = $tool->guid.'|'.$tool->name.'|'.$tool->tool_id;
-				
+				$tools_array[$tool->position] = array(
+					'guid'		=> $tool->guid,
+					'name'		=> strtolower($tool->name),
+					'name_id'	=> $tool->tool,
+					'tool_id'	=> $tool->tool_id,
+				);
+					
 						
 				# Create Tool object
 				$tool_object = Load_Tool::factory($tool->name);			
@@ -75,10 +81,10 @@ class Build_Page_Controller extends Template_Controller {
 			}
 			
 			# Load Public CSS For Tools
-			$css_string		= implode('-', $css_array);
-			$tool_string	= implode('-', $all_tools);
+			$generic_tools	= implode('-', $generic_tools);
+			$all_tools		= implode('-', $all_tools);
 			
-			$this->template->linkCSS("get/css/tools/$css_string/$tool_string");		
+			$this->template->linkCSS("get/css/tools/$generic_tools/$all_tools");		
 			
 		}
 		else

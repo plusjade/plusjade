@@ -46,23 +46,21 @@ if (empty($tools_array))
 						 * THIS IS HIDDEN: Only here so JS can grab html.
 						 * $tool_array = guid|tool_name|tool_id
 						 * Notes:
-						 * GUID			is for pages_tools table
-						 * TOOL_NAME	defines the tool table (plural) ex: album(s)
-						 * TOOL_ID		gets the tool from the tool table
+						 * guid			is for pages_tools table
+						 * name			defines the tool table (plural) ex: album(s)
+						 * name_id		tools_list id of the tool
+						 * tool_id		gets the tool from the tool table
 						 */
 						$position = 0;
-						foreach($tools_array as $db_position => $name_id)
-						{
-							$pieces		= explode('|', $name_id);			
-							$tool_guid	= $pieces['0'];
-							$tool		= strtolower($pieces['1']);			
-							$tool_id	= $pieces['2'];
-							
-							echo '<li id="toolkit_'.++$position.'">';
-								echo '<a href="/get/tool/delete/' . $tool_guid . '" class="jade_delete_tool">delete!</a>';
-								echo '<span class="name">'. ucwords($tool) .'</span>';					
+						foreach($tools_array as $db_position => $data_array)
+						{									
+							echo '<li id="toolkit_' , ++$position , '">';
+								echo '<a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool">delete!</a>';
+								
+								echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
 								echo '<ul>';
-									echo View::factory("$tool/edit/toolbar", array('identifer' => $tool_id) );
+									echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
+									echo '<li><a href="/get/edit_', $data_array['name']  ,'/css/' , $data_array['tool_id'] , '" rel="facebox">CSS</a></li>';
 									
 								echo '</ul>';
 							echo '</li>';

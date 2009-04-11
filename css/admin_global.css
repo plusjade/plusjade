@@ -173,6 +173,7 @@ header("Cache-Control: public");
 
 /* Admin Javascript Prepended Tool Toolbar */
 .jade_toolbar_wrapper{
+	clear:both;
 	font-size:12px !important;
 	font-family: verdana !important;
 	height:20px;
@@ -252,6 +253,12 @@ header("Cache-Control: public");
 .facebox #generic_sortable_list .not_enabled table{
 	background:#eee;
 	border:1px solid #ccc;	
+}
+.facebox #generic_sortable_list .no_menu table{
+	background:#eee;
+}
+.facebox #generic_sortable_list .no_access table{
+	background:#ffcccc;
 }
 .facebox #generic_sortable_list li table td.right{
 	text-align:right;

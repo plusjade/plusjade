@@ -8,22 +8,25 @@
 
 <div id="common_tool_info">
 	Load pages for editing by clicking on the page name link.
+	<br><b style="color:#ccc">Gray</b> links are accessible but not on the menu.
+	<br><b style="color:red">Red</b> links are not publicly accessible.
 </div>
 
 <ul id="generic_sortable_list" class="ui-tabs-nav">
 	<?php
 	# setup the page list.
-	foreach($menu_items as $item)
+	foreach($pages as $page)
 	{
 		$class='';
-		if($item->enable == 'no') $class = 'class="not_enabled"';
+		if($page->menu == 'no') $class = 'class="no_menu"';
+		if($page->enable == 'no') $class = 'class="no_access"';
 		?>
-		<li id="page_<?php echo $item->id?>" <?php echo $class?>>
+		<li id="page_<?php echo $page->id?>" <?php echo $class?>>
 			<table id="menu_page_list"><tr>
 				<td width="80px" class="drag_box"><img src="/images/arrow.png" alt="handle" class="handle"></td>
-				<td width="30px" class="aligncenter"><?php echo $item->position?>. </td>
-				<td class="page_edit"><a href="<?php echo url::site($item->page_name)?>"><?php echo $item->display_name?> - <small><?php echo url::site($item->page_name)?></small></a></td>
-				<td class="alignright" width="50px"><a href="/get/page/delete/<?php echo $item->page_id .'/'.$item->id?>" class="delete_page" id="<?php echo $item->id?>">delete</a></td>
+				<td width="30px" class="aligncenter"><?php echo $page->position?>. </td>
+				<td class="page_edit"><a href="<?php echo url::site($page->page_name)?>"><?php echo $page->label?> - <small><?php echo url::site($page->page_name)?></small></a></td>
+				<td class="alignright" width="50px"><a href="/get/page/delete/<?php echo $page->id?>" class="delete_page" id="<?php echo $page->id?>">delete</a></td>
 			</tr></table>
 		</li>		
 		<?php

@@ -6,7 +6,9 @@ abstract class Template_Controller extends Controller {
 	public function __construct()
 	{
 		parent::__construct();
-
+		
+		#$this->profiler = new Profiler;	
+		
 		# Load Template
 		$this->template = new View("shell");	
 		
