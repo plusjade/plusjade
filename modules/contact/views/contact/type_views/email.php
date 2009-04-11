@@ -1,6 +1,6 @@
 <?php $value = '<a href="mailto:'.$contact->value.'">'.$contact->value.'</a>';?>
 
-<div id="email_form_link">
+<div class="email_form_link">
 	<a href="#email_form" class="inline_form">Send Email Via Form</a>
 </div>
 	

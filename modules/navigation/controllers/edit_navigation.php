@@ -283,6 +283,29 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 
 	}
 
+	public function css($tool_id=NULL)
+	{
+		tool_ui::validate_id($tool_id);
+
+		# Overwrite old file with new file contents;
+		if($_POST)
+		{
+			echo Css::save_contents('navigation', $tool_id, $_POST['contents'] );
+		}
+		else
+		{
+			$primary = new View('css/edit_single');
+
+			$primary->contents	= Css::get_contents('navigation', $tool_id);
+			$primary->tool_id	= $tool_id;
+			$primary->tool_name	= 'navigation';
+			
+			echo $primary;
+		
+		}		
+		die();
+	}
+	
 }
 
 /* -- end of application/controllers/showroom.php -- */

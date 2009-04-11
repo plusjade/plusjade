@@ -18,8 +18,14 @@ else
 		So custom menus can be implemented safely.	
 	*/
 	
-	$db			= new Database;	
-	$menus		= $db->query("SELECT page_name, display_name FROM menus WHERE fk_site = '$this->site_id' AND enable != 'no' ORDER BY position");
+	$db		= new Database;	
+	$menus	= $db->query("SELECT page_name, label FROM pages 
+		WHERE fk_site = '$this->site_id' 
+		AND menu = 'yes' 
+		AND enable = 'yes'
+		ORDER BY position
+	");
+	
 	$pieces		= explode('/', $_SERVER['REQUEST_URI']);
 	$selected	= 'home';
 	
@@ -29,14 +35,12 @@ else
 	echo '<ul>';
 		foreach( $menus as $menu )
 		{
-			$name = $menu->page_name;		
-			if( $menu->display_name != '' )
-				$name = $menu->display_name;
-								
+			$name = ( $menu->label == '' ) ? $menu->page_name : $menu->label;
+			
 			if( $menu->page_name == $selected )
-				echo '<li><a href="'.url::site("$menu->page_name").'" class="selected">'.ucwords($name)."</a></li>\n";
+				echo '<li><a href="' , url::site("$menu->page_name") , '" class="selected">' , $name , "</a></li>\n";
 			else
-				echo '<li><a href="'.url::site("$menu->page_name").'">'.ucwords($name)."</a></li>\n";
+				echo '<li><a href="' , url::site("$menu->page_name") , '">' , $name , "</a></li>\n";
 		}
 	echo '</ul>';
 }

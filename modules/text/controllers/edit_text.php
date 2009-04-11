@@ -192,6 +192,29 @@ class Edit_Text_Controller extends Edit_Module_Controller {
 
 		
 	}
+
+	public function css($tool_id=NULL)
+	{
+		tool_ui::validate_id($tool_id);
+
+		# Overwrite old file with new file contents;
+		if($_POST)
+		{
+			echo Css::save_contents('text', $tool_id, $_POST['contents'] );
+		}
+		else
+		{
+			$primary = new View('css/edit_single');
+
+			$primary->contents	= Css::get_contents('text', $tool_id);
+			$primary->tool_id	= $tool_id;
+			$primary->tool_name	= 'text';
+			
+			echo $primary;
+		
+		}		
+		die();
+	}
 	
 }
 

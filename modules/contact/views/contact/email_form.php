@@ -1,5 +1,5 @@
 
-<div id="email_form_wrapper">
+<div class="email_form_wrapper">
 	<?php echo form::open("contact/email_form", array('class'=> 'public_ajaxForm'))?>
 		<table>
 		<tr><th colspan="2">Email Us Directly with this Handy Form.</th></tr>

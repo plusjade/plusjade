@@ -167,7 +167,28 @@ class Edit_Contact_Controller extends Edit_Module_Controller {
 		die();	
 	}
 	
+	public function css($tool_id=NULL)
+	{
+		tool_ui::validate_id($tool_id);
 
+		# Overwrite old file with new file contents;
+		if($_POST)
+		{
+			echo Css::save_contents('contact', $tool_id, $_POST['contents'] );
+		}
+		else
+		{
+			$primary = new View('css/edit_single');
+
+			$primary->contents	= Css::get_contents('contact', $tool_id);
+			$primary->tool_id	= $tool_id;
+			$primary->tool_name	= 'contact';
+			
+			echo $primary;
+		
+		}		
+		die();
+	}
 }
 
 /* -- end of application/controllers/contact.php -- */
