@@ -39,7 +39,7 @@ if (empty($tools_array))
 		</tr></table>		
 
 			<ul id="cssdropdown" style="display:none">
-					<?php
+					<?php						
 					if( count($tools_array) > 0 )
 					{
 						/*
@@ -51,10 +51,9 @@ if (empty($tools_array))
 						 * name_id		tools_list id of the tool
 						 * tool_id		gets the tool from the tool table
 						 */
-						$position = 0;
 						foreach($tools_array as $db_position => $data_array)
 						{									
-							echo '<li id="toolkit_' , ++$position , '">';
+							echo '<li id="toolkit_' , $data_array['guid'] , '">';
 								echo '<a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool">delete!</a>';
 								
 								echo '<span class="name">', ucwords($data_array['name']) , '</span>';					

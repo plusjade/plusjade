@@ -13,33 +13,34 @@
 	<?php
 	if(! empty($admin_panel) ) echo view::factory('admin/admin_panel');
 	
-	$banner		= View::factory("_global/header");
+	$header		= View::factory("_global/header");
 	$menu		= View::factory("_global/menu");
-	$content	= $primary;
-	$footer		= View::factory("_global/footer");
-
+	
+	if( empty($footer) ) $footer = '';
+	if( empty($secondary) ) $secondary = '';
+	
 	if ( file_exists("{$custom_include}global/master.html") )
 		$master = file_get_contents("{$custom_include}global/master.html");	
 	else
-		$master = file_get_contents(APPPATH."/views/$theme_name/global/master.html");
+		$master = file_get_contents(APPPATH."views/$theme_name/global/master.html");
 
 	$keys = array(
-		'%BANNER%',
+		'%HEADER%',
 		'%MENU%',
-		'%CONTENT%',
+		'%PRIMARY%',
+		'%SECONDARY%',
 		'%FOOTER%'
 	);
 	$replacements = array(
-		$banner,
+		$header,
 		$menu,
-		$content,
+		$primary,
+		$secondary,
 		$footer
 	);
 	
-	$master = str_replace($keys, $replacements , $master);
-	
-	echo $master;	
-		
+	echo str_replace($keys, $replacements , $master);
+			
 	?>
 	<script type="text/javascript"> 
 	  //<![CDATA[

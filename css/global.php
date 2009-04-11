@@ -9,58 +9,50 @@ header("Cache-Control: public");
 if(!empty($_SERVER['PATH_INFO']))
 {
 	$pieces	= explode('/', $_SERVER['PATH_INFO']);
-	$user	= $pieces[1];
-	$theme	= $pieces[2];		
+	$user	= $pieces['1'];
+	$theme	= $pieces['2'];		
 }
 else
 {
 	$user	= $_GET['u'];
 	$theme	= $_GET['t'];
 }
-	
+
 $user_css = "{$_SERVER[DOCUMENT_ROOT]}/data/{$user}/themes/{$theme}/global";	
 $root_css = "{$_SERVER[DOCUMENT_ROOT]}/application/views/{$theme}/global";
 
 # IMAGES: must have absolute paths to user directory
-$user_images = "http://{$_SERVER['HTTP_HOST']}/data/{$user}/themes/{$theme}/global/images/";
-$root_images = "http://{$_SERVER['HTTP_HOST']}/application/views/{$theme}/global/images/";
+$user_images = "/data/{$user}/themes/$theme/global/images";
+$root_images = "/application/views/$theme/global/images";
 
-/* TODO: CHANGE THIS !!!! */ 
-#-----------------------------------------
-# load user custom global css if available
-if (file_exists("$user_css/css_values.php"))
-{
-	$image_path = $user_images;
-	include_once("{$user_css}/css_values.php");
-}
-else
-{
-	$image_path = $root_images;
-	include_once("$root_css/css_values.php");	
-}
 
-# loop through the custom fields to set background vars
-foreach($background as $key => $var)
-{
-	if(strstr($var, '.'))
-		$background[$key] = "background:url('{$image_path}{$var}') repeat left 1px";
-	else
-		$background[$key] = "background:{$var}";
-}		
-	
 # load custom global root css if available
 # else load global root css from theme
+#ob_start();
 
 if ( file_exists("$user_css/global.css") )
-	echo readfile("$user_css/global.css");		
+{
+	$global = file_get_contents("$user_css/global.css");
+}	
+elseif( file_exists("$root_css/global.css") )
+{
+	$global = file_get_contents("$root_css/global.css");
+}
 else
-	echo readfile("$root_css/global.css");	
+	die();
 
-
+	# !NOTE: Decide whether to clone all assets into client data folder
+	$keys = '%PATH%';
+	$replacements = $root_images;
+	
+	echo str_replace($keys, $replacements , $global);
+	
 	
 # load static_helpers.css
 $static_helpers = "{$_SERVER[DOCUMENT_ROOT]}/application/views/_global/static_helpers.css";
+ob_start();
+	readfile($static_helpers);
+echo ob_get_clean();
 
-echo readfile($static_helpers);
-
+die();
 /* end of css/global.css */	

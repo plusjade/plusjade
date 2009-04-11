@@ -16,8 +16,9 @@ $(document).ready(function()
 	// -----------------------------------
 	 $(".common_tool_wrapper").each(function(i){
 		++i;
-		var toolkit = $("#toolkit_"+ i).html();
-		var toolbar = "<div id=\"toolbar_identifer_" + i  + "\" class=\"jade_toolbar_wrapper\">" + toolkit + "</div>";
+		var guid = this.id;
+		var toolkit = $("#toolkit_" + guid).html();
+		var toolbar = "<div id=\"toolbar_identifer_" + guid  + "\" class=\"jade_toolbar_wrapper\">" + toolkit + "</div>";
 		$(this).prepend(toolbar);
 	 });
 

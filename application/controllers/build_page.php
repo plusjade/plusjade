@@ -17,12 +17,14 @@ class Build_Page_Controller extends Template_Controller {
 	# Data = page table row data in array format
 	function _index($data)
 	{
+		$_SESSION['js_files']	= array();
+		$tools_array	= array();
 		$db				= new Database;
 		$page_id		= $data['id'];
-		$tools_array			= array();
-		$_SESSION['js_files']	= array();
 		$primary		= '';
-			
+		$secondary		= '';	
+		$footer			= '';
+		
 		# Load assets from pages table
 		$this->template->title 	= $data['title'];
 		$this->template->meta_tags('description', $data['meta']);
@@ -31,12 +33,14 @@ class Build_Page_Controller extends Template_Controller {
 			
 		# Grab tools for this page ORDER by position
 		# searches "pages_tools" for matching page_id
+		# NEW grab tools that belong on ALL pages (page_id = 0)
 		$tools = $db->query("SELECT * 
 			FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
-			WHERE page_id = '$page_id'
+			WHERE page_id IN ('0', '2', '$page_id')
 			AND fk_site = '$this->site_id'
-			ORDER BY position");
+			ORDER BY position
+		");
 
 		# Load Admin CSS and Javascript (if logged in)
 		$admin_mode = $this->_load_admin();
@@ -48,36 +52,49 @@ class Build_Page_Controller extends Template_Controller {
 			$prepend		= '';
 			$append			= '';
 			
-			# If Logged in wrap classes around tools for Javascript
-			if( $this->client->logged_in() )
-			{
-				$prepend	= '<span class="common_tool_wrapper">';
-				$append		= '</span>';
-			}
-			
+		
 			# Loop through all tools on page
 			foreach ($tools as $tool)
 			{
-				# Create unique Tool array for CSS			
+				(int) $tool->page_id;
+				
+				# If Logged in wrap classes around tools for Javascript
+				# TODO: consider this with javascript
+				if( $this->client->logged_in() )
+				{
+					$prepend	= '<span id="' . $tool->guid . '" class="common_tool_wrapper">';
+					$append		= '</span>';
+				}
+				
+				# Create unique Tool array for CSS	
+				# TODO: elminate generic tools, dont need it.
 				$generic_tools[$tool->name] = strtolower($tool->name);	
 				$all_tools[] = "$tool->tool.$tool->tool_id";
 						
 				# Throw tool into admin panel array
-				$tools_array[$tool->position] = array(
+				$tools_array[$tool->guid] = array(
 					'guid'		=> $tool->guid,
 					'name'		=> strtolower($tool->name),
 					'name_id'	=> $tool->tool,
 					'tool_id'	=> $tool->tool_id,
 				);
-					
-						
+									
 				# Create Tool object
-				$tool_object = Load_Tool::factory($tool->name);			
-								
-				# Render tool output to page view
-				$primary .= $prepend;
-				$primary .= $tool_object->_index($tool->tool_id);
-				$primary .= $append;
+				$tool_object = Load_Tool::factory($tool->name);
+				
+				# Render tool output to page view				
+				switch($tool->page_id)
+				{
+					case '0':
+						$footer .= $prepend . $tool_object->_index($tool->tool_id) . $append;					
+					break;					
+					case '2':
+						$secondary .= $prepend . $tool_object->_index($tool->tool_id) . $append;				
+					break;
+					default:
+						$primary .= $prepend . $tool_object->_index($tool->tool_id) . $append;			
+					break;
+				}				
 			}
 			
 			# Load Public CSS For Tools
@@ -89,14 +106,13 @@ class Build_Page_Controller extends Template_Controller {
 		}
 		else
 		{
-			$primary .= '<div style="text-align:center">This page is blank</div>';
+			$primary .= '<div class="aligncenter">This page is blank</div>';
 		}		
 
 		# Drop Tool array into admin Panel if logged in
 		if($admin_mode)
 			$this->template->set_global('tools_array', $tools_array);			
-
-				
+	
 		# Load Javascript files if they exist.
 		if (! empty($_SESSION['js_files']) AND is_array($_SESSION['js_files']) )
 		{
@@ -122,9 +138,11 @@ class Build_Page_Controller extends Template_Controller {
 		}
 		# Renew Javascript file requests
 		unset($_SESSION['js_files']);		
-			
-		# Render the view
-		$this->template->primary = $primary;
+		
+		# Send to view (shell)
+		$this->template->primary	= $primary;
+		$this->template->secondary	= $secondary;
+		$this->template->footer		= $footer;
 		
 		# needed to hide 404 not found on controller name
 		Event::clear('system.404');
