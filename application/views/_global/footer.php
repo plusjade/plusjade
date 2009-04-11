@@ -1,5 +1,4 @@
 <?php
 
-$navigation = new Navigation_Controller();
-
-echo $navigation->_index('4');
+#$navigation = new Navigation_Controller();
+#echo $navigation->_index('4');
