@@ -122,21 +122,50 @@ class Page_Controller extends Admin_View_Controller {
 	{
 		tool_ui::validate_id($page_id);		
 		$db = new Database;
-	
-		if(! empty($_GET['tool']) )
+
+		$containers = array(
+			'1'	=> 'Container 1',
+			'2'	=> 'Container 2',
+			'3'	=> 'Container 3',
+			'4'	=> 'Container 4',
+			'5'	=> 'Container 5',
+		);
+		
+		if($_POST)
 		{	
-			echo '<PRE>';print_r($_GET);echo '</PRE>';
-			die();		
-			foreach($_GET['tool'] as $position => $tool_guid)
-			{
-				# Update the positions
-				$data = array(
-					'position'	=> $position+1,
-				);
-				$db->update('pages_tools', $data, "guid = '$tool_guid' AND fk_site = '$this->site_id'");						
-			}
+			#echo '<PRE>';print_r($_POST);echo '</PRE>'; die();
+			#hash format: "scope.guid.container.position"
+			$output = rtrim($_POST['output'], '#');	
+			$output = explode('#', $output);
 			
-			echo 'Order Updated!';
+			if(! empty($output['0']) )
+			{
+				foreach($output as $hash)
+				{
+					$pieces		= explode('.', $hash);
+					$scope		= $pieces['0'];
+					$guid		= $pieces['1'];
+					$container	= $pieces['2'];
+					$position	= $pieces['3'];
+					
+					# Update the rows
+					$data['position']	= $position;
+					
+					$data['page_id']	= $page_id;
+					$data['container']	= $container;	
+					if( 'global' == $scope )
+					{
+						$data['page_id']	= $container;
+						$data['container']	= $container;
+					}
+					
+					$db->update('pages_tools', $data, "guid = '$guid' AND fk_site = '$this->site_id'");								
+				}	
+				echo 'Order Updated!';
+			}
+			else
+				echo 'No Tools Sent...';
+			
 			die();
 		}
 		else
@@ -149,31 +178,57 @@ class Page_Controller extends Admin_View_Controller {
 			#Grab tools on this page
 			$tools = $db->query("SELECT * FROM pages_tools 
 				JOIN tools_list ON pages_tools.tool = tools_list.id
-				WHERE page_id IN ('0','1', '2', '$page_id')
+				WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
+				AND fk_site = '$this->site_id'
 				ORDER BY container, position
 			");			
 			$primary->page_id	= $page_id;
 			$primary->tools		= $tools;
+			$primary->containers	= $containers;
 
 			$embed_js ='
 			  // Make Sortable
-				$("#generic_sortable_list").sortable({ axis : "y" });
-				
-				var url = $("#custom_ajaxForm").attr("action");
-						
-				$("#custom_ajaxForm").submit(function(){
-					var order = $("#generic_sortable_list").sortable("serialize");
-
-					var options = {
-						url: url+"?"+order,
-						success:	function(data) { 
-										$.facebox(data, "ajax_status", "facebox_")
-										//setTimeout(function(){location.reload();},1000);
-									}					
-					};				
-					$(this).ajaxSubmit(options);				
-					return false;
+				$(".sortable").sortable({
+					axis : "y",
+					connectWith: ".sortable",
+					placeholder: "placeholder",
+					forcePlaceholderSize: true
 				});
+			
+			$(".scope_global").click(function(){
+				$(this).parents("li").removeClass().addClass("global");
+			});
+			$(".scope_local").click(function(){
+				$(this).parents("li").removeClass().addClass("local");
+			});	
+			
+			var output = "";
+				
+			$(".facebox #link_save_sort").click(function(){
+				page_id = $(this).attr("rel");
+				
+				$(".sortable").each(function(){
+					var container = this.id;
+					var kids = $(this).children("li");
+					
+					$(kids).each(function(i){
+						var scope = $(this).attr("class");
+						output += scope + "." + this.id + "." + container + "." + i + "#";
+					});
+				});
+				//alert(output); return false;					
+				
+				
+				$.facebox(function() {
+						$.post("/get/page/tools/"+page_id, {output: output}, function(data){
+							$.facebox(data, "ajax_status", "facebox_response");
+							//location.reload();
+						})
+					}, 
+					"ajax_status", 
+					"facebox_response"
+				);
+			});		
 			';
 			
 			$embed_js .= tool_ui::js_delete_init('tool');
