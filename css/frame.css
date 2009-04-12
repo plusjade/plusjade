@@ -1,15 +1,8 @@
-<?php
-header("Content-type: text/css");
-header('Expires: ' . date('r',time() + 864000));
-header("Pragma: public");
-header("Cache-Control: public");
 
 /* Base page css for generic inline frame
  * ex: module edit windows loaded as iframe
  */
  
-?>
-
 html {
 	font-size: 80%;
 	<?=$background['html'];?>;
