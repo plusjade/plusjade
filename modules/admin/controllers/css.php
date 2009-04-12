@@ -40,11 +40,12 @@ class Css_Controller extends Controller {
 		foreach ($all_tools as $tool)
 		{
 			$pieces		= explode('.', $tool);
-			$name_id	= $pieces['0'];
-			$name 		= strtolower($tools_list[$name_id]);
+			$name_id	= (int) $pieces['0'];
+			$tool_id	= (! empty($pieces['1']) ) ? (int)$pieces['1'] : '0';
+			$name 		= (! empty($tools_list[$name_id]) ) ? strtolower($tools_list[$name_id]) : '0';
 	
 			$unique_tools[$name_id]	= $name;
-			$all_tool_instances[]	= $name . '.' . $pieces['1'];
+			$all_tool_instances[]	= $name . '.' . $tool_id;
 		}		
 		
 		$primary->unique_tools	= $unique_tools;
@@ -57,12 +58,9 @@ class Css_Controller extends Controller {
 
 	function edit($id_pair=NULL)
 	{
-		$id_pair	= explode('.', $id_pair);
-		$name_id	= $id_pair['0'];
-		$tool_id	= $id_pair['1'];
-		
-		tool_ui::validate_id($name_id);
-		tool_ui::validate_id($tool_id);
+		$id_pair	= explode('.', $id_pair);		
+		$name_id	= tool_ui::validate_id($id_pair['0']);
+		$tool_id	= tool_ui::validate_id($id_pair['1']);
 		
 		$css_file_path = DOCROOT."/data/$this->site_name/tools_css";
 			

@@ -125,15 +125,15 @@ class Page_Controller extends Admin_View_Controller {
 	
 		if(! empty($_GET['tool']) )
 		{	
-			#echo '<PRE>';print_r($_GET);echo '</PRE>';
-			#die();		
+			echo '<PRE>';print_r($_GET);echo '</PRE>';
+			die();		
 			foreach($_GET['tool'] as $position => $tool_guid)
 			{
 				# Update the positions
 				$data = array(
 					'position'	=> $position+1,
 				);
-				$db->update('pages_tools', $data, "guid = '$tool_guid' AND page_id = '$page_id'");						
+				$db->update('pages_tools', $data, "guid = '$tool_guid' AND fk_site = '$this->site_id'");						
 			}
 			
 			echo 'Order Updated!';
@@ -149,9 +149,11 @@ class Page_Controller extends Admin_View_Controller {
 			#Grab tools on this page
 			$tools = $db->query("SELECT * FROM pages_tools 
 				JOIN tools_list ON pages_tools.tool = tools_list.id
-				WHERE page_id = '$page_id' ORDER BY position ");			
-			$primary->page_id = $page_id;
-			$primary->tools = $tools;
+				WHERE page_id IN ('0','1', '2', '$page_id')
+				ORDER BY container, position
+			");			
+			$primary->page_id	= $page_id;
+			$primary->tools		= $tools;
 
 			$embed_js ='
 			  // Make Sortable
@@ -166,7 +168,7 @@ class Page_Controller extends Admin_View_Controller {
 						url: url+"?"+order,
 						success:	function(data) { 
 										$.facebox(data, "ajax_status", "facebox_")
-										setTimeout(function(){location.reload();},1000);
+										//setTimeout(function(){location.reload();},1000);
 									}					
 					};				
 					$(this).ajaxSubmit(options);				

@@ -64,7 +64,13 @@ foreach($all_tools as $tool)
 	if ( file_exists($css_path) )
 		readfile($css_path);
 }
-
-	echo ob_get_clean();
+	
+	$image_path = "/application/views/$theme/global/images";
+	
+	$contents =  ob_get_clean();
+	$keys = '%PATH%';
+	$replacements = $image_path;
+	
+	echo str_replace($keys, $replacements , $contents);
 	
 /*  end of tool.css*/
