@@ -9,8 +9,10 @@
 
 .htaccess
 .gitignore
+index.php
 application/logs/*
+application/hooks/*
+application/config/database.php
 #data/*
 _CLIENTS/*
 _RESOURCES/*
-application/config/database.php

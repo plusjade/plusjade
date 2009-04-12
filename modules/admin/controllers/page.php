@@ -134,32 +134,26 @@ class Page_Controller extends Admin_View_Controller {
 		if($_POST)
 		{	
 			#echo '<PRE>';print_r($_POST);echo '</PRE>'; die();
-			#hash format: "scope.guid.container.position"
 			$output = rtrim($_POST['output'], '#');	
 			$output = explode('#', $output);
 			
 			if(! empty($output['0']) )
 			{
+				# hash format "scope.guid.container.position"
 				foreach($output as $hash)
 				{
-					$pieces		= explode('.', $hash);
-					$scope		= $pieces['0'];
-					$guid		= $pieces['1'];
-					$container	= $pieces['2'];
-					$position	= $pieces['3'];
+					$pieces	= explode('.', $hash);
 					
 					# Update the rows
-					$data['position']	= $position;
-					
+					$data['position']	= $pieces['3'];			
 					$data['page_id']	= $page_id;
-					$data['container']	= $container;	
-					if( 'global' == $scope )
+					$data['container']	= $pieces['2'];	
+					if( 'global' == $pieces['0'] )
 					{
-						$data['page_id']	= $container;
-						$data['container']	= $container;
+						$data['page_id']	= $pieces['2'];
+						$data['container']	= $pieces['2'];
 					}
-					
-					$db->update('pages_tools', $data, "guid = '$guid' AND fk_site = '$this->site_id'");								
+					$db->update('pages_tools', $data, "guid = '{$pieces['1']}' AND fk_site = '$this->site_id'");								
 				}	
 				echo 'Order Updated!';
 			}
@@ -182,28 +176,33 @@ class Page_Controller extends Admin_View_Controller {
 				AND fk_site = '$this->site_id'
 				ORDER BY container, position
 			");			
-			$primary->page_id	= $page_id;
-			$primary->tools		= $tools;
+			$primary->page_id		= $page_id;
+			$primary->tools			= $tools;
 			$primary->containers	= $containers;
 
 			$embed_js ='
-			  // Make Sortable
-				$(".sortable").sortable({
-					axis : "y",
-					connectWith: ".sortable",
-					placeholder: "placeholder",
-					forcePlaceholderSize: true
-				});
-			
-			$(".scope_global").click(function(){
-				$(this).parents("li").removeClass().addClass("global");
+			// Make Sortable
+			$(".sortable").sortable({
+				axis : "y",
+				connectWith: ".sortable",
+				placeholder: "placeholder",
+				forcePlaceholderSize: true
 			});
-			$(".scope_local").click(function(){
-				$(this).parents("li").removeClass().addClass("local");
-			});	
-			
-			var output = "";
-				
+						
+			$(".facebox #page_tools").click($.delegate({
+				".toggle_scope": function(e){
+					var new_scope = $(e.target).attr("rel");	
+					var toggle = "local";
+					if("local" == new_scope) toggle = "global";
+					var new_link = "<a href=\"#\" class=\"toggle_scope\" rel=\"" + toggle + "\">Make " + toggle + "</a>";
+					
+					$(e.target).parents("li").removeClass().addClass(new_scope);
+					$(e.target).replaceWith(new_link);
+					return false;				
+				}
+			}));
+									
+			var output = "";	
 			$(".facebox #link_save_sort").click(function(){
 				page_id = $(this).attr("rel");
 				
@@ -217,12 +216,11 @@ class Page_Controller extends Admin_View_Controller {
 					});
 				});
 				//alert(output); return false;					
-				
-				
+							
 				$.facebox(function() {
 						$.post("/get/page/tools/"+page_id, {output: output}, function(data){
 							$.facebox(data, "ajax_status", "facebox_response");
-							//location.reload();
+							location.reload();
 						})
 					}, 
 					"ajax_status", 

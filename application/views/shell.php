@@ -18,7 +18,7 @@
 	
 	# Required for all controllers passing with primary...
 	# TODO: update this ...
-	if( empty($primary) ) $primary = $containers['1'];
+	if( empty($containers['1']) ) $containers['1'] = $primary;
 	
 	ob_start();
 	

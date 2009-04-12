@@ -1,9 +1,3 @@
-<?php
-header("Content-type: text/css");
-header('Expires: ' . date('r',time() + 864000));
-header("Pragma: public");
-header("Cache-Control: public");
-?>
 /*
  * All administrative views load except inline page toolbars 
  * IN THE FACEBOX, so limit to facebox
@@ -233,17 +227,17 @@ header("Cache-Control: public");
 
 	/* sortable link menu lists  */
 	
-.facebox #generic_sortable_list{
+.facebox #generic_sortable_list, .generic_sortable_list {
 	clear:both;
 	padding:10px;
 }
-.facebox #generic_sortable_list li{
+.facebox #generic_sortable_list li, .generic_sortable_list li{
 	margin:0;
 	padding:0;
 	margin-bottom:5px;
 	clear:both;
 }
-.facebox #generic_sortable_list li table {
+.facebox #generic_sortable_list li table, .generic_sortable_list li table {
 	width:100%;
 	background:#e3eff3;
 	margin:0;
@@ -266,7 +260,7 @@ header("Cache-Control: public");
 .facebox #generic_sortable_list li table img.handle {
 	cursor: move;
 }
-.facebox #generic_sortable_list li a{
+.facebox #generic_sortable_list li a, .generic_sortable_list li a{
 	display:block;
 	color:#333;
 	padding:5px;
@@ -658,13 +652,41 @@ button.jade_positive, .buttons a.jade_positive{
 
 /* page/tools (reorder tools panel) */
 #page_tools ul, #page_tools select{
-
+	min-height:40px;
+	padding:5px;
+	background:#ffffcc;
+	border:1px solid orange;
+	margin-bottom:10px;
+}
+#page_tools ul li{
+	margin-bottom:5px;
 }
 #page_tools ul li div{
-	padding:10px;
-	background:#e3eff3;
+	padding:5px;
 	cursor:move;
 }
+.change_page{
+	float:right;
+	font-size:0.8em
+}
+#page_tools .placeholder{
+	height:40px;
+	background:#fff;
+	border:1px solid lightblue;
+}
+#page_tools ul li.global div{
+	background:orange;
+	color:white;
+	border:1px solid red;
+}
+#page_tools ul li.global div a{
+	color:white;
+}
+	
+#page_tools ul li.local div{
+	background:#e3eff3;
+	border:1px solid lightblue;
+}	
 
 	/*  --- theme_panel.php --- */ 
 #theme_global_wrapper{

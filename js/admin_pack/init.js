@@ -106,7 +106,7 @@ $(document).ready(function()
 				},
 				success: function(data) {
 					$.facebox(data, "ajax_status", "facebox_2");
-					window.setTimeout("location.reload()",2000);							
+					location.reload();							
 				}					
 			};
 		$(".ajaxForm").ajaxForm(options);

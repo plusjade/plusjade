@@ -1,11 +1,3 @@
-<?php
-header("Content-type: text/css");
-header('Expires: ' . date('r',time() + 864000));
-header("Pragma: public");
-header("Cache-Control: public");
-?>
-
-
 /* --- input fields --- */
 /* these are used in root auth page as well */
 
