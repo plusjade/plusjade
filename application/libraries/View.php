@@ -378,16 +378,21 @@ class View_Core {
  *	
  *
  */	
-	public function linkCSS($href, $var = 'load_css') 
+	public function linkCSS($href, $path=FALSE, $var = 'load_css') 
 	{
 		if (!isset($this->$var))  
 			$this->$var = "<!-- @{$var} -->\n\t";
+		
+		$url = 'http://' . ROOTDOMAIN.'/';
+		
+		if ( FALSE !== $path )
+			$url = $path;
 			
 		if (is_array($href)) 
 			foreach ($href as $value)
-				$this->$var .= '<link type="text/css" rel="stylesheet" href="http://'.ROOTDOMAIN.'/'.$value.'" media="screen" />'."\n\t";
+				$this->$var .= '<link type="text/css" rel="stylesheet" href="' . $url . $value . '" media="screen" />'."\n\t";
 		else
-			$this->$var .= '<link type="text/css" rel="stylesheet" href="http://'.ROOTDOMAIN.'/'.$href.'" media="screen" />'."\n\t";
+			$this->$var .= '<link type="text/css" rel="stylesheet" href="' . $url . $href . '" media="screen" />'."\n\t";
 	}
 	
 /*
