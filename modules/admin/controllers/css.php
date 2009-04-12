@@ -17,15 +17,18 @@ class Css_Controller extends Controller {
  * Build the css for the tools on the page
  * $generic_tools = The different tools on the page (non-repeats)
  * $all_tools = every tool on the page
+ * (string) $all_tools = "5.5" = "tools_list_id.tool_id"
  */
-	function tools($generic_tools=NULL, $all_tools=NULL)
+	function tools($all_tools=NULL)
 	{
 		$primary		= new View('css/tools');
 		$db				= New Database;
-		$generic_tools	= explode('-', $generic_tools);
+
 		$all_tools		= explode('-', $all_tools);
 		$tools			= $db->query('SELECT * FROM tools_list');		
 		$tools_list 	= array();
+		$unique_tools	= array();
+		$all_tool_instances = array();
 		
 		# Build assoc array for all tools
 		foreach ($tools as $tool)
@@ -33,20 +36,20 @@ class Css_Controller extends Controller {
 			$tools_list[$tool->id] = $tool->name;
 		}
 		
-		$primary->generic_tools	= $generic_tools;
-		$primary->all_tools		= $all_tools;
-		$primary->tools_list	= $tools_list;
-
+		# get all unique tools
+		foreach ($all_tools as $tool)
+		{
+			$pieces		= explode('.', $tool);
+			$name_id	= $pieces['0'];
+			$name 		= strtolower($tools_list[$name_id]);
+	
+			$unique_tools[$name_id]	= $name;
+			$all_tool_instances[]	= $name . '.' . $pieces['1'];
+		}		
 		
-		# Check if client is logged in.
-		/* DOESNT WORK
-		if(!$this->client->logged_in())
-			$logged_in = 'no';
-		else
-			$logged_in = 'yes';
-			
-		$primary->logged_in = $logged_in;
-		*/
+		$primary->unique_tools	= $unique_tools;
+		$primary->all_tools		= $all_tool_instances;
+
 		echo $primary;
 		die();
 		
