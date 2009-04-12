@@ -1,34 +1,57 @@
 
-<?php echo form::open("page/tools/$page_id", array('id' => 'custom_ajaxForm') )?>
+<div id="common_tool_header" class="buttons">
+	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $page_id?>">
+		<img src="/images/check.png" alt=""/> Save Tool Order
+	</button>
+	<div id="common_title">Sort Tools</div>
+</div>	
 
-	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="update_page" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Tool Order
-		</button>
-		<div id="common_title">Sort Tools</div>
-	</div>	
-	
-	<div id="page_tools">
-		<ul id="generic_sortable_list" class="ui-tabs-nav">	
-			<?php
-			$position = 1;
-			$holder = array('');
-			foreach($tools as $tool)
+<div id="page_tools">
+		<?php		
+		$position		= 1;
+		$containers_array = array('','','','','','');
+
+function _create_element($guid, $name, $position, $scope)
+{
+	return '<li id="'. $guid .'" class="' . $scope . '" rel="' . $scope . '"><div>'
+			. '<span class="change_page"><a href="#" class="scope_local">This Page</a> ... <a href="#" class="scope_global">Globalize</a> ... <a href="/get/tool/move/' . $guid . '" rel="facebox">change page</a></span>'
+			. $position . '. ' . $name . '</div></li>';	
+}		
+		# Loop through tools on this page
+		foreach($tools as $tool)
+		{	
+			$index = $tool->container;
+			$scope = 'local';
+			# if this is a global tool...
+			if('5' >= $tool->page_id )
 			{
-				$holder[$position] = $tool->container;
-				
-				if ( $tool->container != $holder[$position-1])
-					echo 'Container '. $tool->container;
-					
-				echo '<li id="tool_'. $tool->guid .'">';
-				echo '<div>';
-				echo '<a href="/get/tool/move/' . $tool->guid . '" rel="facebox" id="secondary" style="float:right;font-size:0.8em">change page</a>';
-				echo ++$position.'. '.$tool->name;
-				echo '</div>';
-				echo '</li>';
-			}
-		?>
-		</ul>
-	</div>
-</form>
+				$index = $tool->page_id;
+				$scope = 'global';
+			}	
+			$containers_array[$index] .= _create_element($tool->guid, $tool->name, ++$position, $scope);		
+		}
+
+		# display the output
+		
+		$counter = 100;
+		foreach($containers as $key => $name)
+		{
+			echo $name;
+			echo '<ul id="'.$key.'" class="sortable ui-tabs-nav">'."\n";
+			echo $containers_array[$key];
+			echo '</ul>';
+		}
+		
+		/*
+		foreach($statics as $key => $name)
+		{
+			echo $name;
+			echo '<ul id="'.$key.'" class="sortable ui-tabs-nav">'."\n";
+			echo $static_tools[$key];
+			echo '</ul>';
+		}
+		*/
+	?>
+	</ul>
+</div>
 
