@@ -16,32 +16,36 @@
 	$header	= View::factory("_global/header");
 	$menu	= View::factory("_global/menu");
 	
-	if( empty($footer) ) $footer = '';
-	if( empty($secondary) ) $secondary = '';
-
+	# Required for all controllers passing with primary...
+	# TODO: update this ...
+	if( empty($primary) ) $primary = $containers['1'];
+	
 	ob_start();
+	
 	if ( file_exists("{$custom_include}global/master.html") )
 		readfile("{$custom_include}global/master.html");	
 	else
 		readfile(APPPATH."views/$theme_name/global/master.html");
 
 	$master = ob_get_clean();
-	
+
 	$keys = array(
 		'%HEADER%',
 		'%MENU%',
-		'%PRIMARY%',
-		'%SECONDARY%',
-		'%FOOTER%'
 	);
 	$replacements = array(
 		$header,
 		$menu,
-		$primary,
-		$secondary,
-		$footer
 	);
 	
+	# 5 containers
+	foreach($containers as $key => $content)
+	{
+		array_push($keys, "%CONTAINER_$key%");
+		array_push($replacements, $content);
+	}
+	
+	# TODO: Look into compression for this ...
 	echo str_replace($keys, $replacements , $master);
 			
 	?>
