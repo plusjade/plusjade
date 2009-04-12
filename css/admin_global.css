@@ -658,9 +658,9 @@ button.jade_positive, .buttons a.jade_positive{
 
 /* page/tools (reorder tools panel) */
 #page_tools ul, #page_tools select{
-	font-size:1.3em;
+
 }
-#page_tools ul li{
+#page_tools ul li div{
 	padding:10px;
 	background:#e3eff3;
 	cursor:move;

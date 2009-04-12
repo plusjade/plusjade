@@ -3,19 +3,19 @@
 class Css_Core {
 
 	/*
-	 * Dynamically loads a tool object instance
-	 * Used on /application/controllers/build_page.php
+	 * 
+	 *
 	 *
 	 */
 	function get_contents($tool_name, $tool_id)
 	{
-		$dir_path	= DOCROOT."/data/$this->site_name/tools_css/$tool_name";
+		$dir_path	= DOCROOT."data/$this->site_name/tools_css/$tool_name";
 		$file_path	= "$dir_path/$tool_id.css";		
 				
 		if(! file_exists($file_path) )
 		{
 			if(! is_dir($dir_path) )
-				mkdir($dir_path);
+				mkdir("$dir_path");
 			
 			$source = MODPATH . "$tool_name/views/$tool_name/custom.css";
 			if( file_exists($source) )

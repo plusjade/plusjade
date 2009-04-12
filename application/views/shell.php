@@ -13,17 +13,20 @@
 	<?php
 	if(! empty($admin_panel) ) echo view::factory('admin/admin_panel');
 	
-	$header		= View::factory("_global/header");
-	$menu		= View::factory("_global/menu");
+	$header	= View::factory("_global/header");
+	$menu	= View::factory("_global/menu");
 	
 	if( empty($footer) ) $footer = '';
 	if( empty($secondary) ) $secondary = '';
-	
-	if ( file_exists("{$custom_include}global/master.html") )
-		$master = file_get_contents("{$custom_include}global/master.html");	
-	else
-		$master = file_get_contents(APPPATH."views/$theme_name/global/master.html");
 
+	ob_start();
+	if ( file_exists("{$custom_include}global/master.html") )
+		readfile("{$custom_include}global/master.html");	
+	else
+		readfile(APPPATH."views/$theme_name/global/master.html");
+
+	$master = ob_get_clean();
+	
 	$keys = array(
 		'%HEADER%',
 		'%MENU%',
@@ -51,11 +54,15 @@
 	  //]]>
 	</script> 
 	<?php
+	# It is bad to open 2 buffers, fix this
+	ob_start();
 	$tracker_path = DOCROOT."data/$site_name/tracker.html";	
 	if ( file_exists("$tracker_path") )
-		echo readfile("$tracker_path");
-	
-		#<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>	
+		readfile("$tracker_path");
+		
+	echo ob_get_clean();
+		
+	#<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>	
 	?>
 </body>
 </html>

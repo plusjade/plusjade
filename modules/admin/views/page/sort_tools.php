@@ -11,12 +11,20 @@
 	<div id="page_tools">
 		<ul id="generic_sortable_list" class="ui-tabs-nav">	
 			<?php
-			$position = 0;
+			$position = 1;
+			$holder = array('');
 			foreach($tools as $tool)
 			{
+				$holder[$position] = $tool->container;
+				
+				if ( $tool->container != $holder[$position-1])
+					echo 'Container '. $tool->container;
+					
 				echo '<li id="tool_'. $tool->guid .'">';
-				echo '<a href="/get/tool/move/' . $tool->guid . '" rel="facebox" id="secondary" style="float:right;font-size:0.8em">move to another page</a>';
+				echo '<div>';
+				echo '<a href="/get/tool/move/' . $tool->guid . '" rel="facebox" id="secondary" style="float:right;font-size:0.8em">change page</a>';
 				echo ++$position.'. '.$tool->name;
+				echo '</div>';
 				echo '</li>';
 			}
 		?>

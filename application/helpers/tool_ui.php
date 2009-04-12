@@ -19,7 +19,7 @@ class tool_ui_Core {
 			die();
 		}
 		
-		return TRUE;
+		return $id;
 	}	
 	
 

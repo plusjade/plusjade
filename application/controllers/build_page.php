@@ -2,19 +2,19 @@
 class Build_Page_Controller extends Template_Controller {
 
 	/*
-	 * Every live client page is rendered via this controller.
+	 * Renders live client pages.
 	 * Accepts a valid page w/ data from the db sent from build_page HOOK.
-	 * Queries for all tools on this page and displays them accordingly.
+	 * Grabs all tools associated with this page, places them correctly.
 	 * Proceeds to build the page.
-	 * Main output is simply the $primary variable containing all the tool views.
-	 * $primary gets injected into the shell
+	 * Output to "shell" via in template controller 
+	 *
 	 */
 	function __construct()
 	{
 		parent::__construct();
 	}
   
-	# Data = page table row data in array format
+	# Data = (array) page table row data
 	function _index($data)
 	{
 		$_SESSION['js_files']	= array();
@@ -30,16 +30,21 @@ class Build_Page_Controller extends Template_Controller {
 		$this->template->meta_tags('description', $data['meta']);
 		$this->template->set_global('selected', $data['page_name']);	
 		$this->template->set_global('page_id', $page_id);
-			
-		# Grab tools for this page ORDER by position
-		# searches "pages_tools" for matching page_id
-		# NEW grab tools that belong on ALL pages (page_id = 0)
+		
+		/*
+		 * Grab tools for this page in pages_tools table
+		 * Grab static and secondary pages defined below:
+		 * 0 = footer static
+		 * 1 = primary static
+		 * 2 = secondary static
+		 *
+		 */		 
 		$tools = $db->query("SELECT * 
 			FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
-			WHERE page_id IN ('0', '2', '$page_id')
+			WHERE page_id IN ('0','1', '2', '$page_id')
 			AND fk_site = '$this->site_id'
-			ORDER BY position
+			ORDER BY container, position
 		");
 
 		# Load Admin CSS and Javascript (if logged in)
@@ -80,19 +85,36 @@ class Build_Page_Controller extends Template_Controller {
 				);
 									
 				# Create Tool object
-				$tool_object = Load_Tool::factory($tool->name);
-				
-				# Render tool output to page view				
+				$tool_object = $prepend;				
+				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
+				$tool_object .= $append;
+
+				# Add tools to correct container.				
 				switch($tool->page_id)
 				{
 					case '0':
-						$footer .= $prepend . $tool_object->_index($tool->tool_id) . $append;					
-					break;					
-					case '2':
-						$secondary .= $prepend . $tool_object->_index($tool->tool_id) . $append;				
+						$footer .= $tool_object;					
 					break;
-					default:
-						$primary .= $prepend . $tool_object->_index($tool->tool_id) . $append;			
+					
+					case '1':
+						$primary .= $tool_object;			
+					break;					
+					
+					case '2':
+						$secondary .= $tool_object;				
+					break;
+					
+					default:			
+						switch($tool->container)
+						{
+							case '1':
+								$primary .= $tool_object;		
+							break;
+							
+							case '2':
+								$secondary .= $tool_object;			
+							break;					
+						}
 					break;
 				}				
 			}
@@ -101,7 +123,7 @@ class Build_Page_Controller extends Template_Controller {
 			$generic_tools	= implode('-', $generic_tools);
 			$all_tools		= implode('-', $all_tools);
 			
-			$this->template->linkCSS("get/css/tools/$generic_tools/$all_tools");		
+			$this->template->linkCSS("get/css/tools/$all_tools", url::site() );		
 			
 		}
 		else

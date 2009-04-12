@@ -1,0 +1,68 @@
+	/*  --- Main Wrapper --- */
+	
+#contact_wrapper_1{
+
+}
+
+#contact_wrapper_1 table.contact_table td span.contact_name{
+
+	font-weight:bold;
+	font-size:1.2em;
+}
+
+#contact_wrapper_1 table.contact_table td .contact_value{
+	font-size:1.2em;
+	line-height:1.2em;
+	border-bottom:1px dashed #ccc;
+}	
+
+/* --- map  --- */
+
+
+
+/* --- email --- */
+
+#contact_wrapper_1 .email_form_link{
+
+}
+#contact_wrapper_1 .email_form_link a{
+display:block;
+border:1px solid orange;
+background:#ffffcc;
+padding:10px;
+}	
+#contact_wrapper_1 .email_form_link a:hover{
+	color:#fff;
+	background:#333;
+}
+
+	/*  --- email form --- */	
+	
+#contact_wrapper_1 .email_form_wrapper{
+
+}
+#contact_wrapper_1 .email_form_wrapper table{
+	background:#fff;
+	border:1px solid #eee;
+	border-top:0;
+}
+#contact_wrapper_1 .email_form_wrapper table th{	
+	background:#e2f4ff;
+	font-size:1.2em;
+}
+#contact_wrapper_1  .email_form_wrapper table td{
+
+}
+#contact_wrapper_1  .email_form_wrapper div{
+}
+#contact_wrapper_1  .email_form_wrapper b{
+	font-size:1.2em;
+	color:blue;
+}
+#contact_wrapper_1  .email_form_wrapper input{
+	font-size:1.2em;
+}
+#contact_wrapper_1  .email_form_wrapper textarea{
+	font-size:1.2em;
+	height:180px !important;
+}
