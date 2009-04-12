@@ -94,7 +94,7 @@ class Navigation_Core {
 					echo "</li>\n";
 					echo $entry;
 				}
-				elseif( TRUE === $show_root )
+				elseif( TRUE === $show_root)
 				{
 					echo '<ul class="simpleTree">',"\n",'<li class="root" id="1"><span>Navigation Root</span>';				
 				}
