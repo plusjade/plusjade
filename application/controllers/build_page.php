@@ -34,15 +34,15 @@ class Build_Page_Controller extends Template_Controller {
 		/*
 		 * Grab tools for this page in pages_tools table
 		 * Grab static and secondary pages defined below:
-		 * 0 = footer static
-		 * 1 = primary static
-		 * 2 = secondary static
+		 * 0-10 are reserved for global tools
+		 * we only use 1-5 though
+		 * 
 		 *
 		 */		 
 		$tools = $db->query("SELECT * 
 			FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
-			WHERE page_id IN ('0','1', '2', '$page_id')
+			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
 			AND fk_site = '$this->site_id'
 			ORDER BY container, position
 		");
@@ -54,9 +54,11 @@ class Build_Page_Controller extends Template_Controller {
 		{
 			$generic_tools	= array();
 			$all_tools		= array();
+			
+			# initalize 5 containers
+			$containers_array = array('','','','','');
 			$prepend		= '';
 			$append			= '';
-			
 		
 			# Loop through all tools on page
 			foreach ($tools as $tool)
@@ -72,8 +74,6 @@ class Build_Page_Controller extends Template_Controller {
 				}
 				
 				# Create unique Tool array for CSS	
-				# TODO: elminate generic tools, dont need it.
-				$generic_tools[$tool->name] = strtolower($tool->name);	
 				$all_tools[] = "$tool->tool.$tool->tool_id";
 						
 				# Throw tool into admin panel array
@@ -88,35 +88,14 @@ class Build_Page_Controller extends Template_Controller {
 				$tool_object = $prepend;				
 				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
 				$tool_object .= $append;
-
+				
 				# Add tools to correct container.				
-				switch($tool->page_id)
-				{
-					case '0':
-						$footer .= $tool_object;					
-					break;
+				$index = $tool->container;
+				# if this is a global tool...
+				if('5' >= $tool->page_id )
+					$index = $tool->page_id;
 					
-					case '1':
-						$primary .= $tool_object;			
-					break;					
-					
-					case '2':
-						$secondary .= $tool_object;				
-					break;
-					
-					default:			
-						switch($tool->container)
-						{
-							case '1':
-								$primary .= $tool_object;		
-							break;
-							
-							case '2':
-								$secondary .= $tool_object;			
-							break;					
-						}
-					break;
-				}				
+				$containers_array[$index] .= $tool_object;		
 			}
 			
 			# Load Public CSS For Tools
@@ -128,7 +107,7 @@ class Build_Page_Controller extends Template_Controller {
 		}
 		else
 		{
-			$primary .= '<div class="aligncenter">This page is blank</div>';
+			$containers_array['1'] .= '<div class="aligncenter">This page is empty</div>';
 		}		
 
 		# Drop Tool array into admin Panel if logged in
@@ -161,10 +140,11 @@ class Build_Page_Controller extends Template_Controller {
 		# Renew Javascript file requests
 		unset($_SESSION['js_files']);		
 		
-		# Send to view (shell)
-		$this->template->primary	= $primary;
-		$this->template->secondary	= $secondary;
-		$this->template->footer		= $footer;
+			
+		# Send the containers to the view (shell)
+		$this->template->containers = $containers_array;			
+		
+		#echo '<PRE>';print_r($containers_array);echo '</PRE>'; die();
 		
 		# needed to hide 404 not found on controller name
 		Event::clear('system.404');
