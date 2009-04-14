@@ -1,3 +1,3 @@
-<li><a href="/get/edit_album/manage/<?php echo $identifer?>" rel="facebox">Manage Images</a></li>
-<li><a href="/get/edit_album/add/<?php echo $identifer?>" rel="facebox">Add images</a></li>
-<li><a href="/get/edit_album/settings/<?php echo $identifer?>" rel="facebox">Settings</a></li>
+<li><a href="/get/edit_album/manage/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/manage.png" class="imgfacebox" alt="add"> Manage</a></li>
+<li><a href="/get/edit_album/add/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/add.png" class="imgfacebox" alt="add"> Add Items</a></li>
+<li><a href="/get/edit_album/settings/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/wrench.png" class="imgfacebox" alt="settings"> Settings</a></li>

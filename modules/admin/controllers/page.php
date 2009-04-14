@@ -61,7 +61,7 @@ class Page_Controller extends Admin_View_Controller {
 				{
 					$page_name = trim($_POST['page_name']);
 					if( empty($page_name) )
-						$page_name = $_POST['label'];
+						$page_name = strtolower($_POST['label']);
 					
 					# Make URL friendly
 					$pattern = "(\W)";					

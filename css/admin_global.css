@@ -7,8 +7,8 @@
  */
 	/* ------------ reset base styles  ------------*/
 .facebox {
-	font-size: 80% !important;
-	font-family:verdana, arial !important;
+	font-size: 12px !important;
+	font-family:verdana, arial, "sans serif" !important;
 	color:#333 !important;
 }	
 /*
@@ -22,10 +22,10 @@
 .facebox h4,
 .facebox h5,
 .facebox h6{
-		font-size:1em !important; 
-		padding:0 !important; 
-		margin:0 !important; 
-		margin-bottom:10px !important;
+	font-size:1em !important; 
+	padding:0 !important; 
+	margin:0 !important; 
+	margin-bottom:10px !important;
 	}
 .facebox h1{font-size:1.6em !important; color:#0c7ced !important;}
 .facebox h2{font-size:1.4em !important; color:#7c78d3 !important;}
@@ -177,7 +177,6 @@
 	clear:both;
 	font-size:12px !important;
 	font-family: verdana !important;
-	height:20px;
 	background: #d52020 url(/images/admin/red_bg.png) repeat-x bottom left;
 	padding:5px 10px;
 	margin-bottom:7px;
@@ -187,25 +186,32 @@
 	float:right;
 }
 .jade_toolbar_wrapper span.name{
+	float:left;
 	color:white;
 	font-size:1.2em;
 	font-weight:bold;
+	margin-right:3%;
 }
 .jade_toolbar_wrapper ul{
-	display:inline;
-	list-style:none;	
+	list-style:none;
+	margin:0;
+	padding:0;
 }
 .jade_toolbar_wrapper ul li{
-		display:inline;
-		margin-right:15px;
+	display:inline;
+	margin-right:3%;
 }
 .jade_toolbar_wrapper a{
-	ackground:transparent !important;
 	color:#fff !important;
+	text-decoration:none;
 }
 .jade_toolbar_wrapper a:hover{
 	color:black !important;
 }
+.jade_toolbar_wrapper a span{
+	ext-decoration:underline;
+}
+
 
 	/* Tool Item toolbar */	
 	.jade_admin_item_edit{
@@ -820,6 +826,7 @@ button.jade_positive, .buttons a.jade_positive{
 	padding:10px 0;
 	padding-left:20px;
 }
+
 
 
 /* tool/manage view*/

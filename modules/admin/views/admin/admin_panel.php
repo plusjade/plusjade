@@ -54,12 +54,11 @@ if (empty($tools_array))
 						foreach($tools_array as $db_position => $data_array)
 						{									
 							echo '<li id="toolkit_' , $data_array['guid'] , '">';
-								echo '<a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool">delete!</a>';
-								
+								echo '<a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool"><img src="/images/admin/delete.png" alt="delete!"> <span>delete</span></a>';		
 								echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
 								echo '<ul>';
 									echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
-									echo '<li><a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">CSS</a></li>';
+									echo '<li><a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox"><img src="/images/admin/css_add.png" alt="CSS"> Edit CSS</a></li>';
 									
 								echo '</ul>';
 							echo '</li>';

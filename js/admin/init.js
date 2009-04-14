@@ -20,8 +20,18 @@ $(document).ready(function()
 		var toolkit = $("#toolkit_" + guid).html();
 		var toolbar = "<div id=\"toolbar_identifer_" + guid  + "\" class=\"jade_toolbar_wrapper\">" + toolkit + "</div>";
 		$(this).prepend(toolbar);
+	
 	 });
-
+	// break the list if the width is too small
+	 $(".jade_toolbar_wrapper").each(function(i){
+		++i;
+		var guid = this.id;
+		var width = $(this).width();	
+		if(width<300) $("ul", this).css("clear","both");		
+		else $(this).css("height","20px");
+	
+	 });
+	 
 	 
 	// Add PER ITEM TOOLKIT to ITEMS
 	// -----------------------------------
@@ -47,17 +57,28 @@ $(document).ready(function()
 	
 		// facebox links
 		"a[rel*=facebox]": function(e){
-			// loads in "base" unless otherwise noted via id
-			var pane = "base";
-			if(e.target.id) var pane = "2";
-			
+			var pane = "base"; // loads in "base" unless otherwise noted via id
+			if(e.target.id) var pane = "2";			
 			$.facebox(function(){
 					$.get(e.target.href, function(data){
 						$.facebox(data, false, "facebox_"+pane);
 					});
 			}, false, "facebox_"+pane);
 			return false;
-		},	
+		},
+		
+		// img facebox links
+		".imgfacebox": function(e){
+			var pane = "base"; 	// loads in "base" unless otherwise noted via id
+			var href = $(e.target).parent().attr("href");
+			if(e.target.id) var pane = "2";		
+			$.facebox(function(){
+					$.get(href, function(data){
+						$.facebox(data, false, "facebox_"+pane);
+					});
+			}, false, "facebox_"+pane);
+			return false;
+		},
 		
 		// delete an item link		
 		"a.jade_delete_item": function(e) {
@@ -69,8 +90,8 @@ $(document).ready(function()
 		},
 		
 		// delete a tool link	
-		"a.jade_delete_tool": function(e) {
-			url = $(e.target).attr("href");
+		"a.jade_delete_tool img, a.jade_delete_tool span": function(e) {
+			url = $(e.target).parent().attr("href");
 			var data = "<div class=\"buttons confirm_facebox\">This will delete this entire tool.<br>All content will be lost forever!<br><br><a href=\"/#\" class=\"cancel_delete\"><img src='/images/admin/asterisk_yellow.png'>Cancel</a><br><br><br><a href=\"" + url +"\"  class=\"jade_confirm_delete_common jade_negative\"><img src='/images/admin/cross.png'>Delete Tool</a></div>";	
 			$.facebox(data, "confirm_facebox", "confirm_dialog");
 			return false;		

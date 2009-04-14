@@ -18,17 +18,17 @@ class Build_Page_Controller extends Template_Controller {
 	function _index($data)
 	{
 		$_SESSION['js_files']	= array();
-		$tools_array	= array();
 		$db				= new Database;
 		$page_id		= $data['id'];
 		$primary		= '';
-		$secondary		= '';	
-		$footer			= '';
 		# initalize 5 containers
-		$containers_array = array('','','','','');		
+		$containers_array = array(' ',' ',' ',' ',' ');		
+		$tools_array	= array();
+		$generic_tools	= array();
+		$all_tools		= array();		
 		$prepend		= '';
 		$append			= '';
-			
+		
 		# Load assets from pages table
 		$this->template->title 	= $data['title'];
 		$this->template->meta_tags('description', $data['meta']);
@@ -38,10 +38,8 @@ class Build_Page_Controller extends Template_Controller {
 		/*
 		 * Grab tools for this page in pages_tools table
 		 * Grab static and secondary pages defined below:
-		 * 0-10 are reserved for global tools
-		 * we only use 1-5 though
+		 * 0-10 are reserved for global tools. we only use 1-5 though
 		 * 
-		 *
 		 */		 
 		$tools = $db->query("SELECT * 
 			FROM pages_tools 
@@ -55,10 +53,7 @@ class Build_Page_Controller extends Template_Controller {
 		$admin_mode = $this->_load_admin();
 		
 		if( $tools->count() > 0 )
-		{
-			$generic_tools	= array();
-			$all_tools		= array();
-				
+		{		
 			# Loop through all tools on page
 			foreach ($tools as $tool)
 			{
@@ -104,11 +99,8 @@ class Build_Page_Controller extends Template_Controller {
 			$this->template->linkCSS("get/css/tools/$all_tools", url::site() );		
 			
 		}
-		else
-		{
-			$containers_array['1'] .= '<div class="aligncenter">This page is empty</div>';
-		}		
-
+		
+		
 		# Drop Tool array into admin Panel if logged in
 		if($admin_mode)
 			$this->template->set_global('tools_array', $tools_array);			
