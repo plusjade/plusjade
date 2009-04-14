@@ -1,6 +1,6 @@
 ﻿
 $(document).ready(function()
-{
+{	
 	// TOGGLE ADMIN BAR
 	// -----------------------------------	
 	$(".toggle_admin_bar").click(function(){
@@ -141,5 +141,35 @@ $(document).ready(function()
 			$(this).addClass("input_focus");
 		});
 	});
- 
+
+	$("#test_content_toggle").click(function(){
+		$(".jade_toolbar_wrapper").next().slideToggle("slow");
+		$(".jade_toolbar_wrapper ul").toggle();
+
+		// HIGHLITE CONTAINERS.
+		for(i=1;i<=5;i++){
+			$(".container_"+i).addClass("CONTAINER_WRAPPER");
+		}
+
+		
+		$(".CONTAINER_WRAPPER").sortable({
+			items: 'span.common_tool_wrapper',
+			connectWith: '.CONTAINER_WRAPPER',
+			forcePlaceholderSize: true,
+			placeholder: 'CONTAINER_placeholder',
+			appendTo: 'body',
+			cursor: 'move',
+			cursorAt: 'top',
+			forceHelperSize: true,
+			handle: '.jade_toolbar_wrapper',
+			//helper: 'clone',
+			opacity: '0.8'
+			//revert: true
+		});
+	});
+	
+
+
+	
+	
 });
