@@ -4,8 +4,7 @@ class Theme_Controller extends Admin_View_Controller {
 	/**
 	 *	Provides CRUD for theme and theme assets 
 	 *	
-	 */
-	 
+	 */	 
 	function __construct()
 	{
 		parent::__construct();
@@ -18,26 +17,11 @@ class Theme_Controller extends Admin_View_Controller {
 		$directory	= new Data_Folder;	
 		$db			= new Database;
 		
-		$custom_data_path	= DOCROOT."/data/{$this->site_name}/themes/{$this->theme}";		
-		$theme_data_path	= APPPATH."views/{$this->theme}";
+		$custom_data_path	= DOCROOT."/data/$this->site_name/themes/$this->theme";		
+		$theme_data_path	= APPPATH."views/$this->theme";
 		
-		# get custom data FLAT array
-		$primary->custom_flat = $directory->get_files_flat($custom_data_path, TRUE);
-
-		# get theme data FLAT array
-		$primary->theme_flat = $directory->get_files_flat($theme_data_path, TRUE);
-
-		# get any available custom module css
-		$primary->data_modules = $directory->get_dir_only("$custom_data_path/modules", TRUE);
-		
-		# Grab Tool List			
-		$tools = $db->query("SELECT * FROM tools_list");
-		$primary->tools = $tools;
-
-		# Grab theme List			
-		$themes = $db->query("SELECT * FROM themes");
-		$primary->themes = $themes;
-		
+		$primary->theme_files = $directory->get_file_list($custom_data_path, 'root', TRUE);
+				
 		$primary->render(TRUE);
 		die();
 		
@@ -82,12 +66,12 @@ class Theme_Controller extends Admin_View_Controller {
 		$db = new Database;
 		
 		if(! empty($_POST['theme']) )
-		{			
-			# Create Theme directory in site data folder
-			$source = DOCROOT.'application/views/_clone';
-			$dest 	= DOCROOT."data/{$this->site_name}/themes/{$_POST['theme']}";				
+		{	
+			$new_theme	= $_POST['theme'];
+			$source		= DOCROOT . 'application/views/' . $new_theme;
+			$dest		= DOCROOT . "data/$this->site_name/themes/$new_theme";				
 	
-			# If directory does not yet exist, create it.
+			# If theme directory does not yet exist, create it.
 			if(! is_dir($dest) )
 			{					
 				$copy_theme = new Data_Folder;	
@@ -98,10 +82,7 @@ class Theme_Controller extends Admin_View_Controller {
 					die();
 				}
 			}
-		
-			
-			$data = array('theme' => $_POST['theme']);
-			$db->update('sites', $data, "site_id = $this->site_id");			
+			$db->update('sites', array('theme' => $new_theme), "site_id = '$this->site_id'");			
 			
 			#TODO: Make sure this is handled by facebox auto reload.
 			echo 'Theme Changed!!<br>Updating...';
@@ -217,8 +198,7 @@ class Theme_Controller extends Admin_View_Controller {
 	}
 
 	
-	
-	
+		
 	function add_logo()
 	{
 		if(! empty($_FILES['image']['name']) )

@@ -17,13 +17,13 @@ abstract class Template_Controller extends Controller {
 			'theme_name'		=> $this->theme,
 			'site_name'			=> $this->site_name,
 			'js_path'			=> 'http://' . ROOTDOMAIN .'/js',
-			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/{$this->site_name}",
-			'custom_include'	=> DOCROOT."data/{$this->site_name}/themes/{$this->theme}/",
+			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/$this->site_name",
+			'custom_include'	=> DOCROOT."data/$this->site_name/themes/$this->theme",
 		);	
 		$this->template->set_global($data);
 		
 		# Global CSS			
-		$this->template->linkCSS("css/global/{$this->site_name}/{$this->theme}/");
+		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/');
 				
 		# Global Javascript (Theme specific)	
 		$this->template->linkJS('jquery_latest.js');
@@ -61,7 +61,7 @@ abstract class Template_Controller extends Controller {
 					'ui/ui_latest_lite.js',		# Jquery UI
 					'ajax_form/ajax_form.js',	# Ajax Form
 					'jw/jwysiwyg.js',			# JWysiwyg
-					'admin_pack/init.js'		# Document Ready stuff
+					'admin/init.js'				# Document Ready stuff
 				);
 				$this->template->add_root_js_files($js_files);
 				#$embed_js = ' ';				

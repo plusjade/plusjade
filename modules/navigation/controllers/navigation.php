@@ -28,42 +28,13 @@ class Navigation_Controller extends Controller {
 			ORDER BY lft ASC ");		
 		
 		
-		$attributes = explode(',', $parent->attributes);
-		$attr_string ='';
-		if(! empty($attributes['0']) )
-		{
-			foreach($attributes as $attr)
-			{
-				$pieces	= explode(':', $attr);
-				$name	= $pieces['0'];
-				$value	= $pieces['1'];
-				
-				if ( empty($attr_array[$name]) ) 
-					$attr_array[$name]='';
-				
-				$attr_array[$name] .= $value . ' ';
-			}
-			$attr_array['class'] .= 'navigation_wrapper ';
-			
-			
-			foreach ($attr_array as $name => $value)
-			{
-				$attr_string .= $name .' = "' . trim($value) .'" ';
-			}
-			#echo $attr_string; die();
-			
-		}
-		
 		$primary->parent = $parent;
-		$primary->attributes = $attr_string;
 		$primary->tree = Navigation::display_tree($items);
 		
-		
-		#$primary->attributes = $attributes;
-		
-		
 		# Javascript
-		$primary->add_root_js_files('simple_tree/jquery.simple.tree.js');
+		if( $this->client->logged_in() )
+			$primary->add_root_js_files('simple_tree/jquery.simple.tree.js');
+		
 		# $primary->global_readyJS('');
 		
 		return $primary;

@@ -23,11 +23,10 @@
 
 
 # friendly css links
-	RewriteRule ^css/global/([^/]+)/([^/]+) css/global.css?kohana_uri=$1&t=$2 [NC]
-	RewriteRule ^css/module/([^/]+)/([^/]+)/([^/]+) css/module.css?u=$1&t=$2&m=$3 [NC]
+#RewriteRule ^css/global/([^/]+)/([^/]+) css/global.php?kohana_uri=$1&t=$2 [NC]
 
 # this tells the server to parse .css file for php commands 
-	AddType application/x-httpd-php .css
+#AddType application/x-httpd-php .css
 	
 
 
