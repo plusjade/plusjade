@@ -14,7 +14,7 @@ class Css_Controller extends Controller {
 	}
 	
 /*
- * Build the css for the tools on the page
+ * Build css for the tools on the page
  * $generic_tools = The different tools on the page (non-repeats)
  * $all_tools = every tool on the page
  * (string) $all_tools = "5.5" = "tools_list_id.tool_id"
@@ -56,47 +56,48 @@ class Css_Controller extends Controller {
 		
 	}
 
-	function edit($id_pair=NULL)
+/*
+ * Edit a custom css file associated with a tool.
+ * Custom files are auto created if none exists.
+ * Stored in /data/tools_css
+ */
+	function edit($name_id=NULL, $tool_id=NULL)
 	{
-		$id_pair	= explode('.', $id_pair);		
-		$name_id	= tool_ui::validate_id($id_pair['0']);
-		$tool_id	= tool_ui::validate_id($id_pair['1']);
+		tool_ui::validate_id($name_id);	
+		tool_ui::validate_id($tool_id);		
 		
 		$css_file_path = DOCROOT."/data/$this->site_name/tools_css";
-			
+		$db = new Database;
+		
+		# Get the tool name (this is more secure than sending via GET)
+		$tool	= $db->query("SELECT name FROM tools_list WHERE id='$name_id'")->current();
+		$table	= strtolower($tool->name).'s';
+		
 		# Overwrite old file with new file contents;
 		if($_POST)
 		{
-			if( file_put_contents($css_file_path, $_POST['contents']) )
-				echo 'Page updated!'; # Success message	
-			else
-				echo 'Unable to save changes'; # Error message		
+			$attributes = $_POST['attributes'];	
+			$db->update($table, array('attributes' => $attributes ), "id='$tool_id' AND fk_site = '$this->site_id'");
+			
+			echo Css::save_custom_css($tool->name, $tool_id, $_POST['contents'] );
 		}
 		else
 		{
 			$primary = new View('css/edit_single');
+			$primary->contents	= Css::get_css_file($tool->name, $tool_id);
+			$primary->tool_id	= $tool_id;
+			$primary->name_id	= $name_id;
+			$primary->tool_name	= $tool->name;
 			
-			if(! file_exists("$css_file_path/$name_id/$tool_id.css") )
-			{
-				if(! is_dir("$css_file_path/$name_id") )
-					mkdir("$css_file_path/$name_id");
-				
-				$source = MODPATH . "";
-				# Get the stock file helper in the tool folder
-				if( copy($source, "$css_file_path/$name_id/$tool_id.css") )
-					return 'Page created!!'; #Success message
-				else
-					return 'Unable to copy page.'; # Error message
-			}
+			$parent = $db->query("SELECT attributes FROM $table
+				WHERE id='$tool_id'
+			")->current();
+			$primary->attributes = $parent->attributes;
 			
-			$primary->contents	= file_get_contents($css_file_path);
-			$primary->identifer	= "$name_id.$tool_id";
 			echo $primary;
-		
-		}
-	
-	
+		}		
 		die();
+
 	}
 }
 

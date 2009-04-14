@@ -1,13 +1,4 @@
-<?php echo form::open('theme/change')?>
-	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="change_theme" class="jade_positive">
-			Change Theme
-		</button>
-
-		<div id="common_title">Current Theme: <?php echo $theme_name;?></div>
-	</div>
-
-	<style type="text/css">
+<style type="text/css">
 	#jade_tool_box{
 		width:80%;
 		margin:0 auto;
@@ -29,6 +20,17 @@
 		background: #7ebd40 url(/images/admin/light_green_bg.png) repeat-x bottom left;
 	}
 </style>
+
+<?php echo form::open('theme/change', array('class' => 'ajaxForm'))?>
+	
+	<div id="common_tool_header" class="buttons">
+		<button type="submit" name="change_theme" class="jade_positive">
+			Change Theme
+		</button>
+
+		<div id="common_title">Current Theme: <?php echo $theme_name;?></div>
+	</div>
+
 
 	<div id="jade_tool_box">
 		<?php	

@@ -59,7 +59,7 @@ if (empty($tools_array))
 								echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
 								echo '<ul>';
 									echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
-									echo '<li><a href="/get/edit_', $data_array['name']  ,'/css/' , $data_array['tool_id'] , '" rel="facebox">CSS</a></li>';
+									echo '<li><a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">CSS</a></li>';
 									
 								echo '</ul>';
 							echo '</li>';

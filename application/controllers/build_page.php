@@ -24,7 +24,11 @@ class Build_Page_Controller extends Template_Controller {
 		$primary		= '';
 		$secondary		= '';	
 		$footer			= '';
-		
+		# initalize 5 containers
+		$containers_array = array('','','','','');		
+		$prepend		= '';
+		$append			= '';
+			
 		# Load assets from pages table
 		$this->template->title 	= $data['title'];
 		$this->template->meta_tags('description', $data['meta']);
@@ -54,12 +58,7 @@ class Build_Page_Controller extends Template_Controller {
 		{
 			$generic_tools	= array();
 			$all_tools		= array();
-			
-			# initalize 5 containers
-			$containers_array = array('','','','','');
-			$prepend		= '';
-			$append			= '';
-		
+				
 			# Loop through all tools on page
 			foreach ($tools as $tool)
 			{

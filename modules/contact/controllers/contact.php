@@ -34,7 +34,8 @@ class Contact_Controller extends Controller {
 		
 		
 		# Javascript
-		$primary->add_root_js_files('facebox/public_multi.js');
+			# no longer using facebox form.
+			#$primary->add_root_js_files('facebox/public_multi.js');
 		$primary->add_root_js_files('ajax_form/ajax_form.js');	
 				
 		$embed_js = View::factory('contact/index', NULL, 'js');		
