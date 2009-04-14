@@ -13,8 +13,10 @@
 	<?php
 	if(! empty($admin_panel) ) echo view::factory('admin/admin_panel');
 	
+	# Helper tools ...
 	$header	= View::factory("_global/header");
 	$menu	= View::factory("_global/menu");
+	$tracker_path = DOCROOT."data/$site_name/tracker.html";	
 	
 	# Required for all controllers passing with primary...
 	# TODO: update this ...
@@ -22,10 +24,10 @@
 	
 	ob_start();
 	
-	if ( file_exists("{$custom_include}global/master.html") )
-		readfile("{$custom_include}global/master.html");	
+	if ( file_exists("$custom_include/master.html") )
+		readfile("$custom_include/master.html");	
 	else
-		readfile(APPPATH."views/$theme_name/global/master.html");
+		readfile(APPPATH."views/$theme_name/master.html");
 
 	$master = ob_get_clean();
 
@@ -60,7 +62,7 @@
 	<?php
 	# It is bad to open 2 buffers, fix this
 	ob_start();
-	$tracker_path = DOCROOT."data/$site_name/tracker.html";	
+	
 	if ( file_exists("$tracker_path") )
 		readfile("$tracker_path");
 		

@@ -11,7 +11,10 @@
 	font-family:verdana, arial !important;
 	color:#333 !important;
 }	
-.facebox a {border:0;}
+/*
+.facebox a {border:0 !important; color:blue !important; background:transparent !important;}
+.facebox a:hover {color:orange !important;}
+*/
 .facebox img {border:0;}
 .facebox h1,
 .facebox h2, 
@@ -47,7 +50,11 @@
 }
 
 /* --- Top Admin Panel --- */
-
+#admin_bar_wrapper a{
+	background:transparent;
+}
+#admin_bar_wrapper a:hover{
+}
 #admin_bar_wrapper{
 	position:fixed;
 	margin:0;		 
@@ -193,6 +200,7 @@
 		margin-right:15px;
 }
 .jade_toolbar_wrapper a{
+	ackground:transparent !important;
 	color:#fff !important;
 }
 .jade_toolbar_wrapper a:hover{
