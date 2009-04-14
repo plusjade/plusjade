@@ -172,6 +172,17 @@
 	color:red;
 }
 
+.CONTAINER_WRAPPER{
+	padding:10px !important;
+	border:1px solid #ccc !important;
+	background:#eee !important;
+}
+.CONTAINER_placeholder{
+	background:#ffffcc;
+	display:block;
+	height:50px;
+	border:1px solid orange;
+}
 /* Admin Javascript Prepended Tool Toolbar */
 .jade_toolbar_wrapper{
 	clear:both;
@@ -181,6 +192,7 @@
 	padding:5px 10px;
 	margin-bottom:7px;
 	border:1px solid #777;
+	overflow:auto;
 }
 .jade_delete_tool{
 	float:right;

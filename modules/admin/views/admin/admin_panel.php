@@ -25,6 +25,7 @@ if (empty($tools_array))
 				<li><a href="/get/theme" rel="facebox">Theme</a></li>
 				<li><a href="/get/theme/logo" rel="facebox">Logo</a></li>
 				<li><a href="/get/tool" rel="facebox">All Tools</a></li>
+				<li><a href="#" id="test_content_toggle">Toggle Content</a></li>
 			</ul>	
 
 		<div class="clearboth"></div>
