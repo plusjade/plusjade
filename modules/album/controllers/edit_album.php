@@ -135,14 +135,13 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 		}	
 		else
 		{
-
 			/*
 			TOD0: MAKE THIS WORK
 			# Javascript		
 			$this->template->add_root_js_files('multi_form/jquery.MultiFile.pack.js');
 			*/
 			$this->template->rootJS = '$.MultiFile();';		
-			$this->_show_add_single('album', $tool_id);
+			echo $this->_show_add_single('album', $tool_id);
 		}
 		die();	
 	}
