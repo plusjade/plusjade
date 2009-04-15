@@ -66,7 +66,7 @@ class Edit_Slide_Panel_Controller extends Edit_Module_Controller {
 		}
 		else
 		{
-			$this->_show_add_single('slide_panel', $tool_id);
+			echo $this->_show_add_single('slide_panel', $tool_id);
 		}
 		
 		die();

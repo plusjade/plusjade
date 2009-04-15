@@ -22,7 +22,7 @@
 	}
 </style>
 
-<?php echo form::open("tool/add/$page_id", array('class' => 'ajaxForm') )?>
+<?php echo form::open("tool/add/$page_id", array('class' => 'custom_ajaxForm') )?>
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_tool" class="jade_positive">

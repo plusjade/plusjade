@@ -143,7 +143,7 @@ class Edit_Calendar_Controller extends Edit_Module_Controller {
 					});
 			';
 			
-			$this->_show_add_single('calendar', $tool_id);
+			echo $this->_show_add_single('calendar', $tool_id);
 		}
 		die();		
 	}
