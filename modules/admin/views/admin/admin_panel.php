@@ -9,64 +9,98 @@ if (empty($tools_array))
 
 <!-- START admin elements -->		
 <div id="admin_bar_wrapper">
-	
-	<div id="admin_bar">					
-
-			<ul id="admin_right">						
-				<li><a href="http://<?php echo ROOTDOMAIN ?>/auth">+Jade</a></li>
-				<li><a href="/admin/logout">Logout</a></li>
-				<li><b><a class="toggle_admin_bar" href="#">Hide Admin</a></b></li>
+	<ul id="admin_bar">				
+		<li class="root_list">
+			<div class="title_tag">SITEWIDE:</div>
+		</li>
+		
+		<li class="root_list dropdown">
+			<div>Theme</div>
+			<ul>
+				<li><img src="/images/admin/rainbow.png" alt=""> <a href="/get/theme" rel="facebox">Edit Theme</a></li>
+				<li><img src="/images/admin/flag_green.png" alt=""> <a href="/get/theme/logo" rel="facebox">Logo</a></li>
+				<li><img src="/images/admin/flag_green.png" alt=""> <a href="/get/theme/change" rel="facebox">New Theme</a></li>
+			</ul>		
+		</li>
+						
+		<li class="root_list dropdown">
+			<div>Pages</div>
+			<ul>
+				<li><img src="/images/admin/page.png" alt=""> <a href="/get/page" rel="facebox">All Pages</a></li>
+				<li><img src="/images/admin/page_add.png" alt=""> <a href="/get/page/add" rel="facebox">New Page</a></li>					
+			</ul>		
+		</li>
+		
+		<li class="root_list dropdown">
+			<div>Tools</div>
+			<ul>
+				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">All Tools</a></li>
 			</ul>
-			
-			<ul id="admin_left">
-				<li><b>My site</b></li>
-				<li><a href="/get/page" rel="facebox">All Pages</a></li>
-				<li><a href="/get/page/add" rel="facebox">New Page</a></li>
-				<li><a href="/get/theme" rel="facebox">Theme</a></li>
-				<li><a href="/get/theme/logo" rel="facebox">Logo</a></li>
-				<li><a href="/get/tool" rel="facebox">All Tools</a></li>
-				<li><a href="#" id="test_content_toggle">Toggle Content</a></li>
-			</ul>	
+		</li>
 
-		<div class="clearboth"></div>
-	</div>
+		<li class="root_list dropdown">
+			<div>Files</div>
+			<ul>
+				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">Images</a></li>
+			</ul>
+		</li>
+		
+		<li class="root_list floatright">
+			<div><b><a class="toggle_admin_bar" href="#">Hide Admin</a></b></div>
+		</li>
+
+		<li class="root_list floatright">
+			<div><a href="/admin/logout">Logout</a></div>
+		</li>	
+		
+		<li class="root_list floatright">
+			<div><a href="http://<?php echo ROOTDOMAIN ?>/auth">+Jade</a></div>
+		</li>
+	</ul>
+
+	
 	
 	<div id="tool_bar_wrapper">
 		<table><tr>
 			<td class="title"><b>ON THIS PAGE: <?php echo $page_name?></b></td>
 			<td><a href="/get/page/settings/<?php echo $page_id?>" rel="facebox">Page Settings</a></td>
-			<td><a href="/get/page/tools/<?php echo $page_id?>" rel="facebox">Move Tools</a></td>
-			<td><a href="/get/tool/add/<?php echo $page_id?>" rel="facebox">Add to Page</a></td>
+			<td><a href="#" id="get_tool_sort" rel="<?php echo $page_id?>">Save Tool Order</a></td>
+			<td><a href="/get/tool/add/<?php echo $page_id?>" rel="facebox">Add Tools to Page</a></td>
 		</tr></table>		
 
-			<ul id="cssdropdown" style="display:none">
-					<?php						
-					if( count($tools_array) > 0 )
-					{
-						/*
-						 * THIS IS HIDDEN: Only here so JS can grab html.
-						 * $tool_array = guid|tool_name|tool_id
-						 * Notes:
-						 * guid			is for pages_tools table
-						 * name			defines the tool table (plural) ex: album(s)
-						 * name_id		tools_list id of the tool
-						 * tool_id		gets the tool from the tool table
-						 */
-						foreach($tools_array as $db_position => $data_array)
-						{									
-							echo '<li id="toolkit_' , $data_array['guid'] , '">';
-								echo '<a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool"><img src="/images/admin/delete.png" alt="delete!"> <span>delete</span></a>';		
-								echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
-								echo '<ul>';
-									echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
-									echo '<li><a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox"><img src="/images/admin/css_add.png" alt="CSS"> Edit CSS</a></li>';
-									
-								echo '</ul>';
-							echo '</li>';
-						}
-					}
-					?>
-			</ul>		
+
+		<ul id="cssdropdown" style="display:none">
+			<?php						
+			if( count($tools_array) > 0 )
+			{
+				/*
+				 * THIS IS HIDDEN: Only here so JS can grab html.
+				 * $tool_array = guid|tool_name|tool_id
+				 * Notes:
+				 * guid			is for pages_tools table
+				 * name			defines the tool table (plural) ex: album(s)
+				 * name_id		tools_list id of the tool
+				 * tool_id		gets the tool from the tool table
+				 */
+				foreach($tools_array as $db_position => $data_array)
+				{									
+					echo '<li id="toolkit_' , $data_array['guid'] , '">';	
+						echo'<table><tr><td class="name_wrapper">';
+						echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
+						echo '</td><td class="actions_wrapper">';
+						echo '<a href="#" class="actions_link"><img src="/images/admin/cog_edit.png" alt=""> Edit</a>';
+					
+						echo '<ul class="toolkit_dropdown">';
+							echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
+							echo '<li><a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox"><img src="/images/admin/css_add.png" alt="CSS"> Edit CSS</a></li>';
+							echo '<li><a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool"><img src="/images/admin/delete.png" alt="delete!"> <span>delete</span></a></li>';	
+						echo '</ul>';
+						echo '</td></tr></table>';
+					echo '</li>';
+				}
+			}
+			?>
+		</ul>		
 	</div>
 </div>
 

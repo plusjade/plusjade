@@ -62,8 +62,11 @@ class Build_Page_Controller extends Template_Controller {
 				# If Logged in wrap classes around tools for Javascript
 				# TODO: consider this with javascript
 				if( $this->client->logged_in() )
-				{
-					$prepend	= '<span id="' . $tool->guid . '" class="common_tool_wrapper">';
+				{			
+					$scope = 'local';
+					if( '5' >= $tool->page_id ) $scope = 'global';
+		
+					$prepend	= '<span id="' . $tool->guid . '" class="common_tool_wrapper" rel="' . $scope . '">';
 					$append		= '</span>';
 				}
 				
