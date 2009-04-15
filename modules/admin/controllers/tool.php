@@ -81,7 +81,9 @@ class Tool_Controller extends Admin_View_Controller {
 			
 
 			Load_Tool::after_add($tool->name, $tool_insert->insert_id() );
-			echo 'Tool has been added!<br>Updating...';
+			
+			echo strtolower($tool->name).'/add/'.$tool_insert->insert_id();
+
 			die();
 		}	
 		else
@@ -98,6 +100,20 @@ class Tool_Controller extends Admin_View_Controller {
 					$("#jade_tool_box label").removeClass("selected");
 					$(this).addClass("selected");
 				});
+				
+				
+			// custom ajax form
+			var options = {
+				success: function(data) {
+					$.get("/get/edit_"+data, function(data) { 
+						$.facebox(data, false, "facebox_base")				
+					});					
+				}					
+			};
+		$(".facebox .custom_ajaxForm").ajaxForm(options);				
+				
+				
+				
 			';
 			$this->template->primary = $primary; 	
 		}		

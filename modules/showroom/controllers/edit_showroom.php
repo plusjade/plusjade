@@ -78,7 +78,7 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 		{
 			#Javascript
 			$this->template->rootJS = '$("#container-1").tabs()';
-			$this->_show_add_single('showroom', $tool_id);
+			echo $this->_show_add_single('showroom', $tool_id);
 		}
 		die();		
 	}
