@@ -1,13 +1,13 @@
 
 /*   --- css_static_helpers  --- */
 	
-.aligncenter{text-align:center}
-.alignright{text-align:right}
-.clearboth{clear:both}
-.clearleft{clear:left}
-.clearright{clear:right}
-.floatleft{float:left}
-.floatright{float:right}
+.aligncenter{text-align:center !important;}
+.alignright{text-align:right !important;}
+.clearboth{clear:both !important;}
+.clearleft{clear:left !important;}
+.clearright{clear:right !important;}
+.floatleft{float:left !important;}
+.floatright{float:right !important;}
 a img{border:0}
 
 .input_focus{

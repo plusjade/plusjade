@@ -188,7 +188,8 @@ class Page_Controller extends Admin_View_Controller {
 				placeholder: "placeholder",
 				forcePlaceholderSize: true
 			});
-						
+			
+			// toggle local/global scope
 			$(".facebox #page_tools").click($.delegate({
 				".toggle_scope": function(e){
 					var new_scope = $(e.target).attr("rel");	
@@ -201,7 +202,8 @@ class Page_Controller extends Admin_View_Controller {
 					return false;				
 				}
 			}));
-									
+			
+			// get sort results
 			var output = "";	
 			$(".facebox #link_save_sort").click(function(){
 				page_id = $(this).attr("rel");
@@ -215,12 +217,12 @@ class Page_Controller extends Admin_View_Controller {
 						output += scope + "." + this.id + "." + container + "." + i + "#";
 					});
 				});
-				//alert(output); return false;					
+				alert(output); return false;					
 							
 				$.facebox(function() {
 						$.post("/get/page/tools/"+page_id, {output: output}, function(data){
 							$.facebox(data, "ajax_status", "facebox_response");
-							location.reload();
+							//location.reload();
 						})
 					}, 
 					"ajax_status", 
@@ -231,8 +233,6 @@ class Page_Controller extends Admin_View_Controller {
 			
 			$embed_js .= tool_ui::js_delete_init('tool');
 			
-			# $embed_js .= tool_ui::js_save_sort_init('page', 'page');
-
 			$this->template->rootJS = $embed_js;		
 			$this->template->primary = $primary; 		
 		}

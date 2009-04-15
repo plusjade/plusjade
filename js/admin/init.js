@@ -11,6 +11,23 @@ $(document).ready(function()
 		});
 		
 	});
+
+	// Sitewide admin bar dropdowns
+	$('#admin_bar li.dropdown ul').hide();
+	$('#admin_bar li.dropdown div').hover(
+		function(){
+			$('#admin_bar li.dropdown ul').hide();
+			$(this).next('ul').show();
+		},
+		function(){
+			$(this).next('ul').hover(
+				function(){
+				},
+				function(){
+				$(this).hide();
+			});
+		}
+	);
 	
 	// Add tool parent tool_kit to all tools on page
 	// -----------------------------------
@@ -18,17 +35,8 @@ $(document).ready(function()
 		++i;
 		var guid = this.id;
 		var toolkit = $("#toolkit_" + guid).html();
-		var toolbar = "<div id=\"toolbar_identifer_" + guid  + "\" class=\"jade_toolbar_wrapper\">" + toolkit + "</div>";
+		var toolbar = '<div id="toolbar_' + guid  + '" class="jade_toolbar_wrapper" style="z-index:200">' + toolkit + '</div>';
 		$(this).prepend(toolbar);
-	
-	 });
-	// break the list if the width is too small
-	 $(".jade_toolbar_wrapper").each(function(i){
-		++i;
-		var guid = this.id;
-		var width = $(this).width();	
-		if(width<300) $("ul", this).css("clear","both");		
-		else $(this).css("height","20px");
 	
 	 });
 	 
@@ -142,34 +150,120 @@ $(document).ready(function()
 		});
 	});
 
-	$("#test_content_toggle").click(function(){
-		$(".jade_toolbar_wrapper").next().slideToggle("slow");
-		$(".jade_toolbar_wrapper ul").toggle();
+	
+	
+/*
+	test area 
+*/	
 
-		// HIGHLITE CONTAINERS.
-		for(i=1;i<=5;i++){
-			$(".container_"+i).addClass("CONTAINER_WRAPPER");
+	// initalize sortable containers
+	for(i=1;i<=5;i++){
+		$(".container_"+i).addClass("CONTAINER_WRAPPER").attr("rel",i);
+	}
+
+	$(".CONTAINER_WRAPPER").sortable({
+		items: 'span.common_tool_wrapper',
+		connectWith: '.CONTAINER_WRAPPER',
+		forcePlaceholderSize: true,
+		placeholder: 'CONTAINER_placeholder',
+		appendTo: 'body',
+		cursor: 'move',
+		cursorAt: 'top',
+		forceHelperSize: true,
+		handle: '.jade_toolbar_wrapper span.name',
+		scrollSensitivity: 40,
+		tolerance: 'pointer',
+		//helper: 'clone',
+
+		start: function(event, ui) {
+			$('.CONTAINER_WRAPPER').toggleClass('highlight_containers');
+			$(ui.item).toggleClass('sort_active').children('div:last').hide();
+		},
+		stop: function(event, ui) {
+			$('.CONTAINER_WRAPPER').toggleClass('highlight_containers');
+			$(ui.item).toggleClass('sort_active').children('div:last').show();
 		}
+		//revert: true
+	});	
+	
+	// append local/global toggle to action lists
+	// NOTE: consider doing this on the server.
+	$("span.common_tool_wrapper").each(function(){
+		var scope = $(this).attr("rel");
+		var toggle = 'local';
+		if("local" == scope) toggle = 'global';
+		var scope_toggle = '<li><a href="#" class="toggle_scope" rel="'+ toggle +'"><img src="/images/admin/'+ toggle +'.png" alt=""> Make '+ toggle +'</a></li>';
+		$("ul.toolkit_dropdown", this).append(scope_toggle);
+	});	
+
+	// activiate local/global scope toggle
+	$("span.common_tool_wrapper").click($.delegate({
+		".toggle_scope": function(e){
+			var new_scope = $(e.target).attr("rel");	
+			var toggle = "local";
+			if("local" == new_scope) toggle = "global";
+			var new_link = '<a href="#" class="toggle_scope" rel="' + toggle + '"><img src="/images/admin/'+ toggle +'.png" alt=""> Make ' + toggle + '</a>';
+			
+			$(e.target).parents("span").removeAttr("rel").attr("rel",new_scope);
+			$(e.target).replaceWith(new_link);
+			return false;				
+		}
+	}));
+	
+	
+	// get container tool-position results
+	var output = "";	
+	$("#get_tool_sort").click(function(){
+		page_id = $(this).attr("rel");
+		
+		$(".CONTAINER_WRAPPER").each(function(){
+			var container = $(this).attr("rel");
+			var kids = $(this).children("span.common_tool_wrapper");
+			
+			$(kids).each(function(i){
+				var scope = $(this).attr("rel");
+				output += scope + "." + this.id + "." + container + "." + i + "#";
+			});
+		});
+		//alert(output); return false;					
+					
+		$.facebox(function() {
+				$.post("/get/page/tools/"+page_id, {output: output}, function(data){
+					$.facebox(data, "ajax_status", "facebox_response");
+					//location.reload();
+				})
+			}, 
+			"ajax_status", 
+			"facebox_response"
+		);
+		
+	});		
+	
+	
+	
+	// Active hover action toolkit menus	
+	$('.actions_link').hover(
+		function(){
+			$(this).next('ul').show();
+		},
+		function(){
+			$(this).next('ul').hover(
+				function(){
+				},
+				function(){
+				$(this).hide();
+			});
+		}
+	);
 
 		
-		$(".CONTAINER_WRAPPER").sortable({
-			items: 'span.common_tool_wrapper',
-			connectWith: '.CONTAINER_WRAPPER',
-			forcePlaceholderSize: true,
-			placeholder: 'CONTAINER_placeholder',
-			appendTo: 'body',
-			cursor: 'move',
-			cursorAt: 'top',
-			forceHelperSize: true,
-			handle: '.jade_toolbar_wrapper',
-			//helper: 'clone',
-			opacity: '0.8'
-			//revert: true
-		});
+		/*
+	var zIndexNumber = 1000;
+	$('.CONTAINER_WRAPPER div, .CONTAINER_WRAPPER ul ').each(function() {
+		$(this).css('zIndex', zIndexNumber);
+		zIndexNumber -= 10;
+		//alert('blah');
 	});
-	
-
-
-	
+	*/
 	
 });

@@ -70,7 +70,7 @@
 		
 	#<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>	
 	?>
-
+	
 </body>
 </html>
 <!-- panda<3! -->

@@ -65,53 +65,75 @@
 	text-align:center;
 	min-width:800px;
 	width:100%;
-	z-index:9;
+	z-index:200;
 }
-#admin_bar_wrapper ul {
-	display:inline;
-	list-style:none;
-	margin:0;
-	padding:10px 0;
-	text-align:left;
-}
-#admin_bar_wrapper ul li{
-	display:inline;
-}
-#admin_bar_wrapper ul li b{
-	padding:10px;
-	color:#fff;
-	background: #7ebd40 url(/images/admin/green_bg.png) repeat-x bottom left;
-}
+
 /* admin toolbar */
-#admin_bar{
+ul#admin_bar{
 	margin:0 auto;
+	padding:0;
 	min-width:800px;
 	width:80%;
+	height:30px;
 	text-align:left;
+	background: #fff url(/images/admin/orange_bg.png) repeat-x top left;
 	color:#fff;
-	background: orange url(/images/admin/orange_bg.png) repeat-x bottom left;
 	border:2px solid green;
 	border-top:0;
+	list-style:none;
+	z-index:100;
 }
-#admin_bar #admin_right{
-	float:right;	
-}
-#admin_bar #admin_left{
+
+
+#admin_bar li.root_list{
+	display:block;
 	float:left;
+	background: #fff url(/images/admin/orange_bg.png) repeat-x top left;
+	height:30px;
+	width:110px;
+	padding:0;
+	margin:0;
 }
-#admin_bar #admin_right li{
-	margin-left:12px;	
+#admin_bar li.root_list div{
+	width:120px;
+	padding:8px;
 }
-#admin_bar #admin_left li{
-	margin-right:12px;
+#admin_bar li.dropdown div{
+	font-weight:bold;
+	cursor:pointer;
+	cursor:hand;
 }
-#admin_bar ul li a{
+#admin_bar li.root_list div a{
 	color:#fff;
-	font-weight:bold;	
 }
-#admin_bar ul li a:hover{
-	background:#7ebd40;
-	color:#333;	
+#admin_bar li.root_list div a:hover{
+	color:#000;
+}
+#admin_bar li.root_list ul{	
+	display:none;
+	position:absolute;
+	clear:both;
+	width:102px;
+	list-style:none;
+	z-index:90;
+	margin:0;
+	padding:3px;
+	line-height:2em;
+	background:#fff;
+	border:1px solid #777;
+}
+
+
+#admin_bar div.title_tag{
+	color:#fff;
+	font-weight:bold;
+	background: #7ebd40 url(/images/admin/green_bg.png) repeat-x top left !important;
+}
+
+
+
+#tool_bar_wrapper{
+	z-index:90;
 }
 
 /* "on this page" toolbar wrapper */
@@ -156,6 +178,7 @@
 	left:80%;
 	width:100px;
 	text-align:center;
+	z-index:1000;
 }
 #hide_link a {
 	background:orange;
@@ -172,10 +195,12 @@
 	color:red;
 }
 
-.CONTAINER_WRAPPER{
+/* CONTAINER_WRAPPER on sort start */
+.highlight_containers{
 	padding:10px !important;
 	border:1px solid #ccc !important;
 	background:#eee !important;
+	min-height:300px !important;
 }
 .CONTAINER_placeholder{
 	background:#ffffcc;
@@ -183,47 +208,94 @@
 	height:50px;
 	border:1px solid orange;
 }
+.sort_active{
+	width:200px !important;
+	overflow:hidden !important;
+}
+.sort_active ul{
+	display:none !important;
+}
 /* Admin Javascript Prepended Tool Toolbar */
 .jade_toolbar_wrapper{
 	clear:both;
 	font-size:12px !important;
-	font-family: verdana !important;
-	background: #d52020 url(/images/admin/red_bg.png) repeat-x bottom left;
-	padding:5px 10px;
+	font-family: verdana !important;	
 	margin-bottom:7px;
+	z-index:200 !important;
+}
+.jade_toolbar_wrapper table{
+	background: #d52020 url(/images/admin/red_bg.png) repeat-x bottom left;
+	border-collapse:collapse;
+	width:100%;
+	height:30px;
 	border:1px solid #777;
-	overflow:auto;
+	
 }
-.jade_delete_tool{
-	float:right;
+.jade_toolbar_wrapper td{
+	padding:0 10px;
 }
+.jade_toolbar_wrapper td.actions_wrapper{
+	width:100px;
+}
+
+.jade_toolbar_wrapper a.actions_link{
+	display:block;
+	color:white;
+	text-align:right;
+	text-decoration:none;
+}
+
+.jade_toolbar_wrapper ul.toolkit_dropdown{
+	display:none;
+	clear:both;
+	position:absolute;
+	width:100px;
+	border:1px solid #333;
+	list-style:none;
+	margin:0;
+	padding:5px;
+	background:#fff;
+	line-height:2em;
+	z-index:200;
+}
+.jade_toolbar_wrapper ul.toolkit_dropdown li{
+	display:block;	
+}
+
+.jade_toolbar_wrapper ul.toolkit_dropdown:hover{
+	display:block;
+}
+
+
 .jade_toolbar_wrapper span.name{
 	float:left;
 	color:white;
-	font-size:1.2em;
 	font-weight:bold;
-	margin-right:3%;
+	cursor:move;
+
 }
-.jade_toolbar_wrapper ul{
-	list-style:none;
-	margin:0;
-	padding:0;
-}
-.jade_toolbar_wrapper ul li{
-	display:inline;
-	margin-right:3%;
-}
-.jade_toolbar_wrapper a{
-	color:#fff !important;
+
+.jade_toolbar_wrapper ul a{
+	color:#333 !important;
 	text-decoration:none;
 }
-.jade_toolbar_wrapper a:hover{
-	color:black !important;
+.jade_toolbar_wrapper ul a:hover{
+	color:red !important;
 }
 .jade_toolbar_wrapper a span{
 	ext-decoration:underline;
 }
 
+
+.jade_delete_tool{
+
+}
+.jade_toolbar_wrapper a.toggle_scope{
+
+}
+.jade_toolbar_wrapper a.toggle_scope:hover{
+	olor:black;
+}
 
 	/* Tool Item toolbar */	
 	.jade_admin_item_edit{
