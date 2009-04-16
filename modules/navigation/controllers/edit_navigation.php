@@ -63,11 +63,11 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 				
 				$.facebox(function() {
 						$.post("/get/edit_navigation/save_sort/"+tool_id, {output: output}, function(data){
-							$.facebox(data, "ajax_status", "facebox_response");
+							$.facebox(data, "status_reload", "facebox_response");
 							location.reload();
 						})
 					}, 
-					"ajax_status", 
+					"status_reload", 
 					"facebox_response"
 				);
 

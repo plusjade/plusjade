@@ -41,14 +41,14 @@ class Theme_Controller extends Admin_View_Controller {
 		# Save a file
 		if($_POST)
 		{
-			Site_Data::save_file($file, $_POST['contents']);
+			echo Site_Data::save_file($file, $_POST['contents']);
 		}
 		else
 		{
 			$primary = new View('theme/edit_file');
 			$primary->file_name = $file;
 			$primary->file_contents = Site_Data::edit_file($file);
-			$primary->render(true);
+			echo $primary;
 		}
 		die();		
 	}

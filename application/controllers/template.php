@@ -57,11 +57,12 @@ abstract class Template_Controller extends Controller {
 					
 				# Javascript
 				$js_files = array(
-					'facebox/public_multi.js',	# Facebox 
-					'ui/ui_latest_lite.js',		# Jquery UI
-					'ajax_form/ajax_form.js',	# Ajax Form
-					'jw/jwysiwyg.js',			# JWysiwyg
-					'admin/init.js'				# Document Ready stuff
+					'facebox/public_multi.js',		# Facebox 
+					'ui/ui_latest_lite.js',			# Jquery UI
+					'ajax_form/ajax_form.js',		# Ajax Form
+					'multi_form/MultiFile.pack.js',
+					'jw/jwysiwyg.js',				# JWysiwyg
+					'admin/init.js'					# Document Ready stuff
 				);
 				$this->template->add_root_js_files($js_files);
 				#$embed_js = ' ';				

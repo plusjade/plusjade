@@ -66,7 +66,7 @@ class Build_Page_Controller extends Template_Controller {
 					$scope = 'local';
 					if( '5' >= $tool->page_id ) $scope = 'global';
 		
-					$prepend	= '<span id="' . $tool->guid . '" class="common_tool_wrapper" rel="' . $scope . '">';
+					$prepend	= '<span id="' . $tool->guid . '" class="common_tool_wrapper guid_'. $tool->guid . '" rel="' . $scope . '">';
 					$append		= '</span>';
 				}
 				
@@ -80,7 +80,7 @@ class Build_Page_Controller extends Template_Controller {
 					'name_id'	=> $tool->tool,
 					'tool_id'	=> $tool->tool_id,
 				);
-									
+
 				# Create Tool object
 				$tool_object = $prepend;				
 				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
@@ -118,7 +118,7 @@ class Build_Page_Controller extends Template_Controller {
 			foreach($_SESSION['js_files'] as $file => $javascript)
 			{
 				$path = DOCROOT."js/$file/style.css";
-				if(file_exists($path))
+				if( file_exists($path) )
 				{
 					# avoid duplicates for assets Admin uses
 					if('facebox' != $file)

@@ -70,8 +70,9 @@ class Css_Controller extends Controller {
 		$db = new Database;
 		
 		# Get the tool name (this is more secure than sending via GET)
-		$tool	= $db->query("SELECT name FROM tools_list WHERE id='$name_id'")->current();
-		$table	= strtolower($tool->name).'s';
+		$tool		= $db->query("SELECT name FROM tools_list WHERE id='$name_id'")->current();
+		$tool_name	= strtolower($tool->name);
+		$table		= $tool_name.'s';
 		
 		# Overwrite old file with new file contents;
 		if($_POST)
@@ -79,15 +80,15 @@ class Css_Controller extends Controller {
 			$attributes = $_POST['attributes'];	
 			$db->update($table, array('attributes' => $attributes ), "id='$tool_id' AND fk_site = '$this->site_id'");
 			
-			echo Css::save_custom_css($tool->name, $tool_id, $_POST['contents'] );
+			echo Css::save_custom_css($tool_name, $tool_id, $_POST['contents'] );
 		}
 		else
 		{
 			$primary = new View('css/edit_single');
-			$primary->contents	= Css::get_css_file($tool->name, $tool_id);
+			$primary->contents	= Css::get_css_file($tool_name, $tool_id);
 			$primary->tool_id	= $tool_id;
 			$primary->name_id	= $name_id;
-			$primary->tool_name	= $tool->name;
+			$primary->tool_name	= $tool_name;
 			
 			$parent = $db->query("SELECT attributes FROM $table
 				WHERE id='$tool_id'

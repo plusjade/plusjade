@@ -79,9 +79,9 @@ class Tool_Controller extends Admin_View_Controller {
 			);
 			$pages_tools_insert = $db->insert('pages_tools', $data);
 			
-
 			Load_Tool::after_add($tool->name, $tool_insert->insert_id() );
 			
+			# Pass output the facebox
 			echo strtolower($tool->name).'/add/'.$tool_insert->insert_id();
 
 			die();
@@ -95,23 +95,24 @@ class Tool_Controller extends Admin_View_Controller {
 			
 			# Javascript
 			$this->template->rootJS = '
-				// Add Tool, label stuff...
+				// ADD tool label stuff...
 				$("#jade_tool_box label").click(function(){
 					$("#jade_tool_box label").removeClass("selected");
 					$(this).addClass("selected");
 				});
 				
 				
-			// custom ajax form
-			var options = {
-				success: function(data) {
-					$.get("/get/edit_"+data, function(data) { 
-						$.facebox(data, false, "facebox_base")				
-					});					
-				}					
-			};
-		$(".facebox .custom_ajaxForm").ajaxForm(options);				
-				
+				// ACTIVATE custom ajax form
+				// data = post output from this method (above)
+				var options = {
+					success: function(data) {
+						$.get("/get/edit_"+data, function(data) { 
+							$.facebox(data, false, "facebox_base")				
+						});					
+					}					
+				};
+				$(".facebox .custom_ajaxForm").ajaxForm(options);				
+					
 				
 				
 			';
@@ -177,6 +178,8 @@ class Tool_Controller extends Admin_View_Controller {
 		$tool_object = $db->query("SELECT * FROM pages_tools
 			JOIN tools_list ON pages_tools.tool = tools_list.id
 			WHERE guid = '$tool_guid' AND fk_site='$this->site_id' ")->current();	
+		
+		if(! is_object($tool_object) ) die();
 		
 		$table_parent	= strtolower($tool_object->name).'s';
 		$table_child	= strtolower($tool_object->name).'_items';
