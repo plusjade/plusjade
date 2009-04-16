@@ -16,13 +16,12 @@ class Album_Controller extends Controller {
 		# Get album
 		$album	= $db->query("SELECT * FROM albums WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();
 		$display_view = $album->view;
-		$album_id = $album->id;
-		
+
 		if( empty($display_view) )
-			$display_view = 'galleria';
+			$display_view = 'lightbox';
 			
 		# Get images in album
-		$images = $db->query("SELECT * FROM album_items WHERE parent_id = '$album_id' ORDER BY position");
+		$images = $db->query("SELECT * FROM album_items WHERE parent_id = '$album->id' ORDER BY position");
 		
 
 		if($images->count() > 0)
@@ -30,19 +29,15 @@ class Album_Controller extends Controller {
 			# Load View based on album
 			$primary = new View("album/{$display_view}_album");
 
-			# Pass album to view
 			$primary->album = $album;
-			
-			# Pass images to view
 			$primary->images = $images;
-			
-			$primary->img_path = 'http://' . ROOTDOMAIN . "/data/{$this->site_name}" . '/assets/images/albums/' . $album->id;  
+			$primary->img_path = 'http://' . ROOTDOMAIN . "/data/$this->site_name" . '/assets/images/albums/' . $album->id;  
 			
 		
 			switch($display_view)
 			{
 				case 'galleria':
-					# Javascript
+					# Javascript (galleria)
 					$primary->add_root_js_files('galleria/galleria.js');
 					$primary->global_readyJS('									
 						// $("#galleria_'.$album->id .'").addClass("gallery_demo"); // adds new class name to maintain degradability
@@ -61,7 +56,7 @@ class Album_Controller extends Controller {
 				break;
 				
 				case 'cycle':		
-					# Javascript
+					# Javascript (cycle)
 					$primary->add_root_js_files('cycle_lite/cycle_lite.js');								
 					$primary->global_readyJS('
 						$("#album_cycle_wrapper_'.$album->id.'").cycle({
@@ -73,11 +68,11 @@ class Album_Controller extends Controller {
 				break;
 				
 				case 'lightbox':
-					# Javascript
+					# Javascript  (lightbox)
 					$primary->add_root_js_files('lightbox/lightbox.js');				
 					$primary->global_readyJS("		
 						$(function() {
-							$('.jade_album_lightbox a').lightBox();
+							$('.album_lightbox_wrapper a').lightBox();
 						});
 					");
 				break;	
@@ -87,7 +82,7 @@ class Album_Controller extends Controller {
 					$primary->add_root_js_files('lightbox/lightbox.js');					
 					$primary->global_readyJS("		
 						$(function() {
-							$('.jade_album_lightbox a').lightBox();
+							$('.album_lightbox_wrapper a').lightBox();
 						});
 					");
 				break;
@@ -95,21 +90,9 @@ class Album_Controller extends Controller {
 		}
 		else
 		{
-			$primary = new View('empty');
+			$primary = '';
 		}
-		
-		/*
-		 * TODO GET THIS SHIT OUT OF HERE!!!
-		 * SHOULD BE IN EDIT CONTROLLER.
-		 */
-		# Load stuff for edit website mode
-		if($this->client->logged_in() AND $this->client->get_user()->client_site_id == $this->site_id )
-		{	
-			# Javascript		
-			$primary->add_root_js_files('multi_form/MultiFile.pack.js');
-		}
-
-		
+				
 		return $primary;
 	}
 }

@@ -45,9 +45,8 @@
 			
 			echo '<label FOR="radio_'.$key.'">';
 			echo '<input type="radio" name="tool" id="radio_'.$key.'" value="' . $tool->id .' " '.$checked.'> '. $tool->name;				
-			
 			echo '</label>';
-			
+			echo '<div class="aligncenter">'. $tool->desc .'</div>';
 			unset($checked);
 		}
 		?>

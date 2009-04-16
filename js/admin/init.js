@@ -12,7 +12,8 @@ $(document).ready(function()
 		
 	});
 
-	// Sitewide admin bar dropdowns
+	// ACTIVATE Sitewide admin bar dropdowns
+	// -----------------------------------
 	$('#admin_bar li.dropdown ul').hide();
 	$('#admin_bar li.dropdown div').hover(
 		function(){
@@ -21,15 +22,13 @@ $(document).ready(function()
 		},
 		function(){
 			$(this).next('ul').hover(
-				function(){
-				},
-				function(){
-				$(this).hide();
-			});
+				function(){},
+				function(){$(this).hide()}
+			);
 		}
 	);
 	
-	// Add tool parent tool_kit to all tools on page
+	// ADD Tool toolkit to all tools on page
 	// -----------------------------------
 	 $(".common_tool_wrapper").each(function(i){
 		++i;
@@ -41,16 +40,16 @@ $(document).ready(function()
 	 });
 	 
 	 
-	// Add PER ITEM TOOLKIT to ITEMS
+	// ADD tool-item toolkits
 	// -----------------------------------
 	var tools = ["contact", "showroom", "slide_panel"];	
 	$.each(tools, function(){	
 		var tool = this;
 		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
 			var id		= $(this).attr("rel");
-			var edit	= "<a href=\"/get/edit_" + tool + "/edit/" + id + "\" rel=\"facebox\">edit</a>";
-			var del		= "<a href=\"/get/edit_" + tool + "/delete/" + id + "\" class=\"jade_delete_item\">delete</a>";
-			var toolbar	= "<div class=\"jade_admin_item_edit\">" + edit + " " + del + "</div>";
+			var edit	= '<a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<a href="/get/edit_' + tool + '/delete/' + id + '" class="jade_delete_item" rel="item_'+id+'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
 					
 			$(this).prepend(toolbar);			
 		});
@@ -60,7 +59,8 @@ $(document).ready(function()
 	// because i dont want to use livequery
 		
 
-	// Delegate main link functionality
+	// DELEGATE main link functionality
+	// -----------------------------------
 	$("body").click($.delegate({
 	
 		// facebox links
@@ -88,42 +88,53 @@ $(document).ready(function()
 			return false;
 		},
 		
-		// delete an item link		
+		// DELETE single item link		
 		"a.jade_delete_item": function(e) {
-			url = $(e.target).attr("href");
-			var data = "<div class=\"buttons confirm_facebox\">This can not be undone.<br><br><a href=\"/#\" class=\"cancel_delete\"><img src='/images/admin/asterisk_yellow.png'>Cancel</a><br><br><a href=\"" + url +"\"  class=\"jade_confirm_delete_common jade_negative\"><img src='/images/admin/cross.png'>Delete Item</a></div>";
-			
+			var url = $(e.target).attr("href");
+			var rel	= $(e.target).attr('rel');
+			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><br><a href="#" class="cancel_delete"><img src="/images/admin/asterisk_yellow.png">Cancel</a><br><br><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/images/admin/cross.png">Delete Item</a></div>';	
 			$.facebox(data, "confirm_facebox", "confirm_dialog");
 			return false;		
 		},
 		
-		// delete a tool link	
-		"a.jade_delete_tool img, a.jade_delete_tool span": function(e) {
-			url = $(e.target).parent().attr("href");
-			var data = "<div class=\"buttons confirm_facebox\">This will delete this entire tool.<br>All content will be lost forever!<br><br><a href=\"/#\" class=\"cancel_delete\"><img src='/images/admin/asterisk_yellow.png'>Cancel</a><br><br><br><a href=\"" + url +"\"  class=\"jade_confirm_delete_common jade_negative\"><img src='/images/admin/cross.png'>Delete Tool</a></div>";	
+		// DELETE single tool link	
+		"a.jade_delete_tool": function(e) {
+			var url		= e.target.href;
+			var rel	= $(e.target).attr('rel');
+			var data	= '<div class="buttons confirm_facebox">This will delete this entire tool.<br>All content will be lost forever!<br><br><a href="#" class="cancel_delete"><img src="/images/admin/asterisk_yellow.png">Cancel</a><br><br><br><a href="'+ url +'" class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/images/admin/cross.png">Delete Tool</a></div>';	
 			$.facebox(data, "confirm_facebox", "confirm_dialog");
 			return false;		
 		},
-		
-		// confirm delete button
-		"a.jade_confirm_delete_common": function(e) {
-			url = $(e.target).attr("href");
-			$.get(url, function(data) { 
-				$.facebox(data, "ajax_status", "confirm_dialog")
-				location.reload();						
-			});
-			return false;
-		},
-		
-		// cancel delete button
+
+		// CANCEL delete button
 		"a.cancel_delete": function() {
 			$.facebox.close();
 			return false;	
-		}
+		},
 		
+		// DELETE CONFIRMED common button in facebox
+		"a.jade_confirm_delete_common": function(e) {
+			var url		= $(e.target).attr("href");
+			var temp	= new Array();
+			temp		= $(e.target).attr('rel').split('_');
+			// # type/id
+			
+			// FIX THIS so it works with all tool items
+			if('tool' == temp[0]) selector = 'span.guid_';
+			else selector = '#showroom_item_'; 
+	
+			$.get(url, function(data) {
+				$(selector + temp[1]).remove();
+				$.facebox(data, "status_close", "confirm_dialog")
+				setTimeout('$.facebox.close()', 1000);					
+			});
+			return false;
+		}
+
 	}));
 
-
+	// ACTIVATE DEFAULT AJAX FORMS in all facebox windows
+	// Cannot delegate this since theres no event.
 	$(document).bind('reveal.facebox', function(){		
 		// Ajax forms
 			var options = {
@@ -134,7 +145,7 @@ $(document).ready(function()
 						return false;
 				},
 				success: function(data) {
-					$.facebox(data, "ajax_status", "facebox_2");
+					$.facebox(data, "status_reload", "facebox_2");
 					location.reload();							
 				}					
 			};
@@ -156,7 +167,7 @@ $(document).ready(function()
 	test area 
 */	
 
-	// initalize sortable containers
+	// ACTIVATE sortable containers
 	for(i=1;i<=5;i++){
 		$(".container_"+i).addClass("CONTAINER_WRAPPER").attr("rel",i);
 	}
@@ -186,7 +197,7 @@ $(document).ready(function()
 		//revert: true
 	});	
 	
-	// append local/global toggle to action lists
+	// ADD local/global toggle to action lists
 	// NOTE: consider doing this on the server.
 	$("span.common_tool_wrapper").each(function(){
 		var scope = $(this).attr("rel");
@@ -196,7 +207,7 @@ $(document).ready(function()
 		$("ul.toolkit_dropdown", this).append(scope_toggle);
 	});	
 
-	// activiate local/global scope toggle
+	// ACTIVATE local/global scope toggle
 	$("span.common_tool_wrapper").click($.delegate({
 		".toggle_scope": function(e){
 			var new_scope = $(e.target).attr("rel");	
@@ -211,7 +222,7 @@ $(document).ready(function()
 	}));
 	
 	
-	// get container tool-position results
+	// SAVE container tool-position results
 	var output = "";	
 	$("#get_tool_sort").click(function(){
 		page_id = $(this).attr("rel");
@@ -229,34 +240,28 @@ $(document).ready(function()
 					
 		$.facebox(function() {
 				$.post("/get/page/tools/"+page_id, {output: output}, function(data){
-					$.facebox(data, "ajax_status", "facebox_response");
-					//location.reload();
+					$.facebox(data, "status_close", "facebox_2");
+					setTimeout('$.facebox.close()', 1000);
 				})
 			}, 
-			"ajax_status", 
-			"facebox_response"
+			"status_close", 
+			"facebox_2"
 		);
-		
 	});		
-	
-	
-	
-	// Active hover action toolkit menus	
+
+	// ACTIVATE hover action Tool toolkit menus	
 	$('.actions_link').hover(
 		function(){
 			$(this).next('ul').show();
 		},
 		function(){
 			$(this).next('ul').hover(
-				function(){
-				},
-				function(){
-				$(this).hide();
-			});
+				function(){},
+				function(){$(this).hide();}
+			);
 		}
 	);
-
-		
+	
 		/*
 	var zIndexNumber = 1000;
 	$('.CONTAINER_WRAPPER div, .CONTAINER_WRAPPER ul ').each(function() {

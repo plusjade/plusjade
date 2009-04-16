@@ -41,7 +41,7 @@ if (empty($tools_array))
 		<li class="root_list dropdown">
 			<div>Files</div>
 			<ul>
-				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">Images</a></li>
+				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">(not live)</a></li>
 			</ul>
 		</li>
 		
@@ -92,8 +92,8 @@ if (empty($tools_array))
 					
 						echo '<ul class="toolkit_dropdown">';
 							echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
-							echo '<li><a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox"><img src="/images/admin/css_add.png" alt="CSS"> Edit CSS</a></li>';
-							echo '<li><a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool"><img src="/images/admin/delete.png" alt="delete!"> <span>delete</span></a></li>';	
+							echo '<li><img src="/images/admin/css_add.png" alt="CSS"> <a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">Edit CSS</a></li>';
+							echo '<li><img src="/images/admin/delete.png" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool" rel="tool_',$data_array['guid'],'">delete</a></li>';	
 						echo '</ul>';
 						echo '</td></tr></table>';
 					echo '</li>';

@@ -5,16 +5,6 @@ $page_element = array(
 	'global.css'	=> 'CSS'
 );
 /*
-# Check the cascades to find which file is in use.
-foreach($page_element as $file => $page)
-{
-	if( in_array($file, $custom_flat) )
-		$file_array[$page] = 'custom';
-	elseif( in_array($file, $theme_flat) )
-		$file_array[$page] = 'theme';
-	else
-		$file_array[$page] = 'root';
-}
 
 # Make links	
 function _link($type, $page)
@@ -35,25 +25,31 @@ function _link($type, $page)
 <div id="theme_global_wrapper">
 
 <?php
-	echo '<pre>';
-	print_r($theme_files);
-	echo '</pre>';
-/*
-	foreach($theme_files as $files)
+
+	foreach($theme_files as $dir => $file)
 	{
-	
+		if(! is_array($file) )
+		{
+			echo '<a href="'.url::site("get/theme/edit/$file").'" rel="facebox" id="2">'.$file.'</a><br>';
+		
+		}
+		else
+		{	/*
+			echo $dir.'<br><br>';
+			foreach($file as $filename)
+			{
+				echo $filename.'<br>';
+				//echo '<a href="'.url::site("get/theme/edit/$filename").'" rel="facebox" id="2">'.$filename.'</a><br>';
+			}
+			*/
+		}
 	}
-*/
+	
+	#echo '<pre>';print_r($theme_files);echo '</pre>';
 ?>
 
 
 </div>
-
-<div id="theme_layout_wrapper">
-
-
-	
-</div>			
 
 <div class="clearboth"></div>
 

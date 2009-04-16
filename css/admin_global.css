@@ -548,7 +548,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 200;
+  z-index: 999;
   text-align: left; 
 }
 .facebox .popup {
@@ -560,8 +560,10 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 .facebox table div.content{
 	overflow:hidden;
 }
-.facebox table div.ajax_status{
-	background:url('/images/load.gif') no-repeat 50% 50%;
+.facebox table div.status_reload,
+.facebox table div.status_close
+{
+	z-index:500;
 	width:300px;
 	height:200px;
 	font-size:1.4em;
@@ -569,6 +571,9 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	line-height:2em;
 	overflow:hidden;
 	text-align:center;
+}
+.facebox table div.status_reload{
+	background:url('/images/load.gif') no-repeat 50% 50%;
 }
 .facebox td {
   border-bottom: 0;
