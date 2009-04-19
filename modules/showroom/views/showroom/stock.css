@@ -1,27 +1,29 @@
 
 /* --- list_showroom --- */
 
-.list_showroom .showroom_item{
+.list_showroom div.showroom_item{
 	padding:7px;
 	margin:5px;
 	clear:both;
 	margin-bottom:10px;
 	overflow:auto;
+	border:1px solid red;
 }
-.list_showroom  .item_name{
+
+.list_showroom  div.item_name{
 	font-size:1.4em;
 	padding:10px 0;
 }
-.list_showroom  .item_body{
+.list_showroom  div.item_body{
 	float:left;
 	width:45%;
 	padding:10px;
 }
-.list_showroom .item_image{
+.list_showroom div.item_image{
 	float:left;
 	width:45%;
 }
-.list_showroom .item_image img{
+.list_showroom div.item_image img{
 	padding:5px;
 	border:1px solid #ccc;
 }
@@ -33,25 +35,25 @@
 
 /* --- gallery_showroom --- */
 
-.gallery_showroom .showroom_item{
+.gallery_showroom div.showroom_item{
 	float:left;
 	text-align:center;
 	margin:10px 0;
 	padding:10px;
 	width:47%;
 }
-.gallery_showroom .gallery_item_name{
-	font-size:1.6em;
+.gallery_showroom div.item_name{
+
 }
-.gallery_showroom .gallery_item_image{
+.gallery_showroom div.item_image{
 	padding:5px;
 	margin:10px 0;
 }
-.gallery_showroom .gallery_item_image img{
+.gallery_showroom div.item_image img{
 	padding:5px;
 	border:1px solid #ccc;
 }
-.gallery_showroom .gallery_item_intro{
+.gallery_showroom div.item_intro{
 	text-align:left;
 	margin:0 10px;
 }
