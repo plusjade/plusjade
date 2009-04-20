@@ -12,7 +12,7 @@
 		You can add up to 10 files per submit. Just keep picking your images.
 	</div>
 	
-	<div class="fieldsets">
+	<div class="fieldsets aligncenter">
 		<input type="file" name="images[]" class="multi accept-gif|jpg|png" style="font-size:1.4em"/>
 	</div>
 	

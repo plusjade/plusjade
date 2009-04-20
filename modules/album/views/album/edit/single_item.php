@@ -17,6 +17,6 @@
 	</div>
 </form>
 
-		
+<?php /*	
 <img src="<?php echo $data_path.'/assets/images/albums/'.$item->parent_id .'/'.$item->path?>">
-
+*/
