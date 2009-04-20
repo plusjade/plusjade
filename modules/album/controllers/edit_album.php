@@ -50,15 +50,17 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 			{
 			
 				# Get highest position
-				$get_highest = $db->query("SELECT MAX(position) as highest FROM album_items WHERE parent_id = '$tool_id' ");
-				$highest = $get_highest->current()->highest;
+				$get_highest = $db->query("SELECT MAX(position) as highest 
+					FROM album_items 
+					WHERE parent_id = '$tool_id' 
+				")->current()->highest;
 
 				# Setup image store directory
 				$image_store = DOCROOT."data/{$this->site_name}/assets/images/albums";			
 				if(!is_dir($image_store))
 					mkdir($image_store);
 
-				if(!is_dir($image_store.'/'.$tool_id))
+				if(! is_dir($image_store.'/'.$tool_id) )
 					mkdir($image_store.'/'.$tool_id);		
 
 
@@ -76,26 +78,18 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 				foreach($_FILES['images']['type'] as $key => $image)
 				{
 					$tmp_name	= $_FILES['images']['tmp_name'][$key];			
-					$name		= $_FILES['images']['name'][$key];
 					$holder		= array ('tmp_name' => $tmp_name);
 
-					# change whitespace...
-					$pattern = "(\s)";					
-					$name = preg_replace($pattern, '_', $name);
-
 					# Temporary file name
-					$filename = upload::save($holder);
-					$image = new Image($filename);			
-					
-					# shorten name to 15 characters
-					# so it fits in the database & standardized.
-					if(strlen($name) > 20)	
-					{
-						$start = substr($name, 0, 15);
-						$ext = $image->__get('ext');
-						$name = $start.'.'.$ext;
-					}
-					
+					$filename	= upload::save($holder);
+					$image		= new Image($filename);			
+
+					# Name = unix timestamp_album_counter.extension 
+					# with a counter appended. then finally the extension.
+
+					$ext	= $image->__get('ext');
+					$name	= time()."_$tool_id".'_'."$key.$ext";
+
 					if( $image->save("$image_store/$tool_id/$name") )
 					{
 						# add to database
@@ -103,7 +97,7 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 							'parent_id'	=> $tool_id,
 							'fk_site'	=> $this->site_id,
 							'path'		=> $name,
-							'position'	=> ++$highest,
+							'position'	=> ++$get_highest,
 						);
 						$db->insert('album_items', $data);
 						
@@ -129,16 +123,13 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 			}
 			else
 				echo 'Please select iamges to upload';
-				
-				#echo '<script>  $.jGrowl("Please select an image to upload.") </script>';  #status message			
-		
 		}	
 		else
 		{
 			/*
-			TOD0: MAKE THIS WORK
-			# Javascript		
-			$this->template->add_root_js_files('multi_form/jquery.MultiFile.pack.js');
+			 * TOD0: MAKE THIS WORK
+			 * # Javascript		
+			 * $this->template->add_root_js_files('multi_form/jquery.MultiFile.pack.js');
 			*/
 			$this->template->rootJS = '$.MultiFile();';		
 			echo $this->_show_add_single('album', $tool_id);
@@ -161,7 +152,7 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 			);
 			$db->update('album_items', $data, array( 'id' => $id, 'fk_site' => $this->site_id) );
 			
-			echo '<script>$.jGrowl("Image updated!");</script>';
+			echo 'Image Updated!';
 		}
 		else
 		{
@@ -182,7 +173,7 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 		tool_ui::validate_id($tool_id);		
 		$db = new Database;	
 			
-		if(!empty($_POST['view']))
+		if($_POST)
 		{
 			$data = array(
 				'name'		=> $_POST['name'],
@@ -196,6 +187,8 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 		}
 		else
 		{
+			
+			
 			$this->_show_edit_settings('album', $tool_id);
 		}
 		die();
@@ -214,7 +207,7 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 		
 		# Get image object
 		$image = $this->_grab_module_child('album', $id);
-					
+
 		# Image File delete
 		$image_path	= "{$this->site_data_dir}/assets/images/albums/$image->parent_id/$image->path";
 		$image_sm	= "{$this->site_data_dir}/assets/images/albums/$image->parent_id/sm_$image->path";
