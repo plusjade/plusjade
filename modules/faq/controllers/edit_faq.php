@@ -11,61 +11,121 @@ class Edit_Faq_Controller extends Edit_Module_Controller {
 	{
 		parent::__construct();
 	}
-   
-	function index($page_id)
+
+	function manage($tool_id=NULL)
 	{
+		tool_ui::validate_id($tool_id);
+		$db = new Database;
+		$primary = new View('faq/edit/manage');
+		
+		# Get faq items
+		$items = $db->query("SELECT * FROM faq_items 
+			WHERE parent_id = '$tool_id' AND fk_site = '$this->site_id'
+			ORDER BY position
+		");
+		$primary->items = $items;
+		
+		# Javascript
+		$embed_js ='
+			$("#generic_sortable_list").sortable({handle:".handle"});
+		';
+		$embed_js .= tool_ui::js_save_sort_init('faq');
+		$this->template->rootJS($embed_js);		
+		$this->template->primary = $primary;
+		echo $this->template;
+		die();	
+	}
+	
+	function add($tool_id=NULL)
+	{
+		tool_ui::validate_id($tool_id);
 		$db = new Database;
 		
 		if($_POST)
 		{
-			# add faq	
-			if(!empty($_POST['add_faq']))
-			{
-				$data = array(
-						'fk_site'	=> $this->site_id,
-						'page_id'	=> $page_id,
-						'question'	=> $_POST['question'],
-						'answer'	=> $_POST['answer'],
-				);
+			# Get highest position
+			$get_highest = $db->query("SELECT MAX(position) as highest 
+				FROM faq_items 
+				WHERE parent_id = '$tool_id' 
+			")->current()->highest;
 
-				$db->insert('faq', $data); 
+			$data = array(
+				'fk_site'	=> $this->site_id,
+				'parent_id'	=> $tool_id,
+				'question'	=> $_POST['question'],
+				'answer'	=> $_POST['answer'],
+				'position'	=> ++$get_highest
 				
-				$this->template->readyJS('$.jGrowl("New Faq added");'); #status
-			}
-			
-			# update faq
-			if(!empty($_POST['update']))
-			{	
-				$data = array(
-				   'question'	=> $_POST['question'],
-				   'answer'		=> $_POST['answer'],
-				);
-				$db->update('faq', $data, "id = '{$_POST['id']}'");
-				
-				$this->template->readyJS('$.jGrowl("Faq updated");'); #status				
-			}
-			
-			# delete faq
-			if(!empty($_POST['delete']))
-			{
-				$db->delete('faq', array('id' => "{$_POST['id']}")); 						
-				
-				$this->template->readyJS('$.jGrowl("Faq deleted!");'); #status
-			}
-	
+			);
+
+			$db->insert('faq_items', $data); 
+			echo 'Question added'; #status
 		}
-	
-		# Javascript
-		$embed_js ='
-			$("#select_tab_nav").change(function(){
-				var i = $(this).val();
-				$tabs.tabs("select", i);
-			}); 
-		';
-		$this->template->readyJS($embed_js);		
+		else
+		{
+			echo $this->_show_add_single('faq', $tool_id);
+		}
+	}
 
-		# Grab entries from module table
-		$this->_grab_module_items('faq', $page_id);
+
+	function edit($id=NULL)
+	{
+		tool_ui::validate_id($id);
+		
+		if($_POST)
+		{
+			$db = new Database;
+			$data = array(
+			   'question'	=> $_POST['question'],
+			   'answer'		=> $_POST['answer']
+			);
+			$db->update('faq_items', $data, "id = '$id' AND fk_site='$this->site_id'");
+			
+			echo 'Faq updated!<br>Updating...'; #status				
+		}
+		else
+		{
+			echo $this->_show_edit_single('faq', $id);
+		}
+		die();
+	}
+
+	function delete($tool_id=NULL)
+	{
+		tool_ui::validate_id($tool_id);
+		
+		$this->_delete_single_common('faq', $tool_id);
+		echo 'Faq deleted!'; #status
+
+		die();
+	}
+
+	public function save_sort()
+	{
+		echo $this->_save_sort_common($_GET['faq'], 'faq_items');
+		die();	
+	}
+	
+	function settings($tool_id=NULL)
+	{
+		tool_ui::validate_id($tool_id);
+
+		if($_POST)
+		{
+			$db = new Database;
+			$data = array(
+				'title'	=> $_POST['title'],
+			);
+			
+			$db->update('faqs', $data, "id='$tool_id' AND fk_site = '$this->site_id'"); 						
+			
+			echo 'Settings Updated!<br>Updating...'; #success
+		}
+		else
+		{
+			echo $this->_show_edit_settings('faq', $tool_id);
+		}
+		die();
 	}
 	
 }
