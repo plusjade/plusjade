@@ -75,13 +75,10 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 			});		
 		');
 		
-		$primary->tree = Navigation::display_tree($items, TRUE);
-		$primary->tool_id = $tool_id;
-		
+		$primary->tree = Tree::display_tree('navigation', $items, TRUE);
+		$primary->tool_id = $tool_id;	
 		$this->template->primary = $primary;
-		
 		echo $this->template;
-		
 		die();
 	}
 
@@ -122,7 +119,7 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 				$db->insert('navigation_items', $data); 	
 			}
 			# Update left and right values
-			Navigation::rebuild_tree($parent->root_id, '1');
+			Tree::rebuild_tree('navigation_items', $parent->root_id, '1');
 
 			echo 'Links added'; #status message
 			die();
@@ -170,73 +167,11 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
  */ 
 	function save_sort($tool_id)
 	{
-		tool_ui::validate_id($tool_id);
-		$db = new Database;
-		
-		/* output variable comes via ajax post request
-		 * Data Format is : "id:local_parent:position#"
-		 */
-		$output	= rtrim($_POST['output'], '#');
-		$links	= explode('#', $output);
-		
-		# Get parent table to find children 
-		# *root_id* of the root child.
-		$parent_object = $db->query("SELECT * FROM navigations 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id' ")->current();
-	
-		# Get all items (omit root) so we can delete items not sent.
-		$items = $db->query("SELECT id FROM navigation_items 
-			WHERE parent_id = '$tool_id' 
-			AND local_parent != '0'");
-	
-		$all_items = array();
-		foreach($items as $item)
+		if($_POST)
 		{
-			$all_items[$item->id] = $item->id;
-		}		
-		
-		# Trouble shoot
-		# echo '<div style="font-size:1.4em; width:300px; height:300px"><pre>';print_r($links);echo'</pre>';echo '</div>';die();
-		
-		# If at least one still exists...
-		if(! empty($links['0']) )
-		{
-			# Data Format is : "id:local_parent:position"
-			foreach($links as $link)
-			{
-				$pieces 	= explode(':', $link);
-				$id			= $pieces['0'];
-				$parent		= $pieces['1'];
-				$position	= $pieces['2'];
-				
-				# If no parent, assign to root_id
-				# Javascript assigns "0" to elements returning no parent
-				if( '0' == $parent ) $parent = $parent_object->root_id;
-
-				$data = array(
-					'local_parent'	=> $parent,
-					'position'		=> $position
-				);
-				$db->update('navigation_items', $data, "id = '$id' AND fk_site = $this->site_id"); 	
-		
-				# Item exists so remove from the delete array.
-				unset($all_items[$id]);
-			}
+			tool_ui::validate_id($tool_id);
+			echo Tree::save_tree('navigations', 'navigation_items', $tool_id, $_POST['output']);
 		}
-			
-		# Delete links.
-		if( count($all_items) > 0 )
-		{
-			$id_string = implode(',', $all_items);
-			$db->delete('navigation_items', "id IN ($id_string) AND fk_site = '$this->site_id'" ); 
-		}
-
-		# Update Left and right values
-		Navigation::rebuild_tree($parent_object->root_id, '1');
-		
-		echo 'Changes Saved!!<br>Updating...'; # status response
-		
 		die();
 	}
 
@@ -283,27 +218,32 @@ class Edit_Navigation_Controller extends Edit_Module_Controller {
 
 	}
 
-	public function css($tool_id=NULL)
+	public function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
-
-		# Overwrite old file with new file contents;
+		tool_ui::validate_id($tool_id);		
+		$db = new Database;
+			
+		# Edit item
 		if($_POST)
 		{
-			echo Css::save_contents('navigation', $tool_id, $_POST['contents'] );
+			$data = array(
+				'title'	=> $_POST['title'],
+			);		
+			$db->update('navigations', $data, "id = '$tool_id' AND fk_site = '$this->site_id'");
+				
+			echo 'Settings Saved!<br>Updating...';	
 		}
 		else
-		{
-			$primary = new View('css/edit_single');
-
-			$primary->contents	= Css::get_contents('navigation', $tool_id);
-			$primary->tool_id	= $tool_id;
-			$primary->tool_name	= 'navigation';
+		{		
+			$parent = $db->query("SELECT * FROM navigations WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();			
+			$primary = new View("navigation/edit/settings");
 			
-			echo $primary;
+			$primary->parent = $parent;
+			$this->template->primary = $primary;
+			echo $this->template;
+		}
 		
-		}		
-		die();
+		die();				
 	}
 	
 }

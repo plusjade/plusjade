@@ -68,7 +68,7 @@ class Theme_Controller extends Admin_View_Controller {
 		if(! empty($_POST['theme']) )
 		{	
 			$new_theme	= $_POST['theme'];
-			$source		= DOCROOT . 'application/views/' . $new_theme;
+			$source		= APPPATH . "views/$new_theme";
 			$dest		= DOCROOT . "data/$this->site_name/themes/$new_theme";				
 	
 			# If theme directory does not yet exist, create it.

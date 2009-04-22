@@ -40,7 +40,10 @@ class Load_Tool_Core {
 				break;
 			case 'Navigation':
 				$tool = new Navigation_Controller(); 			
-				break;					
+				break;
+			case 'Blog':
+				$tool = new Blog_Controller(); 			
+				break;						
 			default:
 				$tool = new Text_Controller();
 		}
@@ -74,6 +77,32 @@ class Load_Tool_Core {
 				$root_insert = $db->insert('navigation_items', $data); 	
 				
 				$db->update('navigations', 
+					array( 'root_id' => $root_insert->insert_id() ), 
+					array( 'id' => $tool_id, 'fk_site' => $this->site_id ) 
+				);
+				
+				return true;
+				
+			break;
+
+			case 'Showroom':
+				/*
+				 * Need this to enable nested showroom categories
+				 * Need to add a root child to items list for every other
+				 * child to belong to
+				 * Add root child id to parent for easier access.
+				 */
+				$db = new Database;
+				$data = array(
+					'parent_id'		=> $tool_id,
+					'fk_site'		=> $this->site_id,
+					'name'			=> 'ROOT',
+					'local_parent'	=> '0',
+					'position'		=> '0'
+				);	
+				$root_insert = $db->insert('showroom_items', $data); 	
+				
+				$db->update('showrooms', 
 					array( 'root_id' => $root_insert->insert_id() ), 
 					array( 'id' => $tool_id, 'fk_site' => $this->site_id ) 
 				);

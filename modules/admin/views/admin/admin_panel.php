@@ -15,7 +15,7 @@ if (empty($tools_array))
 		</li>
 		
 		<li class="root_list dropdown">
-			<div>Theme</div>
+			<div>Theme &#8595;</div>
 			<ul>
 				<li><img src="/images/admin/rainbow.png" alt=""> <a href="/get/theme" rel="facebox">Edit Theme</a></li>
 				<li><img src="/images/admin/flag_green.png" alt=""> <a href="/get/theme/logo" rel="facebox">Logo</a></li>
@@ -24,7 +24,7 @@ if (empty($tools_array))
 		</li>
 						
 		<li class="root_list dropdown">
-			<div>Pages</div>
+			<div>Pages &#8595;</div>
 			<ul>
 				<li><img src="/images/admin/page.png" alt=""> <a href="/get/page" rel="facebox">All Pages</a></li>
 				<li><img src="/images/admin/page_add.png" alt=""> <a href="/get/page/add" rel="facebox">New Page</a></li>					
@@ -32,14 +32,14 @@ if (empty($tools_array))
 		</li>
 		
 		<li class="root_list dropdown">
-			<div>Tools</div>
+			<div>Tools &#8595;</div>
 			<ul>
 				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">All Tools</a></li>
 			</ul>
 		</li>
 
 		<li class="root_list dropdown">
-			<div>Files</div>
+			<div>Files &#8595;</div>
 			<ul>
 				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">(not live)</a></li>
 			</ul>
@@ -64,8 +64,8 @@ if (empty($tools_array))
 		<table><tr>
 			<td class="title"><b>ON THIS PAGE: <?php echo $page_name?></b></td>
 			<td><a href="/get/page/settings/<?php echo $page_id?>" rel="facebox">Page Settings</a></td>
-			<td><a href="#" id="get_tool_sort" rel="<?php echo $page_id?>">Save Tool Order</a></td>
-			<td><a href="/get/tool/add/<?php echo $page_id?>" rel="facebox">Add Tools to Page</a></td>
+			<td><a href="#" id="get_tool_sort" rel="<?php echo $page_id?>">Save The Page</a></td>
+			<td><a href="/get/tool/add/<?php echo $page_id?>" rel="facebox">ADD CONTENT</a></td>
 		</tr></table>		
 
 
@@ -93,7 +93,7 @@ if (empty($tools_array))
 						echo '<ul class="toolkit_dropdown">';
 							echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
 							echo '<li><img src="/images/admin/css_add.png" alt="CSS"> <a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">Edit CSS</a></li>';
-							echo '<li><img src="/images/admin/delete.png" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool" rel="tool_',$data_array['guid'],'">delete</a></li>';	
+							echo '<li><img src="/images/admin/delete.png" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool" rel="tool_',$data_array['guid'],'">Delete</a></li>';	
 						echo '</ul>';
 						echo '</td></tr></table>';
 					echo '</li>';

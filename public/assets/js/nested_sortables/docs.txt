@@ -1,0 +1,3 @@
+http://bitsinashortbit.wordpress.com/2007/07/22/nested-sortable-jquery-plugin/
+
+http://code.google.com/p/nestedsortables/

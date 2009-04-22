@@ -26,7 +26,7 @@ abstract class Auth_Driver {
 	public function __construct(array $config)
 	{
 		// Load Session
-		$this->session = Session::instance();
+		$this->session = Sessionk::instance();
 
 		// Store config
 		$this->config = $config;

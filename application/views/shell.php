@@ -2,6 +2,7 @@
 <html>
 <head>
 	<?php
+	#$this->profiler = new Profiler;
 	if(! empty($title) ) echo '<title>'.$title.'</title>'."\n\t";
 	if(! empty($meta_tags) ) echo $meta_tags;
 	if(! empty($load_css) ) echo $load_css;
@@ -16,18 +17,18 @@
 	# Helper tools ...
 	$header	= View::factory("_global/header");
 	$menu	= View::factory("_global/menu");
-	$tracker_path = DOCROOT."data/$site_name/tracker.html";	
+	$tracker_path = DATAPATH."$site_name/tracker.html";	
 	
 	# Required for all controllers passing with primary...
 	# TODO: update this ...
 	if( empty($containers['1']) ) $containers['1'] = $primary;
-	
+
 	ob_start();
 	
 	if ( file_exists("$custom_include/master.html") )
 		readfile("$custom_include/master.html");	
 	else
-		readfile(APPPATH."views/$theme_name/master.html");
+		readfile(APPPATH."views/$this->theme/master.html");
 
 	$master = ob_get_clean();
 

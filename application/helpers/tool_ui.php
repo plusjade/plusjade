@@ -65,7 +65,6 @@ class tool_ui_Core {
 					id = this.id;
 					url = $(this).attr("href");
 					$.get(url, function(){
-					  	$.jGrowl("Item deleted!"); 
 						$("#'.$name.'_"+id).remove();
 					});
 				}
@@ -75,9 +74,4 @@ class tool_ui_Core {
 		return $javascript;
 	}
 	
-
-	
-	
-	
-	
-} // End ajax
+} // End tool_ui_Core

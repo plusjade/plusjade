@@ -25,11 +25,12 @@ class Navigation_Controller extends Controller {
 		$items	= $db->query("SELECT * FROM navigation_items 
 			WHERE parent_id = '$parent->id' 
 			AND fk_site = '$this->site_id' 
-			ORDER BY lft ASC ");		
+			ORDER BY lft ASC
+		");		
 		
 		
 		$primary->parent = $parent;
-		$primary->tree = Navigation::display_tree($items);
+		$primary->tree = Tree::display_tree('navigation', $items);
 		
 		# Javascript
 		if( $this->client->logged_in() )

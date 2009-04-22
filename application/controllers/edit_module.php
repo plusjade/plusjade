@@ -22,9 +22,6 @@ abstract class Edit_Module_Controller extends Controller {
 		
 		# View variables						
 		$data = array(
-			'theme_name'		=> $this->theme,
-			'site_name'			=> $this->site_name,
-			'js_path'			=> 'http://' . ROOTDOMAIN . '/js',
 			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/{$this->site_name}",
 			'custom_include'	=> DOCROOT."data/{$this->site_name}/themes/{$this->theme}/",
 		);	
@@ -41,18 +38,25 @@ abstract class Edit_Module_Controller extends Controller {
  * Returns single parent object 
  *
  */ 	
-	function _grab_module_parent($module, $tool_id=NULL, $child_id=NULL)
+	function _grab_module_parent($toolname, $tool_id=NULL, $child_id=NULL)
 	{	
-		$table = $module.'s';
-		$table_items = $module.'_items';
+		$table = $toolname.'s';
+		$table_items = $toolname.'_items';
 		$db = new Database;
 		
 		if (! empty($tool_id) )
 			$query = "SELECT * FROM $table WHERE id = '$tool_id' AND fk_site = '$this->site_id'";
 		else
 		{
-			$item = $db->query("SELECT parent_id FROM $table_items WHERE id = '$child_id' AND fk_site = '$this->site_id' ")->current();
-			$query = "SELECT * FROM $table WHERE id = '$item->parent_id' AND fk_site = '$this->site_id' ";
+			$item = $db->query("SELECT parent_id FROM $table_items 
+				WHERE id = '$child_id' 
+				AND fk_site = '$this->site_id'
+			")->current();
+			
+			$query = "SELECT * FROM $table 
+				WHERE id = '$item->parent_id' 
+				AND fk_site = '$this->site_id'
+			";
 		}
 		
 		$return = $db->query($query)->current();
@@ -203,9 +207,9 @@ abstract class Edit_Module_Controller extends Controller {
 			# Grab module container
 			$parent = $this->_grab_module_parent($module, $tool_id);
 			$primary->set($module, $parent);		
-						
+
 			$this->template->primary = $primary;
-			$this->template->render(TRUE);		
+			echo $this->template;		
 	}
 	
 
@@ -227,7 +231,7 @@ abstract class Edit_Module_Controller extends Controller {
 		foreach($item_array as $position => $id)
 			$db->update($table, array('position' => "$position"), "id = '$id'"); 	
 
-		echo 'Sort Order Saved!!<br>Updating...'; # status response	
+		return 'Sort Order Saved!!<br>Updating...'; # status response	
 	
 	}
 
@@ -236,14 +240,14 @@ abstract class Edit_Module_Controller extends Controller {
  * $id = id of item to delete
  *
  */
-	function _delete_single_common($module, $id)
+	function _delete_single_common($toolname, $tool_id)
 	{	
-		tool_ui::validate_id($id);		
+		tool_ui::validate_id($tool_id);		
 		$db = new Database;
-		$table = $module.'_items';
+		$table = $toolname.'_items';
 		
 		# Perform delete
-		$db->delete( $table, array('id' => "$id", 'fk_site' => $this->site_id) );	
+		$db->delete( $table, array('id' => "$tool_id", 'fk_site' => $this->site_id) );	
 	}
 
 

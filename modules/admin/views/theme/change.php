@@ -40,7 +40,7 @@
 			if($theme_name == $theme->name)
 				$selected = 'CHECKED';
 			echo '<label FOR="radio_'.$key.'">';
-			echo '<input type="radio" name="theme" id="radio_'.$key.'" value="' . $theme->name .' " ' . $selected .'> '. $theme->name;							
+			echo '<input type="radio" name="theme" id="radio_'.$key.'" value="' . $theme->name .'" ' . $selected .'> '. $theme->name;							
 			echo '</label>';
 			
 			unset($selected);

@@ -2,7 +2,7 @@
 // get website configuration from database 	
 function get_user()
 {
-	$session = Session::instance();
+	$session = Sessionk::instance();
 	$host 	= '';
     $user 	= 'root';
     $pass 	= '';
@@ -12,10 +12,10 @@ function get_user()
 	if(in_array('localhost', $parts))
 	{  # search on subdomain
 		$field_name = 'url';
-		if(count($parts) == 2)
+		if( '2' == count($parts) )
 			$site_name = 'jade';
 		else
-			$site_name = $parts[0];
+			$site_name = $parts['0'];
 	}
 	else
 	{  # search on domain
@@ -54,10 +54,29 @@ function get_user()
 Event::add('system.ready', 'get_user');
 
 /**
- * if url has /e/ it means we are trying to directly access a controller
+ * if url has /get/ it means we are trying to directly access a controller
  * else everything is treated as a page name and queried in pages db.
  */
 $pieces = explode('/', $_SERVER['REQUEST_URI']);
-if( $pieces[1] != 'get' AND $pieces[1] != 'e' )
+
+if('showroom' == $pieces['1'] AND 'XMLHttpRequest' == @$_SERVER['HTTP_X_REQUESTED_WITH'])
+{	
+	$category = @$pieces['2'];
+	$item = @$pieces['3'];
+	
+	$showroom = new Showroom_Controller();
+	
+	if(! empty($category) AND empty($item) )
+		echo $showroom->_category($category);
+	elseif(! empty($category) AND !empty($item) )
+		echo $showroom->_item($category, $item);
+		
+	die();
+}
+elseif('get' != $pieces['1'])
 	Event::add('system.ready', 'build_page');
+
+	
+
+				
 /* end */

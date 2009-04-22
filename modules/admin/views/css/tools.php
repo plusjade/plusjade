@@ -19,10 +19,10 @@ ob_start();
 foreach($unique_tools as $tool)
 {
 	$user_images	= url::site() . "data/$site_name/themes/$theme/modules/$tool/";	
-	$user_css		= DOCROOT . "/data/$site_name/themes/$theme/modules/$tool/stock.css";	
-	$theme_tool_css	= DOCROOT . "/application/views/$theme/$tool/stock.css";
-	$stock_tool_css	= DOCROOT . "/modules/$tool/views/$tool/stock.css";
-	$admin_css		= DOCROOT . "/modules/$tool/views/$tool/edit/admin.css";
+	$user_css		= DATAPATH . "$site_name/themes/$theme/modules/$tool/stock.css";	
+	$theme_tool_css	= APPPATH . "views/$theme/$tool/stock.css";
+	$stock_tool_css	= MODPATH . "$tool/views/$tool/stock.css";
+	$admin_css		= MODPATH . "$tool/views/$tool/edit/admin.css";
 
 	#  Load user custom css if available.
 	if ( file_exists($user_css) )
@@ -59,13 +59,13 @@ foreach($all_tools as $tool)
 	$pieces		= explode('.', $tool);
 	$name		= $pieces['0'];
 	$tool_id	= $pieces['1'];
-	$css_path	= DOCROOT . "data/$site_name/tools_css/$name/$tool_id.css";	
+	$css_path	= DATAPATH . "$site_name/tools_css/$name/$tool_id.css";	
 
 	if ( file_exists($css_path) )
 		readfile($css_path);
 }
-	
-	$image_path = "/application/views/$theme/global/images";
+	# This is wrong FIX IT
+	$image_path = "THIS_IS_WRONG/application/views/$theme/global/images";
 	
 	$contents =  ob_get_clean();
 	$keys = '%PATH%';
