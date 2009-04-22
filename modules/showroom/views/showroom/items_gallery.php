@@ -10,7 +10,7 @@
 			?>	
 			<div id="showroom_item_<?php echo $item->id?>" class="showroom_item" rel="<?php echo $item->id?>">
 				<div class="item_name"><?php echo $item->name?></div>	
-				<div class="item_image"><a href="<?php echo url::site("$page_name/$item->id")?>"><?php echo $image?></a></div>
+				<div class="item_image"><a href="<?php echo url::site("$item->id")?>"><?php echo $image?></a></div>
 				<div class="item_intro"><?php echo $item->intro;?></div>
 			</div>
 			

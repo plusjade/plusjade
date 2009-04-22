@@ -1,13 +1,15 @@
-
+.loading{
+	text-align:center;
+	height:100px;
+	background: #fff url(/assets/images/load_big.gif) no-repeat 50% 50%;
+}
 /* --- list_showroom --- */
 
 .list_showroom div.showroom_item{
 	padding:7px;
 	margin:5px;
 	clear:both;
-	margin-bottom:10px;
 	overflow:auto;
-	border:1px solid red;
 }
 
 .list_showroom  div.item_name{
