@@ -84,7 +84,7 @@ class Css_Controller extends Controller {
 		}
 		else
 		{
-			$primary = new View('css/edit_single');
+			$primary = new View('css/edit_single');			
 			$primary->contents	= Css::get_css_file($tool_name, $tool_id);
 			$primary->tool_id	= $tool_id;
 			$primary->name_id	= $name_id;

@@ -106,6 +106,7 @@ $config['modules'] = array
 	MODPATH.'about',
 	MODPATH.'faq',
 	MODPATH.'album',
+	MODPATH.'blog',
 	MODPATH.'admin',
 	MODPATH.'auth'
 );

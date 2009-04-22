@@ -13,6 +13,21 @@
 	*/
 class Calendar_Core {
 
+	# SIMPLE		
+	function day_function($year, $month, $day, $date_data)
+	{
+		# blank cells before day 1 or after day 30/31
+		if ($day == '')
+			echo '&nbsp;'; # for IE table cells
+			
+		if( 'NULL' != $date_data )
+		{
+			echo '<a href="/get/calendar/day/'."$month-$day-$year".'" rel="ajax" class="day_link_simple">'. $day .'</a>';
+		}
+		else
+			echo '<div class="day_simple">'.$day.'</div>';
+	}	
+
 	function getPhpAjaxCalendarCore($month, $year, $date_array=NULL, $day_function=NULL)
 	{
 		// Use the PHP time() function to find out the timestamp for the current time
@@ -176,7 +191,8 @@ EOS;
 					if( empty($date_array[$day]) )
 						$date_array[$day] = 'NULL';
 					
-					call_user_func($day_function, $year, $month, $day, $date_array[$day]);
+
+					call_user_func(array($this, $day_function ), $year, $month, $day, $date_array[$day]);
 				}				
 	
 				echo '</td>';
@@ -195,7 +211,7 @@ EOS;
 		return $this->getPhpAjaxCalendarCore($month, $year, $date_array, $day_function);
 	}
 
-	
+
 
 
 } // End Calendar

@@ -22,7 +22,7 @@ abstract class Controller_Core {
 	 */
 	public function __construct()
 	{
-		# $this->profiler = new Profiler;		
+		$session = Sessionk::instance();		
 		# Controller variables 
 		$this->theme 		= $_SESSION['theme'];	
 		$this->site_id 		= $_SESSION['site_id'];

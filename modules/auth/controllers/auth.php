@@ -83,7 +83,7 @@ class Auth_Controller extends Template_Controller {
 	 
 	public function manage()
 	{
-		if(!empty($_GET['tKn']))
+		if(! empty($_GET['tKn']) )
 		{		
 			/*
 			 * Externally authenticate a user to edit THIS site
@@ -117,7 +117,7 @@ class Auth_Controller extends Template_Controller {
 			$user	= $this->client->get_user()->username;	
 			$token	= $this->client->get_user()->token;	
 			
-			$user_site = "http://$user.".ROOTDOMAIN."/e/auth/manage?tKn=$token";
+			$user_site = "http://$user.".ROOTDOMAIN."/get/auth/manage?tKn=$token";
 			url::redirect($user_site);
 		}
 	
@@ -215,20 +215,12 @@ class Auth_Controller extends Template_Controller {
 							# create pages home record
 							$data = array(
 								'fk_site'	=> $sites_insert_id,
-								'page_name'	=> 'home'					
+								'page_name'	=> 'home',
+								'label'		=> 'Home',
+								'position'	=> '0',								
 							);
 							$query = $db->insert('pages', $data);
 							$pages_insert_id = $query->insert_id();
-							
-							# create menus home record
-							$data = array(
-								'fk_site'		=> $sites_insert_id,
-								'page_id'		=> $pages_insert_id,
-								'page_name'		=> 'home',
-								'display_name'	=> 'Home',
-								'position'		=> '0',
-							);
-							$db->insert('menus', $data);
 							
 							#log user in
 							Auth::instance()->login($user, $_POST['password']);
@@ -284,7 +276,6 @@ class Auth_Controller extends Template_Controller {
 		{
 			# DELETE ALL DATABASE ENTRIES
 			$db->delete('users', array('client_site_id' => $site_id));		
-			$db->delete('menus', array('fk_site' => $site_id));
 			$db->delete('pages', array('fk_site' => $site_id));
 			$db->delete('sites', array('site_id' => $site_id));
 			# do this for all db tables?

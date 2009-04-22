@@ -16,7 +16,7 @@ function page_select($pages, $id)
 }
 ?>
 
-<form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" class="ajaxForm" id="add_links_form" style="min-height:300px;">	
+<form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" id="add_links_form" style="min-height:300px;">	
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive">

@@ -1,0 +1,38 @@
+#showroom_wrapper_6{
+
+}
+
+/* category navigation */
+#showroom_wrapper_6 ul{
+list-style:none;
+}
+#showroom_wrapper_6 ul li{
+
+}
+#showroom_wrapper_6 ul li span a{
+
+}
+
+
+/* item container */
+#category_view_6{
+background:#eee;
+}
+
+#category_view_6 div.showroom_item{
+
+border:1px solid #ccc;
+background:#fff;
+margin:10px;
+}
+#category_view_6 div.showroom_item div.item_name{
+
+}
+#category_view_6 div.showroom_item div.item_body{
+
+}
+#category_view_6 div.showroom_item div.item_image{
+
+}
+
+/* single item view */

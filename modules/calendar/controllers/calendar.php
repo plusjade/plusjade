@@ -25,34 +25,6 @@ class Calendar_Controller extends Controller {
 			AND month = '$month'
 			ORDER BY day
 		");		
-/*		
-		# Load Titles
-		foreach($dates as $date)
-		{
-			if(! empty($date_array[$date->day]) )
-				$date_array[$date->day] .= '<br><a href="/e/calendar/event/'.$date->id.'" rel="facebox">'.$date->title.'</a>';
-			else
-				$date_array[$date->day] = '<br><a href="/e/calendar/event/'.$date->id.'" rel="facebox">'.$date->title.'</a>';
-		}
-
-		# Inject data into the date cells		
-		function day_function($year, $month, $day, $date_data)
-		{
-			# blank cells before day 1 or after day 30/31
-			if ($day == '')
-				echo '&nbsp;'; # for IE table cells
-				
-			if( 'NULL' != $date_data )
-			{
-				echo '<a href="/e/calendar/day/'."$month-$day-$year".'" rel="facebox">'.$day.'</a><br>';			
-				echo $date_data;
-			}
-			else
-				echo $day;
-		}		
-		
-		
-*/
 
 		# Count events
 		foreach($dates as $date)
@@ -85,21 +57,7 @@ class Calendar_Controller extends Controller {
 				echo $day;
 		}
 */		
-		# SIMPLE		
-		function day_function($year, $month, $day, $date_data)
-		{
-			# blank cells before day 1 or after day 30/31
-			if ($day == '')
-				echo '&nbsp;'; # for IE table cells
-				
-			if( 'NULL' != $date_data )
-			{
-				echo '<a href="/get/calendar/day/'."$month-$day-$year".'" rel="ajax" class="day_link_simple">'. $day .'</a>';
-			}
-			else
-				echo '<div class="day_simple">'.$day.'</div>';
-		}
-		
+
 		$primary->calendar = $calendar->getPhpAjaxCalendar($month, $year, $date_array, 'day_function'); 
 
 		# Javascript
@@ -175,20 +133,6 @@ class Calendar_Controller extends Controller {
 				(int) $date_array[$date->day] = 1;
 		}
 		
-		# SIMPLE		
-		function day_function($year, $month, $day, $date_data)
-		{
-			# blank cells before day 1 or after day 30/31
-			if ($day == '')
-				echo '&nbsp;'; # for IE table cells
-				
-			if( 'NULL' != $date_data )
-			{
-				echo '<a href="/get/calendar/day/'."$month-$day-$year".'" rel="ajax" class="day_link_simple">'. $day .'</a>';
-			}
-			else
-				echo '<div class="day_simple">'.$day.'</div>';
-		}		
 		
 		echo $calendar->getPhpAjaxCalendar($month, $year, $date_array, 'day_function');
 		
@@ -268,5 +212,3 @@ class Calendar_Controller extends Controller {
 	
 
 }
-
-/* -- end of application/controllers/showroom.php -- */

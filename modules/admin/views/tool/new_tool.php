@@ -1,19 +1,32 @@
 
 <style type="text/css">
 	#jade_tool_box{
-		width:80%;
-		margin:0 auto;
+		padding:5px;
+		background:#eee;
+		overflow:auto;
+		border:1px solid #ccc;
+	}
+	.tool_box_wrapper{
+		width:170px;
+		height:170px;
+		border:1px solid lightblue;
+		margin:5px;
+		float:left;
+		background:#fff;
+	}
+	.tool_box_wrapper div{
+		padding:10px;
+		line-height:1.5em;
+		margin-top:15px;
 	}
 	#jade_tool_box label{
 		display:block;
-		padding:10px;
-		margin:10px;
+		padding:10px 0;
 		cursor:cursor;
 		cursor:pointer;
-		background:lightblue;
+		background: lightblue url(/images/admin/blue_bg.png) repeat-x bottom left;
 		color:#fff;
-		font-size:1.6em;
-		width:99%;
+		font-size:1.4em;
 	}
 	#jade_tool_box label:hover,
 	#jade_tool_box label.selected
@@ -43,10 +56,13 @@
 			$checked ='';
 			if('0' == $key ) $checked = 'CHECKED';
 			
+			echo '<div class="tool_box_wrapper">';
 			echo '<label FOR="radio_'.$key.'">';
 			echo '<input type="radio" name="tool" id="radio_'.$key.'" value="' . $tool->id .' " '.$checked.'> '. $tool->name;				
 			echo '</label>';
-			echo '<div class="aligncenter">'. $tool->desc .'</div>';
+			echo '<div>'. $tool->desc .'</div>';
+			echo '</div>';
+			
 			unset($checked);
 		}
 		?>

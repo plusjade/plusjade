@@ -340,12 +340,12 @@ class View_Core {
 			foreach ($href as $value)
 			{
 				if(!in_array($value, $this->js_array))
-					$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/js/'.$value.'" charset="utf-8"></script>'."\n\t";
+					$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/assets/js/'.$value.'" charset="utf-8"></script>'."\n\t";
 			}
 		}
 		else
 			if(!in_array($href, $this->js_array))
-				$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/js/'.$href.'" charset="utf-8"></script>'."\n\t";
+				$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/assets/js/'.$href.'" charset="utf-8"></script>'."\n\t";
 
 
 		if (is_array($href)) 
@@ -383,7 +383,7 @@ class View_Core {
 		if (!isset($this->$var))  
 			$this->$var = "<!-- @{$var} -->\n\t";
 		
-		$url = 'http://' . ROOTDOMAIN.'/';
+		$url = 'http://' . ROOTDOMAIN.'/assets/';
 		
 		if ( FALSE !== $path )
 			$url = $path;

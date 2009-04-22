@@ -16,22 +16,22 @@ abstract class Template_Controller extends Controller {
 		$data = array(
 			'theme_name'		=> $this->theme,
 			'site_name'			=> $this->site_name,
-			'js_path'			=> 'http://' . ROOTDOMAIN .'/js',
 			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/$this->site_name",
-			'custom_include'	=> DOCROOT."data/$this->site_name/themes/$this->theme",
+			'custom_include'	=> DATAPATH."$this->site_name/themes/$this->theme",
 		);	
 		$this->template->set_global($data);
 		
 		# Global CSS			
-		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/');
+		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/assets/');
 				
 		# Global Javascript (Theme specific)	
 		$this->template->linkJS('jquery_latest.js');
 		
+		/*
 		$theme_js_path = APPPATH."/views/{$this->theme}/js/js.php";
 		if( file_exists($theme_js_path) )
 			include($theme_js_path);	
-			
+		*/
 		
 		# Render Template immediately after controller method	
 		if ($this->auto_render == TRUE)
