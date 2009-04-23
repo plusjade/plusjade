@@ -22,7 +22,7 @@ $(document).ready(function()
 		return false;		
 	});
 
-
+	// Click away removes open toolbars
 	$('body:not(.jade_toolbar_wrapper)').click(function(){
 		$('li.dropdown ul').hide();
 		$('.actions_wrapper ul').hide();
@@ -44,18 +44,35 @@ $(document).ready(function()
 	 
 	// ADD tool-item toolkits
 	// -----------------------------------
-	var tools = ['contact', 'showroom', 'slide_panel', 'faq'];	
-	$.each(tools, function(){	
-		var tool = this;
-		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
-			var id		= $(this).attr("rel");
-			var edit	= '<a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<a href="/get/edit_' + tool + '/delete/' + id + '" class="jade_delete_item" rel="item_'+id+'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
-					
-			$(this).prepend(toolbar);			
-		});
+/*
+	testing
+*/
+var tools = ['contact', 'showroom', 'slide_panel', 'faq'];
+$.each(tools, function(){	
+	var tool = this;
+	$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
+		var id		= $(this).attr("rel");
+		var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
+		var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="jade_delete_item" rel="item_'+id+'">delete</a>';
+		var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
+				
+		$(this).prepend(toolbar);			
 	});
+});
+
+/* used for ajax requests */
+jQuery.fn.add_toolkit_items = function(toolname){
+	$("." + toolname + "_wrapper ." + toolname + "_item").each(function(i){					
+		var id		= $(this).attr("rel");
+		var edit	= '<a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
+		var del		= '<a href="/get/edit_' + toolname + '/delete/' + id + '" class="jade_delete_item" rel="item_'+id+'">delete</a>';
+		var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
+				
+		$(this).prepend(toolbar);			
+	});
+
+};	
+	
 	// CALENDAR ITEM TOOLBAR
 	// its enabled inside the calendar controller
 	// because i dont want to use livequery
@@ -64,7 +81,14 @@ $(document).ready(function()
 	// DELEGATE main link functionality
 	// -----------------------------------
 	$("body").click($.delegate({
-	
+
+			// TEST
+		"a.inline_text": function(e){
+			rel = $(e.target).attr('rel');
+			$("#text_wrapper_"+rel).load(e.target.href);
+			return false;
+		},	
+		
 		// facebox links
 		"a[rel*=facebox]": function(e){
 			var pane = "base"; // loads in "base" unless otherwise noted via id
@@ -72,8 +96,11 @@ $(document).ready(function()
 			$.facebox(function(){
 					$.get(e.target.href, function(data){
 						$.facebox(data, false, "facebox_"+pane);
+						// wysiwyg text editor
+						$("textarea.render_html").wysiwyg();
 					});
 			}, false, "facebox_"+pane);
+
 			return false;
 		},
 		
@@ -134,7 +161,7 @@ $(document).ready(function()
 		}
 
 	}));
-
+	
 	// ACTIVATE DEFAULT AJAX FORMS in all facebox windows
 	// Cannot delegate this since theres no event.
 	$(document).bind('reveal.facebox', function(){		
@@ -153,8 +180,6 @@ $(document).ready(function()
 			};
 		$(".ajaxForm").ajaxForm(options);
 		
-		// wysiwyg text editor
-		$("textarea.render_html").wysiwyg();
 		
 		// Focus for input fields
 		$("form input, form select").focus(function(){

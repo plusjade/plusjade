@@ -1,16 +1,15 @@
-<div id="showroom_wrapper_PARENT_ID" class="showroom_wrapper gallery_showroom">
+<div class="gallery_showroom">
 	<?php
 		$counter = 0;
 		foreach($items as $item)
 		{
 			$image = '';
 			if(!empty($item->img))
-				$image = '<img src="'."$data_path/assets/images/showroom/$item->img".'" alt="'.$item->name.'">';
-				
+				$image = '<img src="'."$img_path/sm_$item->img".'" class="loader" alt="'.$item->url.'">';
 			?>	
 			<div id="showroom_item_<?php echo $item->id?>" class="showroom_item" rel="<?php echo $item->id?>">
 				<div class="item_name"><?php echo $item->name?></div>	
-				<div class="item_image"><a href="<?php echo url::site("$item->id")?>"><?php echo $image?></a></div>
+				<div class="item_image"><a href="<?php echo url::site("showroom/$category/$item->url")?>"><?php echo $image?></a></div>
 				<div class="item_intro"><?php echo $item->intro;?></div>
 			</div>
 			

@@ -6,11 +6,6 @@ class Showroom_Controller extends Controller {
 	{
 		parent::__construct();
 	}
-
-	function index()
-	{
-		echo 'blah';
-	}
 	
 	function _index($tool_id)
 	{
@@ -23,10 +18,12 @@ class Showroom_Controller extends Controller {
 			AND fk_site = '$this->site_id'
 		")->current();			
 
+		$primary = new View("showroom/index");
+		
 		# Show products immediately
 		if(	'simple' == $parent->params )
 		{
-			$primary = new View("showroom/items_$parent->view");
+			$item_view = new View("showroom/items_$parent->view");
 			$categories = $db->query("SELECT id FROM showroom_items 
 				WHERE parent_id = '$parent->id' 
 				AND fk_site = '$this->site_id'
@@ -44,63 +41,63 @@ class Showroom_Controller extends Controller {
 				ORDER BY position
 			");		
 			
-			$primary->items = $items;
+			$item_view->items = $items;
+			#Fix this
+			$item_view->img_path = "/data/$this->site_name/assets/images/showroom/39";
 			
+			$item_view->category = 'BLAH';
+			$primary->items = $item_view;
 		}
 		else
 		{
 			$primary = new View("showroom/index");
 			
-			if( empty($category) AND empty($item)  ) #display navigation
+			if( empty($category) AND empty($item)  )
 			{
-				$primary->navigation = $this->_navigation($parent->id);
-			}
-			elseif( empty($item) ) #display category
-			{
-				if(@$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
-				{
-					echo $this->_category($category);
-					die();
-				}
-
-				$primary->navigation = $this->_navigation($parent->id);
-				$primary->items = $this->_category($category);
-
-			}
-			else #display item
-			{ 
-				if(@$_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
-				{
-					echo $this->_item($category, $item);
-					die();
-				}
+				$primary->categories = $this->_categories($parent->id);
 				
-				$primary->navigation = $this->_navigation($parent->id);
+				#TODO: Make this configurable frontpage
+				$primary->items = $this->_items_category('Shirts');
+			}
+			elseif( empty($item) )
+			{
+				$primary->categories = $this->_categories($parent->id);
+				$primary->items = $this->_items_category($category, $parent->view);
+			}
+			else
+			{ 
+				$primary->categories = $this->_categories($parent->id);
 				$primary->item = $this->_item($category, $item);
-			
 			}
 		}
 
-		$primary->img_path = "/data/$this->site_name/assets/images/showroom";
+		$primary->img_path = "/data/$this->site_name/assets/images/showroom/$parent->id";
 		$primary->parent = $parent;
 		
+		
+				# Javascript
+		$edit_item_toolbar = '';
+		if($this->client->logged_in())
+			$edit_item_toolbar = '$().add_toolkit_items("showroom");';
+			
 		$primary->global_readyJS('			
-			target_div = "div#category_view_'. $parent->id .'";
+			target_div = "#showroom_wrapper_'.$parent->id.' div.showroom_items";
 			loading = "<div class=\"loading\"></div>";
 			
 			$("#showroom_wrapper_'.$parent->id.'").click($.delegate({		
-				"ul a": function(e){
+				"a.loader": function(e){
 						$(target_div).html(loading);
 						$(target_div).load(e.target.href, function(){
-
+							'. $edit_item_toolbar .'
 						});
 						return false;
-				},				
+				},
 				
-				"div#category_view_'. $parent->id .' a": function(e){
+				"a img.loader": function(e){
 						$(target_div).html(loading);
-						$(target_div).load(e.target.href, function(){
-
+						url = $(e.target).parent("a").attr("href");
+						$(target_div).load(url, function(){
+							'. $edit_item_toolbar .'
 						});
 						return false;
 				}
@@ -110,7 +107,7 @@ class Showroom_Controller extends Controller {
 		return $primary;		
 	}
 
-	function _navigation($parent_id)
+	function _categories($parent_id)
 	{
 		$db = new Database;
 		$items = $db->query("SELECT * FROM showroom_items 
@@ -122,21 +119,24 @@ class Showroom_Controller extends Controller {
 		return Tree::display_tree('showroom', $items);
 	}
 	
-	
-	function _category($category)
+	# Get items from a category
+	function _items_category($category, $view='list')
 	{
 		$db = new Database;
-		$primary = new View("showroom/items_list");
-		$primary->img_path = "/data/$this->site_name/assets/images/showroom";
+		$item_view = new View("showroom/items_$view");
 		
-		# parent 		
+		# parent category 		
 		$parent = $db->query("SELECT * FROM showroom_items 
 			WHERE fk_site = '$this->site_id'
 			AND name = '$category'
 		")->current();			
-
+		
+		
 		if(is_object($parent))
 		{
+			$item_view->img_path = "/data/$this->site_name/assets/images/showroom/$parent->id";
+		
+		
 			#display items in this cat
 			$items = $db->query("SELECT * FROM showroom_items_meta
 				WHERE cat_id = '$parent->id'	
@@ -149,16 +149,16 @@ class Showroom_Controller extends Controller {
 			
 		if( count($items) > 0 )
 		{
-			$primary->category = $category;
-			$primary->items = $items;
-			return $primary;
+			$item_view->category = $category;
+			$item_view->items = $items;
+			return $item_view;
 		}
 		else
 			return 'No items. Check back soon!';
 			
 	}
 
-	
+	# Get a single item
 	function _item($category, $item)
 	{
 		$db = new Database;	
@@ -173,7 +173,7 @@ class Showroom_Controller extends Controller {
 		{
 			$primary->item = $item_object;
 			$primary->category = $category;
-			$primary->img_path = "/data/$this->site_name/assets/images/showroom";
+			$primary->img_path = "/data/$this->site_name/assets/images/showroom/$item_object->cat_id";
 
 			return $primary;
 		}

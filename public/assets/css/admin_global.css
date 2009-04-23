@@ -36,15 +36,15 @@
 
 
 /* textarea defaults */
-.facebox div.wysiwyg iframe{
+textarea.render_html div.wysiwyg iframe{
 	height:370px !important;
 }
-.faceboxdiv.wysiwyg{
+textarea.render_html div.wysiwyg{
 	height:420px !important;
 	width:97% !important;
 }
 
-.facebox textarea{
+textarea.render_html{
 	width:99% !important;
 	height:300px !important;
 }
@@ -304,13 +304,15 @@ ul#admin_bar{
 	/* Tool Item toolbar */	
 	.jade_admin_item_edit{
 		text-align:right;
+		height:20px;
+		padding:3px;
+		background:lightblue url('/assets/images/admin/blue_bg.png') repeat-x bottom left;
 	}
 	.jade_admin_item_edit a{
-		background:lightblue;
-		padding:5px;
+		color:#fff;
 	}
 	.jade_admin_item_edit a:hover{
-		background:#ffffcc;
+		color:#000;
 	}
 
 

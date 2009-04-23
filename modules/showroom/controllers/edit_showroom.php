@@ -188,10 +188,16 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 			")->current();
 			
 			foreach($_POST['category'] as $key => $category)
-			{			
+			{
+				# Make URL friendly
+				$url = trim($category);
+				$url = strtolower($url);
+				$url = preg_replace("(\W)", '_', $url);
+			
 				$data = array(
 					'parent_id'		=> $tool_id,
 					'fk_site'		=> $this->site_id,
+					'url'			=> $url,
 					'name'			=> $category,
 					'local_parent'	=> $parent->root_id,
 					'position'		=> '0'
@@ -224,14 +230,25 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 		$db = new Database;	
 		if($_POST)
 		{
+			if( empty($_POST['name']) )
+			{
+				echo 'Name is required'; die(); # error
+			}
+			
 			# Get highest position
 			$get_highest = $db->query("SELECT MAX(position) as highest 
 				FROM showroom_items_meta 
 				WHERE cat_id = '{$_POST['category']}'
 			")->current();
-
+			
+			# Make URL friendly
+			$url = trim($_POST['url']);
+			$url = ( empty($url) ) ? $_POST['name'] : $url;
+			$url = preg_replace("(\W)", '_', $url);
+			
 			$data = array(			
 				'fk_site'	=> $this->site_id,
+				'url'		=> $url,
 				'cat_id'	=> $_POST['category'],
 				'name'		=> $_POST['name'],
 				'intro'		=> $_POST['intro'],
@@ -241,7 +258,7 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 
 			# Upload image if sent
 			if(! empty($_FILES['image']['name']) )
-				if (! $data['img'] = $this->_upload_image($_FILES) )
+				if (! $data['img'] = $this->_upload_image($_FILES, $_POST['category']) )
 					echo 'Image must be jpg, gif, or png.';
 
 
@@ -299,23 +316,30 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 				echo 'Name is required'; # error
 				die();
 			}
-
+			# Make URL friendly
+			$url = trim($_POST['url']);
+			$url = ( empty($url) ) ? $_POST['name'] : $url;
+			$url = preg_replace("(\W)", '_', $url);
+			
 			$data = array(
-				'name'	=> $_POST['name'],
-				'intro'	=> $_POST['intro'],
-				'body'	=> $_POST['body'],		
+				'url'		=> $url,
+				'cat_id'	=> $_POST['category'],
+				'name'		=> $_POST['name'],
+				'intro'		=> $_POST['intro'],
+				'body'		=> $_POST['body'],		
 			);
 			
 			# Upload image if sent
-			if(!empty($_FILES['image']['name']))
+			if(! empty($_FILES['image']['name']) )
 			{
-				$image = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['old_image']}";
+				$image = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['cat_id']}/{$_POST['old_image']}";
 		
-				if (! $data['img'] = $this->_upload_image($_FILES) )
+				if (! $data['img'] = $this->_upload_image($_FILES, $_POST['cat_id']) )
 					echo 'Image must be jpg, gif, or png.';
 				
-				if(! empty($_POST['old_image']))
-					unlink($image);
+				if(! empty($_POST['old_image']) )
+					if( file_exists($image) )
+						unlink($image);
 			}
 
 			$db->update('showroom_items_meta', $data, "id = '$id' AND fk_site = '$this->site_id'");
@@ -325,7 +349,6 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 		}
 		else
 		{
-
 			$primary = new View("showroom/edit/single_item");
 
 			# Grab single item
@@ -336,6 +359,19 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 			# If item exists & belongs to this site:
 			if(! empty($item) )
 			{
+				# Get list of categories
+				$category = $db->query("SELECT id, name, parent_id FROM showroom_items
+					WHERE id = '$item->cat_id' AND fk_site = '$this->site_id'
+				")->current();
+				
+				$categories = $db->query("SELECT id, name FROM showroom_items
+					WHERE parent_id = '$category->parent_id' AND fk_site = '$this->site_id'
+					AND local_parent != '0'
+					ORDER BY lft ASC
+				");
+				
+				$primary->categories = $categories;
+				
 				# Javascript
 				$this->template->rootJS = '$("#container-1").tabs()';			
 		
@@ -424,32 +460,51 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
  * Upload an image to showroom
  * @Param array $file = $_FILES array
  */ 	
-	private function _upload_image($_FILES)
+	private function _upload_image($_FILES, $category_id)
 	{		
 		$files = new Validation($_FILES);
 		$files->add_rules('image', 'upload::valid','upload::type[gif,jpg,png]', 'upload::size[1M]');
 		
 		if ($files->validate())
 		{
+		
+			# Name = unix timestamp_album_counter.extension 
+			# with a counter appended. then finally the extension.
+			$key=1;
 			# Temp file name
 			$filename	= upload::save('image');
 			$image		= new Image($filename);			
 			$ext		= $image->__get('ext');
-			$file_name	= basename($filename).'.'.$ext;
-			$directory	= DOCROOT."data/{$this->site_name}/assets/images/showroom";			
+			$name		= time()."$category_id".''."$key.$ext";
+			$image_store	= DATAPATH ."$this->site_name/assets/images/showroom/$category_id";			
 			
-			if(! is_dir($directory) )
-				mkdir($directory);	
+			
+			if(! is_dir($image_store) )
+				mkdir($image_store);	
 			
 			if( $image->__get('width') > 350 )
 				$image->resize(350, 650);
 			
-			$image->save("$directory/$file_name");
-		 
+			$image->save("$image_store/$name");
+		  
+			# Create sm thumb (TODO: optimize this later)
+			$image_sm = new Image($filename);			
+			
+			$sm_width = $image_sm->__get('width');
+			$sm_height = $image_sm->__get('height');
+			
+			# Make square thumbnails
+			if( $sm_width > $sm_height )
+				$image_sm->resize(200,200,Image::HEIGHT)->crop(200,200);
+			else
+				$image_sm->resize(200,200,Image::WIDTH)->crop(200,200);
+			
+			$image_sm->save("$image_store/sm_$name");
+			
 			# Remove temp file
 			unlink($filename);
 			
-			return $file_name;
+			return $name;
 		}
 		else
 			return FALSE;
