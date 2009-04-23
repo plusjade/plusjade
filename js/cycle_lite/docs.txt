@@ -1,1 +1,0 @@
-http://malsup.com/jquery/cycle/lite/

@@ -1,1 +1,0 @@
-admin folder right now just includes the admin initialization functions

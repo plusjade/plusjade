@@ -1,4 +1,0 @@
-http://lab.distilldesign.com/event-delegation/
-
-
-http://www.danwebb.net/2008/2/8/event-delegation-made-easy-in-jquery

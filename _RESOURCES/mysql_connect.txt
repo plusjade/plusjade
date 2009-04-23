@@ -1,6 +1,0 @@
-log in ssh as root 
-
-mysql -u root -p 
-prompt password "genius12"
-
-mysql-> (run mysql commands)
