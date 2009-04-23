@@ -1,5 +1,0 @@
-includes 
-
-latest jquery ui
-ajax form 
-livequery

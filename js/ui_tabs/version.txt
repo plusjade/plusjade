@@ -1,3 +1,0 @@
-1.5.3
-http://stilbuero.de/jquery/tabs_3/
-http://docs.jquery.com/UI/Tabs

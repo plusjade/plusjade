@@ -1,2 +1,0 @@
-http://www.fyneworks.com/jquery/multiple-file-upload/
-http://code.google.com/p/jquery-multifile-plugin/
