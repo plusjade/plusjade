@@ -1,19 +1,28 @@
 
-<a href="/showroom/<?php echo "$category"?>">Back to Item List</a>
-<br>
-<p class="aligncenter">
-	Link to this item: <b><?php echo url::site("showroom/$category/$item->url")?></b>
-</p>
-Intro:
-<div>
-	<? echo $item->intro?>
+<div class="breadcrumb">
+	<a href="/showroom/<?php echo "$category"?>" class="loader"><?php echo $category?></a>
+	&#8594; <?php echo $item->url?>
 </div>
 
-Body:
-<div>
-	<? echo $item->body?>
-</div>
+<div class="single_item showroom_item" rel="<?php echo $item->id?>">
 
-<p>
-	<img src="<?php echo $img_path.'/'.$item->img?>" alt="">
-</p>
+	<div class="single_name">
+		<? echo $item->name?>
+	</div>
+	
+	<div class="single_intro">
+		<? echo $item->intro?>
+	</div>
+
+	<div class="single_body">
+		<? echo $item->body?>
+	</div>
+
+	<div class="single_image">
+		<img src="<?php echo $img_path.'/'.$item->img?>" alt="">
+	</div>
+
+	<div class="aligncenter">
+		<b>Link to this item:</b> <input type="text" value="<?php echo url::site("showroom/$category/$item->url")?>" style="width:80%">
+	</div>	
+</div>

@@ -61,26 +61,12 @@ class Calendar_Controller extends Controller {
 		$primary->calendar = $calendar->getPhpAjaxCalendar($month, $year, $date_array, 'day_function'); 
 
 		# Javascript
-		$edit_item_function ='';
 		$edit_item_toolbar = '';
 		if($this->client->logged_in())
-		{
-			$edit_item_toolbar = 'edit_calendar_items();';
-			$edit_item_function ='
-				function edit_calendar_items(){	
-					$(".calendar_wrapper .calendar_item").each(function(){
-						var id		= $(this).attr("rel");
-						var edit	= "<a href=\"/e/edit_calendar/edit/" + id + "\" rel=\"facebox\">edit</a>";	
-						var del		= "<a href=\"/e/edit_calendar/delete/" + id + "\" class=\"jade_delete_item\">delete</a>";
-						var toolbar	= "<div id=\"blah\" class=\"jade_admin_item_edit\">" + edit + "-" + del + "</div>";				
-						$(this).prepend(toolbar);	
-					});
-				};			
-			';
-		}
+			$edit_item_toolbar = '$().add_toolkit_items("calendar");';
+
 		
-		
-		$primary->global_readyJS($edit_item_function.'	
+		$primary->global_readyJS('	
 			$(".phpajaxcalendar_wrapper").click($.delegate({
 
 				"a[rel*=ajax]" : function(e){			

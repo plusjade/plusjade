@@ -23,3 +23,16 @@
 	</div>
 	
 </form>
+
+<script type="text/javascript">
+	$("input[name='name']").keyup(function(){
+		input = $(this).val().replace(/\W/g, '_').toLowerCase();
+		$("input[name='url']").val(input);
+	});
+	$("input[name='url']").keyup(function(){
+		input = $(this).val().replace(/\W/g, '_');
+		$(this).val(input);
+	});
+
+
+</script>

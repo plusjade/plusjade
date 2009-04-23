@@ -28,6 +28,8 @@ jQuery.delegate = function(rules) {
       if (target.is(selector)) return rules[selector].apply(this, $.makeArray(arguments));
   }
 }
+
+
 /*
  * Public Form Validation
  *

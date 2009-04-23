@@ -10,7 +10,7 @@
 ?>		<div id="showroom_item_<?php echo $item->id?>" class="showroom_item" rel="<?php echo $item->id;?>">
 			<div class="item_name"><?php echo $item->name;?></div>
 			<div class="item_body">
-				<a href="/showroom/<?php echo "$category/$item->url"?>">More info</a><br>
+				<a href="/showroom/<?php echo "$category/$item->url"?>" class="loader">More info</a><br>
 				<?php echo $item->intro?>
 				<?php echo $item->body?>
 			</div>

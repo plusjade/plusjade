@@ -27,7 +27,7 @@
 #common_tool_header{
 	min-width:700px;
 	overflow:auto;
-	background: #fff url(/images/admin/sky_bg.png) repeat-x bottom left;
+	background: #fff url(/assets/assets/images/admin/sky_bg.png) repeat-x bottom left;
 	margin-bottom:10px;
 	padding:6px;
 	
@@ -99,15 +99,15 @@ button:hover, .buttons a:hover{
 /* POSITIVE */
 button.jade_positive, .buttons a.jade_positive{
     color:#fff;
-	background: #7ebd40 url(/images/admin/light_green_bg.png) repeat-x bottom left;
+	background: #7ebd40 url(/assets/images/admin/light_green_bg.png) repeat-x bottom left;
     border:1px solid #7ebd40;
 }
 .buttons a.jade_positive:hover, button.jade_positive:hover{
-    background: orange url(/images/admin/light_orange_bg.png) repeat-x bottom left;
+    background: orange url(/assets/images/admin/light_orange_bg.png) repeat-x bottom left;
 	border:1px solid orange; 
 }
 .buttons a.jade_positive:active{
-    background: orange url(/images/admin/light_orange_bg.png) repeat-x bottom left;
+    background: orange url(/assets/images/admin/light_orange_bg.png) repeat-x bottom left;
 	border:1px solid orange; 
 }
 

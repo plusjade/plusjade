@@ -60,14 +60,16 @@ Event::add('system.ready', 'get_user');
 $pieces = explode('/', $_SERVER['REQUEST_URI']);
 
 if('showroom' == $pieces['1'] AND 'XMLHttpRequest' == @$_SERVER['HTTP_X_REQUESTED_WITH'])
-{	
-	$category = @$pieces['2'];
-	$item = @$pieces['3'];
+{
+	$category	= @$pieces['2'];
+	$item		= @$pieces['3'];
 	
 	$showroom = new Showroom_Controller();
 	
 	if(! empty($category) AND empty($item) )
-		echo $showroom->_category($category);
+	{
+		echo $showroom->_items_category($category);
+	}
 	elseif(! empty($category) AND !empty($item) )
 		echo $showroom->_item($category, $item);
 		

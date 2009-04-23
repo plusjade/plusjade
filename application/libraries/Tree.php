@@ -93,7 +93,7 @@ class Tree_Core {
 					break;
 					
 					case 'showroom';				
-						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/showroom/'. $item->name .'">' . $item->name . '</a></span>'; 
+						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/showroom/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
 					break;
 				}
 			}

@@ -8,8 +8,11 @@
 		<div id="common_title">Edit Text</div>
 	</div>	
 	
+
 	<textarea name="body" class="render_html"><?php echo $item->body?></textarea>
 
 </form>
 
-
+<script type="text/javascript">
+	//$("textarea.render_html ").wysiwyg();
+</script>

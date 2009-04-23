@@ -1,1 +1,1 @@
-<li><a href="/get/edit_text/add/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/edit.png" class="imgfacebox" alt="edit"> Edit Text</a></li>
+<li> <img src="/assets/images/admin/edit.png" alt="edit"> <a href="/get/edit_text/add/<?php echo $identifer?>" rel="facebox" lass="inline_text" el="<?php echo $identifer?>">Edit Text</a></li>
