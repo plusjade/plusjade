@@ -15,7 +15,7 @@ if(! empty($error) )
 	
 ?>
 <div id="tagline">
-	Join <span class="text_logo"><b>+</b>Jade</span> &#8594; Create your website in minutes -
+	Join <span class="text_logo"><b>+</b>Jade</span> &#8594; Create your website in minutes.
 </div>
 
 <form action="" method="POST">	

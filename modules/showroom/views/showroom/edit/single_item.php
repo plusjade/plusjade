@@ -1,7 +1,7 @@
 
 <?php echo form::open_multipart("edit_showroom/edit/$item->id", array('class' => 'ajaxForm'))?>
 	<input type="hidden" name="old_image" value="<?php echo $item->img?>">	
-	<input type="hidden" name="cat_id" value="<?php echo $item->cat_id?>">	
+	<input type="hidden" name="old_category" value="<?php echo $item->cat_id?>">	
 	
 	
 	<div id="common_tool_header" class="buttons">

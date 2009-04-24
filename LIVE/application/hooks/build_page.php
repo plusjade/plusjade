@@ -2,7 +2,7 @@
 # query user pages and build accordingly
 function build_page()
 {	
-	$session = Session::instance();		
+	$session = Sessionk::instance();		
 	$host 	= '';
     $user 	= 'root';
     $pass 	= 'genius12';

@@ -1,13 +1,13 @@
 
-	#Header unset ETag
+#Header unset ETag
 	FileETag None
 
 # Turn on URL rewriting
 	RewriteEngine On
 
 # Allow any files or directories that exist to be displayed directly
-	#RewriteCond %{REQUEST_FILENAME} !-f
-	#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
 	
 # remove www from domains	  
 	RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
@@ -18,16 +18,16 @@
 	
 # Rewrite all other URLs to index.php/URL
 # RewriteRule ^(.+)$ index.php?kohana_uri=$1 [L]
-	RewriteCond $1 !^(index\.php|images|robots\.txt|css|js|data|application)
+	RewriteCond $1 !^(index\.php|robots\.txt|data|assets)
 	RewriteRule ^(.*)$ /index.php/$1 [L]	
 
 
 # friendly css links
-	RewriteRule ^css/global/([^/]+)/([^/]+) css/global.php?kohana_uri=$1&t=$2 [NC]
-	RewriteRule ^css/tools/([^/]+)/([^/]+)/([^/]+) css/tools.css?u=$1&t=$2&m=$3 [NC]
+#RewriteRule ^css/global/([^/]+)/([^/]+) css/global.php?kohana_uri=$1&t=$2 [NC]
+#RewriteRule ^css/tools/([^/]+)/([^/]+)/([^/]+) css/tools.css?u=$1&t=$2&m=$3 [NC]
 
 # this tells the server to parse .css file for php commands 
-	#AddType application/x-httpd-php .css
+#AddType application/x-httpd-php .css
 	
 
 

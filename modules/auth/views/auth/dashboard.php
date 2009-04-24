@@ -58,10 +58,10 @@ Create your website in 3 easy steps:
 if($this->client->logged_in(2))
 {
 	?>
-	<p><a href="/auth/create">Create New Site account</a></p>
+	<p><a href="/get/auth/create">Create New Site account</a></p>
 
-	<p><a href="/auth/destroy">Destroy Site account</a></p>
+	<p><a href="/get/auth/destroy">Destroy Site account</a></p>
 	
-	<p><a href="/auth/clean_db">Clean Database</a></p>
+	<p><a href="/get/auth/clean_db">Clean Database</a></p>
 	<?php
 }
