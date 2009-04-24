@@ -95,7 +95,7 @@ class Auth_User_Model extends ORM {
 			->pre_filter('trim')
 			->add_rules('password', 'required', 'length[5,127]')
 			->add_rules('password_confirm', 'matches[password]');
-
+		
 		if ($status = $array->validate())
 		{
 			// Change the password
