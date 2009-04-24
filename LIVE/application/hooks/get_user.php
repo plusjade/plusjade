@@ -2,7 +2,7 @@
 // get website configuration from database 	
 function get_user()
 {
-	$session = Session::instance();
+	$session = Sessionk::instance();
 	$host 	= '';
     $user 	= 'root';
     $pass 	= 'genius12';
@@ -58,6 +58,27 @@ Event::add('system.ready', 'get_user');
  * else everything is treated as a page name and queried in pages db.
  */
 $pieces = explode('/', $_SERVER['REQUEST_URI']);
-if( $pieces[1] != 'get' AND $pieces[1] != 'e' )
+
+if('showroom' == $pieces['1'] AND 'XMLHttpRequest' == @$_SERVER['HTTP_X_REQUESTED_WITH'])
+{
+	$category	= @$pieces['2'];
+	$item		= @$pieces['3'];
+	
+	$showroom = new Showroom_Controller();
+	
+	if(! empty($category) AND empty($item) )
+	{
+		echo $showroom->_items_category($category);
+	}
+	elseif(! empty($category) AND !empty($item) )
+		echo $showroom->_item($category, $item);
+		
+	die();
+}
+elseif('get' != $pieces['1'])
 	Event::add('system.ready', 'build_page');
+
+	
+
+
 /* end */

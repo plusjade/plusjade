@@ -7,12 +7,14 @@
 
 # The path starts at the $GIT_DIR and not '/'
 
-.htaccess
-.gitignore
-index.php
+
 application/logs/*
 application/hooks/*
 application/config/database.php
-#data/*
-_CLIENTS/*
-_RESOURCES/*
+extend/*
+public/index.php
+public/.htaccess
+public/blog/*
+public/data/*
+public/assets/images/_upload*
+

@@ -40,6 +40,13 @@
 		$header,
 		$menu,
 	);
+
+	# Add login to +Jade
+	if('jade' == $this->site_name )
+	{
+		array_push($keys, "%LOGIN%");
+		array_push($replacements, View::factory("_global/login"));
+	}
 	
 	# 5 containers
 	foreach($containers as $key => $content)
@@ -74,4 +81,4 @@
 	
 </body>
 </html>
-<!-- panda<3! -->
+<!-- <3panda -->

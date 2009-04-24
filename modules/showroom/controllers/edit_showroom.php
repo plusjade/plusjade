@@ -328,19 +328,32 @@ class Edit_Showroom_Controller extends Edit_Module_Controller {
 				'intro'		=> $_POST['intro'],
 				'body'		=> $_POST['body'],		
 			);
-			
+		
+			$old_image = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['old_category']}/{$_POST['old_image']}";
+		
 			# Upload image if sent
 			if(! empty($_FILES['image']['name']) )
 			{
-				$image = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['cat_id']}/{$_POST['old_image']}";
-		
-				if (! $data['img'] = $this->_upload_image($_FILES, $_POST['cat_id']) )
+				if (! $data['img'] = $this->_upload_image($_FILES, $_POST['category']) )
 					echo 'Image must be jpg, gif, or png.';
 				
 				if(! empty($_POST['old_image']) )
-					if( file_exists($image) )
-						unlink($image);
+					if( file_exists($old_image) )
+						unlink($old_image);
 			}
+			#If user has changed the category:
+			elseif ($_POST['category'] != $_POST['old_category'])
+			{
+				$new_path = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['category']}";
+				if(! is_dir($new_path) )
+					mkdir($new_path);
+				
+				$small_path = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['old_category']}/sm_{$_POST['old_image']}";
+				
+				rename($old_image, "$new_path/{$_POST['old_image']}");
+				rename($small_path, "$new_path/sm_{$_POST['old_image']}");
+			
+			}			
 
 			$db->update('showroom_items_meta', $data, "id = '$id' AND fk_site = '$this->site_id'");
 			

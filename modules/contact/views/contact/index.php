@@ -7,7 +7,7 @@
 			?>
 			<tr>
 				<td class="contact_icon">
-					<img src="/images/contact/<?php echo $contact->type; ?>_icon.png" alt="icon">
+					<img src="/assets/images/contact/<?php echo $contact->type; ?>_icon.png" alt="icon">
 				</td>
 				<td id="contact_item_<?php echo $contact->id?>" class="contact_item" rel="<?php echo $contact->id?>">
 					<?php echo View::factory("contact/type_views/$contact->type", array('contact'	=> $contact) )?>

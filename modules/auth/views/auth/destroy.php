@@ -12,5 +12,5 @@ if(!empty($confirm_link))
 <?php	
 foreach($sites as $site)
 {
-	echo '<a href="/e/auth/destroy/' , $site->site_id , '/' , $site->url , '">' , $site->url , '</a><br><br>',"\n";
+	echo '<a href="/get/auth/destroy/' , $site->site_id , '/' , $site->url , '">' , $site->url , '</a><br><br>',"\n";
 }
