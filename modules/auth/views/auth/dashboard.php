@@ -1,6 +1,5 @@
 
 
-
 <ul id="admin_generic_tab_nav" class="ui-tabs-nav">	
 	<li><a href="#fragment-1" class="ui-tabs-selected"><span>Dashboard</span></a></li>
 	<li><a href="#fragment-2"><span>Create & Manage</span></a></li>
@@ -12,7 +11,9 @@
 
 	
 <div id="common_tool_header" class="buttons">
-	<a href="/auth/logout" class="jade_negative">Logout</a>	
+	<a href="/auth/logout" class="jade_negative">Logout</a>
+	<a href="/auth/change_password">Change Password</a>
+	
 	<div id="common_title">Hello there, <?php echo ucwords($user->username)?>!</div>
 </div>
 

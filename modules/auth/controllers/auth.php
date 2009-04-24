@@ -129,29 +129,34 @@ class Auth_Controller extends Template_Controller {
 	 
 	public function create()
 	{
-		if($this->site_name != 'jade') url::redirect();
-		if(!$this->client->logged_in('admin')) url::redirect();	
-		
+		if('jade' != $this->site_name) url::redirect();
+	
 		$this->template->title = 'Create User';		
 		$primary = new View("auth/create_user");
-		
-		if ($_POST)
-		{	
-			# setup and initialize your form field names
-			$form = array(
-				'email'		=> '',
-				'username'	=> '',
-				'password'	=> '',
-				'password2'	=> '',
-			);		 
-			#  copy the form as errors, so the errors will be stored with keys corresponding to the form field names
-			$errors = $form;
 
+		# setup and initialize your form field names
+		$form = array(
+			'beta'		=> '',
+			'email'		=> '',
+			'username'	=> '',
+			'password'	=> '',
+			'password2'	=> '',
+		);	
+		#  copy the form as errors, so the errors will be stored with keys corresponding to the form field names
+		$errors = $form;
+		
+		if($_POST AND 'DOTHEDEW' != $_POST['beta'])
+		{
+			$primary->error = 'The beta code is not valid';	
+		}
+		elseif ($_POST)
+		{			 
 			# Create new user
 			$user = ORM::factory('user');			
 			
 			$post = new Validation($_POST);
 			$post->pre_filter('trim');
+			$post->add_rules('beta', 'required', 'valid::alpha_numeric'); 
 			$post->add_rules('email', 'required', 'valid::email'); 
 			$post->add_rules('username', 'required', 'valid::alpha_numeric');
 			$post->add_rules('password', 'required', 'matches[password2]', 'valid::alpha_dash');
@@ -167,13 +172,13 @@ class Auth_Controller extends Template_Controller {
 						$db = new Database;
 						while (TRUE)
 						{
-							// Create a random token
+							# Create a random token
 							$token = text::random('alnum', 32);
 
-							// Make sure the token does not already exist
+							# Make sure the token does not already exist
 							if ($db->select('id')->where('token', $token)->get('users')->count() === 0)
 							{
-								// A unique token has been found
+								# A unique token has been found
 								return $token;
 							}
 						}
@@ -184,7 +189,7 @@ class Auth_Controller extends Template_Controller {
 					foreach ($_POST as $key => $val)
 					{
 						# Set user data
-						if($key != 'password2')
+						if($key != 'password2' AND 'beta' != $key)
 							$user->$key = $val;
 					}
 					
@@ -222,10 +227,10 @@ class Auth_Controller extends Template_Controller {
 							$query = $db->insert('pages', $data);
 							$pages_insert_id = $query->insert_id();
 							
-							#log user in
+							# Log user in
 							Auth::instance()->login($user, $_POST['password']);
 								
-							#take to user dashboard
+							# Take to user dashboard
 							url::redirect('get/auth');							
 						}
 						else
@@ -239,18 +244,25 @@ class Auth_Controller extends Template_Controller {
 			}
 			else
 			{
-				# repopulate the form fields
-				$form = arr::overwrite($form, $post->as_array()); 
-				# populate the error fields, if any
-				# We need to already have created an error message file, for Kohana to use
-				# Pass the error message file name to the errors() method
-				$errors = arr::overwrite($errors, $post->errors('form_error_messages'));
-				$primary->error = $errors;
+				# Errors				
+				$errors	= arr::overwrite($errors, $post->errors('form_error_messages'));
+				$primary->error = $errors;			
 			}	
+		
+			$form	= arr::overwrite($form, $post->as_array()); 
+			$primary->values = $form;		
 		}
 		
+		#Javascript 
+		$this->template->global_readyJS('
+			// Focus for input fields
+			$("form input, form select").focus(function(){
+				$("form input, form select").removeClass("input_focus");
+				$(this).addClass("input_focus");
+			});	
+		');
 		# Display the form
-		$this->template->primary = $primary;
+		$this->template->primary = $primary;		
 			
 	}
 	
@@ -270,7 +282,7 @@ class Auth_Controller extends Template_Controller {
 		$primary = new View('auth/destroy');
 		
 		if(!empty($site_id) AND empty($confirm))
-			$primary->confirm_link = '<a href="/e/auth/destroy/' . $site_id . '/' . $site_name . '/true">Are you sure??</a>';
+			$primary->confirm_link = '<a href="/get/auth/destroy/' . $site_id . '/' . $site_name . '/true">Are you sure??</a>';
 		
 		if(!empty($site_id) AND !empty($site_name) AND !empty($confirm))
 		{
@@ -279,7 +291,7 @@ class Auth_Controller extends Template_Controller {
 			$db->delete('pages', array('fk_site' => $site_id));
 			$db->delete('sites', array('site_id' => $site_id));
 			# do this for all db tables?
-			# note (see the clean_db method in this class)
+			# NOTE (see the clean_db method in this class)
 		
 			# DELETE DATA FOLDER
 			$data_path = DOCROOT."data/$site_name";
@@ -318,6 +330,13 @@ class Auth_Controller extends Template_Controller {
 			'tools_list',
 			'users',
 			'user_tokens',
+			'chyrp_groups',
+			'chyrp_pages',
+			'chyrp_posts',
+			'chyrp_permissions',
+			'chyrp_post_attributes',
+			'chyrp_sessions',
+			'chyrp_users',
 		);
 		
 		# Get all tables from database
@@ -359,7 +378,7 @@ class Auth_Controller extends Template_Controller {
 			$id = 'id';
 			if( 'pages_tools' == $table )
 				$id = 'guid';
-							
+
 			$table_object = $db->query("SELECT fk_site FROM $table WHERE fk_site NOT IN ($id_string) ");		
 			
 			if( $table_object->count() > 0 )
@@ -384,6 +403,47 @@ class Auth_Controller extends Template_Controller {
 		$primary->results = $results;
 		$this->template->primary = $primary;
 	}
+	
+
+
+	function change_password()
+	{
+		$this->template->title = 'Change Password';
+		
+		if($_POST)
+		{
+			$old_password	= $_POST['old_password'];
+			$auth			= Auth::instance();	
+			$salt			= $auth->find_salt($auth->get_user()->password);		
+			$old_password	= $auth->hash_password($old_password, $salt);
+			unset($_POST['old_password']);
+			
+			if($old_password == $auth->get_user()->password)
+			{
+				if( $auth->get_user()->change_password($_POST, $save = TRUE) )
+				{
+					$primary = new View('auth/change_success');
+				}
+				else
+				{
+					$primary = new View('auth/change_password');
+					$primary->status = 'New Password Error';
+				}
+			}
+			else
+			{
+				$primary = new View('auth/change_password');
+				$primary->status =  'Old password is incorrect';
+			}
+		}
+		else
+		{
+			$primary = new View('auth/change_password');			
+		}
+
+		$this->template->primary = $primary;
+	}
+
 	
 	
 	/**
