@@ -6,7 +6,7 @@ class Build_Page_Controller extends Template_Controller {
 	 * Accepts a valid page w/ data from the db sent from build_page HOOK.
 	 * Grabs all tools associated with this page, places them correctly.
 	 * Proceeds to build the page.
-	 * Output to "shell" via in template controller 
+	 * Output to "shell" via template controller 
 	 *
 	 */
 	function __construct()
@@ -14,22 +14,20 @@ class Build_Page_Controller extends Template_Controller {
 		parent::__construct();
 	}
   
-	# Data = (array) page table row data
+	# $data = (array) plusjade.pages row-data
 	function _index($data)
 	{
+		$db			= new Database;
+		$page_id	= $data['id'];	
 		$_SESSION['js_files']	= array();
-		$db				= new Database;
-		$page_id		= $data['id'];
-		$primary		= '';
-		# initalize 5 containers
-		$containers_array = array(' ',' ',' ',' ',' ');		
-		$tools_array	= array();
-		$generic_tools	= array();
-		$all_tools		= array();		
-		$prepend		= '';
-		$append			= '';
+		$containers_array		= array(' ',' ',' ',' ',' ');		
+		$tools_array			= array();
+		$generic_tools			= array();
+		$all_tools				= array();		
+		$primary	= '';
+		$prepend	= '';
+		$append		= '';
 		
-		# Load assets from pages table
 		$this->template->title 	= $data['title'];
 		$this->template->meta_tags('description', $data['meta']);
 		$this->template->set_global('selected', $data['page_name']);	
@@ -37,12 +35,10 @@ class Build_Page_Controller extends Template_Controller {
 		
 		/*
 		 * Grab tools for this page in pages_tools table
-		 * Grab static and secondary pages defined below:
 		 * 0-10 are reserved for global tools. we only use 1-5 though
 		 * 
 		 */		 
-		$tools = $db->query("SELECT * 
-			FROM pages_tools 
+		$tools = $db->query("SELECT * FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
 			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
 			AND fk_site = '$this->site_id'
@@ -54,11 +50,8 @@ class Build_Page_Controller extends Template_Controller {
 		
 		if( $tools->count() > 0 )
 		{		
-			# Loop through all tools on page
 			foreach ($tools as $tool)
 			{
-				(int) $tool->page_id;
-				
 				# If Logged in wrap classes around tools for Javascript
 				# TODO: consider this with javascript
 				if( $this->client->logged_in() )
@@ -72,7 +65,7 @@ class Build_Page_Controller extends Template_Controller {
 				
 				# Create unique Tool array for CSS	
 				$all_tools[] = "$tool->tool.$tool->tool_id";
-						
+
 				# Throw tool into admin panel array
 				$tools_array[$tool->guid] = array(
 					'guid'		=> $tool->guid,
@@ -82,16 +75,14 @@ class Build_Page_Controller extends Template_Controller {
 				);
 
 				# Create Tool object
-				$tool_object = $prepend;				
+				$tool_object  = $prepend;				
 				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
 				$tool_object .= $append;
 				
 				# Add tools to correct container.				
 				$index = $tool->container;
-				# if this is a global tool...
-				if('5' >= $tool->page_id )
-					$index = $tool->page_id;
-					
+				if('5' >= $tool->page_id ) $index = $tool->page_id; #...if global
+
 				$containers_array[$index] .= $tool_object;		
 			}
 			
@@ -148,5 +139,4 @@ class Build_Page_Controller extends Template_Controller {
 		
 	}
 }
-
-/* -- end of application/controllers/about.php -- */
+/* -- end of application/controllers/build_page.php -- */

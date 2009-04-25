@@ -1,5 +1,5 @@
 <?php
-class Tool_Controller extends Admin_View_Controller {
+class Tool_Controller extends Controller {
 
 	/**
 	 *	SCOPE: Performs CRUD for tools
@@ -11,6 +11,9 @@ class Tool_Controller extends Admin_View_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		if(! $this->client->logged_in()
+			OR $this->client->get_user()->client_site_id != $this->site_id )
+				die();
 	}
 	
 # List ALL TOOLS for this site.
@@ -35,7 +38,8 @@ class Tool_Controller extends Admin_View_Controller {
 		
 		$primary->tools = $tools;
 		$primary->pages = $pages;
-		$this->template->primary = $primary;
+		echo $primary;
+		die();
 	}
 
 /*
@@ -61,7 +65,7 @@ class Tool_Controller extends Admin_View_Controller {
 				'fk_site'	=> $this->site_id
 			);			
 			$tool_insert = $db->insert($table, $data);
-					
+
 			# GET max position of tools on page			
 			$tools = $db->query("SELECT MAX(position) as highest FROM pages_tools WHERE page_id ='$page_id' ")->current();			
 			if( empty($tools->highest) ) 
@@ -92,31 +96,8 @@ class Tool_Controller extends Admin_View_Controller {
 			$tools = $db->query('SELECT * FROM tools_list');
 			$primary->tools_list = $tools;
 			$primary->page_id = $page_id;
-			
-			# Javascript
-			$this->template->rootJS = '
-				// ADD tool label stuff...
-				$("#jade_tool_box label").click(function(){
-					$("#jade_tool_box label").removeClass("selected");
-					$(this).addClass("selected");
-				});
-				
-				
-				// ACTIVATE custom ajax form
-				// data = post output from this method (above)
-				var options = {
-					success: function(data) {
-						$.get("/get/edit_"+data, function(data) { 
-							$.facebox(data, false, "facebox_base")				
-						});					
-					}					
-				};
-				$(".facebox .custom_ajaxForm").ajaxForm(options);				
-					
-				
-				
-			';
-			$this->template->primary = $primary; 	
+			echo $primary; 
+			die();
 		}		
 	}
 	
@@ -132,44 +113,35 @@ class Tool_Controller extends Admin_View_Controller {
 		
 		if($_POST)
 		{
-			$page_id = $_POST['new_page'];		
 			$data = array(
-				'page_id'	=> $page_id
+				'page_id'	=> $_POST['new_page']
 			);
-			$db->update('pages_tools', $data, array( 'guid' => "$tool_guid", 'fk_site' => "$this->site_id" ) );
-			
+			$db->update('pages_tools', $data, array( 'guid' => "$tool_guid", 'fk_site' => "$this->site_id" ) );			
 			echo 'Tool moved!!';
-			die();
 		}
 		else
 		{
-			$primary = new View('tool/move');
-
-			# Get all pages belonging to this site.
-			$pages = $db->query("SELECT id, page_name FROM pages WHERE fk_site = '$this->site_id' ORDER BY page_name");
+			$primary	= new View('tool/move');
+			$pages		= $db->query("SELECT id, page_name FROM pages WHERE fk_site = '$this->site_id' ORDER BY page_name");
 			$primary->pages = $pages;
-			
 			$primary->tool_guid = $tool_guid;
-						
-			$this->template->primary = $primary; 	
+			echo $primary;	
 		}
-		
-		# die();
-	
+		die();
 	}
 	
 	
 	
 /*
  *	Delete single tool, both parent and children.
- *  Delets the page reference in pages_tools as well.
+ *  Deletes the page reference in pages_tools as well.
  *  Comes from the tools js red toolbar
  *
  */	
- 		/*
-		 * TODO delete all image and non-database assets associated with 
-		 * the tools.
-		 */
+/*
+ * TODO delete all image and non-database assets associated with 
+ * the tools.
+ */
 	function delete($tool_guid=NULL)
 	{
 		tool_ui::validate_id($tool_guid);		
@@ -198,18 +170,6 @@ class Tool_Controller extends Admin_View_Controller {
 		echo 'Tool Deleted!<br>Updating...';
 		die();
 	}
-	
-
-	
-	
-	
-# logout
-	function logout()
-	{
-		Auth::instance()->logout();
-		url::redirect('auth');
-	}
 }
 
-/* End of file admin.php */
-/* Location: ./modules/admin/controllers/admin.php */
+/* End of file tools.php */

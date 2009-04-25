@@ -1,6 +1,6 @@
 <?php
 
-class Edit_Contact_Controller extends Edit_Module_Controller {
+class Edit_Contact_Controller extends Edit_Tool_Controller {
 
 	function __construct()
 	{

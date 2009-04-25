@@ -121,7 +121,7 @@ jQuery.fn.add_toolkit_items = function(toolname){
 		"a.jade_delete_item": function(e) {
 			var url = $(e.target).attr("href");
 			var rel	= $(e.target).attr('rel');
-			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><br><a href="#" class="cancel_delete"><img src="/images/admin/asterisk_yellow.png">Cancel</a><br><br><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/images/admin/cross.png">Delete Item</a></div>';	
+			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><br><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a><br><br><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Item</a></div>';	
 			$.facebox(data, "confirm_facebox", "confirm_dialog");
 			return false;		
 		},
@@ -130,7 +130,7 @@ jQuery.fn.add_toolkit_items = function(toolname){
 		"a.jade_delete_tool": function(e) {
 			var url		= e.target.href;
 			var rel	= $(e.target).attr('rel');
-			var data	= '<div class="buttons confirm_facebox">This will delete this entire tool.<br>All content will be lost forever!<br><br><a href="#" class="cancel_delete"><img src="/images/admin/asterisk_yellow.png">Cancel</a><br><br><br><a href="'+ url +'" class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/images/admin/cross.png">Delete Tool</a></div>';	
+			var data	= '<div class="buttons confirm_facebox">This will delete this entire tool.<br>All content will be lost forever!<br><br><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a><br><br><br><a href="'+ url +'" class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Tool</a></div>';	
 			$.facebox(data, "confirm_facebox", "confirm_dialog");
 			return false;		
 		},
@@ -230,7 +230,7 @@ jQuery.fn.add_toolkit_items = function(toolname){
 		var scope = $(this).attr("rel");
 		var toggle = 'local';
 		if("local" == scope) toggle = 'global';
-		var scope_toggle = '<li><a href="#" class="toggle_scope" rel="'+ toggle +'"><img src="/images/admin/'+ toggle +'.png" alt=""> Make '+ toggle +'</a></li>';
+		var scope_toggle = '<li><a href="#" class="toggle_scope" rel="'+ toggle +'"><img src="/assets/images/admin/'+ toggle +'.png" alt=""> Make '+ toggle +'</a></li>';
 		$("ul.toolkit_dropdown", this).append(scope_toggle);
 	});	
 
@@ -240,7 +240,7 @@ jQuery.fn.add_toolkit_items = function(toolname){
 			var new_scope = $(e.target).attr("rel");	
 			var toggle = "local";
 			if("local" == new_scope) toggle = "global";
-			var new_link = '<a href="#" class="toggle_scope" rel="' + toggle + '"><img src="/images/admin/'+ toggle +'.png" alt=""> Make ' + toggle + '</a>';
+			var new_link = '<a href="#" class="toggle_scope" rel="' + toggle + '"><img src="/assets/images/admin/'+ toggle +'.png" alt=""> Make ' + toggle + '</a>';
 			
 			$(e.target).parents("span").removeAttr("rel").attr("rel",new_scope);
 			$(e.target).replaceWith(new_link);
@@ -264,7 +264,7 @@ jQuery.fn.add_toolkit_items = function(toolname){
 			});
 		});
 		//alert(output); return false;					
-					
+
 		$.facebox(function() {
 				$.post("/get/page/tools/"+page_id, {output: output}, function(data){
 					$.facebox(data, "status_close", "facebox_2");

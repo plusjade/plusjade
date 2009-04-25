@@ -1,6 +1,6 @@
 <?php
 
-class Edit_Showroom_Controller extends Edit_Module_Controller {
+class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 /*
  *	Handles all editing logic for Showroom module.

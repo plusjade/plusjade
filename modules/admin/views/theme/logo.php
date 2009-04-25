@@ -24,12 +24,12 @@ if(count($saved_banners) > 0)
 	{
 		if($image == $_SESSION['banner'])
 		{
-			echo '<label FOR="radio_'.$key.'"><img src="'."$data_path/assets/images/banners/$image".'" id="selected_banner"></label><br>'."\n";
+			echo '<label FOR="radio_'.$key.'"><img src="'."/data/$this->site_name/assets/images/banners/$image".'" id="selected_banner"></label><br>'."\n";
 			echo '<input type="radio" name="banner" value="'.$image.'" id="radio_'.$key.'" CHECKED> Select<br>'."\n";
 		}
 		else
 		{
-			echo '<label FOR="radio_'.$key.'"><img src="'."$data_path/assets/images/banners/$image".'"></label><br>'."\n";
+			echo '<label FOR="radio_'.$key.'"><img src="'."/data/$this->site_name/assets/images/banners/$image".'"></label><br>'."\n";
 			echo '<input type="radio" name="banner" value="'.$image.'" id="radio_'.$key.'" > <b class="jade_red">Select</b><br>'."\n";
 		}
 	}

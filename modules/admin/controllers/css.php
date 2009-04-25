@@ -2,15 +2,17 @@
 class Css_Controller extends Controller {
 
 	/**
-	 *	Compile the tools css for each page
-	 * 
-	 *
-	 *
+	 * Compile the tools css for each page
+	 * edit css files for each tool
+	 * This controller shoudl be renamed to a more specific "tool" css controller
 	 */
 	
 	function __construct()
 	{
 		parent::__construct();
+		if(! $this->client->logged_in()
+			OR $this->client->get_user()->client_site_id != $this->site_id )
+				die();
 	}
 	
 /*
@@ -23,7 +25,6 @@ class Css_Controller extends Controller {
 	{
 		$primary		= new View('css/tools');
 		$db				= New Database;
-
 		$all_tools		= explode('-', $all_tools);
 		$tools			= $db->query('SELECT * FROM tools_list');		
 		$tools_list 	= array();
@@ -53,7 +54,6 @@ class Css_Controller extends Controller {
 
 		echo $primary;
 		die();
-		
 	}
 
 /*
@@ -66,10 +66,8 @@ class Css_Controller extends Controller {
 		tool_ui::validate_id($name_id);	
 		tool_ui::validate_id($tool_id);		
 		
-		$css_file_path = DOCROOT."/data/$this->site_name/tools_css";
+		$css_file_path = DOCROOT."data/$this->site_name/tools_css";
 		$db = new Database;
-		
-		# Get the tool name (this is more secure than sending via GET)
 		$tool		= $db->query("SELECT name FROM tools_list WHERE id='$name_id'")->current();
 		$tool_name	= strtolower($tool->name);
 		$table		= $tool_name.'s';

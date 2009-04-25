@@ -2,7 +2,7 @@
 <div id="common_tool_header" class="buttons">
 	<a href="/get/page/add" rel="facebox" id="add_page" class="jade_positive" style="float:left">Add New Page</a>	
 	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="/images/check.png" alt=""/> Save Menu Order
+		<img src="/assets/images/check.png" alt=""/> Save Menu Order
 	</button>
 </div>
 
@@ -34,3 +34,16 @@
 	?>
 </ul>
 
+<script type="text/javascript">
+	$("#container-1").tabs({ fx: { opacity: "toggle",duration: "fast"} });
+	
+	$("#generic_sortable_list").sortable({ 
+		handle	: ".handle",
+		axis	: "y"
+	});
+	
+	<?php
+		echo tool_ui::js_delete_init('page');
+		echo tool_ui::js_save_sort_init('page', 'page');
+	?>	
+</script>

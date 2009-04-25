@@ -1,15 +1,16 @@
 <?php
-class Admin_Controller extends Admin_View_Controller {
+class Admin_Controller extends Template_Controller {
 
 	/**
-	 *	SCOPE: Sitewide assets.
-	 *	
+	 * The admin interface should only be available at plusjade.com
 	 *
 	 */
 	
 	function __construct()
 	{
 		parent::__construct();
+		if(! $this->client->logged_in() )
+			url::redirect();
 	}
 	
 # dashboard
