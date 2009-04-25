@@ -11,8 +11,8 @@
 
 	
 <div id="common_tool_header" class="buttons">
-	<a href="/auth/logout" class="jade_negative">Logout</a>
-	<a href="/auth/change_password">Change Password</a>
+	<a href="/get/auth/logout" class="jade_negative">Logout</a>
+	<a href="/get/auth/change_password">Change Password</a>
 	
 	<div id="common_title">Hello there, <?php echo ucwords($user->username)?>!</div>
 </div>
@@ -40,7 +40,7 @@ Create your website in 3 easy steps:
 
 <div id="edit_website_link">	
 	<div class="buttons">
-		<a href="/auth/manage" class="jade_positive">Edit Website</a>
+		<a href="/get/auth/manage" class="jade_positive">Edit Website</a>
 	</div>
 </div>		
 
@@ -59,9 +59,7 @@ if($this->client->logged_in(2))
 {
 	?>
 	<p><a href="/get/auth/create">Create New Site account</a></p>
-
-	<p><a href="/get/auth/destroy">Destroy Site account</a></p>
-	
+	<p><a href="/get/auth/destroy">Destroy Site account</a></p>	
 	<p><a href="/get/auth/clean_db">Clean Database</a></p>
 	<?php
 }

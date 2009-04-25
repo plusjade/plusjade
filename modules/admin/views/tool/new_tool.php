@@ -1,6 +1,7 @@
 
 <style type="text/css">
 	#jade_tool_box{
+		width:750px;
 		padding:5px;
 		background:#eee;
 		overflow:auto;
@@ -24,14 +25,14 @@
 		padding:10px 0;
 		cursor:cursor;
 		cursor:pointer;
-		background: lightblue url(/images/admin/blue_bg.png) repeat-x bottom left;
+		background: lightblue url(/assets/images/admin/blue_bg.png) repeat-x bottom left;
 		color:#fff;
 		font-size:1.4em;
 	}
 	#jade_tool_box label:hover,
 	#jade_tool_box label.selected
 	{	
-		background: #7ebd40 url(/images/admin/light_green_bg.png) repeat-x bottom left;
+		background: #7ebd40 url(/assets/images/admin/light_green_bg.png) repeat-x bottom left;
 	}
 </style>
 
@@ -69,4 +70,21 @@
 	</div>
 	
 </form>
-
+<script type="text/javascript">
+	// ADD tool label stuff...
+	$('#jade_tool_box label').click(function(){
+		$('#jade_tool_box label').removeClass('selected');
+		$(this).addClass('selected');
+	});
+		
+	// ACTIVATE custom ajax form
+	// data = post output from this method (above)
+	var options = {
+		success: function(data) {
+			$.get('/get/edit_'+data, function(data) { 
+				$.facebox(data, false, 'facebox_base')				
+			});					
+		}					
+	};
+	$('.facebox .custom_ajaxForm').ajaxForm(options);
+</script>

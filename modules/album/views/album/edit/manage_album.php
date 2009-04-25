@@ -15,3 +15,11 @@
 		}				
 	?>
 </ul>	
+
+<script type="text/javascript">
+	$("#sortable_images_wrapper").sortable({ handle : "img" });
+	<?php
+		echo tool_ui::js_save_sort_init('album', NULL, 'sortable_images_wrapper');
+		echo tool_ui::js_delete_init('image');
+	?>
+</script>

@@ -17,13 +17,13 @@ abstract class Template_Controller extends Controller {
 			'theme_name'		=> $this->theme,
 			'site_name'			=> $this->site_name,
 			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/$this->site_name",
-			'custom_include'	=> DATAPATH."$this->site_name/themes/$this->theme",
+			'custom_include'	=> DATAPATH . "$this->site_name/themes/$this->theme",
 		);	
 		$this->template->set_global($data);
 		
 		# Global CSS			
 		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/assets/');
-				
+		
 		# Global Javascript (Theme specific)	
 		$this->template->linkJS('jquery_latest.js');
 		

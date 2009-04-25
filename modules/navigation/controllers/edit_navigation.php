@@ -1,6 +1,6 @@
 <?php
 
-class Edit_Navigation_Controller extends Edit_Module_Controller {
+class Edit_Navigation_Controller extends Edit_Tool_Controller {
 /*
  * Edit a navigation menu
  *

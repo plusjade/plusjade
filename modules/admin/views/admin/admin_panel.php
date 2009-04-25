@@ -16,32 +16,32 @@ if (empty($tools_array))
 		
 		<li class="root_list dropdown">
 			<div>Theme &#8595;</div>
-			<ul>
-				<li><img src="/images/admin/rainbow.png" alt=""> <a href="/get/theme" rel="facebox">Edit Theme</a></li>
-				<li><img src="/images/admin/flag_green.png" alt=""> <a href="/get/theme/logo" rel="facebox">Logo</a></li>
-				<li><img src="/images/admin/flag_green.png" alt=""> <a href="/get/theme/change" rel="facebox">New Theme</a></li>
+			<ul> 
+				<li><img src="<?php echo url::image_path('admin/rainbow.png')?>" alt=""> <a href="/get/theme" rel="facebox">Edit Theme</a></li>
+				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/logo" rel="facebox">Logo</a></li>
+				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/change" rel="facebox">New Theme</a></li>
 			</ul>		
 		</li>
 						
 		<li class="root_list dropdown">
 			<div>Pages &#8595;</div>
 			<ul>
-				<li><img src="/images/admin/page.png" alt=""> <a href="/get/page" rel="facebox">All Pages</a></li>
-				<li><img src="/images/admin/page_add.png" alt=""> <a href="/get/page/add" rel="facebox">New Page</a></li>					
+				<li><img src="<?php echo url::image_path('admin/page.png')?>" alt=""> <a href="/get/page" rel="facebox">All Pages</a></li>
+				<li><img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="/get/page/add" rel="facebox">New Page</a></li>					
 			</ul>		
 		</li>
 		
 		<li class="root_list dropdown">
 			<div>Tools &#8595;</div>
 			<ul>
-				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">All Tools</a></li>
+				<li><img src="<?php echo url::image_path('admin/tools.png')?>" alt=""> <a href="/get/tool" rel="facebox">All Tools</a></li>
 			</ul>
 		</li>
 
 		<li class="root_list dropdown">
 			<div>Files &#8595;</div>
 			<ul>
-				<li><img src="/images/admin/tools.png" alt=""> <a href="/get/tool" rel="facebox">(not live)</a></li>
+				<li><img src="<?php echo url::image_path('admin/tools.png')?>" alt=""> <a href="/get/tool" rel="facebox">(not live)</a></li>
 			</ul>
 		</li>
 		
@@ -50,15 +50,13 @@ if (empty($tools_array))
 		</li>
 
 		<li class="root_list floatright">
-			<div><a href="/admin/logout">Logout</a></div>
+			<div><a href="/get/admin/logout">Logout</a></div>
 		</li>	
 		
 		<li class="root_list floatright">
-			<div><a href="http://<?php echo ROOTDOMAIN ?>/auth">+Jade</a></div>
+			<div><a href="http://<?php echo ROOTDOMAIN ?>/get/auth">+Jade</a></div>
 		</li>
 	</ul>
-
-	
 	
 	<div id="tool_bar_wrapper">
 		<table><tr>
@@ -74,9 +72,8 @@ if (empty($tools_array))
 			if( count($tools_array) > 0 )
 			{
 				/*
-				 * THIS IS HIDDEN: Only here so JS can grab html.
+				 * THIS IS HIDDEN: Exists so JS can grab html.
 				 * $tool_array = guid|tool_name|tool_id
-				 * Notes:
 				 * guid			is for pages_tools table
 				 * name			defines the tool table (plural) ex: album(s)
 				 * name_id		tools_list id of the tool
@@ -88,12 +85,12 @@ if (empty($tools_array))
 						echo'<table><tr><td class="name_wrapper">';
 						echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
 						echo '</td><td class="actions_wrapper">';
-						echo '<a href="#" class="actions_link"><img src="/assets/images/admin/cog_edit.png" alt=""> Edit</a>';
+						echo '<a href="#" class="actions_link"><img src="'. url::image_path('admin/cog_edit.png') .'" alt=""> Edit</a>';
 					
 						echo '<ul class="toolkit_dropdown">';
 							echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
-							echo '<li><img src="/assets/images/admin/css_add.png" alt="CSS"> <a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">Edit CSS</a></li>';
-							echo '<li><img src="/assets/images/admin/delete.png" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool" rel="tool_',$data_array['guid'],'">Delete</a></li>';	
+							echo '<li><img src="'. url::image_path('admin/css_add.png') .'" alt="CSS"> <a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">Edit CSS</a></li>';
+							echo '<li><img src="'. url::image_path('admin/delete.png') .'" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool" rel="tool_',$data_array['guid'],'">Delete</a></li>';	
 						echo '</ul>';
 						echo '</td></tr></table>';
 					echo '</li>';

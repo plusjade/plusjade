@@ -1,5 +1,5 @@
 <?php
-class Edit_Album_Controller extends Edit_Module_Controller {
+class Edit_Album_Controller extends Edit_Tool_Controller {
 	
 	function __construct()
 	{
@@ -14,22 +14,7 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 	function manage($tool_id=NULL)
 	{
 		tool_ui::validate_id($tool_id);
-
-		$embed_js = '	
-			$("#sortable_images_wrapper").sortable({ handle : "img" });
-		';
-		$this->template->rootJS($embed_js);
-
-		# Javascript Save sort
-		$save_sort_js = tool_ui::js_save_sort_init('album', NULL, 'sortable_images_wrapper');
-		$this->template->rootJS($save_sort_js);
-		
-		# Javascript delete		
-		$delete_js = tool_ui::js_delete_init('image');
-		$this->template->rootJS($delete_js);
-
-		# Show the manage panel
-		$this->_show_manage_module_items('album', $tool_id);		
+		echo $this->_show_manage_module_items('album', $tool_id);		
 		die();
 	}
 
@@ -151,7 +136,6 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 				'caption'	=> $_POST['caption'],
 			);
 			$db->update('album_items', $data, array( 'id' => $id, 'fk_site' => $this->site_id) );
-			
 			echo 'Image Updated!';
 		}
 		else
@@ -180,15 +164,11 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 				'view'		=> $_POST['view'],
 				'params'	=> $_POST['params'],
 			);
-			
-			$db->update('albums', $data, " id = '$tool_id' AND fk_site = '{$this->site_id}' ");
-			
+			$db->update('albums', $data, " id = '$tool_id' AND fk_site = '$this->site_id' ");
 			echo 'Settings Saved!!<br>Updating ...';
 		}
 		else
 		{
-			
-			
 			$this->_show_edit_settings('album', $tool_id);
 		}
 		die();
@@ -209,8 +189,8 @@ class Edit_Album_Controller extends Edit_Module_Controller {
 		$image = $this->_grab_module_child('album', $id);
 
 		# Image File delete
-		$image_path	= "{$this->site_data_dir}/assets/images/albums/$image->parent_id/$image->path";
-		$image_sm	= "{$this->site_data_dir}/assets/images/albums/$image->parent_id/sm_$image->path";
+		$image_path	= "$this->site_data_dir/assets/images/albums/$image->parent_id/$image->path";
+		$image_sm	= "$this->site_data_dir/assets/images/albums/$image->parent_id/sm_$image->path";
 		unlink($image_path);
 		unlink($image_sm);
 		

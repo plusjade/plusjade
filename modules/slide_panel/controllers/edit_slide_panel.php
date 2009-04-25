@@ -1,5 +1,5 @@
 <?php
-class Edit_Slide_Panel_Controller extends Edit_Module_Controller {
+class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
 	
 	function __construct()
 	{

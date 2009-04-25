@@ -59,7 +59,7 @@ class Site_Data_Core {
 # edit a site data file
 	function edit_file($filename)
 	{		
-		$current_file = DOCROOT."data/$this->site_name/themes/$this->theme/$filename";
+		$current_file = DATAPATH . "$this->site_name/themes/$this->theme/$filename";
 		
 		if( file_exists($current_file) )
 		{
@@ -67,13 +67,13 @@ class Site_Data_Core {
 			return $contents;
 		}
 		else
-			return 'You cannot edit this file'; #status message		
+			return FALSE; #status message		
 	}
 
 # save edits to a file
 	function save_file($filename, $new_contents)
 	{
-		$current_file = DOCROOT."data/$this->site_name/themes/$this->theme/$filename";
+		$current_file = DATAPATH . "$this->site_name/themes/$this->theme/$filename";
 		
 		if( file_exists($current_file) )
 		{

@@ -1,5 +1,5 @@
 <?php
-class Edit_Faq_Controller extends Edit_Module_Controller {
+class Edit_Faq_Controller extends Edit_Tool_Controller {
 
 /*
  *	Handles all editing logic for FAQ module.

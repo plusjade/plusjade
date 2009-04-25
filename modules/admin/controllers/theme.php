@@ -1,5 +1,5 @@
 <?php
-class Theme_Controller extends Admin_View_Controller {
+class Theme_Controller extends Controller {
 
 	/**
 	 *	Provides CRUD for theme and theme assets 
@@ -8,6 +8,9 @@ class Theme_Controller extends Admin_View_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		if(! $this->client->logged_in()
+			OR $this->client->get_user()->client_site_id != $this->site_id )
+				die();
 	}
 
 # Manage Current Theme Files
@@ -21,18 +24,9 @@ class Theme_Controller extends Admin_View_Controller {
 		$theme_data_path	= APPPATH."views/$this->theme";
 		
 		$primary->theme_files = $directory->get_file_list($custom_data_path, 'root', TRUE);
-				
-		$primary->render(TRUE);
-		die();
-		
-		# $this->template->primary = $primary;	
-	}
 
-# Create new custom file instance.
-	function create($file=Null, $dir=NULL)
-	{	
-		echo Site_Data::create_file($file, $dir); 
-		die();	
+		echo $primary;
+		die();
 	}
 
 # Update a file	
@@ -47,19 +41,15 @@ class Theme_Controller extends Admin_View_Controller {
 		{
 			$primary = new View('theme/edit_file');
 			$primary->file_name = $file;
-			$primary->file_contents = Site_Data::edit_file($file);
-			echo $primary;
+			
+			if( $primary->file_contents = Site_Data::edit_file($file) )
+				echo $primary;
+			else
+				echo 'You cannot edit this file';
 		}
 		die();		
 	}
 
-# delete custom file instance	
-	function delete($file=NULL, $dir=NULL)
-	{		
-		echo Site_Data::delete_file($file, $dir);
-		die();
-	}
-	
 # Change Sitewide Theme
 	function change()
 	{
@@ -77,7 +67,7 @@ class Theme_Controller extends Admin_View_Controller {
 				$copy_theme = new Data_Folder;	
 				if(! $copy_theme->dir_copy($source, $dest) )
 				{
-					#Error message
+					# Error
 					echo 'Unable to change theme<br>Please try again later.';
 					die();
 				}
@@ -86,15 +76,12 @@ class Theme_Controller extends Admin_View_Controller {
 			
 			#TODO: Make sure this is handled by facebox auto reload.
 			echo 'Theme Changed!!<br>Updating...';
-		
 		}
 		else
 		{
-			$primary = new View('theme/change');
-				
-			$themes = $db->query('SELECT * FROM themes');
-			$primary->themes = $themes;
-			
+			$primary	= new View('theme/change');
+			$themes		= $db->query('SELECT * FROM themes');
+			$primary->themes = $themes;			
 			echo $primary;
 		}
 		
@@ -198,7 +185,6 @@ class Theme_Controller extends Admin_View_Controller {
 	}
 
 	
-		
 	function add_logo()
 	{
 		if(! empty($_FILES['image']['name']) )
@@ -257,7 +243,8 @@ class Theme_Controller extends Admin_View_Controller {
 			
 			#success message	
 			echo 'Image changed!';  		
-		}		
+		}
+		die();
 	}
 	
 	
@@ -274,7 +261,8 @@ class Theme_Controller extends Admin_View_Controller {
 					echo 'Unable to delete image'; 
 				
 			}
-		}	
+		}
+		die();
 	}
 
 	
@@ -284,7 +272,7 @@ class Theme_Controller extends Admin_View_Controller {
 		$primary = new View("theme/logo");
 		
 		# Get all uploaded Logos
-		$upload_path = DOCROOT."/data/{$this->site_name}/assets/images/banners";		
+		$upload_path = DOCROOT."/data/$this->site_name/assets/images/banners";		
 		$saved_banners = array();
 		
 		if(is_dir($upload_path))

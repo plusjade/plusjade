@@ -9,7 +9,7 @@ class Css_Core {
 	 */
 	function get_css_file($tool_name, $tool_id)
 	{
-		$dir_path	= DOCROOT."data/$this->site_name/tools_css/$tool_name";
+		$dir_path	= DATAPATH . "$this->site_name/tools_css/$tool_name";
 		$file_path	= "$dir_path/$tool_id.css";		
 		
 		ob_start();
@@ -27,7 +27,7 @@ class Css_Core {
 			{
 				return '/* new file */';
 			}
-						
+
 			# Change the values
 			$source_contents = str_replace('++', $tool_id , ob_get_clean() );
 			
@@ -51,7 +51,7 @@ class Css_Core {
 	 */
 	function save_custom_css($tool_name, $tool_id, $contents)
 	{
-		$dir_path	= DOCROOT."/data/$this->site_name/tools_css/$tool_name";
+		$dir_path	= DOCROOT."data/$this->site_name/tools_css/$tool_name";
 		$file_path	= "$dir_path/$tool_id.css";	
 		
 		if( file_put_contents($file_path, $contents) )

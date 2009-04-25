@@ -16,7 +16,7 @@
 			<br>Convenient checklists ensure you keep on track!
 			
 		</p>
-		<a href="/e/admin/logout" target="_parent">logout</a>
+		<a href="/get/admin/logout" target="_parent">logout</a>
 	</div>
 
 	<div id="fragment-2" class="ui-tabs-hide">
