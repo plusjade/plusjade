@@ -54,6 +54,22 @@ function page_select($pages, $id)
 	
 	?>
 	</div>
+</form>
 
-	
-</form>		
+<script type="text/javascript">
+	$(".facebox .toggle_type").each(function(){
+		var field_id = $(this).attr("rel");
+		
+		$(this).change(function(){
+			var span = "#" + $(this).val() + "_" + field_id;
+			
+			// Disable to start over
+			$(".hide_" + field_id).hide();
+			$(".hide_" + field_id + " > :input").attr("disabled","disabled").removeAttr("rel");
+			
+			// Enable selection
+			$(span + " > :input").removeAttr("disabled").attr("rel","text_req");
+			$(span).show();
+		});
+	});
+</script>

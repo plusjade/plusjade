@@ -24,3 +24,10 @@
 	}
 	?>
 </ul>
+
+<script type="text/javascript">
+	$("#generic_sortable_list").sortable({handle:".handle"});
+	<?php 
+		echo tool_ui::js_save_sort_init('faq');
+	?>
+</script>

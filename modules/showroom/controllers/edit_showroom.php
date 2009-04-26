@@ -25,7 +25,6 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			AND fk_site = '$this->site_id'
 		")->current();			
 
-
 		#show category list.
 		$primary = new View("showroom/edit/manage_showroom");
 		$items = $db->query("SELECT * FROM showroom_items 
@@ -33,73 +32,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			AND fk_site = '$this->site_id' 
 			ORDER BY lft ASC 
 		");		
-
 		$primary->tree = Tree::display_tree('showroom', $items, TRUE);		
-
-		$embed_js ='
-			// start simple tree mode
-			$simpleTreeCollection = $(".facebox .simpleTree").simpleTree({
-				autoclose: true,
-				animate:true
-			});
-			
-			// add delete icons
-			$(".facebox li:not(.root)>span").after(" <img src=\"/images/navigation/cross.png\" class=\"li_delete\" alt=\"\">");
-			
-			// activate delete icons
-			$(".facebox .li_delete").click(function(){
-				$(this).parent().remove();	
-			});
-			
-			
-			// Gather and send nest data.
-			$(".facebox #link_save_sort").click(function() {
-				var output = "";
-				var tool_id = $(this).attr("rel");
-				
-				$(".facebox #admin_category_wrapper ul").each(function(){
-					var parentId = $(this).parent().attr("rel");
-					if(!parentId) parentId = 0;
-					var $kids = $(this).children("li:not(.root, .line, .line-last)");
-					
-					// Data set format: "id:local_parent_id:position#"
-					$kids.each(function(i){
-						output += $(this).attr("rel") + ":" + parentId + ":" + i + "#";
-					});
-				});
-				
-				//alert (output); return false;
-				
-				
-				$.facebox(function() {
-						$.post("/get/edit_showroom/category_sort/"+tool_id, {output: output}, function(data){
-							$.facebox(data, "status_reload", "facebox_response");
-							location.reload();
-						})
-					}, 
-					"status_reload", 
-					"facebox_response"
-				);
-
-				
-			});		
-		';
-		$this->template->rootJS($embed_js);
-		$this->template->primary = $primary;
 		$primary->tool_id = $tool_id;
-		echo $this->template;
-		die();
-	
-		
-		# Javascript Save sort
-		$save_sort_js = tool_ui::js_save_sort_init('showroom');
-		$this->template->rootJS($save_sort_js);
-		
-		# Javascript delete
-		$delete_js = tool_ui::js_delete_init('showroom');
-		$this->template->rootJS($delete_js);
-		# Show the manage panel
-		$this->_show_manage_module_items('showroom', $tool_id);
+		echo $primary;
 		die();
 	}
 
@@ -117,21 +52,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			ORDER BY lft ASC
 		");	
 		$primary->categories = $categories;
-		
-		$this->template->rootJS = '
-			$("#admin_cat_dropdown").change(function(){
-				val = $("option:selected", this).val();
-				//alert(val);
-				$("#load_box").load("get/edit_showroom/list_items/"+val);
-			})
-		
-		
-		';
-
-		$this->template->primary = $primary;
-		
-		
-		echo $this->template;
+		echo $primary;
 		die();
 	}
 
@@ -140,6 +61,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		tool_ui::validate_id($cat_id);
 		$db = new Database;
 		$primary = new View('showroom/edit/list');
+		
 		#display items in this cat
 		$items = $db->query("SELECT * FROM showroom_items_meta 
 			WHERE cat_id = '$cat_id' AND fk_site = '$this->site_id'
@@ -206,7 +128,6 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			}
 			# Update left and right values
 			Tree::rebuild_tree('showroom_items', $parent->root_id, '1');
-
 			echo 'Categories added<br>Updating...'; #status message
 			die();
 			
@@ -282,11 +203,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				$primary->tool_id = $tool_id;			
 				$this->template->primary = $primary;
 				$primary->categories = $categories;
-				
-				#Javascript
-				$this->template->rootJS = '$("#tab_container").tabs()';
-				
-				echo $this->template;			
+				echo $primary;			
 			}
 			else
 			{
@@ -383,23 +300,13 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 					ORDER BY lft ASC
 				");
 				
-				$primary->categories = $categories;
-				
-				# Javascript
-				$this->template->rootJS = '$("#container-1").tabs()';			
-		
+				$primary->categories = $categories;	
 				$primary->item = $item;
-				$this->template->primary = $primary;
-				echo $this->template;			
+				echo $primary;			
 			}
 			else
-			{
 				echo 'Bad id';
-			}	
-		
-
 		}
-		
 		die();		
 	}
 
@@ -413,7 +320,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	{
 		tool_ui::validate_id($id);				
 		# Get image object
-		$image = $this->_grab_module_child('showroom', $id);
+		$image = $this->_grab_tool_child('showroom', $id);
 
 		# Image File delete		
 		$image_path = "$this->site_data_dir/assets/images/showroom/$image->img";	
@@ -456,15 +363,12 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				'view'		=> $_POST['view'],
 				'params'	=> $_POST['params'],
 			);
-			
 			$db->update('showrooms', $data, " id = '$tool_id' AND fk_site = '{$this->site_id}' ");
-			
 			echo 'Showroom updated!!';		
-		
 		}
 		else
 		{
-			$this->_show_edit_settings('showroom', $tool_id);	
+			$this->_view_edit_settings('showroom', $tool_id);	
 		}
 		die();
 	}
@@ -521,10 +425,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		}
 		else
 			return FALSE;
-
-		
-	}
-	
+	}	
 }
 
 /* -- end of application/controllers/showroom.php -- */

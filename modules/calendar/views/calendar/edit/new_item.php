@@ -21,4 +21,12 @@
 			<textarea name="desc" class="render_html"></textarea>
 		</div>
 	</div>
-</form>		
+</form>	
+
+<script type="text/javascript">
+	$("#datepicker").datepicker({
+		altField: "#date_field",
+		changeMonth: true
+		//changeYear: true
+	});
+</script>

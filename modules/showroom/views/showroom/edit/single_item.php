@@ -3,7 +3,6 @@
 	<input type="hidden" name="old_image" value="<?php echo $item->img?>">	
 	<input type="hidden" name="old_category" value="<?php echo $item->cat_id?>">	
 	
-	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="edit_item" class="jade_positive" accesskey="enter">
 			<img src="/images/check.png" alt=""/>  Save Changes
@@ -11,7 +10,6 @@
 		<div id="common_title">Edit Showroom item</div>
 	</div>	
 	
-
 	<div id="container-1">
 		<ul class="ui-tabs-nav" id="showroom_textarea_tab_list">
 			<li><a href="#fragment-1"><b>Attributes</b></span></a><li>
@@ -41,7 +39,6 @@
 							echo '<option value="'.$category->id.'" selected="selected">'.$category->name.'</option>'."\n";
 						else
 							echo '<option value="'.$category->id.'">'.$category->name.'</option>'."\n";
-					
 					}
 					?>
 				</select>
@@ -67,7 +64,7 @@
 </form>
 
 <script type="text/javascript">
-
+	$("#container-1").tabs();
 	$("input[name='name']").keyup(function(){
 		input = $(this).val().replace(/\W/g, '_').toLowerCase();
 		$("input[name='url']").val(input);
@@ -76,6 +73,4 @@
 		input = $(this).val().replace(/\W/g, '_');
 		$(this).val(input);
 	});
-
-
 </script>

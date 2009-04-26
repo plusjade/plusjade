@@ -22,7 +22,8 @@
 	# Required for all controllers passing with primary...
 	# TODO: update this ...
 	if( empty($containers['1']) ) $containers['1'] = $primary;
-
+	if( empty($containers['2']) ) $containers['2'] = '';
+	
 	ob_start();
 	
 	if ( file_exists("$custom_include/master.html") )
@@ -40,19 +41,19 @@
 		$header,
 		$menu,
 	);
-
-	# Add login to +Jade
-	if('jade' == $this->site_name )
-	{
-		array_push($keys, "%LOGIN%");
-		array_push($replacements, View::factory("_global/login"));
-	}
 	
 	# 5 containers
 	foreach($containers as $key => $content)
 	{
 		array_push($keys, "%CONTAINER_$key%");
 		array_push($replacements, $content);
+	}
+	
+	# Add login to +Jade
+	if('jade' == $this->site_name )
+	{
+		array_push($keys, "%LOGIN%");
+		array_push($replacements, View::factory("_global/login"));
 	}
 	
 	# TODO: Look into compression for this ...

@@ -64,3 +64,10 @@ echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'id'
 	?>
 </form>
 
+<script type="text/javascript">
+	$(".facebox #place_address").click(function(){
+		var html = $(".facebox #address_container").html();
+		$(".facebox #contact_textarea").html(html);
+		return false;
+	});
+</script>

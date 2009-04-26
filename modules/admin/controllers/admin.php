@@ -27,7 +27,7 @@ class Admin_Controller extends Template_Controller {
 	function logout()
 	{
 		Auth::instance()->logout();
-		url::redirect('auth');
+		url::redirect('/get/auth');
 	}
 }
 

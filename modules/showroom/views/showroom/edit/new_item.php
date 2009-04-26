@@ -64,6 +64,8 @@
 </form>
 
 <script type="text/javascript">
+	$("#tab_container").tabs();
+	
 	$("input[name='name']").keyup(function(){
 		input = $(this).val().replace(/\W/g, '_').toLowerCase();
 		$("input[name='url']").val(input);

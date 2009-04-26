@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /**
- * Auth module demo controller. This controller should NOT be used in production.
- * It is for demonstration purposes only!
+ * 
+ * Functions exclusive to plusjade.com only
  *
  * $Id: user.php 3769 2008-12-15 00:48:56Z zombor $
  *
@@ -15,11 +15,7 @@ class Auth_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->template->linkCSS('css/auth.css');
-		$js_array = array('jgrowl/jquery.jgrowl_minimized.js');	
-		#$this->template->global_linkJS($js_array);		
-		
-		# $this->profiler = new Profiler;		
+		$this->template->linkCSS('css/auth.css');		
 	}
 	
 	/*
@@ -28,50 +24,36 @@ class Auth_Controller extends Template_Controller {
 	 */	 
 	public function index()
 	{
-		# dashboard only available at plusjade
-		if($this->site_id != 1) url::redirect();
+		if('jade' != $this->site_name) url::redirect();	
 		
-		# begin with no access 
-		$access = FALSE;
-		$primary = new View("auth/login");
-		
-		# if logged in
-		if(Auth::instance()->logged_in())
+		if( Auth::instance()->logged_in() )
 		{
-			$access = TRUE;
+			$this->template->title = 'My dashboard';	
 			$primary = new View("auth/dashboard");
+			$primary->user = Auth::instance()->get_user();	
 		}
-		elseif ($_POST) # trying to log in...
+		elseif(! $_POST)
 		{
-			# Load the user
-			$user = ORM::factory('user', $_POST['username']);
-			
-			# Login successful 
-			# TODO: force facebox init
-			# TRUE means to save token for auto login
-			if (Auth::instance()->login($user, $_POST['password'], TRUE))
-			{			
-				$access = TRUE;	
-				$primary = new View("auth/dashboard");
-			}
-			else
-				$primary->errors = 'Invalid username or password';
-		}
-			
-		if ($access === TRUE)
-		{
-			# User dashboard screen	
-			$primary->user = Auth::instance()->get_user();
-			$this->template->title = 'Auth dashboard';
-			$this->template->primary = $primary; 
+			$this->template->title = 'User Login';
+			$primary = new View('auth/login');
 		}
 		else
 		{
-			# Log in screen
-			$this->template->title = 'User Login';
-			$this->template->primary = $primary;
-			$primary = new View('auth/login');		
+			$user = ORM::factory('user', $_POST['username']);
+			# TRUE means to save token for auto login
+			if (Auth::instance()->login($user, $_POST['password'], TRUE))
+			{			
+				$primary = new View("auth/dashboard");
+				$primary->user = Auth::instance()->get_user();
+				$this->template->title = 'My dashboard';
+			}
+			else
+			{
+				$primary = new View('auth/login');
+				$primary->errors = 'Invalid username or password';
+			}
 		}
+		$this->template->primary = $primary; 
 	}
 
 
@@ -79,8 +61,7 @@ class Auth_Controller extends Template_Controller {
 	 * Externally authenticate a user to edit their website
 	 * Uses token to validate user
 	 * no view
-	 */
-	 
+	 */ 
 	public function manage()
 	{
 		if(! empty($_GET['tKn']) )
@@ -96,7 +77,7 @@ class Auth_Controller extends Template_Controller {
 			$user	= ORM::factory('user')->where('token', $token)->find();
 			
 			# if token does not match any user...
-			if(empty($user->username)) url::redirect();
+			if( empty($user->username) ) url::redirect();
 			
 			# Log user in ONLY IF site ids match (user is attached to this site)
 			if($user->client_site_id == $this->site_id)
@@ -112,7 +93,7 @@ class Auth_Controller extends Template_Controller {
 			 * build the auth token link to the website owned by the logged in user
 			 */
 			
-			if(!$this->client->logged_in()) url::redirect();
+			if(! $this->client->logged_in() ) die();
 			
 			$user	= $this->client->get_user()->username;	
 			$token	= $this->client->get_user()->token;	
@@ -125,13 +106,12 @@ class Auth_Controller extends Template_Controller {
 	
 	/*
 	 * Create a new user account (creates website as well)
-	 */
-	 
+	 */	 
 	public function create()
 	{
 		if('jade' != $this->site_name) url::redirect();
 	
-		$this->template->title = 'Create User';		
+		$this->template->title = 'Create Account';		
 		$primary = new View("auth/create_user");
 
 		# setup and initialize your form field names
@@ -252,16 +232,14 @@ class Auth_Controller extends Template_Controller {
 			$form	= arr::overwrite($form, $post->as_array()); 
 			$primary->values = $form;		
 		}
-		
-		#Javascript 
+
+		#Javascript
 		$this->template->global_readyJS('
-			// Focus for input fields
 			$("form input, form select").focus(function(){
 				$("form input, form select").removeClass("input_focus");
 				$(this).addClass("input_focus");
 			});	
 		');
-		# Display the form
 		$this->template->primary = $primary;		
 			
 	}
@@ -294,7 +272,7 @@ class Auth_Controller extends Template_Controller {
 			# NOTE (see the clean_db method in this class)
 		
 			# DELETE DATA FOLDER
-			$data_path = DOCROOT."data/$site_name";
+			$data_path = DATAPATH ."$site_name";
 			$directory = new Data_Folder;
 			
 			if($directory->rmdir_recurse($data_path))
@@ -396,7 +374,7 @@ class Auth_Controller extends Template_Controller {
 			}
 			else
 			{
-					$results[$table] = 'clean';
+				$results[$table] = 'clean';
 			}
 		}
 	

@@ -1,5 +1,4 @@
 
-
 <ul id="admin_generic_tab_nav" class="ui-tabs-nav">	
 	<li><a href="#fragment-1" class="ui-tabs-selected"><span>Dashboard</span></a></li>
 	<li><a href="#fragment-2"><span>Create & Manage</span></a></li>
@@ -7,9 +6,7 @@
 	<li><a href="#fragment-3"><span>Analyze</span></a></li>
 	<li><a href="#fragment-3"><span>Grow</span></a></li>
 </ul>
-	
 
-	
 <div id="common_tool_header" class="buttons">
 	<a href="/get/auth/logout" class="jade_negative">Logout</a>
 	<a href="/get/auth/change_password">Change Password</a>
@@ -17,12 +14,9 @@
 	<div id="common_title">Hello there, <?php echo ucwords($user->username)?>!</div>
 </div>
 
-
-
-	
 <div class="indent">
 
-Create your website in 3 easy steps:
+	Create your website in 3 easy steps:
 	<ol>
 		<li><b>Choose a theme</b>
 			<br>You can always change your theme later, or even pay a profesional to custom design
@@ -38,20 +32,15 @@ Create your website in 3 easy steps:
 		
 	</ol>
 
-<div id="edit_website_link">	
-	<div class="buttons">
-		<a href="/get/auth/manage" class="jade_positive">Edit Website</a>
-	</div>
-</div>		
+	<div id="edit_website_link">	
+		<div class="buttons">
+			<a href="/get/auth/manage" class="jade_positive">Edit Website</a>
+		</div>
+	</div>		
 
 
 
 </div>
-
-
-
-
-
 
 <?php 
 #quick hack - remove later
@@ -63,3 +52,4 @@ if($this->client->logged_in(2))
 	<p><a href="/get/auth/clean_db">Clean Database</a></p>
 	<?php
 }
+?>

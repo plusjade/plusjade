@@ -30,3 +30,11 @@
 	}
 	?>		
 </ul>
+
+<script type="text/javascript">
+	$("#generic_sortable_list").sortable({ handle : "img", axis : "y" });
+	<?php 
+		echo tool_ui::js_save_sort_init('slide_panel');
+		echo tool_ui::js_delete_init('slide_panel');
+	?>
+</script>

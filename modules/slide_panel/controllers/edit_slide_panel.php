@@ -8,30 +8,12 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
 
 /*
  * MANAGE slide_panels 
- * Loads into tier 1 Facebox
  * @PARM (INT) $page_id = page id (table pages) contact tool is installed
  */
 	function manage($tool_id=Null)
 	{
 		tool_ui::validate_id($tool_id);
-	
-		# Javascript sortable list
-		$embed_js ='
-		  // Make Sortable
-			$("#generic_sortable_list").sortable({ handle : "img", axis : "y" });
-		';
-		$this->template->rootJS($embed_js);
-		
-		# Javascript Save sort
-		$save_sort_js = tool_ui::js_save_sort_init('slide_panel');
-		$this->template->rootJS($save_sort_js);
-		
-		# Javascript delete
-		$delete_js = tool_ui::js_delete_init('slide_panel');
-		$this->template->rootJS($delete_js);
-
-		# Show the manage panel
-		$this->_show_manage_module_items('slide_panel', $tool_id);	
+		echo $this->_view_manage_tool_items('slide_panel', $tool_id);	
 		die();
 	}
 
@@ -66,7 +48,7 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			echo $this->_show_add_single('slide_panel', $tool_id);
+			echo $this->_view_add_single('slide_panel', $tool_id);
 		}
 		
 		die();
@@ -89,12 +71,11 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
 				'body'		=> $_POST['body'],
 			);
 			$db->update('slide_panel_items', $data, "id = '$id'");
-			
 			echo 'Panel edited!!<br>Updating...'; #status message			
 		}
 		else
 		{
-			$this->_show_edit_single('slide_panel', $id);
+			$this->_view_edit_single('slide_panel', $id);
 		}
 		die();
 	}
@@ -135,12 +116,10 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
-		
-		
 		}
 		else
 		{
-			$this->_show_edit_settings('slide_panel', $tool_id);	
+			$this->_view_edit_settings('slide_panel', $tool_id);	
 		}
 		die();
 	}
