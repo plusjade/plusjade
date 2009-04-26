@@ -17,3 +17,10 @@
 </select>
 
 	<div id="load_box" style="min-height:400px"></div>
+
+<script type="text/javascript">
+	$("#admin_cat_dropdown").change(function(){
+		val = $("option:selected", this).val();
+		$("#load_box").load("get/edit_showroom/list_items/"+val);
+	})
+</script>

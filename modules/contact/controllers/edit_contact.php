@@ -16,29 +16,11 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 	{
 		tool_ui::validate_id($tool_id);
 		$db = new Database;
-
-		# Get all available contact types
-		$result = $db->query("SELECT * FROM contact_types");
-		$this->template->set_global('contact_types', $result);
-		
-		# Javascript
-		$this->template->rootJS('		
-			// Make contacts sortable
-			$("#generic_sortable_list").sortable({ handle : ".handle", axis : "y" });	
-		');
-		
-		# Javascript Save sort
-		$save_sort_js = tool_ui::js_save_sort_init('contact');
-		$this->template->rootJS($save_sort_js);
-
-		# Javascript delete
-		$delete_js = tool_ui::js_delete_init('contact');
-		$this->template->rootJS($delete_js);
-	
-		# Show the manage panel
-		# JOIN contact_type to item table.
+		$contact_types = $db->query("SELECT * FROM contact_types");	
 		$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
-		$this->_show_manage_module_items('contact', $tool_id, $join);	
+		$primary = $this->_view_manage_tool_items('contact', $tool_id, $join);
+		$primary->set_global('contact_types', $contact_types);
+		echo $primary;
 		die();
 	}
 
@@ -71,7 +53,6 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 					);
 					$db->insert('contact_items', $data); 
 				}
-				
 				echo 'Contacts added!!<br>Updating...'; #status message
 			}
 			else
@@ -80,18 +61,17 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 		else
 		{
 			$primary = new View('contact/edit/new_item');
-						
-			# Grab all contact types
-			$result = $db->query("SELECT * FROM contact_types");
-			$primary->contact_types = $result;
-			
-			# Grab items
-			$result = $db->query("SELECT * FROM contact_items JOIN contact_types ON contact_types.type_id = contact_items.type  WHERE parent_id = '$tool_id' AND fk_site = '{$this->site_id}' ORDER BY position");
-			$primary->contacts = $result;
-			
+			$contact_types = $db->query("SELECT * FROM contact_types");
+			$primary->contact_types = $contact_types;
+			$contacts = $db->query("SELECT * FROM contact_items 
+				JOIN contact_types ON contact_types.type_id = contact_items.type
+				WHERE parent_id = '$tool_id' 
+				AND fk_site = '{$this->site_id}' 
+				ORDER BY position
+			");
+			$primary->contacts = $contacts;
 			$primary->tool_id = $tool_id;
-			$this->template->primary = $primary;	
-			$this->template->render(true);	
+			echo $primary;	
 		}
 		die();
 	}
@@ -114,35 +94,18 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 				'enable'		=> $_POST['enable'],
 			);
 			$db->update( 'contact_items', $data, array('id' => $id, 'fk_site' => $this->site_id) );
-		
-			# Status message
-			echo 'Contact edited!!<br>Updating...';
+			echo 'Contact edited!!<br>Updating...'; # success
 		}
 		else
 		{
 			$primary = new View("contact/edit/single_item");
-			
-			# Join contact_type to item table.
 			$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
-			$item = $this->_grab_module_child('contact', $id, $join);
-			
+			$item = $this->_grab_tool_child('contact', $id, $join);		
 			$primary->item = $item;
-			$this->template->rootJS = '
-				$(".facebox #place_address").click(function(){
-					var html = $(".facebox #address_container").html();
-					$(".facebox #contact_textarea").html(html);
-					return false;
-				});
-			';
-			$this->template->primary = $primary;
-			$this->template->render(true);
-			
-			#$this->_show_edit_single( 'contact', $id, $join);
+			echo $primary;
 		}
 		die();	
-	
 	}
-
 	
 /*
  * DELETE single contact
@@ -165,29 +128,6 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 	{
 		$this->_save_sort_common($_GET['contact'], 'contact_items');
 		die();	
-	}
-	
-	public function css($tool_id=NULL)
-	{
-		tool_ui::validate_id($tool_id);
-
-		# Overwrite old file with new file contents;
-		if($_POST)
-		{
-			echo Css::save_contents('contact', $tool_id, $_POST['contents'] );
-		}
-		else
-		{
-			$primary = new View('css/edit_single');
-
-			$primary->contents	= Css::get_contents('contact', $tool_id);
-			$primary->tool_id	= $tool_id;
-			$primary->tool_name	= 'contact';
-			
-			echo $primary;
-		
-		}		
-		die();
 	}
 }
 

@@ -23,7 +23,6 @@ abstract class Controller_Core {
 	public function __construct()
 	{
 		$session = Sessionk::instance();		
-		# Controller variables 
 		$this->theme 		= $_SESSION['theme'];	
 		$this->site_id 		= $_SESSION['site_id'];
 		$this->site_name 	= $_SESSION['site_name'];
@@ -31,26 +30,19 @@ abstract class Controller_Core {
 		# Auth Instance
 		$this->client = new Auth;	
 		
-	
 		if (Kohana::$instance == NULL)
 		{
-			// Set the instance to the first controller loaded
+			# Set the instance to the first controller loaded
 			Kohana::$instance = $this;
 		}
 
-		// URI should always be available
+		# URI should always be available
 		$this->uri = URI::instance();
 
-		// Input should always be available
+		# Input should always be available
 		$this->input = Input::instance();
 	}
 
-	
-	
-	
-	
-	
-	
 	/**
 	 * Handles methods that do not exist.
 	 *
@@ -62,7 +54,7 @@ abstract class Controller_Core {
 	{
 		// Default to showing a 404 page
 		#Event::run('system.404');
-		echo 'not found';
+		echo 'root controller method not found';
 		die();
 	}
 

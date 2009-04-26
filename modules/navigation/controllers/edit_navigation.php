@@ -17,68 +17,15 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	{
 		tool_ui::validate_id($tool_id);
 		$primary	= new View('navigation/edit/manage');
-		$db			= new Database;
-		
-		# Grab items belonging to this tool.
-		$items	= $db->query("SELECT * FROM navigation_items 
+		$db			= new Database;	
+		$items		= $db->query("SELECT * FROM navigation_items 
 			WHERE parent_id = '$tool_id' 
 			AND fk_site = '$this->site_id' 
-			ORDER BY lft ASC ");		
-			
-		#Javascript
-		$this->template->rootJS('
-			// start simple tree mode
-			$simpleTreeCollection = $(".facebox .simpleTree").simpleTree({
-				autoclose: true,
-				animate:true
-			});
-			
-			// add delete icons
-			$(".facebox li:not(.root)>span").after(" <img src=\"/images/navigation/cross.png\" class=\"li_delete\" alt=\"\">");
-			
-			// activate delete icons
-			$(".facebox .li_delete").click(function(){
-				$(this).parent().remove();	
-			});
-			
-			
-			// Gather and send nest data.
-			$(".facebox #link_save_sort").click(function() {
-				var output = "";
-				var tool_id = $(this).attr("rel");
-				
-				$(".facebox #admin_navigation_wrapper ul").each(function(){
-					var parentId = $(this).parent().attr("rel");
-					if(!parentId) parentId = 0;
-					var $kids = $(this).children("li:not(.root, .line,.line-last)");
-					
-					// Data set format: "id:local_parent_id:position#"
-					$kids.each(function(i){
-						output += $(this).attr("rel") + ":" + parentId + ":" + i + "#";
-					});
-				});
-				
-				//alert (output); return false;
-				
-				
-				$.facebox(function() {
-						$.post("/get/edit_navigation/save_sort/"+tool_id, {output: output}, function(data){
-							$.facebox(data, "status_reload", "facebox_response");
-							location.reload();
-						})
-					}, 
-					"status_reload", 
-					"facebox_response"
-				);
-
-				
-			});		
-		');
-		
+			ORDER BY lft ASC
+		");				
 		$primary->tree = Tree::display_tree('navigation', $items, TRUE);
 		$primary->tool_id = $tool_id;	
-		$this->template->primary = $primary;
-		echo $this->template;
+		echo $primary;
 		die();
 	}
 
@@ -120,42 +67,19 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			}
 			# Update left and right values
 			Tree::rebuild_tree('navigation_items', $parent->root_id, '1');
-
 			echo 'Links added'; #status message
-			die();
-			
 		}
 		else
 		{
 			$primary = new View('navigation/edit/new_item');
 			$db = new Database;
-			$pages = $db->query("SELECT page_name FROM pages WHERE fk_site = '$this->site_id' ORDER BY page_name");			
-			
-					
+			$pages = $db->query("SELECT page_name FROM pages 
+				WHERE fk_site = '$this->site_id'
+				ORDER BY page_name
+			");			
 			$primary->pages = $pages;
-			
 			$primary->tool_id = $tool_id;	
-			$this->template->rootJS ='
-				$(".facebox .toggle_type").each(function(){
-					var field_id = $(this).attr("rel");
-					
-					$(this).change(function(){
-						var span = "#" + $(this).val() + "_" + field_id;
-						
-						// Disable to start over
-						$(".hide_" + field_id).hide();
-						$(".hide_" + field_id + " > :input").attr("disabled","disabled").removeAttr("rel");
-						
-						// Enable selection
-						$(span + " > :input").removeAttr("disabled").attr("rel","text_req");
-						$(span).show();
-					});
-				});
-			';
-			
-			$this->template->primary = $primary;
-			
-			echo $this->template;
+			echo $primary;
 		}
 		die();		
 	}
@@ -174,19 +98,14 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		}
 		die();
 	}
-
-
-	
 /*
  * Edit single Item
  */
 	public function edit($id=NULL)
 	{
-		tool_ui::validate_id($id);
-		
+		tool_ui::validate_id($id);		
 		$db = new Database;
-			
-		# Edit item
+
 		if(! empty($_POST['title']) )
 		{
 			$data = array(
@@ -194,25 +113,18 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 				'desc'	=> $_POST['desc'],		
 			);		
 			$db->update('calendar_items', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			
-			#echo '<script>$.jGrowl("Event updated")</script>'; #status message		
 			echo 'Event Saved<br>Updating...';
-		
 		}
 		else
 		{		
 			$parent = $db->query("SELECT * FROM calendar_items WHERE id = '$id' AND fk_site = '$this->site_id' ")->current();			
 			$primary = new View("calendar/edit/single_item");
-			
 			$primary->item = $parent;
-			$this->template->primary = $primary;
-			$this->template->render(true);
-		}
-		
+			echo $primary;
+		}	
 		die();		
 	}
-
-
+	
 	public function delete($id=NULL)
 	{
 
@@ -222,30 +134,23 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	{
 		tool_ui::validate_id($tool_id);		
 		$db = new Database;
-			
-		# Edit item
+
 		if($_POST)
 		{
 			$data = array(
 				'title'	=> $_POST['title'],
 			);		
 			$db->update('navigations', $data, "id = '$tool_id' AND fk_site = '$this->site_id'");
-				
 			echo 'Settings Saved!<br>Updating...';	
 		}
 		else
-		{		
-			$parent = $db->query("SELECT * FROM navigations WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();			
+		{
 			$primary = new View("navigation/edit/settings");
-			
+			$parent = $db->query("SELECT * FROM navigations WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();			
 			$primary->parent = $parent;
-			$this->template->primary = $primary;
-			echo $this->template;
+			echo $primary;
 		}
-		
 		die();				
 	}
 	
 }
-
-/* -- end of application/controllers/showroom.php -- */

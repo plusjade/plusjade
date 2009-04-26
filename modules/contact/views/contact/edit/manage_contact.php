@@ -29,3 +29,11 @@ $highest_position = 0;
 	}
 	?>
 </ul>	
+
+<script type="text/javascript">
+	$("#generic_sortable_list").sortable({ handle : ".handle", axis : "y" });	
+	<?php	
+		echo tool_ui::js_save_sort_init('contact');
+		echo tool_ui::js_delete_init('contact');
+	?>
+</script>

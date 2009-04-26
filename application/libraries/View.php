@@ -271,10 +271,8 @@ class View_Core {
 		{
 			# Set the content type and size
 			/*
-			 * JADES EDIT
-			 * I don't know if i'll ever need this,
-			 * but for now i need to inject files contents into
-			 * my shell
+			 * JADES EDIT: don't know if i'll ever need this,
+			 * but for now i need to inject files contents into shell view
 			*/
 			#header('Content-Type: '.$this->kohana_filetype[0]);
 
@@ -296,10 +294,8 @@ class View_Core {
 		return $output;
 	}
 	
-####################################################	
-			# JADES EXTRA STUFF #
-####################################################
 
+# JADES EXTRA STUFF #
 /*
  * Add request for javascript file to be loaded in the root document
  * Send both public and admin requests here to fiter duplicates
@@ -355,8 +351,6 @@ class View_Core {
 			array_push($this->js_array, $href);
 	}
 	
-
-
 /*
  * Add inline Javascript within the jquery document ready function
  * Adds to the initial root page
@@ -370,9 +364,6 @@ class View_Core {
 		self::$kohana_global_data[$var] .= $script;
 
 	}
-
-
-
 /*
  *	Load CSS files in the source page
  *	
@@ -398,7 +389,6 @@ class View_Core {
 /*
  *	Javascript calls to ROOT
  *	Takes only strings
- *
  */	
 	public function rootJS($script, $var = 'rootJS') 
 	{
@@ -410,8 +400,6 @@ class View_Core {
 
 /*
  *	Build meta tags for pages
- *
- *
  */	
 	public function meta_tags($name, $content = NULL, $var = 'meta_tags') 
 	{

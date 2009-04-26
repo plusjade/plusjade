@@ -17,22 +17,12 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 		tool_ui::validate_id($tool_id);
 		$db = new Database;
 		$primary = new View('faq/edit/manage');
-		
-		# Get faq items
 		$items = $db->query("SELECT * FROM faq_items 
 			WHERE parent_id = '$tool_id' AND fk_site = '$this->site_id'
 			ORDER BY position
 		");
 		$primary->items = $items;
-		
-		# Javascript
-		$embed_js ='
-			$("#generic_sortable_list").sortable({handle:".handle"});
-		';
-		$embed_js .= tool_ui::js_save_sort_init('faq');
-		$this->template->rootJS($embed_js);		
-		$this->template->primary = $primary;
-		echo $this->template;
+		echo $this->primary;
 		die();	
 	}
 	
@@ -57,14 +47,14 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 				'position'	=> ++$get_highest
 				
 			);
-
 			$db->insert('faq_items', $data); 
 			echo 'Question added'; #status
 		}
 		else
 		{
-			echo $this->_show_add_single('faq', $tool_id);
+			echo $this->_view_add_single('faq', $tool_id);
 		}
+		die();
 	}
 
 
@@ -79,13 +69,12 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 			   'question'	=> $_POST['question'],
 			   'answer'		=> $_POST['answer']
 			);
-			$db->update('faq_items', $data, "id = '$id' AND fk_site='$this->site_id'");
-			
+			$db->update('faq_items', $data, "id = '$id' AND fk_site='$this->site_id'");		
 			echo 'Faq updated!<br>Updating...'; #status				
 		}
 		else
 		{
-			echo $this->_show_edit_single('faq', $id);
+			echo $this->_view_edit_single('faq', $id);
 		}
 		die();
 	}
@@ -93,10 +82,8 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	function delete($tool_id=NULL)
 	{
 		tool_ui::validate_id($tool_id);
-		
 		$this->_delete_single_common('faq', $tool_id);
 		echo 'Faq deleted!'; #status
-
 		die();
 	}
 
@@ -116,18 +103,15 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 			$data = array(
 				'title'	=> $_POST['title'],
 			);
-			
 			$db->update('faqs', $data, "id='$tool_id' AND fk_site = '$this->site_id'"); 						
-			
 			echo 'Settings Updated!<br>Updating...'; #success
 		}
 		else
 		{
-			echo $this->_show_edit_settings('faq', $tool_id);
+			echo $this->_view_edit_settings('faq', $tool_id);
 		}
 		die();
 	}
-	
 }
 
 /* -- end of application/controllers/faq.php -- */

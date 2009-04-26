@@ -3,49 +3,41 @@ abstract class Edit_Tool_Controller extends Controller {
 
 /*
  *	Creates a template for edit Module controller tasks
- *	views are rendered for ajax mode - no page can be built
- *		
- * 	also provides useful automation functions
+ *	views are rendered for ajax mode
+ *	provides useful automation functions		
+ * 
  */
  
 	public function __construct()
 	{
 		parent::__construct();
+		/*
 		if(! $this->client->logged_in()
 			OR $this->client->get_user()->client_site_id != $this->site_id )
 				die();
-		
-		$this->template = new View("ajax");	
-
+		*/
 		# Controller variables
 		$this->site_data_dir = DATAPATH . "$this->site_name";
-		
-		# View variables						
-		$data = array(
-			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/$this->site_name",
-			'custom_include'	=> DATAPATH . "$this->site_name/themes/$this->theme/",
-		);	
-		$this->template->set_global($data);
 	}
 	
-
-##################################
-# ---------- GRABS --------------#
-##################################
+# ---------- GRABS
 # Grabs always return data/objects
 	
 /*
  * Returns single parent object 
  *
  */ 	
-	function _grab_module_parent($toolname, $tool_id=NULL, $child_id=NULL)
+	function _grab_tool_parent($toolname, $tool_id=NULL, $child_id=NULL)
 	{	
 		$table = $toolname.'s';
 		$table_items = $toolname.'_items';
 		$db = new Database;
 		
 		if (! empty($tool_id) )
-			$query = "SELECT * FROM $table WHERE id = '$tool_id' AND fk_site = '$this->site_id'";
+			$query = "SELECT * FROM $table 
+				WHERE id = '$tool_id'
+				AND fk_site = '$this->site_id'
+			";
 		else
 		{
 			$item = $db->query("SELECT parent_id FROM $table_items 
@@ -57,40 +49,39 @@ abstract class Edit_Tool_Controller extends Controller {
 				WHERE id = '$item->parent_id' 
 				AND fk_site = '$this->site_id'
 			";
-		}
+		}	
+		$parent = $db->query($query)->current();
 		
-		$return = $db->query($query)->current();
-		
-		# Needs to return only one object for now
-		return $return;
+		if( is_object($parent) )
+			return $parent;
+		else
+			return FALSE;
 	}
 
 /*
  * Returns single child object 
  *
  */ 
-	function _grab_module_child($module, $child_id, $JOIN ='')
+	function _grab_tool_child($toolname, $child_id, $JOIN ='')
 	{
 		$db = new Database;
-		$table_items = $module.'_items';
-		
+		$table_items = $toolname.'_items';
 		$query = "SELECT * 
 			FROM $table_items 
 			$JOIN 
 			WHERE id = '$child_id' 
-			AND fk_site = '$this->site_id'";
+			AND fk_site = '$this->site_id'
+		";
+		$child = $db->query($query)->current();	
 		
-		$return = $db->query($query);
-		
-		return $return->current();
+		if( is_object($child) )
+			return $child;
+		else
+			return FALSE;
 	}
 
-	
-	
 
-##################################
 # ---------- SHOWS --------------#
-##################################
 # Show functions always return VIEWS
 
 	/*
@@ -99,97 +90,79 @@ abstract class Edit_Tool_Controller extends Controller {
 	 * Validates ownership of module items to page/site/client.
 	 * If no items found, show new_module builder view
 	 * redirects if no validation
-	 * 		@param (string)	$module		=	singular name of the Module to Grab
+	 * 		@param (string)	$toolname		=	singular name of the Module to Grab
 	 * 		@param (int)	$tool_id	= 	tool_id of the parent tool	
 	 * 		@param (string)	$join		= 	add a join statement to the query
 	 */
 	
-	function _show_manage_module_items( $module, $tool_id, $join = '')
+	function _view_manage_tool_items($toolname, $tool_id, $join = '')
 	{
 		$db = new Database;
-		$table = $module.'s';		
-	
-		# Grab module parent
-		$parent = $this->_grab_module_parent($module, $tool_id);
-		
-		# Grab items belonging to parent		
-		$query = "SELECT * FROM {$module}_items $join WHERE parent_id = '{$parent->id}' AND fk_site = '{$this->site_id}' ORDER BY position";
-		
+		$table = $toolname.'s';		
+
+		$parent = $this->_grab_tool_parent($toolname, $tool_id);		
+		$query = "SELECT * FROM {$toolname}_items 
+			$join 
+			WHERE parent_id = '$parent->id' 
+			AND fk_site = '$this->site_id' 
+			ORDER BY position
+		";	
 		$items = $db->query($query);
 
-		# If items exist, load edit view
 		if($items->count() > 0)
 		{
-			$primary = new View("$module/edit/manage_$module");
-
-			# Send parent object
-			$primary->set($module, $parent);
-
-			# Send items object
+			$primary = new View("$toolname/edit/manage_$toolname");
+			$primary->set($toolname, $parent);
 			$primary->items = $items;
 		}
 		else
 		{
-			# If the parent exists SHOW NEW module instance.
 			if( is_object($parent) )
 			{
-				$primary = new View("$module/edit/new_$module");
-				$primary->add = new View("$module/edit/new_item");			
-				$primary->add->tool_id = $parent->id;
+				$primary = new View("$toolname/edit/new_item");			
+				$primary->tool_id = $parent->id;
 			}
 			else
-				url::redirect('get/admin/pages'); # if logged in - should not be gaming!
+				die();
 		}
-				
-		# Display the view
 		return $primary;		
 	}	
 
 	
 /*
  * SHOW add a new item to a Tool
- * 		@PARAM $module	(STRING)	=	tool name to add to
+ * 		@PARAM $toolname (STRING)	=	tool name to add to
  * 		@PARAM $tool_id	(INT)		=	tool_id of the tool parent	
  */
-	function _show_add_single($module, $tool_id)
+	function _view_add_single($toolname, $tool_id)
 	{
-		$primary = new View("$module/edit/new_item");
+		$primary = new View("$toolname/edit/new_item");
 		$primary->tool_id = $tool_id;			
-		$this->template->primary = $primary;
-		
-		return $this->template;
+		return $primary;
 	}
 
 
 	/*
 	 * SHOW single view of a module item 
 	 * Validates ownership of module items to page/site/client.
-	 * if no items found = bad id
-	 * redirects if no validation
-	 * 		@param (string)	$module		=	singular name of the Module to Grab
+	 * 		@param (string)	$toolname		=	singular name of the Module to Grab
 	 * 		@param (int)	$item_id	= 	item id
 	 * 		@param (string)	$query		= 	overwrite default simple query with custom one (useful for joins)
 	 */
 	
-	function _show_edit_single( $module, $item_id, $JOIN = '' )
+	function _view_edit_single($toolname, $item_id, $JOIN = '' )
 	{	
-		$primary = new View("$module/edit/single_item");
-		$table = $module.'s';
-			
-		# Grab single item
-		$item = $this->_grab_module_child($module, $item_id, $JOIN);
+		$primary	= new View("$toolname/edit/single_item");
+		$table		= $toolname.'s';
+		$item		= $this->_grab_tool_child($toolname, $item_id, $JOIN);
 
-		# If item exists & belongs to this site:
-		if(! empty($item) )
+		if( is_object($item) )
 		{
 			$primary->item = $item;
-			$this->template->primary = $primary;
-			$this->template->render(true);			
+			return $primary;
 		}
 		else
-		{
 			echo 'Bad id';
-		}		
 	}
 
 	
@@ -197,18 +170,19 @@ abstract class Edit_Tool_Controller extends Controller {
  *	SHOW edit settings view
  *	
  */	
-	public function _show_edit_settings($module, $tool_id)
+	public function _view_edit_settings($toolname, $tool_id)
 	{
-		$primary = new View("$module/edit/settings");
-		$primary->page_id = '';	
-		$primary->tool_id = $tool_id;
+		$primary = new View("$toolname/edit/settings");
+		$primary->tool_id = $tool_id;	
+		$parent = $this->_grab_tool_parent($toolname, $tool_id);
 		
-		# Grab module container
-		$parent = $this->_grab_module_parent($module, $tool_id);
-		$primary->set($module, $parent);		
-
-		$this->template->primary = $primary;
-		echo $this->template;		
+		if( is_object($parent) )
+		{
+			$primary->set($toolname, $parent);		
+			return $primary;
+		}
+		else
+			return FALSE;
 	}
 	
 
@@ -227,13 +201,12 @@ abstract class Edit_Tool_Controller extends Controller {
 		
 		foreach($item_array as $position => $id)
 			$db->update($table, array('position' => "$position"), "id = '$id'"); 	
-
+		
 		return 'Sort Order Saved!!<br>Updating...'; # status response	
-	
 	}
 
 /*
- * $module = name of module
+ * $toolname = name of module
  * $id = id of item to delete
  *
  */
@@ -242,11 +215,8 @@ abstract class Edit_Tool_Controller extends Controller {
 		tool_ui::validate_id($tool_id);		
 		$db = new Database;
 		$table = $toolname.'_items';
-		
-		# Perform delete
 		$db->delete( $table, array('id' => "$tool_id", 'fk_site' => $this->site_id) );	
 	}
-
 
 	public function __call($method, $id)
     {

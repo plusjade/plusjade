@@ -48,29 +48,24 @@ abstract class Template_Controller extends Controller {
 		{	
 			if($this->client->get_user()->client_site_id == $this->site_id)
 			{
-				# Top Admin panel
 				$this->template->admin_panel = TRUE;				
-				
-				# CSS			
+	
 				$this->template->linkCSS('css/admin_global.css');
 				$this->template->linkCSS('css/smoothness.css');
-					
-				# Javascript
+
 				$js_files = array(
-					'facebox/public_multi.js',		# Facebox 
-					'ui/ui_latest_lite.js',			# Jquery UI
-					'ajax_form/ajax_form.js',		# Ajax Form
-					'multi_form/MultiFile.pack.js',
-					'jw/jwysiwyg.js',				# JWysiwyg
-					'admin/init.js'					# Document Ready stuff
+					'facebox/public_multi.js',
+					'ui/ui_latest_lite.js',
+					'ajax_form/ajax_form.js',
+					'jw/jwysiwyg.js',
+					'swfupload/swfupload.js',
+					'admin/init.js'	
 				);
 				$this->template->add_root_js_files($js_files);
-				#$embed_js = ' ';				
-				#$this->template->global_readyJS($embed_js);	
 			}
-			return true;
+			return TRUE;
 		}	
-		return false;
+		return FALSE;
 	}
 	
 	

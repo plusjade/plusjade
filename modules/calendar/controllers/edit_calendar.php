@@ -15,29 +15,24 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	}
 	
 /*
- * Manage Function display a sortable list of tool resources (items)
+ * THIS DOES NOT WORK, SHOULD NOT WORK
  */
 	function manage($tool_id=NULL)
 	{
 		tool_ui::validate_id($tool_id);
-		
 		$calendar = new Calendar;
-		
+		$db = new Database;
 		$month = date('m');
-	
 		$year = date('Y');
-
+		$date_array = array();
 
 		# Create array for dates associated with this month
-		$db = new Database;
-		$dates = $db->query("SELECT * FROM calendar_items WHERE parent_id = '$tool_id'
+		$dates = $db->query("SELECT * FROM calendar_items 
+			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
 			AND month = '$month'
 			ORDER BY day
 		");
-		
-		$date_array = array();
-		
 /*
 		foreach($dates as $date)
 		{
@@ -66,7 +61,6 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 				(int) $date_array[$date->day] = 1;
 		}
 
-				
 		# SIMPLE		
 		function day_function($year, $month, $day, $date_data)
 		{
@@ -81,22 +75,18 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			else
 				echo '<div class="day_simple">'.$day.'</div>';
 		}
-				
+
 		$javascript .= tool_ui::js_delete_init('calendar');
-				
+
 		$this->template->rootJS($javascript);
 		
 		
 		$calendar = $calendar->getPhpAjaxCalendar($month, $year, $date_array, 'day_function');
 		$calendar .= '<div id="admin_calendar_event_details">hello</div>'; 
 		
-		$this->template->primary = $calendar;
-		$this->template->render(TRUE);
-		die();
-
+		echo $calendar;
 		
-
-
+		die();
 	}
 
 /*
@@ -108,10 +98,9 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
-
 			$db = new Database;
 			$dates = explode('/', $_POST['date']);
-						
+			
 			$data = array(			
 				'parent_id'	=> $tool_id,
 				'fk_site'	=> $this->site_id,
@@ -126,24 +115,13 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			if(!empty($_FILES['image']['name']))
 				if (! $data['image'] = $this->_upload_image($_FILES) )
 					echo 'Image must be jpg, gif, or png.';
-				
-				
+
 			$db->insert('calendar_items', $data);
-			
 			echo 'Event added'; #status message
 		}
 		else
-		{
-			#Javascript
-			$this->template->rootJS = '	
-					$("#datepicker").datepicker({
-						altField: "#date_field",
-						changeMonth: true
-						//changeYear: true
-					});
-			';
-			
-			echo $this->_show_add_single('calendar', $tool_id);
+		{			
+			echo $this->_view_add_single('calendar', $tool_id);
 		}
 		die();		
 	}
@@ -154,10 +132,8 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	public function edit($id=NULL)
 	{
 		tool_ui::validate_id($id);
-		
 		$db = new Database;
-			
-		# Edit item
+
 		if(! empty($_POST['title']) )
 		{
 			$data = array(
@@ -165,21 +141,19 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 				'desc'	=> $_POST['desc'],		
 			);		
 			$db->update('calendar_items', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			
-			#echo '<script>$.jGrowl("Event updated")</script>'; #status message		
 			echo 'Event Saved<br>Updating...';
 		
 		}
 		else
-		{		
-			$parent = $db->query("SELECT * FROM calendar_items WHERE id = '$id' AND fk_site = '$this->site_id' ")->current();			
-			$primary = new View("calendar/edit/single_item");
-			
+		{
+			$primary = new View("calendar/edit/single_item");		
+			$parent = $db->query("SELECT * FROM calendar_items 
+				WHERE id = '$id' 
+				AND fk_site = '$this->site_id'
+			")->current();
 			$primary->item = $parent;
-			$this->template->primary = $primary;
-			$this->template->render(true);
+			echo $primary;
 		}
-		
 		die();		
 	}
 
@@ -192,8 +166,6 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	public function delete($id=NULL)
 	{
 		tool_ui::validate_id($id);				
-		echo 'hello!';die();
-		# db delete
 		$this->_delete_single_common('calendar', $id);
 		die();
 	}
@@ -236,20 +208,16 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			$primary = new View('calendar/edit/day');
 			$primary->events = $events;
 			$primary->date = $date;
-			$primary->render(TRUE);
+			echo $primary;
 		}
 		else
-		{
 			echo 'no events on this day';
-		}
-		
-		
+			
 		die();
-		
 	}
 	
 /*
- * Upload an image to showroom
+ * Upload an image
  * @Param array $file = $_FILES array
  */ 	
 	private function _upload_image($_FILES)
@@ -274,17 +242,12 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			
 			$image->save("$directory/$file_name");
 		 
-			# Remove temp file
 			unlink($filename);
 			
 			return $file_name;
-			#status message
-			#return '<script> $.jGrowl("Image uploaded!")</script>';
 		}
 		else
 			return FALSE;
-
-		
 	}
 	
 }

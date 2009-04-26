@@ -10,9 +10,6 @@ class Css_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
-		if(! $this->client->logged_in()
-			OR $this->client->get_user()->client_site_id != $this->site_id )
-				die();
 	}
 	
 /*
@@ -51,7 +48,6 @@ class Css_Controller extends Controller {
 		
 		$primary->unique_tools	= $unique_tools;
 		$primary->all_tools		= $all_tool_instances;
-
 		echo $primary;
 		die();
 	}
@@ -63,6 +59,10 @@ class Css_Controller extends Controller {
  */
 	function edit($name_id=NULL, $tool_id=NULL)
 	{
+		if(! $this->client->logged_in()
+			OR $this->client->get_user()->client_site_id != $this->site_id )
+				die();
+
 		tool_ui::validate_id($name_id);	
 		tool_ui::validate_id($tool_id);		
 		
