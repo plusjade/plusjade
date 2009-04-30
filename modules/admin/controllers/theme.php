@@ -10,7 +10,10 @@ class Theme_Controller extends Controller {
 		parent::__construct();
 		if(! $this->client->logged_in()
 			OR $this->client->get_user()->client_site_id != $this->site_id )
+			{
+				echo 'Please Login';
 				die();
+			}
 	}
 
 # Manage Current Theme Files

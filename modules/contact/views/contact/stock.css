@@ -33,7 +33,17 @@
 }	
 .email_form_link a:hover{
 }
-
+.send_success,
+.send_error{
+	text-align:center;
+	padding:10px;
+	background:#ffffcc;
+	font-weight:bold;
+	margin:10px;
+}
+.send_error{
+	background:pink;
+}
 	/*  --- email form --- */	
 	
 .email_form_wrapper{

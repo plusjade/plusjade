@@ -1,3 +1,3 @@
-<li><a href="/get/edit_navigation/manage/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/manage.png" class="imgfacebox" alt="add"> Manage</a></li>
-<li><a href="/get/edit_navigation/add/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/add.png" class="imgfacebox" alt="add"> Add Items</a></li>
-<li><a href="/get/edit_navigation/settings/<?php echo $identifer?>" rel="facebox"><img src="/images/admin/wrench.png" class="imgfacebox" alt="settings"> Settings</a></li>
+<li><img src="<?php echo url::image_path('admin/manage.png')?>" alt="add"> <a href="/get/edit_navigation/manage/<?php echo $identifer?>" rel="facebox">Manage</a></li>
+<li><img src="<?php echo url::image_path('admin/add.png')?>" alt="add"> <a href="/get/edit_navigation/add/<?php echo $identifer?>" rel="facebox">Add Items</a></li>
+<li><img src="<?php echo url::image_path('admin/wrench.png')?>" alt="settings"> <a href="/get/edit_navigation/settings/<?php echo $identifer?>" rel="facebox">Settings</a></li>

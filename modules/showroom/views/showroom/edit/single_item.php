@@ -46,7 +46,7 @@
 				<br>
 				<br><b>Image</b> (leave blank for no change)
 				<br><input type="file" name="image">
-				<br><br><img src="<?php echo $data_path.'/assets/images/showroom/'."$item->cat_id/sm_$item->img"?>" width="150px" height="150px" alt="">			
+				<br><br><img src="/data/<?php echo "$this->site_name/assets/images/showroom/$item->cat_id/sm_$item->img"?>" width="150px" height="150px" alt="">			
 			</div>
 	
 		</div>

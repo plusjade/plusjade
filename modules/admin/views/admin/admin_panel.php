@@ -18,7 +18,7 @@ if (empty($tools_array))
 			<div>Theme &#8595;</div>
 			<ul> 
 				<li><img src="<?php echo url::image_path('admin/rainbow.png')?>" alt=""> <a href="/get/theme" rel="facebox">Edit Theme</a></li>
-				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/logo" rel="facebox">Logo</a></li>
+				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/logo" rel="facebox">Edit Logo</a></li>
 				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/change" rel="facebox">New Theme</a></li>
 			</ul>		
 		</li>

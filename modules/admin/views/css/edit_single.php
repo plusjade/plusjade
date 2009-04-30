@@ -12,6 +12,6 @@
 		<b>Add Class to Container:</b> <input type="text" name="attributes" value="<?php echo $attributes?>" style="width:400px">
 	</div>
 	
-	<textarea name="contents" style="height:300px !important; overflow:auto"><?php echo $contents?></textarea>
+	<textarea name="contents" style="height:300px !important; width:99%; overflow:auto"><?php echo $contents?></textarea>
 
 </form>

@@ -1,13 +1,8 @@
-<?php $value = '<a href="mailto:'.$contact->value.'">'.$contact->value.'</a>';?>
 
-<div class="email_form_link">
-	<a href="#email_form" class="inline_form">Send Email Via Form</a>
-</div>
-	
 <span class="contact_name"><?php echo $contact->display_name?></span> 
 
 <div class="contact_value">
-	<?php echo $value?>
+	<a href="#email_form" class="inline_form"><?php echo $contact->value?></a> <small>(displays a form)</small>
 </div>
 
-<?php echo View::factory('contact/email_form')?>
+<?php echo View::factory('contact/email_form', array('email'=> $contact->value) )?>

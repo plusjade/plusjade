@@ -40,10 +40,6 @@
 <?php echo form::open('theme/change', array('class' => 'ajaxForm'))?>
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="change_theme" class="jade_positive">
-			Change Theme
-		</button>
-
 		<div id="common_title">Current Theme: <?php echo $this->theme;?></div>
 	</div>
 
@@ -52,25 +48,27 @@
 		<?php	
 		foreach($themes as $key => $theme)
 		{					
-			$selected = '';
+			$disabled = '';
 			if($this->theme == $theme->name)
-				$selected = 'CHECKED';
+				$disabled = 'disabled="disabled"';
 				
 			echo '<div class="tool_box_wrapper">';
-			echo '<label FOR="radio_'.$key.'">';
-			echo '<input type="radio" name="theme" id="radio_'.$key.'" value="' . $theme->name .'" ' . $selected .'> '. $theme->name;							
-			echo '</label>';
+			echo'
+				<button type="submit" name="theme" value="' . $theme->name .'" class="jade_positive" style="width:100%;height:40px" '.$disabled.'>
+				<img src="/assets/images/admin/add.png"> ' . $theme->name .'
+				</button>
+			';
 			echo '</div>';
 			
-			unset($selected);
+			unset($disabled);
 		}
 		?>
 	</div>
 </form>
 <script type="text/javascript">
 	// ADD tool label stuff...
-	$('#jade_tool_box label').click(function(){
-		$('#jade_tool_box label').removeClass('selected');
+	$('#jade_tool_box button').click(function(){
+		$('#jade_tool_box button').removeClass('selected');
 		$(this).addClass('selected');
 	});
 </script>

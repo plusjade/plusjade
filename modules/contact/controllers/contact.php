@@ -34,10 +34,7 @@ class Contact_Controller extends Controller {
 		
 		
 		# Javascript
-			# no longer using facebox form.
-			#$primary->add_root_js_files('facebox/public_multi.js');
 		$primary->add_root_js_files('ajax_form/ajax_form.js');	
-				
 		$embed_js = View::factory('contact/index', NULL, 'js');		
 		$primary->global_readyJS($embed_js);			
 		
@@ -48,13 +45,7 @@ class Contact_Controller extends Controller {
 	{
 		if($_POST)
 		{
-			echo 'Offline but working...';
-			echo '<br><a href="/get/page" rel="facebox">blah</a>';
-			echo'<pre>';print_r($_POST);echo'</pre>';
-			
-			die();
-			
-			$to      = 'superjadex12@gmail.com';
+			$to      = $_POST['sendto'];
 			$subject = 'Customer message from: '.url::site();			
 			
 			$message = 'Name: '.$_POST['name']."\r\n";
@@ -62,14 +53,14 @@ class Contact_Controller extends Controller {
 			$message .= 'Phone: '.$_POST['phone']."\r\n";
 			$message .= 'Message: '.$_POST['message']."\r\n";
 			
-			$headers = 'From: webmaster@example.com' . "\r\n" .
-				'Reply-To: webmaster@example.com' . "\r\n" .
+			$headers = 'From: '.$_POST['email'] . "\r\n" .
+				'Reply-To: '.$_POST['email'] . "\r\n" .
 				'X-Mailer: PHP/' . phpversion();
 
 			if(! mail($to, $subject, $message, $headers) )
-				echo 'There was a problem sending the email.';
+				echo '<div class="send_error">There was a problem sending the email.</div>';
 			else
-				echo 'Email Sent! We will be in touch shortly!';
+				echo '<div class="send_success">Email Sent! We will be in touch shortly!</div>';
 		}
 		
 		die();

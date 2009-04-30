@@ -15,7 +15,8 @@ class Auth_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->template->linkCSS('css/auth.css');		
+		$this->template->linkCSS('css/auth.css');
+		$this->template->linkJS('ui/ui_latest_lite.js');	
 	}
 	
 	/*
@@ -205,7 +206,14 @@ class Auth_Controller extends Template_Controller {
 								'position'	=> '0',								
 							);
 							$query = $db->insert('pages', $data);
-							$pages_insert_id = $query->insert_id();
+
+							$data = array(
+								'fk_site'	=> $sites_insert_id,
+								'page_name'	=> 'about',
+								'label'		=> 'About',
+								'position'	=> '1',								
+							);
+							$query = $db->insert('pages', $data);
 							
 							# Log user in
 							Auth::instance()->login($user, $_POST['password']);

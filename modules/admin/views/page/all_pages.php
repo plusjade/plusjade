@@ -23,7 +23,7 @@
 		?>
 		<li id="page_<?php echo $page->id?>" <?php echo $class?>>
 			<table id="menu_page_list"><tr>
-				<td width="80px" class="drag_box"><img src="/images/arrow.png" alt="handle" class="handle"></td>
+				<td width="80px" class="drag_box"><img src="<?php echo url::image_path('arrow.png')?>" alt="handle" class="handle"></td>
 				<td width="30px" class="aligncenter"><?php echo $page->position?>. </td>
 				<td class="page_edit"><a href="<?php echo url::site($page->page_name)?>"><?php echo $page->label?> - <small><?php echo url::site($page->page_name)?></small></a></td>
 				<td class="alignright" width="50px"><a href="/get/page/delete/<?php echo $page->id?>" class="delete_page" id="<?php echo $page->id?>">delete</a></td>

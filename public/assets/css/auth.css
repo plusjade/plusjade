@@ -15,6 +15,7 @@
 	font-size:1.2em;
 	color:blue;
 	font-family: 'Lucida Console', Monaco, monospace;
+	text-decoration:underline;
 }
 .fieldsets input, .fieldsets select{
 	padding:5px;
@@ -59,8 +60,6 @@
 	overflow:visible;
 }
 .buttons a, .buttons button{
-    display:block;
-	float:right;
     background-color:#eee;
     border:1px solid #ccc;
     font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
@@ -161,7 +160,7 @@ button.jade_positive, .buttons a.jade_positive{
 #auth_form{
 	margin:10px auto;
 	padding:10px;
-	background:#e4f3ff;
+	ackground:#e4f3ff;
 }
 #auth_form div.fieldsets{
 	background:#fff;
@@ -176,6 +175,9 @@ button.jade_positive, .buttons a.jade_positive{
 }
 #auth_form input{
 	font-size:1.8em;
+	background: lightblue url(/assets/images/admin/sky_bg.png) repeat-x bottom left;
+	border:1px solid #ccc;
+	
 }
 #auth_form input.full{
 	width:400px;
@@ -223,6 +225,45 @@ button.jade_positive, .buttons a.jade_positive{
 	margin:0;
 	padding:0;	
 }
+
+
+	/* top navigation style button style */
+#vertical_tabs{
+	margin:0;
+	padding:0;
+	width:15%;
+	float:left;
+	overflow:hidden;
+}
+#vertical_tabs li{
+	margin-bottom:10px;
+}
+#vertical_tabs li a{
+	display:block;
+	padding:8px 10px;
+	color:#333;
+}
+#vertical_tabs li a:hover, #vertical_tabs .ui-tabs-selected a{
+	color:red;
+}
+
+
+#vertical_content{
+	width:80%;
+	float:right;
+	line-height:2em;
+}
+
+
+.main_header{
+	color:#7ebd40;
+	font-size:1.2em;
+	font-weight:bold;
+}
+
+
+
+
 
 	/* top navigation style button style */
 #admin_generic_tab_nav{

@@ -39,9 +39,6 @@
 <?php echo form::open("tool/add/$page_id", array('class' => 'custom_ajaxForm') )?>
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="add_tool" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Add Tool
-		</button>
 		<div id="common_title">Add New Tool to Page</div>
 	</div>
 	
@@ -58,9 +55,11 @@
 			if('0' == $key ) $checked = 'CHECKED';
 			
 			echo '<div class="tool_box_wrapper">';
-			echo '<label FOR="radio_'.$key.'">';
-			echo '<input type="radio" name="tool" id="radio_'.$key.'" value="' . $tool->id .' " '.$checked.'> '. $tool->name;				
-			echo '</label>';
+			echo '
+				<button type="submit" name="tool" value="' . $tool->id .' " class="jade_positive" style="width:100%;height:40px">
+					<img src="/assets/images/admin/add.png" alt=""/> Add '.$tool->name.'
+				</button>
+			';
 			echo '<div>'. $tool->desc .'</div>';
 			echo '</div>';
 			
