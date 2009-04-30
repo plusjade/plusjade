@@ -65,7 +65,7 @@ textarea.render_html{
 	text-align:center;
 	min-width:800px;
 	width:100%;
-	z-index:200;
+	z-index:999;
 }
 
 /* admin toolbar */
@@ -81,7 +81,6 @@ ul#admin_bar{
 	border:2px solid green;
 	border-top:0;
 	list-style:none;
-	z-index:100;
 }
 
 
@@ -119,7 +118,6 @@ ul#admin_bar{
 	clear:both;
 	width:102px;
 	list-style:none;
-	z-index:90;
 	margin:0;
 	padding:3px;
 	line-height:2em;
@@ -137,7 +135,7 @@ ul#admin_bar{
 
 
 #tool_bar_wrapper{
-	z-index:90;
+
 }
 
 /* "on this page" toolbar wrapper */
@@ -182,16 +180,15 @@ ul#admin_bar{
 	left:80%;
 	width:100px;
 	text-align:center;
-	z-index:1000;
 }
 #hide_link a {
 	background:orange;
 	color:#fff;
 	display:block;
-	width:100px;
+	width:70px;
 	padding:7px 0;
 	text-decoration:none;
-	border:2px solid green;
+	border:1px solid green;
 	border-top:0;
 }
 #hide_link a:hover {
@@ -559,7 +556,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 200;
+  z-index: 99;
   text-align: left; 
 }
 .facebox .popup {
@@ -574,7 +571,6 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 .facebox table div.status_reload,
 .facebox table div.status_close
 {
-	z-index:500;
 	width:300px;
 	height:200px;
 	font-size:1.4em;
@@ -948,8 +944,8 @@ button.jade_positive, .buttons a.jade_positive{
 	width:70px;
 }
 .row_change{
-	text-align:right;
-	width:90px;
+	text-align:center;
+	width:60px;
 }
 .row_delete{
 	text-align:right;
@@ -957,12 +953,12 @@ button.jade_positive, .buttons a.jade_positive{
 }
 
 #all_tools_table td{
-	padding:8px;
-	border:2px solid #fff;
+	padding:5px;
+	border:3px solid #fff;
 }
 th{
 	font-weight:bold;
-	padding:10px 0;
+	padding:5px 0;
 }
 .row_wrapper{
 	padding:10px 5px;
@@ -976,6 +972,11 @@ th{
 .notice {background:#FFF6BF;color:#514721;border-color:#FFD324;}
 .orphan td{
 	background:#FBE3E4;
+	border:1px solid #FBC2C4;
+	color:#8a1f11;
+}
+.global td{
+	background:#ffffcc;
 	border:1px solid #FBC2C4;
 	color:#8a1f11;
 }

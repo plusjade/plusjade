@@ -8,6 +8,6 @@ if('jade' == $this->site_name)
 	}
 	else
 	{
-		echo '<a href="/get/auth">Login</a> <a href="/get/auth/create">Create Account</a>';
+		echo '<a href="/get/auth">Login</a> <a href="/get/auth/create">Create Website</a>';
 	}
 }

@@ -1,55 +1,97 @@
 
-<ul id="admin_generic_tab_nav" class="ui-tabs-nav">	
-	<li><a href="#fragment-1" class="ui-tabs-selected"><span>Dashboard</span></a></li>
-	<li><a href="#fragment-2"><span>Create & Manage</span></a></li>
-	<li><a href="#fragment-3"><span>Market</span></a></li>
-	<li><a href="#fragment-3"><span>Analyze</span></a></li>
-	<li><a href="#fragment-3"><span>Grow</span></a></li>
-</ul>
+<div id="container-1">
 
-<div id="common_tool_header" class="buttons">
-	<a href="/get/auth/logout" class="jade_negative">Logout</a>
-	<a href="/get/auth/change_password">Change Password</a>
-	
-	<div id="common_title">Hello there, <?php echo ucwords($user->username)?>!</div>
-</div>
+	<ul id="vertical_tabs" class="ui-tabs-nav">	
+		<li><a href="#fragment-1" class="ui-tabs-selected"><span>Dashboard</span></a></li>
+		<li><a href="#fragment-2"><span>Website</span></a></li>
+		<li><a href="#fragment-3"><span>Marketing</span></a></li>
+		<li><a href="#fragment-4"><span>Analytics</span></a></li>
+		<li><a href="#fragment-5"><span>Account</span></a></li>
+	</ul>
 
-<div class="indent">
+	<div id="vertical_content">
 
-	Create your website in 3 easy steps:
-	<ol>
-		<li><b>Choose a theme</b>
-			<br>You can always change your theme later, or even pay a profesional to custom design
-			your website for you. But to get started dead-fast, pick a theme to hold the content you will create.
-		</li>
-		<li><b>Gather content information and images.</b>
-			<br>
-		</li>
-		<li>
-			<b>Upload Content</b>
-			<br>Your website automatically comes with 6 core pages. Simply follow the directions to upload your content.
-		</li>
+		<div id="fragment-1">
+
+			<div id="common_tool_header" class="buttons">
 		
-	</ol>
+				<a href="/get/auth/manage" class="jade_positive floatright">Edit Website</a>
 
-	<div id="edit_website_link">	
-		<div class="buttons">
-			<a href="/get/auth/manage" class="jade_positive">Edit Website</a>
+				<div id="common_title">Hello there, <?php echo ucwords($user->username)?>!</div>
+			</div>
+		
+		
+				Glad you are back, we have work to do: 
+				
+				<ol>
+					<li>
+						<span class="main_header">Website - Create essential pages.</span>
+					</li>
+					
+					<li>
+						<span class="main_header">Marketing - Establish Lines of Communication</span>
+						<ol>
+							<li>
+								<b>Your email Newsletter Campaign</b>
+		
+							</li>
+							
+							<li>
+								<b>Your consistently updated blog.</b>
+								<br>
+							</li>
+							
+							<li>
+								<b>Your Twitter Feed.</b>
+								
+							</li>
+							
+						</ol>
+					
+					</li>
+					
+					
+					<li>
+						<span class="main_header">Analytics - Track Your Progress</span>
+						<br>Your website automatically comes with 6 core pages. Simply follow the directions to upload your content.
+					</li>
+					
+				</ol>
+			
 		</div>
-	</div>		
 
+		<div id="fragment-2">
+			hello jello
+		</div>
+		
+		<div id="fragment-3">
+			hello jello
+		</div>
+		<div id="fragment-4">
+			hello jello
+		</div>
+		
+		<div id="fragment-5">		
+			<a href="/get/auth/change_password">Change Password</a>
 
+			<?php 
+			#quick hack - remove later
+			if($this->client->logged_in(2))
+			{
+				?>
+				<p><a href="/get/auth/create">Create New Site account</a></p>
+				<p><a href="/get/auth/destroy">Destroy Site account</a></p>	
+				<p><a href="/get/auth/clean_db">Clean Database</a></p>
+				<?php
+			}
+			?>
+		</div>
+		
+		
+	</div>
 
 </div>
 
-<?php 
-#quick hack - remove later
-if($this->client->logged_in(2))
-{
-	?>
-	<p><a href="/get/auth/create">Create New Site account</a></p>
-	<p><a href="/get/auth/destroy">Destroy Site account</a></p>	
-	<p><a href="/get/auth/clean_db">Clean Database</a></p>
-	<?php
-}
-?>
+<script type="text/javascript">
+	$("#container-1").tabs();
+</script>

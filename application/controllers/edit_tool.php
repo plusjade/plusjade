@@ -11,11 +11,13 @@ abstract class Edit_Tool_Controller extends Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		/*
 		if(! $this->client->logged_in()
 			OR $this->client->get_user()->client_site_id != $this->site_id )
-				die();
-		*/
+		{
+			echo 'Please login';
+			die();
+		}
+		
 		# Controller variables
 		$this->site_data_dir = DATAPATH . "$this->site_name";
 	}

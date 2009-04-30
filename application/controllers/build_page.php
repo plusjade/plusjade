@@ -108,7 +108,7 @@ class Build_Page_Controller extends Template_Controller {
 			# Load PUBLIC CSS required for Javascript associated with Tools		
 			foreach($_SESSION['js_files'] as $file => $javascript)
 			{
-				$path = DOCROOT."js/$file/style.css";
+				$path = DOCROOT . "assets/js/$file/style.css";
 				if( file_exists($path) )
 				{
 					# avoid duplicates for assets Admin uses

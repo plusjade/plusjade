@@ -16,7 +16,7 @@
 	});
 	
 	// add delete icons
-	$(".facebox li:not(.root)>span").after(" <img src=\"/images/navigation/cross.png\" class=\"li_delete\" alt=\"\">");
+	$(".facebox li:not(.root)>span").after(' <img src="<?php echo url::image_path('navigation/cross.png')?>" class="li_delete" alt="">');
 	
 	// activate delete icons
 	$(".facebox .li_delete").click(function(){
