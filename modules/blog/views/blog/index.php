@@ -1,21 +1,43 @@
 
-<div id="faq_wrapper_<?php echo $parent->id?>" class="faq_wrapper">
-	
-	<div class="faq_title"><?php echo $parent->title?></div> 
 
-	<dl class="faq_list">
-		<?php
-		$x=0;
-		foreach($items as $item)
-		{
-			$url_question = preg_replace("(\W)", '_', $item->question);
-			$url_question = strtolower($url_question);			
-			$url_question = trim($url_question, '_');
+<div id="blog_wrapper_<?php echo $tool_id?>" class="blog_wrapper">
+
+	<div class="blog_navigation">
+
+		<h3>Tags</h3>
+			<ul>
+			<?php
+				foreach($tags as $tag)
+				{
+					echo '<li><a href="'.url::site("blog/tag/$tag->value").'">'.$tag->value . '</a></li>';
+				}
+			?>
+			</ul>
+		
+		<h3>Archives</h3>
+		
+		<a href="/blog/archive/2009">2009</a>
+		
+		<ul>
+			<li><a href="/blog/archive/2009/03">March</a></li>
+			<li><a href="/blog/archive/2009/04">April</a></li>
+			<li><a href="/blog/archive/2009/05">May</a></li>
+		</ul>
+		
+		<a href="/blog/archive">View All</a>
+		
+
+		<h3>Spotlight</h3>
+
+		<h3>Recent Comments</h3>
 			
-			echo '<dt class="faq_item" rel="'.$item->id.'">' . ++$x . '. <span class="minus"><img src="/images/public/minus.png" alt=""></span> <a href="#'.$url_question.'" class="toggle">' . $item->question . '</a></dt>' . "\n";	
-			echo '<dd id="'.$url_question.'" class="faq_answer">' . $item->answer . '</dd>' . "\n";
-		}	
-		?>		
-	</dl>
-
+	
+	
+	</div>
+	
+	<div class="blog_content">
+		<?php if (! empty($content) ) echo $content?>
+		<?php if(! empty($response) ) echo '<div class="blog_response">'.$response.'</div>'?>
+	</div>
+	
 </div>
