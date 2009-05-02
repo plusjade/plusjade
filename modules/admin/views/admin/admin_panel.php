@@ -1,7 +1,7 @@
 <?php 
 if( empty($page_id) ) $page_id = NULL;
 #HACK
-$page_name = uri::easy_segment(1);
+$page_name = uri::easy_segment('1');
 
 if (empty($tools_array))
 	$tools_array = array();

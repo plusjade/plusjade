@@ -1,5 +1,5 @@
 <?php
-if( empty($_SESSION['banner']) )
+if( empty($this->banner) )
 {
 	?>
 	<div id="text_logo">
@@ -11,7 +11,7 @@ else
 {
 	?>	
 	<a href="<?php echo url::site()?>">
-		<img src="<?php echo $data_path?>/assets/images/banners/<?php echo $_SESSION['banner']?>" id="header_banner">
+		<img src="<?php echo $data_path?>/assets/images/banners/<?php echo $this->banner?>" id="header_banner">
 	</a>
 	<?php
 }

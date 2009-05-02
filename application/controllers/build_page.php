@@ -3,10 +3,9 @@ class Build_Page_Controller extends Template_Controller {
 
 	/*
 	 * Renders live client pages.
-	 * Accepts a valid page w/ data from the db sent from build_page HOOK.
+	 * Queries for page_name
 	 * Grabs all tools associated with this page, places them correctly.
-	 * Proceeds to build the page.
-	 * Output to "shell" via template controller 
+	 * and  outputs the view "shell" via template controller.
 	 *
 	 */
 	function __construct()
@@ -14,13 +13,42 @@ class Build_Page_Controller extends Template_Controller {
 		parent::__construct();
 	}
   
-	# $data = (array) plusjade.pages row-data
-	function _index($data)
+	function _index()
 	{
-		$db			= new Database;
-		$page_id	= $data['id'];	
+		$db	= new Database;
+
+		# get the page_name from the url
+		$pieces = explode('/', $_SERVER['REQUEST_URI']);
+		$page_name = $main	= ( empty($pieces['1']) ) ? 'home' : $pieces['1'];
+		
+		#PAGE NAME CHECKS (reserved names are "showroom" and "blog" )
+		if(! empty($pieces['1']) AND 'showroom' != $pieces['1'] AND 'blog' != $pieces['1'] )
+		{
+			$page_name = strstr($_SERVER['REQUEST_URI'], '/');
+			$page_name = ltrim($page_name, '/');
+		}
+		
+		# Grant access to all pages if logged in.
+		$check_enabled = " AND enable = 'yes' ";
+		if( $this->client->logged_in() )
+			$check_enabled = '';
+			
+		# Grab the page row
+		$page = $db->query("SELECT * FROM pages 
+			WHERE fk_site = '$this->site_id' 
+			AND page_name = '$page_name' $check_enabled
+		")->current();
+		
+		# if page doesnt exist
+		if (! is_object($page) )
+		{
+			echo '<div class="aligncenter">Page Not Found</div>';
+			Event::run('system.404');
+			die();
+		}
+		
+		$containers_array		= array(' ',' ',' ',' ',' ');
 		$_SESSION['js_files']	= array();
-		$containers_array		= array(' ',' ',' ',' ',' ');		
 		$tools_array			= array();
 		$generic_tools			= array();
 		$all_tools				= array();		
@@ -28,28 +56,26 @@ class Build_Page_Controller extends Template_Controller {
 		$prepend	= '';
 		$append		= '';
 		
-		$this->template->title 	= $data['title'];
-		$this->template->meta_tags('description', $data['meta']);
-		$this->template->set_global('selected', $data['page_name']);	
-		$this->template->set_global('page_id', $page_id);
+		$this->template->title 	= $page->title;
+		$this->template->meta_tags('description', $page->meta);
+		$this->template->set_global('selected', $page->page_name);	
+		$this->template->set_global('page_id', $page->id);
 		
 		/*
 		 * Grab tools for this page in pages_tools table
-		 * 0-10 are reserved for global tools. we only use 1-5 though
-		 * 
+		 * 0-10 are reserved for global tools. we only use 1-5
 		 */		 
 		$tools = $db->query("SELECT * FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
-			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
+			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page->id')
 			AND fk_site = '$this->site_id'
 			ORDER BY container, position
 		");
 
 		# Load Admin CSS and Javascript (if logged in)
 		$admin_mode = $this->_load_admin();
-		
 		if( $tools->count() > 0 )
-		{		
+		{	
 			foreach ($tools as $tool)
 			{
 				# If Logged in wrap classes around tools for Javascript
@@ -90,8 +116,7 @@ class Build_Page_Controller extends Template_Controller {
 			$generic_tools	= implode('-', $generic_tools);
 			$all_tools		= implode('-', $all_tools);
 			
-			$this->template->linkCSS("get/css/tools/$all_tools", url::site() );		
-			
+			$this->template->linkCSS("get/css/tools/$all_tools", url::site() );			
 		}
 		
 		
