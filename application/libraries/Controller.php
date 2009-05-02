@@ -21,12 +21,25 @@ abstract class Controller_Core {
 	 * @return  void
 	 */
 	public function __construct()
-	{
-		$session = Sessionk::instance();		
-		$this->theme 		= $_SESSION['theme'];	
-		$this->site_id 		= $_SESSION['site_id'];
-		$this->site_name 	= $_SESSION['site_name'];
-	
+	{	
+		$session = Sessionk::instance();
+		$site_name = $_SESSION['site_name'];
+		
+		$identifer = file_get_contents(DATAPATH . "$site_name/protected/identifer.yaml");
+		$identifer = explode(',',$identifer);
+		$keys = array();
+		foreach($identifer as $string)
+		{
+			$value = strstr($string ,':');
+			$value = ltrim($value, ':');
+			$keys[] = trim($value);
+		}
+		$this->site_id 		= $keys['0'];
+		$this->site_name 	= $keys['1'];
+		$this->theme 		= $keys['2'];
+		$this->banner 		= $keys['3'];
+		
+		
 		# Auth Instance
 		$this->client = new Auth;	
 		

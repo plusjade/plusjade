@@ -9,9 +9,9 @@ class Showroom_Controller extends Controller {
 	
 	function _index($tool_id)
 	{
-		$db = new Database;
-		$category = uri::easy_segment('2');
-		$item = uri::easy_segment('3');
+		$db			= new Database;
+		$category	= uri::easy_segment('2');
+		$item		= uri::easy_segment('3');
 		
 		$parent = $db->query("SELECT * FROM showrooms 
 			WHERE id = '$tool_id' 
