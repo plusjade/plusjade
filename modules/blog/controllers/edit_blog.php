@@ -2,7 +2,7 @@
 class Edit_Blog_Controller extends Edit_Tool_Controller {
 
 /*
- *	Handles all editing logic for FAQ module.
+ *	Handles all editing logic for blog module.
  *	Extends the module template to build page quickly in facebox frame mode.
  *	Only Logged in users should have access
  *
@@ -16,12 +16,11 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	{
 		tool_ui::validate_id($tool_id);
 		$db = new Database;
-		$primary = new View('faq/edit/manage');
+		$primary = new View('blog/edit/manage');
 		
 		# Get faq items
-		$items = $db->query("SELECT * FROM faq_items 
+		$items = $db->query("SELECT * FROM blog_items 
 			WHERE parent_id = '$tool_id' AND fk_site = '$this->site_id'
-			ORDER BY position
 		");
 		$primary->items = $items;
 		
@@ -43,27 +42,20 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
-			# Get highest position
-			$get_highest = $db->query("SELECT MAX(position) as highest 
-				FROM faq_items 
-				WHERE parent_id = '$tool_id' 
-			")->current()->highest;
-
 			$data = array(
 				'fk_site'	=> $this->site_id,
 				'parent_id'	=> $tool_id,
-				'question'	=> $_POST['question'],
-				'answer'	=> $_POST['answer'],
-				'position'	=> ++$get_highest
-				
+				'title'		=> $_POST['title'],
+				'body'		=> $_POST['body'],
+				'created'	=> date("Y-m-d H:m:s")
 			);
 
-			$db->insert('faq_items', $data); 
-			echo 'Question added'; #status
+			$db->insert('blog_items', $data); 
+			echo 'Post added'; #status
 		}
 		else
 		{
-			echo $this->_show_add_single('faq', $tool_id);
+			echo $this->_view_add_single('blog', $tool_id);
 		}
 	}
 
