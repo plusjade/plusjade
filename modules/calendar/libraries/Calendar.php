@@ -22,7 +22,7 @@ class Calendar_Core {
 			
 		if( 'NULL' != $date_data )
 		{
-			echo '<a href="/get/calendar/day/'."$month-$day-$year".'" rel="ajax" class="day_link_simple">'. $day .'</a>';
+			echo '<a href="/calendar/day/'."$year/$month/$day".'" rel="ajax" class="day_link_simple">'. $day .'</a>';
 		}
 		else
 			echo '<div class="day_simple">'.$day.'</div>';
@@ -154,9 +154,9 @@ class Calendar_Core {
 		echo <<<EOS
 		<table id="calendar">
 		<tr>
-			<td><a href="/get/calendar/month/$prev_month/$prev_year" class="monthnav">&laquo; Last</a></td>
+			<td><a href="/calendar/month/$prev_year/$prev_month" class="monthnav">&laquo; Last</a></td>
 			<td colspan="5" class="month">$month_name $year</td>
-			<td><a href="/get/calendar/month/$next_month/$next_year" class="monthnav">Next &raquo;</a></td>
+			<td><a href="/calendar/month/$next_year/$next_month" class="monthnav">Next &raquo;</a></td>
 		</tr>
 		<tr class="daynames"> 
 			<td>S</td><td>M</td><td>T</td><td>W</td><td>T</td><td>F</td><td>S</td>

@@ -63,9 +63,9 @@
 	<script type="text/javascript"> 
 	  //<![CDATA[
 		$(document).ready(function(){				
-			<?php if(! empty($readyJS) ) echo $readyJS?> 
-		});	
-			<?php if(! empty($rootJS) ) echo $rootJS?>  
+			<?php if(! empty($javascript) ) echo $javascript?>
+			<?php if(! empty($readyJS) ) echo $readyJS?>
+		});
 	  //]]>
 	</script> 
 	<?php
@@ -78,8 +78,7 @@
 	echo ob_get_clean();
 		
 	#<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>	
-	?>
-	
+	?>	
 </body>
 </html>
 <!-- <3panda -->

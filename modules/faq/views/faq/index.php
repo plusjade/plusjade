@@ -12,7 +12,7 @@
 			$url_question = strtolower($url_question);			
 			$url_question = trim($url_question, '_');
 			
-			echo '<dt class="faq_item" rel="'.$item->id.'">' . ++$x . '. <span class="minus"><img src="/images/public/minus.png" alt=""></span> <a href="#'.$url_question.'" class="toggle">' . $item->question . '</a></dt>' . "\n";	
+			echo '<dt class="faq_item" rel="'.$item->id.'">' . ++$x . '. <span class="minus"><img src="/assets/images/public/minus.png" alt=""></span> <a href="#'.$url_question.'" class="toggle">' . $item->question . '</a></dt>' . "\n";	
 			echo '<dd id="'.$url_question.'" class="faq_answer">' . $item->answer . '</dd>' . "\n";
 		}	
 		?>		

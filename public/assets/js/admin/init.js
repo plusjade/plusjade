@@ -9,7 +9,6 @@ $(document).ready(function()
 			$(".jade_admin_item_edit").slideToggle("slow");
 			$("#hide_link").slideToggle("slow");
 		});
-		
 	});
 
 	// ACTIVATE Sitewide admin bar dropdowns
@@ -28,67 +27,61 @@ $(document).ready(function()
 		$('.actions_wrapper ul').hide();
 	});
 
-	
-	
-	// ADD Tool toolkit to all tools on page
+
+	// ADD Tool toolkit to all tools
 	// -----------------------------------
 	 $(".common_tool_wrapper").each(function(i){
 		++i;
-		var guid = this.id;
-		var toolkit = $("#toolkit_" + guid).html();
-		var toolbar = '<div id="toolbar_' + guid  + '" class="jade_toolbar_wrapper" style="z-index:200">' + toolkit + '</div>';
+		var temp	= new Array();
+		temp		= $(this).attr('id').split('_');
+		var toolkit = $("#toolkit_" + temp[1]).html();
+		var toolbar = '<div id="toolbar_' + temp[1]  + '" class="jade_toolbar_wrapper">' + toolkit + '</div>';
 		$(this).prepend(toolbar);
-	
 	 });
 	 
-	 
-	// ADD tool-item toolkits
-	// -----------------------------------
-/*
-	testing
-*/
-var tools = ['contact', 'showroom', 'slide_panel', 'faq'];
-$.each(tools, function(){	
-	var tool = this;
-	$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
-		var id		= $(this).attr("rel");
-		var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
-		var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="jade_delete_item" rel="item_'+id+'">delete</a>';
-		var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
-				
-		$(this).prepend(toolbar);			
+	// ACTIVATE action Tool toolkit menus	
+	$('.actions_link').click(function(){
+		$(this).next('ul').toggle();
+		return false;
 	});
-});
-
-/* used for ajax requests */
-jQuery.fn.add_toolkit_items = function(toolname){
-	$("." + toolname + "_wrapper ." + toolname + "_item").each(function(i){					
-		var id		= $(this).attr("rel");
-		var edit	= '<a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
-		var del		= '<a href="/get/edit_' + toolname + '/delete/' + id + '" class="jade_delete_item" rel="item_'+id+'">delete</a>';
-		var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
-				
-		$(this).prepend(toolbar);			
-	});
-
-};	
 	
-	// CALENDAR ITEM TOOLBAR
-	// its enabled inside the calendar controller
-	// because i dont want to use livequery
-		
+	/* ADD tool-item toolkits
+	 * selector format: .tool_wrapper .tool_item
+	 * -----------------------------------
+	 */
+	var tools = ['contact', 'showroom', 'slide_panel', 'faq', 'blog'];
+	$.each(tools, function(){	
+		var tool = this;
+		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
+			var id		= $(this).attr("rel");
+			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="item_'+id+'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
+					
+			$(this).prepend(toolbar);			
+		});
+	});
 
-	// DELEGATE main link functionality
-	// -----------------------------------
+	/* add tool-item toolkits to DOM ajax requests
+	 * enabled for calendar, showroom, (blog)
+	 * -----------------------------------
+	*/
+	jQuery.fn.add_toolkit_items = function(toolname){
+		$("." + toolname + "_wrapper ." + toolname + "_item").each(function(i){					
+			var id		= $(this).attr("rel");
+			var edit	= '<a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="item_'+id+'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
+			$(this).prepend(toolbar);			
+		});
+	};	
+	
+	/*
+	 * DELEGATE admin link functionality
+	 * -----------------------------------
+	 */
 	$("body").click($.delegate({
-
-			// TEST
-		"a.inline_text": function(e){
-			rel = $(e.target).attr('rel');
-			$("#text_wrapper_"+rel).load(e.target.href);
-			return false;
-		},	
-		
+	
 		// facebox links
 		"a[rel*=facebox]": function(e){
 			var pane = "base"; // loads in "base" unless otherwise noted via id
@@ -96,11 +89,9 @@ jQuery.fn.add_toolkit_items = function(toolname){
 			$.facebox(function(){
 					$.get(e.target.href, function(data){
 						$.facebox(data, false, "facebox_"+pane);
-						// wysiwyg text editor
 						$("textarea.render_html").wysiwyg();
 					});
 			}, false, "facebox_"+pane);
-
 			return false;
 		},
 		
@@ -118,7 +109,7 @@ jQuery.fn.add_toolkit_items = function(toolname){
 		},
 		
 		// DELETE single item link		
-		"a.jade_delete_item": function(e) {
+		"a.js_admin_delete": function(e) {
 			var url = $(e.target).attr("href");
 			var rel	= $(e.target).attr('rel');
 			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><br><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a><br><br><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Item</a></div>';	
@@ -126,15 +117,6 @@ jQuery.fn.add_toolkit_items = function(toolname){
 			return false;		
 		},
 		
-		// DELETE single tool link	
-		"a.jade_delete_tool": function(e) {
-			var url		= e.target.href;
-			var rel	= $(e.target).attr('rel');
-			var data	= '<div class="buttons confirm_facebox">This will delete this entire tool.<br>All content will be lost forever!<br><br><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a><br><br><br><a href="'+ url +'" class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Tool</a></div>';	
-			$.facebox(data, "confirm_facebox", "confirm_dialog");
-			return false;		
-		},
-
 		// CANCEL delete button
 		"a.cancel_delete": function() {
 			$.facebox.close();
@@ -143,17 +125,10 @@ jQuery.fn.add_toolkit_items = function(toolname){
 		
 		// DELETE CONFIRMED common button in facebox
 		"a.jade_confirm_delete_common": function(e) {
-			var url		= $(e.target).attr("href");
-			var temp	= new Array();
-			temp		= $(e.target).attr('rel').split('_');
-			// # type/id
-			
-			// TODO:: FIX THIS so it works with all tool items
-			if('tool' == temp[0]) selector = 'span.guid_';
-			else selector = '#showroom_item_'; 
-	
+			var url	= $(e.target).attr("href");
+			var el	= $(e.target).attr('rel');
 			$.get(url, function(data) {
-				$(selector + temp[1]).remove();
+				$('#' + el).remove();
 				$.facebox(data, "status_close", "confirm_dialog")
 				setTimeout('$.facebox.close()', 1000);					
 			});
@@ -162,10 +137,9 @@ jQuery.fn.add_toolkit_items = function(toolname){
 
 	}));
 	
-	// ACTIVATE DEFAULT AJAX FORMS in all facebox windows
-	// Cannot delegate this since theres no event.
+	// ACTIVATE default ajax forms in all facebox windows
+	// Can delegate on the submit event but we'll keep it as is fornow.
 	$(document).bind('reveal.facebox', function(){		
-		// Ajax forms
 			var options = {
 				beforeSubmit: function(){
 					if( $(".ajaxForm input").jade_validate() )
@@ -275,14 +249,8 @@ jQuery.fn.add_toolkit_items = function(toolname){
 			"facebox_2"
 		);
 	});		
-
-	// ACTIVATE action Tool toolkit menus	
-	$('.actions_link').click(function(){
-		$(this).next('ul').toggle();
-		return false;
-	});
 	
-		/*
+	/*
 	var zIndexNumber = 1000;
 	$('.CONTAINER_WRAPPER div, .CONTAINER_WRAPPER ul ').each(function() {
 		$(this).css('zIndex', zIndexNumber);

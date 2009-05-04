@@ -14,14 +14,21 @@ class Album_Controller extends Controller {
 		$db = new Database;
 		
 		# Get album
-		$album	= $db->query("SELECT * FROM albums WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();
-		$display_view = $album->view;
-
-		if( empty($display_view) )
-			$display_view = 'lightbox';
+		$album	= $db->query("SELECT * FROM albums 
+			WHERE id = '$tool_id' 
+			AND fk_site = '$this->site_id'
+		")->current();
+		$display_view = 'lightbox';
+		
+		if(! empty($album->view) )
+			$display_view = $album->view;
+			
 			
 		# Get images in album
-		$images = $db->query("SELECT * FROM album_items WHERE parent_id = '$album->id' ORDER BY position");
+		$images = $db->query("SELECT * FROM album_items 
+			WHERE parent_id = '$album->id' 
+			ORDER BY position
+		");
 		
 
 		if($images->count() > 0)

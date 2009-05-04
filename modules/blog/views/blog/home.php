@@ -4,7 +4,7 @@
 		foreach($items as $item)
 		{
 			?>
-			<div class="each_post">
+			<div class="blog_item" rel="<?php echo $item->id?>">
 			
 				<div class="post_title">
 					<div class="post_created"><?php echo $item->created?></div>

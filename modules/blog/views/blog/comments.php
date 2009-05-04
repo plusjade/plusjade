@@ -1,15 +1,17 @@
 
 <form action="/blog/comment/<?php echo $item_id?>" method="POST" class="public_ajaxForm">
 	
-	<div class="comments_wrapper">	
+	<div id="comments" class="comments_wrapper">	
 		<div class="comment_title">Comments</div>
 			<?php
 			foreach($comments as $comment)
 			{
 				?>
-				<div class="comment_item">
-					<?php echo $comment->author?><br>
-					<?php echo $comment->body?>
+				<div id="comment_<?php echo $comment->id?>" class="comment_item" rel="<?php echo $comment->id?>">
+				
+					<?php echo $comment->author?>
+					<br><?php echo $comment->body?>
+					
 				</div>						
 				<?php
 			}
@@ -31,4 +33,6 @@
 	</div>
 
 </form>
-	
+<script type="text/javascript">
+	$("#click_hook").click();
+</script>

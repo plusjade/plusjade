@@ -15,17 +15,13 @@ class tool_ui_Core {
 	{
 		if( NULL == $id OR !is_numeric($id) )
 		{
-			echo 'bad id';
+			Event::run('system.404');
 			die();
 		}
-		
 		return $id;
 	}	
-	
-
-##################################
-#-------Javascript helpers-------#
-##################################
+#Javascript helpers
+#--------------
 	/*
 	 *	Javascript enabling sort items save
 	 */ 

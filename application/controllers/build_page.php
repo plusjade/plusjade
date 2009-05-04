@@ -2,8 +2,8 @@
 class Build_Page_Controller extends Template_Controller {
 
 	/*
-	 * Renders live client pages.
-	 * Queries for page_name
+	 * Case B: is page_name.
+	 * Renders live client pages. Queries on page_name
 	 * Grabs all tools associated with this page, places them correctly.
 	 * and  outputs the view "shell" via template controller.
 	 *
@@ -17,16 +17,18 @@ class Build_Page_Controller extends Template_Controller {
 	{
 		$db	= new Database;
 
-		# get the page_name from the url
+		# get the page_name
 		$pieces = explode('/', $_SERVER['REQUEST_URI']);
 		$page_name = $main	= ( empty($pieces['1']) ) ? 'home' : $pieces['1'];
 		
+		/*
 		#PAGE NAME CHECKS (reserved names are "showroom" and "blog" )
-		if(! empty($pieces['1']) AND 'showroom' != $pieces['1'] AND 'blog' != $pieces['1'] )
+		if('showroom' != $page_name AND 'blog' != $page_name AND 'calendar' != $page_name )
 		{
 			$page_name = strstr($_SERVER['REQUEST_URI'], '/');
 			$page_name = ltrim($page_name, '/');
 		}
+		*/
 		
 		# Grant access to all pages if logged in.
 		$check_enabled = " AND enable = 'yes' ";
@@ -74,6 +76,7 @@ class Build_Page_Controller extends Template_Controller {
 
 		# Load Admin CSS and Javascript (if logged in)
 		$admin_mode = $this->_load_admin();
+		
 		if( $tools->count() > 0 )
 		{	
 			foreach ($tools as $tool)
@@ -85,7 +88,7 @@ class Build_Page_Controller extends Template_Controller {
 					$scope = 'local';
 					if( '5' >= $tool->page_id ) $scope = 'global';
 		
-					$prepend	= '<span id="' . $tool->guid . '" class="common_tool_wrapper guid_'. $tool->guid . '" rel="' . $scope . '">';
+					$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper" rel="' . $scope . '">';
 					$append		= '</span>';
 				}
 				
@@ -149,19 +152,15 @@ class Build_Page_Controller extends Template_Controller {
 		}
 		# Renew Javascript file requests
 		unset($_SESSION['js_files']);		
-		
 			
 		# Send the containers to the view (shell)
 		$this->template->containers = $containers_array;			
-		
-		#echo '<PRE>';print_r($containers_array);echo '</PRE>'; die();
 		
 		# needed to hide 404 not found on controller name
 		Event::clear('system.404');
 		
 		# this hook needed to enable auto rendering of controllers
 		Event::run('system.post_controller');		
-		
 	}
 }
 /* -- end of application/controllers/build_page.php -- */
