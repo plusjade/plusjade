@@ -10,7 +10,7 @@ class Calendar_Controller extends Controller {
 	function _index($tool_id)
 	{
 		valid::id_key($tool_id);		
-		$primary	= new View('calendar/index');	
+		$primary	= new View('public_calendar/index');	
 		$action		= uri::easy_segment('2');
 		$year		= uri::easy_segment('3');
 		$month		= uri::easy_segment('4');
@@ -90,7 +90,7 @@ class Calendar_Controller extends Controller {
 			AND day = '$day'
 		");
 	
-		$primary = new View('calendar/day');
+		$primary = new View('public_calendar/day');
 		$primary->events = $events;
 		$primary->date = "$year $month $day";
 		return $primary;
@@ -99,7 +99,7 @@ class Calendar_Controller extends Controller {
 	
 	public function event($id=NULL)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		$db = new Database;
 		
 		$event = $db->query("SELECT * FROM calendar_items 
@@ -109,7 +109,7 @@ class Calendar_Controller extends Controller {
 		
 		if( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']=="XMLHttpRequest")
 		{
-			$primary = new View('calendar/event');
+			$primary = new View('public_calendar/event');
 			$primary->event = $event;
 			echo $primary;
 		}
@@ -119,7 +119,7 @@ class Calendar_Controller extends Controller {
 			die();
 			
 			$view = new View('shell');
-			$primary = new View('calendar/event');
+			$primary = new View('public_calendar/event');
 			$primary->event = $event;
 			
 			echo $view;

@@ -9,7 +9,7 @@ class Slide_Panel_Controller extends Controller {
 	function _index($tool_id)
 	{		
 		$db = new Database;
-		$primary = new View("slide_panel/index");
+		$primary = new View("public_slide_panel/index");
 				
 		# Grab Slide panel parent for this page
 		$parent = $db->query("SELECT * FROM slide_panels WHERE id = '{$tool_id}' AND fk_site = '{$this->site_id}' ")->current();

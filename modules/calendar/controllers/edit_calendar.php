@@ -19,7 +19,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$calendar = new Calendar;
 		$db = new Database;
 		$month = date('m');
@@ -70,7 +70,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 				
 			if( 'NULL' != $date_data )
 			{
-				echo '<a href="/e/edit_calendar/day/'."$month-$day-$year".'" rel="admin_ajax" class="day_link_simple">'. $day .'</a>';
+				echo '<a href="/get/edit_calendar/day/'."$month-$day-$year".'" rel="admin_ajax" class="day_link_simple">'. $day .'</a>';
 			}
 			else
 				echo '<div class="day_simple">'.$day.'</div>';
@@ -94,7 +94,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
  */ 
 	public function add($tool_id=NULL)
 	{		
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		
 		if($_POST)
 		{
@@ -131,7 +131,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
  */
 	public function edit($id=NULL)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		$db = new Database;
 
 		if(! empty($_POST['title']) )
@@ -146,7 +146,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View("calendar/edit/single_item");		
+			$primary = new View("edit_calendar/single_item");		
 			$parent = $db->query("SELECT * FROM calendar_items 
 				WHERE id = '$id' 
 				AND fk_site = '$this->site_id'
@@ -165,7 +165,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
  */
 	public function delete($id=NULL)
 	{
-		tool_ui::validate_id($id);				
+		valid::id_key($id);				
 		$this->_delete_single_common('calendar', $id);
 		die();
 	}
@@ -187,9 +187,9 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 		# Format: month/day/year
 		$pieces = explode('-', $date);
 		
-		tool_ui::validate_id($pieces['0']);
-		tool_ui::validate_id($pieces['1']);
-		tool_ui::validate_id($pieces['2']);
+		valid::id_key($pieces['0']);
+		valid::id_key($pieces['1']);
+		valid::id_key($pieces['2']);
 		
 		$month	= $pieces['0'];
 		$day	= $pieces['1'];
@@ -205,7 +205,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	
 		if( $events->count() > 0 )
 		{
-			$primary = new View('calendar/edit/day');
+			$primary = new View('edit_calendar/day');
 			$primary->events = $events;
 			$primary->date = $date;
 			echo $primary;

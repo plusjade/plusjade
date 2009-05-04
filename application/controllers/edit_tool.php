@@ -113,7 +113,7 @@ abstract class Edit_Tool_Controller extends Controller {
 
 		if($items->count() > 0)
 		{
-			$primary = new View("$toolname/edit/manage_$toolname");
+			$primary = new View("edit_$toolname/manage_$toolname");
 			$primary->set($toolname, $parent);
 			$primary->items = $items;
 		}
@@ -121,7 +121,7 @@ abstract class Edit_Tool_Controller extends Controller {
 		{
 			if( is_object($parent) )
 			{
-				$primary = new View("$toolname/edit/new_item");			
+				$primary = new View("edit_$toolname/new_item");			
 				$primary->tool_id = $parent->id;
 			}
 			else
@@ -138,7 +138,7 @@ abstract class Edit_Tool_Controller extends Controller {
  */
 	function _view_add_single($toolname, $tool_id)
 	{
-		$primary = new View("$toolname/edit/new_item");
+		$primary = new View("edit_$toolname/new_item");
 		$primary->tool_id = $tool_id;			
 		return $primary;
 	}
@@ -154,7 +154,7 @@ abstract class Edit_Tool_Controller extends Controller {
 	
 	function _view_edit_single($toolname, $item_id, $JOIN = '' )
 	{	
-		$primary	= new View("$toolname/edit/single_item");
+		$primary	= new View("edit_$toolname/single_item");
 		$table		= $toolname.'s';
 		$item		= $this->_grab_tool_child($toolname, $item_id, $JOIN);
 
@@ -174,7 +174,7 @@ abstract class Edit_Tool_Controller extends Controller {
  */	
 	public function _view_edit_settings($toolname, $tool_id)
 	{
-		$primary = new View("$toolname/edit/settings");
+		$primary = new View("edit_$toolname/settings");
 		$primary->tool_id = $tool_id;	
 		$parent = $this->_grab_tool_parent($toolname, $tool_id);
 		

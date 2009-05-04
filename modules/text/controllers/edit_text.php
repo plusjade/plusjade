@@ -15,7 +15,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
  */
 	public function add($id=NULL)
 	{
-		tool_ui::validate_id($id);		
+		valid::id_key($id);		
 		$db = new Database;
 
 		if($_POST)
@@ -28,7 +28,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View("text/edit/single_item");
+			$primary = new View("edit_text/single_item");
 			$parent = $db->query("SELECT * FROM texts 
 				WHERE id = '$id' 
 				AND fk_site = '$this->site_id'

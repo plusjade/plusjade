@@ -10,7 +10,7 @@ class Text_Controller extends Controller {
 	function _index($tool_id)
 	{		
 		$db = new Database;
-		$primary = new View("text/index");
+		$primary = new View("public_text/index");
 		
 		$parent = $db->query("SELECT * FROM texts 
 			WHERE id = '$tool_id' 

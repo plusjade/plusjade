@@ -12,7 +12,7 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id=Null)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		echo $this->_view_manage_tool_items('slide_panel', $tool_id);	
 		die();
 	}
@@ -24,7 +24,7 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
  */ 
 	function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		
 		if($_POST)
 		{
@@ -61,7 +61,7 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
  */
 	function edit($id = Null)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		
 		if($_POST)
 		{
@@ -111,7 +111,7 @@ class Edit_Slide_Panel_Controller extends Edit_Tool_Controller {
  */
 	public function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		
 		if($_POST)

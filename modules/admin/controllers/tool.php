@@ -49,7 +49,7 @@ class Tool_Controller extends Controller {
  */
 	function add($page_id=NULL)
 	{
-		tool_ui::validate_id($page_id);		
+		valid::id_key($page_id);		
 		$db = new Database;		
 
 		if(! empty($_POST['tool']) )
@@ -108,7 +108,7 @@ class Tool_Controller extends Controller {
  */ 
 	function move($tool_guid=NULL)
 	{
-		tool_ui::validate_id($tool_guid);
+		valid::id_key($tool_guid);
 		$db = new Database;
 		
 		if($_POST)
@@ -144,7 +144,7 @@ class Tool_Controller extends Controller {
  */
 	function delete($tool_guid=NULL)
 	{
-		tool_ui::validate_id($tool_guid);		
+		valid::id_key($tool_guid);		
 		$db = new Database;	
 	
 		$tool_object = $db->query("SELECT * FROM pages_tools
