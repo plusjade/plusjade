@@ -21,8 +21,8 @@ foreach($unique_tools as $tool)
 	$user_images	= url::site() . "data/$site_name/themes/$theme/modules/$tool/";	
 	$user_css		= DATAPATH . "$site_name/themes/$theme/modules/$tool/stock.css";	
 	$theme_tool_css	= APPPATH . "views/$theme/$tool/stock.css";
-	$stock_tool_css	= MODPATH . "$tool/views/$tool/stock.css";
-	$admin_css		= MODPATH . "$tool/views/$tool/edit/admin.css";
+	$stock_tool_css	= MODPATH . "$tool/views/public_$tool/stock.css";
+	$admin_css		= MODPATH . "$tool/views/edit_$tool/admin.css";
 
 	#  Load user custom css if available.
 	if ( file_exists($user_css) )

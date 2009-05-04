@@ -18,7 +18,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		$parent = $db->query("SELECT * FROM showrooms 
 			WHERE id = '$tool_id' 
@@ -26,7 +26,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		")->current();			
 
 		#show category list.
-		$primary = new View("showroom/edit/manage_showroom");
+		$primary = new View("edit_showroom/manage_showroom");
 		$items = $db->query("SELECT * FROM showroom_items 
 			WHERE parent_id = '$parent->id' 
 			AND fk_site = '$this->site_id' 
@@ -41,8 +41,8 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	
 	function items($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
-		$primary = new View('showroom/edit/manage_items');
+		valid::id_key($tool_id);
+		$primary = new View('edit_showroom/manage_items');
 		$db = new Database;
 		
 		# Get list of categories
@@ -58,9 +58,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 	function list_items($cat_id=NULL)
 	{
-		tool_ui::validate_id($cat_id);
+		valid::id_key($cat_id);
 		$db = new Database;
-		$primary = new View('showroom/edit/list');
+		$primary = new View('edit_showroom/list');
 		
 		#display items in this cat
 		$items = $db->query("SELECT * FROM showroom_items_meta 
@@ -87,7 +87,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	{
 		if($_POST)
 		{
-			tool_ui::validate_id($tool_id);
+			valid::id_key($tool_id);
 			echo Tree::save_tree('showrooms', 'showroom_items', $tool_id, $_POST['output']);
 		}
 		die();
@@ -98,7 +98,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */ 
 	public function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		
 		if($_POST)
 		{
@@ -134,7 +134,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View('showroom/edit/new_category');
+			$primary = new View('edit_showroom/new_category');
 			$primary->tool_id = $tool_id;				
 			echo $primary;
 		}
@@ -147,7 +147,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */ 
 	public function add_item($tool_id=NULL)
 	{		
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;	
 		if($_POST)
 		{
@@ -199,7 +199,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			# If categories
 			if( count($categories) > 0)
 			{
-				$primary = new View("showroom/edit/new_item");
+				$primary = new View("edit_showroom/new_item");
 				$primary->tool_id = $tool_id;			
 				$this->template->primary = $primary;
 				$primary->categories = $categories;
@@ -208,7 +208,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			else
 			{
 				# add categories screen
-				$primary = new View('showroom/edit/new_category');
+				$primary = new View('edit_showroom/new_category');
 				$primary->tool_id = $tool_id;				
 				$primary->message = 'You will need to add some categories first.';
 				echo $primary;
@@ -223,7 +223,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	public function edit($id=NULL)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		$db = new Database;
 			
 		if($_POST)
@@ -279,7 +279,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View("showroom/edit/single_item");
+			$primary = new View("edit_showroom/single_item");
 
 			# Grab single item
 			$item = $db->query("SELECT * FROM showroom_items_meta
@@ -318,7 +318,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	public function delete($id=NULL)
 	{
-		tool_ui::validate_id($id);				
+		valid::id_key($id);				
 		# Get image object
 		$image = $this->_grab_tool_child('showroom', $id);
 
@@ -353,7 +353,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	public function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		
 		if($_POST)

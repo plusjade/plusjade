@@ -14,9 +14,9 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 
 	function manage($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
-		$primary = new View('faq/edit/manage');
+		$primary = new View('edit_faq/manage');
 		$items = $db->query("SELECT * FROM faq_items 
 			WHERE parent_id = '$tool_id' AND fk_site = '$this->site_id'
 			ORDER BY position
@@ -28,7 +28,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	
 	function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		
 		if($_POST)
@@ -60,7 +60,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 
 	function edit($id=NULL)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		
 		if($_POST)
 		{
@@ -81,7 +81,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 
 	function delete($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$this->_delete_single_common('faq', $tool_id);
 		echo 'Faq deleted!'; #status
 		die();
@@ -95,7 +95,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	
 	function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 
 		if($_POST)
 		{

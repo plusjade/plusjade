@@ -34,7 +34,7 @@ class Album_Controller extends Controller {
 		if($images->count() > 0)
 		{
 			# Load View based on album
-			$primary = new View("album/{$display_view}_album");
+			$primary = new View("public_album/{$display_view}_album");
 
 			$primary->album = $album;
 			$primary->images = $images;

@@ -15,8 +15,8 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
-		$primary	= new View('navigation/edit/manage');
+		valid::id_key($tool_id);
+		$primary	= new View('edit_navigation/manage');
 		$db			= new Database;	
 		$items		= $db->query("SELECT * FROM navigation_items 
 			WHERE parent_id = '$tool_id' 
@@ -34,7 +34,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
  */ 
 	public function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		
 		if($_POST)
 		{
@@ -71,7 +71,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View('navigation/edit/new_item');
+			$primary = new View('edit_navigation/new_item');
 			$db = new Database;
 			$pages = $db->query("SELECT page_name FROM pages 
 				WHERE fk_site = '$this->site_id'
@@ -93,7 +93,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	{
 		if($_POST)
 		{
-			tool_ui::validate_id($tool_id);
+			valid::id_key($tool_id);
 			echo Tree::save_tree('navigations', 'navigation_items', $tool_id, $_POST['output']);
 		}
 		die();
@@ -103,7 +103,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
  */
 	public function edit($id=NULL)
 	{
-		tool_ui::validate_id($id);		
+		valid::id_key($id);		
 		$db = new Database;
 
 		if(! empty($_POST['title']) )
@@ -118,7 +118,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		else
 		{		
 			$parent = $db->query("SELECT * FROM calendar_items WHERE id = '$id' AND fk_site = '$this->site_id' ")->current();			
-			$primary = new View("calendar/edit/single_item");
+			$primary = new View("edit_navigation/single_item");
 			$primary->item = $parent;
 			echo $primary;
 		}	
@@ -132,7 +132,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 
 	public function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);		
+		valid::id_key($tool_id);		
 		$db = new Database;
 
 		if($_POST)
@@ -145,7 +145,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View("navigation/edit/settings");
+			$primary = new View("edit_navigation/settings");
 			$parent = $db->query("SELECT * FROM navigations WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();			
 			$primary->parent = $parent;
 			echo $primary;

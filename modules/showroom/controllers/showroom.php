@@ -12,7 +12,7 @@ class Showroom_Controller extends Controller {
 		$db			= new Database;
 		$category	= uri::easy_segment('2');
 		$item		= uri::easy_segment('3');
-		$primary	= new View("showroom/index");
+		$primary	= new View("public_showroom/index");
 		
 		$parent = $db->query("SELECT * FROM showrooms 
 			WHERE id = '$tool_id' 
@@ -22,7 +22,7 @@ class Showroom_Controller extends Controller {
 		# Show products immediately
 		if(	'simple' == $parent->params )
 		{
-			$item_view = new View("showroom/items_$parent->view");
+			$item_view = new View("public_showroom/items_$parent->view");
 			$categories = $db->query("SELECT id FROM showroom_items 
 				WHERE parent_id = '$parent->id' 
 				AND fk_site = '$this->site_id'
@@ -99,7 +99,7 @@ class Showroom_Controller extends Controller {
 	function _items_category($category, $view='list')
 	{
 		$db = new Database;
-		$item_view = new View("showroom/items_$view");
+		$item_view = new View("public_showroom/items_$view");
 		
 		# parent category 		
 		$parent = $db->query("SELECT * FROM showroom_items 
@@ -136,7 +136,7 @@ class Showroom_Controller extends Controller {
 	function _item($category, $item)
 	{
 		$db = new Database;	
-		$primary = new View('showroom/single_item');		
+		$primary = new View('public_showroom/single_item');		
 		#display items in this cat
 		$item_object = $db->query("SELECT * FROM showroom_items_meta 
 			WHERE fk_site = '$this->site_id'

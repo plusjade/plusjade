@@ -14,9 +14,9 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 
 	function manage($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
-		$primary = new View('blog/edit/manage');
+		$primary = new View('edit_blog/manage');
 		
 		# Get faq items
 		$items = $db->query("SELECT * FROM blog_items 
@@ -37,7 +37,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	
 	function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		
 		if($_POST)
@@ -62,7 +62,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 
 	function edit($id=NULL)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		
 		if($_POST)
 		{
@@ -84,7 +84,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 
 	function delete($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		
 		$this->_delete_single_common('faq', $tool_id);
 		echo 'Faq deleted!'; #status
@@ -110,7 +110,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	
 	function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 
 		if($_POST)
 		{

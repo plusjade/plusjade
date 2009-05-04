@@ -14,7 +14,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		$contact_types = $db->query("SELECT * FROM contact_types");	
 		$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
@@ -31,7 +31,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
  */
 	public function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;
 		
 		if($_POST)
@@ -60,7 +60,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View('contact/edit/new_item');
+			$primary = new View('edit_contact/new_item');
 			$contact_types = $db->query("SELECT * FROM contact_types");
 			$primary->contact_types = $contact_types;
 			$contacts = $db->query("SELECT * FROM contact_items 
@@ -83,7 +83,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
  */
 	public function edit($id=Null)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		
 		if(! empty($_POST['enable']) )
 		{
@@ -98,7 +98,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 		}
 		else
 		{
-			$primary = new View("contact/edit/single_item");
+			$primary = new View("edit_contact/single_item");
 			$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
 			$item = $this->_grab_tool_child('contact', $id, $join);		
 			$primary->item = $item;

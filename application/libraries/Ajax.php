@@ -38,7 +38,7 @@ class Ajax_Core {
 		{
 			# this is an ajaxForm comment post request
 			# OR ajax request to view comments
-			tool_ui::validate_id($value);
+			valid::id_key($value);
 			if($_POST)
 				return $blog->_post_comment($value);
 			else

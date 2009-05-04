@@ -13,9 +13,9 @@ class Navigation_Controller extends Controller {
 	 */	 
 	function _index($tool_id)
 	{	
-		tool_ui::validate_id($tool_id);	
+		valid::id_key($tool_id);	
 		
-		$primary	= new View('navigation/index');	
+		$primary	= new View('public_navigation/index');	
 		$db			= new Database;
 		
 		$parent	= $db->query("SELECT * FROM navigations 

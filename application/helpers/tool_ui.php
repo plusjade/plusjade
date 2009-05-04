@@ -7,19 +7,6 @@
  */
 class tool_ui_Core {
 
-/*
- *	Validate Page and Item ids passing via url
- *	
- */
-	static function validate_id($id)
-	{
-		if( NULL == $id OR !is_numeric($id) )
-		{
-			Event::run('system.404');
-			die();
-		}
-		return $id;
-	}	
 #Javascript helpers
 #--------------
 	/*

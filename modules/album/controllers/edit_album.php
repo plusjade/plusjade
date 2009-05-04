@@ -13,14 +13,14 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		echo $this->_view_manage_tool_items('album', $tool_id);		
 		die();
 	}
 
 	public function add($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		echo $this->_view_add_single('album', $tool_id);
 		die();
 	}
@@ -33,7 +33,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	public function add_image($tool_id=NULL)
 	{
 		#TODO: TEST to make sure all names are unique. Cant have htem rewrite eachother.
-		tool_ui::validate_id($tool_id);
+		valid::id_key($tool_id);
 		$db = new Database;	
 
 		// Work-around for setting up a session because Flash Player doesn't send the cookies
@@ -102,7 +102,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 # Edit_image 
 	public function edit_item($id=NULL)
 	{
-		tool_ui::validate_id($id);
+		valid::id_key($id);
 		$db = new Database;		
 
 		if(! empty($_POST['parent_id']) )
@@ -128,7 +128,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	public function settings($tool_id=NULL)
 	{
-		tool_ui::validate_id($tool_id);		
+		valid::id_key($tool_id);		
 		$db = new Database;	
 			
 		if($_POST)
@@ -157,7 +157,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	public function delete_image($id=NULL)
 	{
-		tool_ui::validate_id($id);		
+		valid::id_key($id);		
 		
 		# Get image object
 		$image = $this->_grab_tool_child('album', $id);

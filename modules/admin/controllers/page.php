@@ -84,7 +84,7 @@ class Page_Controller extends Admin_Controller {
 
 	function delete($page_id=NULL)
 	{
-		tool_ui::validate_id($page_id);
+		valid::id_key($page_id);
 		$db = new Database;		
 		$data = array(
 			'id'		=> $page_id,
@@ -101,7 +101,7 @@ class Page_Controller extends Admin_Controller {
 # invoked via id="get_tool_sort" link
 	function tools($page_id=NULL)
 	{
-		tool_ui::validate_id($page_id);		
+		valid::id_key($page_id);		
 		
 		if($_POST)
 		{
@@ -152,7 +152,7 @@ class Page_Controller extends Admin_Controller {
 # Configure page settings	
 	function settings($page_id=NULL)
 	{
-		tool_ui::validate_id($page_id);
+		valid::id_key($page_id);
 		$db = new Database;
 
 		if($_POST)

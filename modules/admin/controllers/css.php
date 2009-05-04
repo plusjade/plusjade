@@ -63,8 +63,8 @@ class Css_Controller extends Controller {
 			OR $this->client->get_user()->client_site_id != $this->site_id )
 				die();
 
-		tool_ui::validate_id($name_id);	
-		tool_ui::validate_id($tool_id);		
+		valid::id_key($name_id);	
+		valid::id_key($tool_id);		
 		
 		$css_file_path = DOCROOT."data/$this->site_name/tools_css";
 		$db = new Database;

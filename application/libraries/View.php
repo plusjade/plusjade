@@ -371,8 +371,8 @@ class View_Core {
 		if (! isset(self::$kohana_global_data['javascript']) )  
 			self::$kohana_global_data['javascript'] = '';
 
-		$edit = (TRUE === $edit) ? 'edit/' : '';
-		$file_path = MODPATH . "$toolname/views/$toolname/". $edit ."js/$filename.js";
+		$view = (TRUE === $edit) ? 'edit' : 'public';
+		$file_path = MODPATH . "$toolname/views/".$view."_$toolname/js/$filename.js";
 		
 		if( file_exists($file_path) )
 		{

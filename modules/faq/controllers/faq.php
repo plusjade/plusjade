@@ -9,7 +9,7 @@ class Faq_Controller extends Controller {
 	function _index($tool_id)
 	{
 		$db = new Database;
-		$primary = new View("faq/index");
+		$primary = new View("public_faq/index");
 		
 		$parent = $db->query("SELECT * FROM faqs 
 			WHERE id = '$tool_id' 

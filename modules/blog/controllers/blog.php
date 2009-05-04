@@ -24,7 +24,7 @@ class Blog_Controller extends Controller {
 		")->current();	
 		*/
 		
-		$primary = new View("blog/index");
+		$primary = new View("public_blog/index");
 		$primary->tool_id = $tool_id;
 		$primary->tags = $this->_get_tags($tool_id);
 		$primary->add_root_js_files('ajax_form/ajax_form.js');
@@ -40,7 +40,7 @@ class Blog_Controller extends Controller {
 				break;
 				
 			case 'archive':
-				$content = new View("blog/archive");
+				$content = new View("public_blog/archive");
 				$date_search = false;
 				
 				# year search
@@ -100,7 +100,7 @@ class Blog_Controller extends Controller {
 					GROUP BY blog_items.id
 				");
 				
-				$content = new View('blog/home');	
+				$content = new View('public_blog/home');	
 				$content->items = $items;
 				
 				$primary->add_root_js_files('expander/expander.js');
@@ -134,7 +134,7 @@ class Blog_Controller extends Controller {
 	function _single_post($tool_id, $url=NULL, $id=NULL)
 	{
 		$db = new Database;
-		$content = new View("blog/single");
+		$content = new View("public_blog/single");
 		
 		$field = 'url';
 		if(NULL !== $id)
@@ -171,7 +171,7 @@ class Blog_Controller extends Controller {
 	function _get_comments($post_id=NULL)
 	{
 		$db = new Database;
-		$content = new View('blog/comments');
+		$content = new View('public_blog/comments');
 		$comments =  $db->query("SELECT *
 			FROM blog_items_comments 
 			WHERE item_id = '$post_id' AND fk_site = '$this->site_id'
