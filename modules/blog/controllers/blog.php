@@ -7,11 +7,11 @@ class Blog_Controller extends Controller {
 	}
   /*
    * events in here assume everything is being loaded normally
-   * in non-ajax mode. so we build the page in pieces everytime
+   * in non-ajax mode. so we build the page in pieces every time
    */
 	function _index($tool_id)
 	{
-		$db = new Database;
+		$db		= new Database;
 		$action	= uri::easy_segment('2');
 		$value	= uri::easy_segment('3');
 		$value2	= uri::easy_segment('4');
@@ -46,7 +46,7 @@ class Blog_Controller extends Controller {
 				# year search
 				if(! empty($value) AND empty($value2) )
 				{
-					tool_ui::validate_id($value);
+					valid::year($value);
 					$start = $value;
 					(int)$end = $value+1;				
 					$date_search = "AND created >= '$start' AND created < '$end'";		
@@ -54,15 +54,14 @@ class Blog_Controller extends Controller {
 				# month search
 				elseif(! empty($value) AND !empty($value2) )
 				{
-					tool_ui::validate_id($value);
+					valid::year($value);
+					valid::month($value2);
 					$month = $value2+1;
 					if(10 > $month)
 						$month = "0$month";
 						
-					$start	= "$value-$value2";
-					$end	= "$value-$month";
-					
-					#echo $start.' '.$end;die();
+					$start		= "$value-$value2";
+					$end		= "$value-$month";
 					$date_search = "AND created >= '$start' AND created < '$end'";				
 				}
 
@@ -77,21 +76,17 @@ class Blog_Controller extends Controller {
 					ORDER BY created
 				");
 				$content->items = $items;
-				
 				break;
 				
 			case 'comment':
 			/* comment action is only called via ajax (comment form and view_comment link).
 			 * users calling this action should just get the full post_view
-			 *
 			 */
-				tool_ui::validate_id($value);
-				
+				valid::id_key($value);
 				if($_POST)
 					$primary->response = $this->_post_comment($value);
 				
 				$content = $this->_single_post($tool_id, NULL, $value);
-				
 				break;
 				
 			default:
@@ -109,41 +104,26 @@ class Blog_Controller extends Controller {
 				$content->items = $items;
 				
 				$primary->add_root_js_files('expander/expander.js');
-				$primary->global_readyJS('
-				
-					$("div.post_body").expander({
-						 userCollapseText: "[collapse]"
-					});
-					
-					$(".get_comments").click(function(){
-						id = $(this).attr("rel");
-						$("#post_comments_"+id).load("/blog/comment/"+id);
-						return false;
-					});
-					
-		$("body").submit($.delegate({
-			"form.public_ajaxForm": function(e){
-				form = $(e.target);
-				var options = {
-					beforeSubmit: function(){
-						if( $("input[type=text]", form).jade_validate() )
-							return true;
-						else
-							return false;
-					},
-					success: function(data) {
-						$(".comments_wrapper", form).append(data);
-						$(".add_comment", form).replaceWith("<div class=\"blog_response\">Comment Added!</div>");
-					}	
-				};
-				$(form).ajaxSubmit(options);	
-				return false;
-		}	
-	}));
-	
-				');		
+				$primary->readyJS('blog', 'home');		
 				break;
-		}	
+		}
+		#Javascript
+		$primary->readyJS('blog', 'index');
+		# Javascript
+		if($this->client->logged_in())
+			$primary->global_readyJS('
+				$("#click_hook").click(function(){
+					$(".comment_item").each(function(i){
+						var toolname = "blog";
+						var id		= $(this).attr("rel");
+						var edit	= "<a href=\"/get/edit_" + toolname + "/edit/" + id + "\" rel=\"facebox\">edit</a>";
+						var del		= "<a href=\"/get/edit_" + toolname + "/delete_comment/" + id + "\" class=\"js_admin_delete\" rel=\"comment_"+id+"\">delete</a>";
+						var toolbar	= "<div class=\"jade_admin_item_edit\">" + edit + " " + del + "</div>";
+						$(this).prepend(toolbar);			
+					});
+				});
+			');
+			
 		$primary->content = $content;
 		return $primary;
 	}
@@ -154,7 +134,6 @@ class Blog_Controller extends Controller {
 	function _single_post($tool_id, $url=NULL, $id=NULL)
 	{
 		$db = new Database;
-		
 		$content = new View("blog/single");
 		
 		$field = 'url';
@@ -185,7 +164,6 @@ class Blog_Controller extends Controller {
 			WHERE parent_id = '$tool_id'
 			AND fk_site='$this->site_id'
 			ORDER BY id
-		
 		");
 		return $tags;		
 	}

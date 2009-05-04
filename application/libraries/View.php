@@ -298,8 +298,8 @@ class View_Core {
 # JADES EXTRA STUFF #
 /*
  * Add request for javascript file to be loaded in the root document
- * Send both public and admin requests here to fiter duplicates
- * Avoids duplicates and collisions
+ * Send both public and admin requests here
+ * fiters for duplicates and collisions
  * 
  */
 	static public function add_root_js_files($files)
@@ -322,14 +322,14 @@ class View_Core {
 	}
 
 /*
- *	Magically adds javascript files to the root document
- *	strings or array
- *
+ * actually adds javascript files to the root document
+ * should only be called after add_root_js_files() filters requests
+ * strings or array
  */	
 	public function linkJS($href, $var = 'load_js') 
 	{
-		if (!isset($this->$var))  
-			$this->$var = "<!-- @{$var} -->\n\t";
+		if (! isset($this->$var) )  
+			$this->$var = '';
 		
 		if (is_array($href))
 		{
@@ -362,19 +362,37 @@ class View_Core {
 			self::$kohana_global_data[$var] = '';
 			
 		self::$kohana_global_data[$var] .= $script;
+	}
+	/*
+	 * strings only
+	 */
+	public function readyJS($toolname, $filename, $variable=NULL, $edit=FALSE)
+	{
+		if (! isset(self::$kohana_global_data['javascript']) )  
+			self::$kohana_global_data['javascript'] = '';
 
+		$edit = (TRUE === $edit) ? 'edit/' : '';
+		$file_path = MODPATH . "$toolname/views/$toolname/". $edit ."js/$filename.js";
+		
+		if( file_exists($file_path) )
+		{
+			$contents = file_get_contents($file_path);
+			
+			if(! empty($variable) )
+				$contents = str_replace('%VAR%', $variable , $contents);
+			
+			self::$kohana_global_data['javascript'] .= $contents;
+		}
 	}
 /*
  *	Load CSS files in the source page
- *	
- *
  */	
 	public function linkCSS($href, $path=FALSE, $var = 'load_css') 
 	{
 		if (!isset($this->$var))  
-			$this->$var = "<!-- @{$var} -->\n\t";
+			$this->$var = '';
 		
-		$url = 'http://' . ROOTDOMAIN.'/assets/';
+		$url = 'http://' . ROOTDOMAIN . '/assets/';
 		
 		if ( FALSE !== $path )
 			$url = $path;
@@ -385,18 +403,6 @@ class View_Core {
 		else
 			$this->$var .= '<link type="text/css" rel="stylesheet" href="' . $url . $href . '" media="screen" />'."\n\t";
 	}
-	
-/*
- *	Javascript calls to ROOT
- *	Takes only strings
- */	
-	public function rootJS($script, $var = 'rootJS') 
-	{
-		if (!isset($this->$var))  
-			$this->$var = "<!-- @{$var} -->\n\t";
-			
-			$this->$var .= $script."\n";
-	}
 
 /*
  *	Build meta tags for pages
@@ -404,7 +410,7 @@ class View_Core {
 	public function meta_tags($name, $content = NULL, $var = 'meta_tags') 
 	{
 		if (!isset($this->$var))  
-			$this->$var = "<!-- @{$var} -->\n\t";
+			$this->$var = '';
 			
 		if (is_array($name)) 
 		{

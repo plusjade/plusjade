@@ -92,6 +92,16 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		die();
 	}
 
+	
+	function delete_comment($id=NULL)
+	{
+		valid::id_key($id);
+		$db = new Database;
+		$db->delete('blog_items_comments', array('id' => "$id", 'fk_site' => $this->site_id) );	
+		echo 'Comment deleted!'; #status
+		die();
+	}
+	
 	public function save_sort()
 	{
 		echo $this->_save_sort_common($_GET['faq'], 'faq_items');

@@ -16,27 +16,26 @@ class Contact_Controller extends Controller {
 		# Get contact parent
 		$parent = $db->query("SELECT * FROM contacts 
 			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'")->current();
+			AND fk_site = '$this->site_id'
+		")->current();
 		$primary->parent_id = $parent->id;
 		
-		# Grab contact items
 		$contacts = $db->query("SELECT * FROM contact_items 
 			JOIN contact_types ON contact_types.type_id = contact_items.type 
 			WHERE parent_id = '$parent->id' 
-			AND fk_site = '{$this->site_id}' 
+			AND fk_site = '$this->site_id' 
 			AND enable = 'yes' 
-			ORDER BY position");
+			ORDER BY position
+		");
 		$primary->contacts = $contacts;
 		
-		# Get all contact_types (to switch display styles)
+		# contact_types (to switch display styles)
 		$contact_types = $db->query('SELECT * FROM contact_types');
 		$primary->contact_types = $contact_types;
 		
-		
 		# Javascript
 		$primary->add_root_js_files('ajax_form/ajax_form.js');	
-		$embed_js = View::factory('contact/index', NULL, 'js');		
-		$primary->global_readyJS($embed_js);			
+		$primary->readyJS('contact','index');			
 		
 		return $primary;
 	}
@@ -80,7 +79,5 @@ class Contact_Controller extends Controller {
 		die();
 	}
 
-	
-	
-	
+
 }	/* -- end of application/controllers/contact.php -- */

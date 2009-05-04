@@ -68,6 +68,7 @@ if (empty($tools_array))
 
 
 		<ul id="cssdropdown" style="display:none">
+			<span id="click_hook" style="display:none"></span>
 			<?php						
 			if( count($tools_array) > 0 )
 			{
@@ -90,7 +91,7 @@ if (empty($tools_array))
 						echo '<ul class="toolkit_dropdown">';
 							echo View::factory($data_array['name'].'/edit/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
 							echo '<li><img src="'. url::image_path('admin/css_add.png') .'" alt="CSS"> <a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">Edit CSS</a></li>';
-							echo '<li><img src="'. url::image_path('admin/delete.png') .'" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="jade_delete_tool" rel="tool_',$data_array['guid'],'">Delete</a></li>';	
+							echo '<li><img src="'. url::image_path('admin/delete.png') .'" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="js_admin_delete" rel="guid_',$data_array['guid'],'">Delete</a></li>';	
 						echo '</ul>';
 						echo '</td></tr></table>';
 					echo '</li>';
