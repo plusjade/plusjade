@@ -38,21 +38,20 @@ class Build_Page_Controller extends Template_Controller {
 		# Grab the page row
 		$page = $db->query("SELECT * FROM pages 
 			WHERE fk_site = '$this->site_id' 
-			AND page_name = '$page_name' $check_enabled
+			AND page_name = '$page_name'
+			$check_enabled
 		")->current();
 		
 		# if page doesnt exist
 		if (! is_object($page) )
 		{
-			echo '<div class="aligncenter">Page Not Found</div>';
 			Event::run('system.404');
-			die();
+			die('Page Not Found');
 		}
 		
 		$containers_array		= array(' ',' ',' ',' ',' ');
 		$_SESSION['js_files']	= array();
 		$tools_array			= array();
-		$generic_tools			= array();
 		$all_tools				= array();		
 		$primary	= '';
 		$prepend	= '';
@@ -110,14 +109,14 @@ class Build_Page_Controller extends Template_Controller {
 				
 				# Add tools to correct container.				
 				$index = $tool->container;
-				if('5' >= $tool->page_id ) $index = $tool->page_id; #...if global
+				if('5' >= $tool->page_id ) #...if global
+					$index = $tool->page_id; 
 
 				$containers_array[$index] .= $tool_object;		
 			}
 			
-			# Load Public CSS For Tools
-			$generic_tools	= implode('-', $generic_tools);
-			$all_tools		= implode('-', $all_tools);
+			# Load Tools Public CSS
+			$all_tools = implode('-', $all_tools);
 			
 			$this->template->linkCSS("get/css/tools/$all_tools", url::site() );			
 		}
@@ -159,7 +158,7 @@ class Build_Page_Controller extends Template_Controller {
 		# needed to hide 404 not found on controller name
 		Event::clear('system.404');
 		
-		# this hook needed to enable auto rendering of controllers
+		# needed to enable auto rendering of controllers
 		Event::run('system.post_controller');		
 	}
 }

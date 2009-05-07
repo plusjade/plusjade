@@ -8,12 +8,7 @@ class Theme_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
-		if(! $this->client->logged_in()
-			OR $this->client->get_user()->client_site_id != $this->site_id )
-			{
-				echo 'Please Login';
-				die();
-			}
+		$this->client->can_edit($this->site_id);
 	}
 
 # Manage Current Theme Files

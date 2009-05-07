@@ -9,9 +9,7 @@ class Page_Controller extends Admin_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		if(! $this->client->logged_in()
-			OR $this->client->get_user()->client_site_id != $this->site_id )
-				die();
+		$this->client->can_edit($this->site_id);
 	}
 	
 
@@ -20,6 +18,7 @@ class Page_Controller extends Admin_Controller {
 	{		
 		$db			= new Database;				
 		$primary	= new View("page/all_pages");
+		
 		$pages = $db->query("SELECT * FROM pages 
 			WHERE fk_site = '$this->site_id' 
 			ORDER BY position
@@ -35,40 +34,31 @@ class Page_Controller extends Admin_Controller {
 	{
 		if($_POST)
 		{
-			#sanitize data 
-			$post = new Validation($_POST);			
-			$post->add_rules('label', 'required');
-			
-			if($post->validate())
-			{
-				$db = new Database;
-				# Sanitize display/link names
-				if(! empty($_POST['label']) )
-				{
-					$page_name = trim($_POST['page_name']);
-					if( empty($page_name) )
-						$page_name = strtolower($_POST['label']);
-					
-					# Make URL friendly
-					$pattern = "(\W)";					
-					$page_name = preg_replace($pattern, '_', $page_name);
-				}
+			$label = trim($_POST['label']);
+			if( empty($label) )
+				die('Name is required'); #error	
 
-				# Get highest page position
-				$max = $db->query("SELECT MAX(position) as highest FROM pages WHERE fk_site = '$this->site_id' ")->current();			
+			$db = new Database;
 			
-				# Add to pages table
-				$data = array(
-					'fk_site'	=> $this->site_id,
-					'page_name'	=> $page_name,
-					'label'		=> $_POST['label'],
-					'position'	=> ++$max->highest,
-				);
-				$db->insert('pages', $data);
-				echo 'Page Created!!<br>Updating...'; # success			
-			}
-			else
-				echo 'Name is required'; #error	
+			$page_name = trim($_POST['page_name']);
+			if( empty($page_name) )
+				$page_name = strtolower($label);
+			
+			# Make URL friendly
+			$page_name = valid::filter_php_url($page_name);
+
+			# Get highest page position
+			$max = $db->query("SELECT MAX(position) as highest FROM pages WHERE fk_site = '$this->site_id' ")->current();			
+		
+			# Add to pages table
+			$data = array(
+				'fk_site'	=> $this->site_id,
+				'page_name'	=> $page_name,
+				'label'		=> $_POST['label'],
+				'position'	=> ++$max->highest,
+			);
+			$db->insert('pages', $data);
+			echo 'Page Created!!<br>Updating...'; # success			
 		}
 		else
 		{		
@@ -157,48 +147,42 @@ class Page_Controller extends Admin_Controller {
 
 		if($_POST)
 		{
-			if(! empty($_POST['label']) )
-			{
-				# Sanitize display/link names
-				$page_name = trim($_POST['page_name']);
-				if( empty($page_name) )
-					$page_name = $_POST['label'];
-				
-				# Make URL friendly
-				$pattern = "(\W)";					
-				$page_name = preg_replace($pattern, '_', $page_name);
+			$label = trim($_POST['label']);
+			if(empty($label) )
+				die('Label is required'); #error	
+			
+			$page_name = trim($_POST['page_name']);
+			if( empty($page_name) )
+				$page_name = $label;
+			
+			$page_name = valid::filter_php_url($page_name);
 
-				# Update pages
-				$data = array(
-					'page_name'	=> $page_name,
-					'title'		=> $_POST['title'],
-					'meta'		=> $_POST['meta'],
-					'label'		=> $_POST['label'],
-					'menu'		=> $_POST['menu'],
-					'enable'	=> $_POST['enable'],
-				);
-				$db->update('pages', $data, "id = '$page_id' AND fk_site = '$this->site_id' "); 			
+			# Update pages
+			$data = array(
+				'page_name'	=> $page_name,
+				'title'		=> $_POST['title'],
+				'meta'		=> $_POST['meta'],
+				'label'		=> $_POST['label'],
+				'menu'		=> $_POST['menu'],
+				'enable'	=> $_POST['enable'],
+			);
+			$db->update('pages', $data, "id = '$page_id' AND fk_site = '$this->site_id' "); 			
 
-				#status message
-				echo 'Changes Saved!<br>Updating...';
-			}
-			else
-				echo 'Label is required';	
+			echo 'Changes Saved!<br>Updating...'; # success				
 		}
 		else
 		{
 			$page = $db->query("SELECT * FROM pages
 				WHERE id = '$page_id' 
 				AND fk_site = '$this->site_id'
-			")->current();		
-			if( is_object($page) )
-			{
-				$primary = new View("page/page_settings");	
-				$primary->page = $page;	
-				echo $primary;
-			}
-			else
-				echo 'Page not found';
+			")->current();
+			
+			if(! is_object($page) )
+				die('Page not found'); # error
+				
+			$primary = new View("page/page_settings");	
+			$primary->page = $page;	
+			echo $primary;
 		}
 		die();
 	}

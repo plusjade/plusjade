@@ -55,7 +55,7 @@ $(document).ready(function()
 		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
 			var id		= $(this).attr("rel");
 			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="item_'+id+'">delete</a>';
+			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="'+tool+'_item_'+id+'">delete</a>';
 			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
 					
 			$(this).prepend(toolbar);			

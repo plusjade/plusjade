@@ -11,7 +11,8 @@
  */
 class valid_Core {
 
-	/* is this a valid database id_key */
+	/* is this a valid database id_key
+	*/
 	static function id_key($id)
 	{
 		if( NULL == $id OR !is_numeric($id) )
@@ -22,6 +23,8 @@ class valid_Core {
 		return $id;
 	}	
 
+	/* is this a valid year? 4 digit integer between 1990-3000
+	*/
 	static function year($year)
 	{
 		if( NULL == $year OR !is_numeric($year) OR 3000 < $year OR 1990 > $year )
@@ -32,6 +35,8 @@ class valid_Core {
 		return $year;
 	}
 
+	/* is this a valid month? integer from 1-12
+	*/
 	static function month($month)
 	{
 		if( NULL == $month OR !is_numeric($month) OR 12 < $month OR 1 > $month )
@@ -42,6 +47,8 @@ class valid_Core {
 		return $month;
 	}
 	
+	/* is this a valid day date? integer from 1-31
+	*/
 	static function day($day)
 	{
 		if( NULL == $day OR !is_numeric($day) OR 31 < $day OR 1 > $day )
@@ -52,9 +59,26 @@ class valid_Core {
 		return $day;
 	}		
 
+/* 
+ * FILTERS
+ * Filters are used to filter data supplied the user
+ * Javascript filters must match exactly the server filters so there are no collisions.
+ * The filters return actual regex filters. Manupulation of the input is left for the application. 
+ */
 
+	static function filter_js_url()
+	{
+		return '/[^-a-z0-9_]/ig';
+	}
 
-
+	/* return a formatted string
+	 */
+	static function filter_php_url($string)
+	{
+		return preg_replace('/^[-a-z0-9_]++$/iD', '-', (string) $string);
+	}
+	
+	
 	/**
 	 * Validate email, commonly used characters only
 	 *

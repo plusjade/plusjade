@@ -90,7 +90,7 @@ class Auth_Controller extends Template_Controller {
 		{
 			/*
 			 * Execute "Edit Website" link on client dashboard (auth/index).
-			 * This is pretty safe since the link will ONLY
+			 * This is pretty safe since the link will only
 			 * build the auth token link to the website owned by the logged in user
 			 */
 			
@@ -316,13 +316,6 @@ class Auth_Controller extends Template_Controller {
 			'tools_list',
 			'users',
 			'user_tokens',
-			'chyrp_groups',
-			'chyrp_pages',
-			'chyrp_posts',
-			'chyrp_permissions',
-			'chyrp_post_attributes',
-			'chyrp_sessions',
-			'chyrp_users',
 		);
 		
 		# Get all tables from database
@@ -365,7 +358,10 @@ class Auth_Controller extends Template_Controller {
 			if( 'pages_tools' == $table )
 				$id = 'guid';
 
-			$table_object = $db->query("SELECT fk_site FROM $table WHERE fk_site NOT IN ($id_string) ");		
+			$table_object = $db->query("SELECT fk_site 
+				FROM $table WHERE fk_site 
+				NOT IN ($id_string)
+			");		
 			
 			if( $table_object->count() > 0 )
 			{
@@ -374,8 +370,8 @@ class Auth_Controller extends Template_Controller {
 					$results[$table] .= $row->$id . '<br>';
 				}
 				/*
-				If orphans exists,
-				run delete query on all rows having fk_site...
+				 * If orphans exists,
+				 * run delete query on all rows having fk_site...
 				*/
 				$db->delete($table, array("fk_site" => "$row->fk_site") );
 				

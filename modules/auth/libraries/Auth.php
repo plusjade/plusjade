@@ -87,6 +87,23 @@ class Auth_Core {
 		return $this->driver->logged_in($role);
 	}
 
+	
+	/**
+	 * Check if there is an active session. and that this session
+	 * can edit this site.
+	 *
+	 * @param   string   role name
+	 * @return  boolean
+	 */
+	public function can_edit($site_id, $role = NULL)
+	{
+		if(! $this->driver->logged_in($role)
+			OR $this->get_user()->client_site_id != $site_id )
+				die('You do not have permission to edit this site.');
+		
+		return TRUE;
+	}	
+	
 	/**
 	 * Returns the currently logged in user, or FALSE.
 	 *

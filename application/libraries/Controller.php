@@ -8,11 +8,11 @@
  * @package    Core
  * @author     Kohana Team
  * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
+ * @license    http:#kohanaphp.com/license.html
  */
 abstract class Controller_Core {
 
-	// Allow all controllers to run in production by default
+	# Allow all controllers to run in production by default
 	const ALLOW_PRODUCTION = TRUE;
 	
 	/**
@@ -22,17 +22,16 @@ abstract class Controller_Core {
 	 */
 	public function __construct()
 	{	
-		$session = Sessionk::instance();
-		$site_name = $_SESSION['site_name'];
+		$session	= Session::instance();
+		$site_name	= $_SESSION['site_name'];
 		
 		$identifer = file_get_contents(DATAPATH . "$site_name/protected/identifer.yaml");
 		$identifer = explode(',',$identifer);
 		$keys = array();
 		foreach($identifer as $string)
 		{
-			$value = strstr($string ,':');
-			$value = ltrim($value, ':');
-			$keys[] = trim($value);
+			$value	= strstr($string ,':');
+			$keys[]	= ltrim($value, ':');
 		}
 		$this->site_id 		= $keys['0'];
 		$this->site_name 	= $keys['1'];
@@ -65,10 +64,9 @@ abstract class Controller_Core {
 	 */
 	public function __call($method, $args)
 	{
-		// Default to showing a 404 page
+		# Default to showing a 404 page
 		#Event::run('system.404');
-		echo 'root controller method not found';
-		die();
+		die('root controller method not found');
 	}
 
 	/**
@@ -83,27 +81,27 @@ abstract class Controller_Core {
 		if ($kohana_view_filename == '')
 			return;
 
-		// Buffering on
+		# Buffering on
 		ob_start();
 
-		// Import the view variables to local namespace
+		# Import the view variables to local namespace
 		extract($kohana_input_data, EXTR_SKIP);
 
 		try
 		{
-			// Views are straight HTML pages with embedded PHP, so importing them
-			// this way insures that $this can be accessed as if the user was in
-			// the controller, which gives the easiest access to libraries in views
+			# Views are straight HTML pages with embedded PHP, so importing them
+			# this way insures that $this can be accessed as if the user was in
+			# the controller, which gives the easiest access to libraries in views
 			include $kohana_view_filename;
 		}
 		catch (Exception $e)
 		{
-			// Display the exception using its internal __toString method
+			# Display the exception using its internal __toString method
 			echo $e;
 		}
 
-		// Fetch the output and close the buffer
+		# Fetch the output and close the buffer
 		return ob_get_clean();
 	}
 
-} // End Controller Class
+} # End Controller Class

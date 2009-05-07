@@ -546,6 +546,12 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	min-height:375px;
 	min-width:700px;
 }
+#facebox_base{
+	z-index: 99;
+}
+#facebox_2{
+	z-index: 200;
+}
 
 .facebox .b {background:url(/assets/images/facebox/b.png)}
 .facebox .tl {background:url(/assets/images/facebox/tl.png)}
@@ -632,6 +638,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
   position: absolute;
   height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
 }
+
 /* facebox custom class views*/
 	.confirm_facebox{
 		text-align:center;
@@ -647,7 +654,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	} 
 
 
-/* --- form buttons --- */
+/* --- FORM BUTTONS --- */
 
 .buttons{
 	margin-bottom:10px;
@@ -686,7 +693,6 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
     width:16px;
     height:16px;
 }
-
 /* STANDARD */
 button:hover, .buttons a:hover{
     background: blue url(/assets/images/admin/dark_blue_bg.png) repeat-x bottom left;
