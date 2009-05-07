@@ -1,5 +1,6 @@
 
 <div class="archive_wrapper">
+	<div>Viewing posts tagged "startup"</div>
 	<?php
 	$old_year = false;
 	$old_month = false;
@@ -16,7 +17,7 @@
 			$old_month = $item->month;
 		}
 			
-		echo '<div class="archive_post"><span>'. $item->day . ':</span> <a href="'.url::site("blog/entry/$item->url").'" rel="blog_ajax"> '. $item->title .'</a></div>';
+		echo '<div class="archive_post"><span>'. $item->day . ':</span> <a href="'.url::site("blog/entry/$item->url").'"> '. $item->title .'</a></div>';
 	}
 	?>
 </div>

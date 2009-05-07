@@ -16,7 +16,13 @@
 			<b>Url - Slug</b> <input type="text" name="url" size="50" rel="text_req">
 		</p>
 		
-		<b>Category/tags</b> <input type="text" name="category" size="50">
+		<b>Tags</b> <input type="text" name="tags" size="50">
+		
+		<br>Status:
+		 <select name="status">
+			<option>draft</option>
+			<option>publish</option>
+		</select>
 	</div>
 	
 	<b>Body</b>	
@@ -26,11 +32,11 @@
 
 <script type="text/javascript">
 $("input[name='title']").keyup(function(){
-	input = $(this).val().replace(/\W/g, '_').toLowerCase();
+	input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
 	$("input[name='url']").val(input);
 });
 $("input[name='url']").keyup(function(){
-	input = $(this).val().replace(/\W/g, '_');
+	input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
 	$(this).val(input);
 });
 </script>
