@@ -12,14 +12,13 @@ abstract class Template_Controller extends Controller {
 		# Load Template
 		$this->template = new View("shell");	
 		
+
 		# View variables						
 		$data = array(
-			'theme_name'		=> $this->theme,
-			'site_name'			=> $this->site_name,
-			'data_path'			=> 'http://' . ROOTDOMAIN . "/data/$this->site_name",
-			'custom_include'	=> DATAPATH . "$this->site_name/themes/$this->theme",
+			'data_path' => 'http://' . ROOTDOMAIN . "/data/$this->site_name",
 		);	
 		$this->template->set_global($data);
+
 		
 		# Global CSS			
 		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/assets/');
@@ -28,7 +27,7 @@ abstract class Template_Controller extends Controller {
 		$this->template->linkJS('jquery_latest.js');
 		
 		/*
-		$theme_js_path = APPPATH."/views/{$this->theme}/js/js.php";
+		$theme_js_path = APPPATH."/views/$this->theme/js/js.php";
 		if( file_exists($theme_js_path) )
 			include($theme_js_path);	
 		*/
@@ -44,25 +43,21 @@ abstract class Template_Controller extends Controller {
  */ 
 	function _load_admin()
 	{	
-		if( $this->client->logged_in() )
+		if( $this->client->logged_in() AND ($this->client->get_user()->client_site_id == $this->site_id) )
 		{	
-			if($this->client->get_user()->client_site_id == $this->site_id)
-			{
-				$this->template->admin_panel = TRUE;				
-	
-				$this->template->linkCSS('css/admin_global.css');
-				$this->template->linkCSS('css/smoothness.css');
+			$this->template->linkCSS('css/admin_global.css');
+			$this->template->linkCSS('css/smoothness.css');
 
-				$js_files = array(
-					'facebox/public_multi.js',
-					'ui/ui_latest_lite.js',
-					'ajax_form/ajax_form.js',
-					'jw/jwysiwyg.js',
-					'swfupload/swfupload.js',
-					'admin/init.js'	
-				);
-				$this->template->add_root_js_files($js_files);
-			}
+			$js_files = array(
+				'facebox/public_multi.js',
+				'ui/ui_latest_lite.js',
+				'ajax_form/ajax_form.js',
+				'jw/jwysiwyg.js',
+				'swfupload/swfupload.js',
+				'admin/init.js'	
+			);
+			$this->template->add_root_js_files($js_files);
+			$this->template->admin_panel = view::factory('admin/admin_panel');
 			return TRUE;
 		}	
 		return FALSE;

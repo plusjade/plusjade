@@ -3,7 +3,7 @@
 <head>
 	<?php
 	#$this->profiler = new Profiler;
-	if(! empty($title) ) echo '<title>'.$title.'</title>'."\n\t";
+	if(! empty($title) ) echo "<title>$title</title>\n\t";
 	if(! empty($meta_tags) ) echo $meta_tags;
 	if(! empty($load_css) ) echo $load_css;
 	if(! empty($load_js) ) echo $load_js;
@@ -12,25 +12,26 @@
 
 <body>
 	<?php
-	if(! empty($admin_panel) ) echo view::factory('admin/admin_panel');
+	if(! empty($admin_panel) ) echo $admin_panel;
 	
 	# Helper tools ...
 	$header	= View::factory("_global/header");
 	$menu	= View::factory("_global/menu");
-	$tracker_path = DATAPATH."$site_name/tracker.html";	
+	
+	# file paths
+	$tracker_path = DATAPATH."$this->site_name/tracker.html";	
+	$site_theme_path = DATAPATH . "$this->site_name/themes/$this->theme";
 	
 	# Required for all controllers passing with primary...
 	# TODO: update this ...
 	if( empty($containers['1']) ) $containers['1'] = $primary;
 	if( empty($containers['2']) ) $containers['2'] = '';
 	
-	ob_start();
-	
-	if ( file_exists("$custom_include/master.html") )
-		readfile("$custom_include/master.html");	
+	ob_start();	
+	if ( file_exists("$site_theme_path/master.html") )
+		readfile("$site_theme_path/master.html");	
 	else
-		readfile(APPPATH."views/$this->theme/master.html");
-
+		readfile(APPPATH . "views/$this->theme/master.html");
 	$master = ob_get_clean();
 
 	$keys = array(

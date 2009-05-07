@@ -213,8 +213,7 @@ abstract class Edit_Tool_Controller extends Controller {
  *
  */
 	function _delete_single_common($toolname, $tool_id)
-	{	
-		valid::id_key($tool_id);		
+	{		
 		$db = new Database;
 		$table = $toolname.'_items';
 		$db->delete( $table, array('id' => "$tool_id", 'fk_site' => $this->site_id) );	

@@ -88,8 +88,13 @@ echo form::open( "page/settings/$page->id", array('class' => 'ajaxForm') );
 </form>
 
 <script type="text/javascript">
+$("input[name='label']").keyup(function(){
+	input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
+	$("input[name='page_name']").val(input);
+});
+
 $("input[name='page_name']").keyup(function(){
-	input = $(this).val().replace(/\W/g, '_');
+	input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
 	$(this).val(input);
 });
 

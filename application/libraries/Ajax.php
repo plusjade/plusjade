@@ -25,25 +25,32 @@ class Ajax_Core {
 		$action	= @$url_array['2'];
 		$value	= @$url_array['3'];	
 		$blog	= new Blog_Controller();
-		
-		if( empty($action) )
+		switch($action)
 		{
+			case 'entry':
+				return $blog->_single_post($value);
+				break;
+			
+			case 'tag':
+				break;	
+				
+			case 'archive':
+				break;
 
+			case 'comment':
+				# this is an ajaxForm comment post request
+				# OR ajax request to view comments
+				valid::id_key($value);
+				if($_POST)
+					return $blog->_post_comment($value);
+				else
+					return $blog->_get_comments($value);
+				break;
+				
+			default:
+	
+				break;
 		}
-		elseif('entry' == $action)
-		{
-			return $this->_single_post($value);
-		}
-		elseif('comment' == $action AND !empty($value))
-		{
-			# this is an ajaxForm comment post request
-			# OR ajax request to view comments
-			valid::id_key($value);
-			if($_POST)
-				return $blog->_post_comment($value);
-			else
-				return $blog->_get_comments($value);
-		}	
 	}
 	
 	public function calendar($url_array)
@@ -67,7 +74,7 @@ class Ajax_Core {
 	# Fail silently
 	public function __call($method, $args)
 	{
-		echo '_ajax_call'; #delete in production
+		echo "undefined Method: '$method'"; #delete in production
 		die();
 	}
 } # End
