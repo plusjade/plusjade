@@ -17,3 +17,12 @@ $('body').submit($.delegate({
 		return false;
 	}	
 }));
+
+$('body').click($.delegate({
+	'a[rel*=blog_ajax]': function(e){
+		url = $(e.target).attr('href');
+		$('.blog_content').html('<div class="ajax_loading">Loading...</div>');
+		$('.blog_content').load(url);
+		return false;
+	}
+}));

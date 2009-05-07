@@ -1,139 +1,98 @@
 <?php
 class Blog_Controller extends Controller {
 
+	
 	function __construct()
 	{
 		parent::__construct();
+		$this->db = new Database;
 	}
+	
   /*
-   * events in here assume everything is being loaded normally
-   * in non-ajax mode. so we build the page in pieces every time
+   * The _index controller is only called when building full pages.
+   * This therefore assumes no ajax calls.
    */
 	function _index($tool_id)
 	{
-		$db		= new Database;
 		$action	= uri::easy_segment('2');
 		$value	= uri::easy_segment('3');
 		$value2	= uri::easy_segment('4');
 		
 		/*
 		 * need the parent to setup appropriate views and user-specific settings
+		 */
 		# get parent 
-		$parent = $db->query("SELECT * FROM blogs 
+		$parent = $this->db->query("
+			SELECT * FROM blogs 
 			WHERE id = '$tool_id' AND fk_site = '$this->site_id'
 		")->current();	
-		*/
+
 		
 		$primary = new View("public_blog/index");
 		$primary->tool_id = $tool_id;
 		$primary->tags = $this->_get_tags($tool_id);
+		$primary->sticky_posts = $this->_get_sticky_posts($parent->sticky_posts);
+		$primary->recent_comments = $this->_get_recent_comments($tool_id);
 		$primary->add_root_js_files('ajax_form/ajax_form.js');
 
 		switch($action)
 		{
 			case 'entry':
-				$content = $this->_single_post($tool_id, $value);
+				$content = $this->_single_post($value);
 				break;
 			
 			case 'tag':
-				$content = $this->_single_post($tool_id, $value);
+				$content = $this->_tag_search($tool_id, $value);
 				break;
 				
 			case 'archive':
-				$content = new View("public_blog/archive");
-				$date_search = false;
-				
-				# year search
-				if(! empty($value) AND empty($value2) )
-				{
-					valid::year($value);
-					$start = $value;
-					(int)$end = $value+1;				
-					$date_search = "AND created >= '$start' AND created < '$end'";		
-				}
-				# month search
-				elseif(! empty($value) AND !empty($value2) )
-				{
-					valid::year($value);
-					valid::month($value2);
-					$month = $value2+1;
-					if(10 > $month)
-						$month = "0$month";
-						
-					$start		= "$value-$value2";
-					$end		= "$value-$month";
-					$date_search = "AND created >= '$start' AND created < '$end'";				
-				}
-
-				$items = $db->query("SELECT blog_items.*, 
-					DATE_FORMAT(created, '%Y') as year,
-					DATE_FORMAT(created, '%M') as month,
-					DATE_FORMAT(created, '%e') as day
-					FROM blog_items 
-					WHERE blog_items.parent_id = '$tool_id' 
-					AND blog_items.fk_site = '$this->site_id'
-					$date_search
-					ORDER BY created
-				");
-				$content->items = $items;
+				$content = $this->_show_archive($tool_id, $value, $value2);
 				break;
-				
+
 			case 'comment':
-			/* comment action is only called via ajax (comment form and view_comment link).
-			 * users calling this action should just get the full post_view
-			 */
 				valid::id_key($value);
 				if($_POST)
 					$primary->response = $this->_post_comment($value);
 				
-				$content = $this->_single_post($tool_id, NULL, $value);
+				$content = $this->_single_post(NULL, $value);
 				break;
 				
 			default:
 				# blog homepage
-				$items = $db->query("SELECT blog_items.*, 
-					COUNT(blog_items_comments.id) as comments,
-					DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created 
-					FROM blog_items 
-					JOIN blog_items_comments ON blog_items.id = blog_items_comments.item_id
-					WHERE blog_items.parent_id = '$tool_id' AND blog_items.fk_site = '$this->site_id'
-					GROUP BY blog_items.id
+				$items = $this->db->query("
+					SELECT blog_items.*, 					
+					DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on,
+					GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string,
+					COUNT(DISTINCT blog_items_comments.id) as comments
+					FROM blog_items
+					LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
+					LEFT JOIN blog_items_comments ON blog_items.id = blog_items_comments.item_id
+					WHERE blog_items.parent_id = '$tool_id'
+					AND blog_items.fk_site = '$this->site_id'					
+					AND blog_items.status = 'publish'
+					GROUP BY blog_items.id 
+					ORDER BY created DESC
 				");
-				
-				$content = new View('public_blog/home');	
+				$content = new View('public_blog/multiple_posts');	
 				$content->items = $items;
 				
 				$primary->add_root_js_files('expander/expander.js');
-				$primary->readyJS('blog', 'home');		
+				$primary->readyJS('blog', 'multiple_posts');		
 				break;
 		}
 		#Javascript
 		$primary->readyJS('blog', 'index');
-		# Javascript
-		if($this->client->logged_in())
-			$primary->global_readyJS('
-				$("#click_hook").click(function(){
-					$(".comment_item").each(function(i){
-						var toolname = "blog";
-						var id		= $(this).attr("rel");
-						var edit	= "<a href=\"/get/edit_" + toolname + "/edit/" + id + "\" rel=\"facebox\">edit</a>";
-						var del		= "<a href=\"/get/edit_" + toolname + "/delete_comment/" + id + "\" class=\"js_admin_delete\" rel=\"comment_"+id+"\">delete</a>";
-						var toolbar	= "<div class=\"jade_admin_item_edit\">" + edit + " " + del + "</div>";
-						$(this).prepend(toolbar);			
-					});
-				});
-			');
-			
 		$primary->content = $content;
 		return $primary;
 	}
 	
 	
-	# return single post view
-	# get by url, or id if sent from comment form
-	function _single_post($tool_id, $url=NULL, $id=NULL)
+	/*
+	 * return single post view
+	 * get by url, or id if sent from comment form
+	 */
+	function _single_post($url=NULL, $id=NULL)
 	{
-		$db = new Database;
 		$content = new View("public_blog/single");
 		
 		$field = 'url';
@@ -142,64 +101,199 @@ class Blog_Controller extends Controller {
 			$field	= 'id';
 			$url	= $id;
 		}	
-		$item = $db->query("SELECT *, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created 
+		$item = $this->db->query("
+			SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
+			GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string
 			FROM blog_items 
-			WHERE $field = '$url' AND fk_site = '$this->site_id'
+			LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
+			WHERE blog_items.$field = '$url'
+			AND blog_items.fk_site = '$this->site_id'
+			AND blog_items.status = 'publish'
 		")->current();
 
 		if(! is_object($item) )
 			return 'This post does not exist';
 		
 		$content->item = $item;	
-		$content->comments = $this->_get_comments($item->id);
+		$content->comments = $this->_get_comments($item->id, $item->parent_id);
 	
 		return $content;
 	}
 
-	# get all tags
-	function _get_tags($tool_id)
+
+	function _tag_search($tool_id, $tag)
 	{
-		$db = new Database;
-		$tags = $db->query("SELECT * FROM blog_items_meta
-			WHERE parent_id = '$tool_id'
-			AND fk_site='$this->site_id'
-			ORDER BY id
+		$content = new View('public_blog/multiple_posts');
+		$items = $this->db->query("
+			SELECT blog_items.*,					
+			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, blog_items_tags.value,
+			GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string,
+			FIND_IN_SET('$tag', GROUP_CONCAT(DISTINCT blog_items_tags.value)) as tag_match,
+			COUNT(DISTINCT blog_items_comments.id) as comments
+			FROM blog_items
+			LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
+			LEFT JOIN blog_items_comments ON blog_items.id = blog_items_comments.item_id
+			WHERE blog_items.parent_id = '$tool_id'
+			AND blog_items.fk_site = '$this->site_id'					
+			AND blog_items.status = 'publish'
+			GROUP BY blog_items.id HAVING tag_match > '0'
+			ORDER BY created DESC
 		");
-		return $tags;		
+		$content->items = $items;
+		#Javascript
+		$content->add_root_js_files('expander/expander.js');
+		$content->readyJS('blog', 'multiple_posts');		
+		return $content;		
 	}
 	
-	function _get_comments($post_id=NULL)
+	
+	function _show_archive($tool_id, $value, $value2)
 	{
-		$db = new Database;
+		$content = new View("public_blog/archive");
+		$date_search = false;
+		
+		# year search
+		if(! empty($value) AND empty($value2) )
+		{
+			valid::year($value);
+			$start = $value;
+			(int)$end = $value+1;				
+			$date_search = "AND created >= '$start' AND created < '$end'";		
+		}
+		# month search
+		elseif(! empty($value) AND !empty($value2) )
+		{
+			valid::year($value);
+			valid::month($value2);
+			$month = $value2+1;
+			if(10 > $month)
+				$month = "0$month";
+				
+			$start		= "$value-$value2";
+			$end		= "$value-$month";
+			$date_search = "AND created >= '$start' AND created < '$end'";				
+		}
+
+		$items = $this->db->query("SELECT blog_items.*, 
+			DATE_FORMAT(created, '%Y') as year,
+			DATE_FORMAT(created, '%M') as month,
+			DATE_FORMAT(created, '%e') as day
+			FROM blog_items 
+			WHERE blog_items.parent_id = '$tool_id' 
+			AND blog_items.fk_site = '$this->site_id'
+			$date_search
+			ORDER BY created
+			LIMIT 0, 10
+		");
+		$content->items = $items;
+		return $content;
+	}
+	
+	
+	function _get_comments($post_id=NULL, $tool_id = NULL)
+	{
 		$content = new View('public_blog/comments');
-		$comments =  $db->query("SELECT *
+		
+		if(NULL == $tool_id)
+		{
+			$parent =  $this->db->query("
+				SELECT parent_id FROM blog_items 
+				WHERE id = '$post_id' AND fk_site = '$this->site_id'
+			")->current();
+			$tool_id = $parent->parent_id;
+		}			
+			
+		$comments =  $this->db->query("
+			SELECT *,
+			DATE_FORMAT(created_at, '%M %e, %Y, %l:%i%p') as clean_date
 			FROM blog_items_comments 
-			WHERE item_id = '$post_id' AND fk_site = '$this->site_id'
+			WHERE item_id = '$post_id'
+			AND fk_site = '$this->site_id'
+			ORDER BY created_at
 		");
 		$content->comments = $comments;
 		$content->item_id = $post_id;
+		$content->tool_id = $tool_id;
+		
+		# Javascript 
+		# TODO: this is being duplicated on all posts,
+		# make this into a function and call the function instead.
+		if($this->client->logged_in())
+			$content->admin_js = '
+				$("#post_comments_'.$post_id.' .comment_item").each(function(i){
+					var toolname = "blog";
+					var id		= $(this).attr("rel");
+					var del		= "<img src=\"'.url::image_path('admin/delete.png').'\" alt=\"\"> <a href=\"/get/edit_" + toolname + "/delete_comment/" + id + "\" class=\"js_admin_delete\" rel=\"comment_"+id+"\">delete</a>";
+					var toolbar	= "<div class=\"jade_admin_item_edit\">" + del + "</div>";
+					$(this).prepend(toolbar);
+				});
+			';
 		return $content;
 
 	}
 
 	function _post_comment($post_id=NULL)
 	{
-		$db = new Database;
 		if($_POST)
 		{
 			$data = array(
+				'parent_id'		=> $_POST['tool_id'],
 				'item_id'		=> $post_id,
 				'fk_site'		=> $this->site_id,
 				'body'			=> $_POST['body'],
-				'author'		=> $_POST['author'],
-				'author_url'	=> $_POST['url'],
-				'author_email'	=> $_POST['email'],
+				'name'			=> $_POST['name'],
+				'url'			=> $_POST['url'],
+				'email'			=> $_POST['email'],
 				'created_at'	=> date("Y-m-d H:m:s"),					
 			);
-			$db->insert('blog_items_comments', $data);
-			return '<div class="comment_item">' . $_POST['author'] . '<br>' . $_POST['body'] . '</div>';
+			$this->db->insert('blog_items_comments', $data);
+			return '<div class="comment_item">' . $_POST['name'] . '<br>' . $_POST['body'] . '</div>';
 		}
-	}	
+	}
+
+/* Sidebar functions */
+	
+	# get all tags
+	function _get_tags($tool_id)
+	{
+		$tags = $this->db->query("
+			SELECT id, value,
+			COUNT(tags.id) as qty
+			FROM blog_items_tags as tags
+			WHERE parent_id = '$tool_id'
+			AND fk_site='$this->site_id'
+			GROUP BY tags.value
+			ORDER BY qty DESC
+		");
+		return $tags;		
+	}
+
+	
+	function _get_sticky_posts($id_string=Null)
+	{
+		$item =  $this->db->query("
+			SELECT blog_items.title, blog_items.url
+			FROM blog_items
+			WHERE id IN ($id_string)
+			AND fk_site = '$this->site_id'
+			LIMIT 0,5
+		");
+		return $item;	
+	}
+	
+	function _get_recent_comments($tool_id=Null)
+	{
+		$comments =  $this->db->query("
+			SELECT comments.name, blog_items.title, blog_items.url
+			FROM blog_items_comments as comments
+			JOIN blog_items ON blog_items.id = comments.item_id
+			WHERE comments.parent_id = '$tool_id' AND comments.fk_site = '$this->site_id'
+			ORDER BY comments.created_at DESC
+			LIMIT 0,5
+		");
+		return $comments;	
+	}
+	
 }
 
 /* -- end of application/controllers/blog.php -- */
