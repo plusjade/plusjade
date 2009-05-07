@@ -40,15 +40,30 @@ class Page_Controller extends Admin_Controller {
 
 			$db = new Database;
 			
+			# Sanitize URL
 			$page_name = trim($_POST['page_name']);
 			if( empty($page_name) )
 				$page_name = strtolower($label);
-			
-			# Make URL friendly
+
 			$page_name = valid::filter_php_url($page_name);
 
-			# Get highest page position
-			$max = $db->query("SELECT MAX(position) as highest FROM pages WHERE fk_site = '$this->site_id' ")->current();			
+			/* Make sure page name is unique
+			 * TODO: consider adding a javascript signifer that validates
+			 * the javascript validation so we can bypass server validation?? 0.o
+			 */
+			$page_names = $db->query("
+				SELECT GROUP_CONCAT( page_name separator ',') as name_string
+				FROM pages
+				WHERE fk_site = '$this->site_id'
+			")->current();		
+			$name_array = explode(',', $page_names->name_string);		
+			if( in_array($page_name, $name_array) )
+				die('Page name already exists');
+			
+			$max = $db->query("
+				SELECT MAX(position) as highest 
+				FROM pages WHERE fk_site = '$this->site_id'
+			")->current();			
 		
 			# Add to pages table
 			$data = array(
@@ -63,6 +78,17 @@ class Page_Controller extends Admin_Controller {
 		else
 		{		
 			$primary = new View("page/new_page");
+			$db = new Database;
+			/*
+			 * Send all site page_names in javascript formatted array, 
+			 * so the validator can check for duplicates.
+			 */
+			$page_names = $db->query("
+				SELECT GROUP_CONCAT( CONCAT('\'',page_name,'\'') separator ',') as name_string
+				FROM pages
+				WHERE fk_site = '$this->site_id'
+			")->current();
+			$primary->page_names = $page_names->name_string;
 			echo $primary;		
 		}
 		die();
@@ -157,6 +183,20 @@ class Page_Controller extends Admin_Controller {
 			
 			$page_name = valid::filter_php_url($page_name);
 
+			/* Make sure page name is unique
+			 * TODO: consider adding a javascript signifer that validates
+			 * the javascript validation so we can bypass server validation?? 0.o
+			 */
+			$page_names = $db->query("
+				SELECT GROUP_CONCAT( page_name separator ',') as name_string
+				FROM pages
+				WHERE fk_site = '$this->site_id'
+				AND id != '$page_id'
+			")->current();		
+			$name_array = explode(',', $page_names->name_string);		
+			if( in_array($page_name, $name_array) )
+				die('Page name already exists');
+
 			# Update pages
 			$data = array(
 				'page_name'	=> $page_name,
@@ -172,16 +212,31 @@ class Page_Controller extends Admin_Controller {
 		}
 		else
 		{
-			$page = $db->query("SELECT * FROM pages
+			$page = $db->query("
+				SELECT * FROM pages
 				WHERE id = '$page_id' 
 				AND fk_site = '$this->site_id'
 			")->current();
-			
+
 			if(! is_object($page) )
 				die('Page not found'); # error
-				
+
 			$primary = new View("page/page_settings");	
 			$primary->page = $page;	
+			
+			/*
+			 * Send all site page_names except this name, in javascript formatted array, 
+			 * so the validator can check for duplicates.
+			 */
+			$page_names = $db->query("
+				SELECT GROUP_CONCAT( CONCAT('\'',page_name,'\'') separator ',') as name_string
+				FROM pages
+				WHERE fk_site = '$this->site_id'
+				AND id != '$page->id'
+			")->current();
+			$primary->page_names = $page_names->name_string;
+			
+			
 			echo $primary;
 		}
 		die();
