@@ -89,7 +89,6 @@ $(document).ready(function()
 			$.facebox(function(){
 					$.get(e.target.href, function(data){
 						$.facebox(data, false, "facebox_"+pane);
-						$("textarea.render_html").wysiwyg();
 					});
 			}, false, "facebox_"+pane);
 			return false;
@@ -142,16 +141,19 @@ $(document).ready(function()
 	$(document).bind('reveal.facebox', function(){		
 			var options = {
 				beforeSubmit: function(){
-					if( $(".ajaxForm input").jade_validate() )
-						return true;
-					else
+					if(! $(".ajaxForm input").jade_validate() )
 						return false;
 				},
 				success: function(data) {
 					$.facebox(data, "status_reload", "facebox_2");
-					location.reload();							
+					//location.reload();							
 				}					
 			};
+	
+		$('textarea').fck({
+			path: '/assets/js/fckeditor/'
+			, toolbar:'Plusjade'
+		});	
 		$(".ajaxForm").ajaxForm(options);
 		
 		

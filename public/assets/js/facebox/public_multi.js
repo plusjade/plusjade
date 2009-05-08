@@ -65,8 +65,8 @@
 
       $('#'+$.facebox.settings.id+' .content').empty()
       $('#'+$.facebox.settings.id+' .body').children().hide().end().
-        append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
-
+        append('<div class="loading">Loading...</div>')
+		//append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
       $('#'+$.facebox.settings.id).css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
         left:	getPageWidth() / 2 - ($('#'+$.facebox.settings.id).width() / 2)
