@@ -236,6 +236,8 @@ class Blog_Controller extends Controller {
 	{
 		if($_POST)
 		{
+			ini_set('date.timezone', 'America/Los_Angeles');
+
 			$data = array(
 				'parent_id'		=> $_POST['tool_id'],
 				'item_id'		=> $post_id,
@@ -246,8 +248,15 @@ class Blog_Controller extends Controller {
 				'email'			=> $_POST['email'],
 				'created_at'	=> date("Y-m-d H:m:s"),					
 			);
-			$this->db->insert('blog_items_comments', $data);
-			return '<div class="comment_item">' . $_POST['name'] . '<br>' . $_POST['body'] . '</div>';
+			
+			$insert_id = $this->db->insert('blog_items_comments', $data);
+			return '		
+			<div class="comment_item">				
+				<div class="comment_name">'.$_POST['name'].' says...</div>
+				<div class="comment_time">just now</div>
+				<div class="comment_body">' .$_POST['body']. '</div>
+			</div>
+			';		
 		}
 	}
 
@@ -271,6 +280,9 @@ class Blog_Controller extends Controller {
 	
 	function _get_sticky_posts($id_string=Null)
 	{
+		if( empty($id_string) )
+			return false;
+			
 		$item =  $this->db->query("
 			SELECT blog_items.title, blog_items.url
 			FROM blog_items

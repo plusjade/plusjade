@@ -22,70 +22,13 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 		valid::id_key($tool_id);
 		$calendar = new Calendar;
 		$db = new Database;
-		$month = date('m');
-		$year = date('Y');
-		$date_array = array();
-
 		# Create array for dates associated with this month
-		$dates = $db->query("SELECT * FROM calendar_items 
+		$dates = $db->query("
+			SELECT * FROM calendar_items 
 			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
-			AND month = '$month'
-			ORDER BY day
 		");
-/*
-		foreach($dates as $date)
-		{
-			if(! empty($date_array[$date->day]) )
-				$date_array[$date->day] .= '
-					<div id="calendar_'.$date->id.'">
-					<a href="/e/edit_calendar/edit/'. $date->id .'" rel="facebox" id="'.$date->id.'">'.$date->title.'</a>
-					<br><a href="/e/edit_calendar/delete/'.$date->id.'" class="delete_calendar" id="'.$date->id.'">Delete!</a>
-					</div>
-				';
-			else
-				$date_array[$date->day] = '
-				<div id="calendar_'.$date->id.'">
-				<a href="/e/edit_calendar/edit/'. $date->id .'" rel="facebox" id="'.$date->id.'">'.$date->title.'</a>
-				<br><a href="/e/edit_calendar/delete/'.$date->id.'" class="delete_calendar" id="'.$date->id.'">Delete!</a>
-				</div>
-				';
-		}
-*/		
-		# Count events
-		foreach($dates as $date)
-		{
-			if(! empty($date_array[$date->day]) )
-				(int) ++$date_array[$date->day];
-			else
-				(int) $date_array[$date->day] = 1;
-		}
-
-		# SIMPLE		
-		function day_function($year, $month, $day, $date_data)
-		{
-			# blank cells before day 1 or after day 30/31
-			if ($day == '')
-				echo '&nbsp;'; # for IE table cells
-				
-			if( 'NULL' != $date_data )
-			{
-				echo '<a href="/get/edit_calendar/day/'."$month-$day-$year".'" rel="admin_ajax" class="day_link_simple">'. $day .'</a>';
-			}
-			else
-				echo '<div class="day_simple">'.$day.'</div>';
-		}
-
-		$javascript .= tool_ui::js_delete_init('calendar');
-
-		$this->template->rootJS($javascript);
-		
-		
-		$calendar = $calendar->getPhpAjaxCalendar($month, $year, $date_array, 'day_function');
-		$calendar .= '<div id="admin_calendar_event_details">hello</div>'; 
-		
-		echo $calendar;
-		
+		echo 'blah';
 		die();
 	}
 

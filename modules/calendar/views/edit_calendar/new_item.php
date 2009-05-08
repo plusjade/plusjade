@@ -2,7 +2,7 @@
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_item" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Add Event
+			<img src="<?php echo url::image_path('check.png')?>" alt=""/> Add Event
 		</button>
 		<div id="common_title">Create New Calendar Entry</div>
 	</div>

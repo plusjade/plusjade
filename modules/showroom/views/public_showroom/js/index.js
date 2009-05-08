@@ -1,6 +1,6 @@
 
 target_div = '#showroom_wrapper_%VAR% div.showroom_items';
-loading = '<div class="loading"></div>';
+loading = '<div class="ajax_loading">Loading...</div>';
 
 $("#showroom_wrapper_%VAR%").click($.delegate({		
 	"a.loader": function(e){

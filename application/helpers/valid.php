@@ -75,7 +75,7 @@ class valid_Core {
 	 */
 	static function filter_php_url($string)
 	{
-		return preg_replace('/^[-a-z0-9_]++$/iD', '-', (string) $string);
+		return preg_replace("/[^-a-z0-9_]/i", '-', (string) $string);
 	}
 	
 	
