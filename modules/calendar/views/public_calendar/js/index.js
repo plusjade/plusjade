@@ -1,20 +1,20 @@
 
 $('.phpajaxcalendar_wrapper').click($.delegate({
 
-	'a[rel*=ajax]' : function(e){			
+	'a[rel*=ajax]' : function(e){		
 		$('a[rel*=ajax]').removeClass('selected');
 		$(e.target).addClass('selected');
 		
-		$('#loadImage').show();
+		$('#calendar_event_details').html('<div class="ajax_loading">Loading...</div>');
 		$('#calendar_event_details').load(e.target.href,{}, function(){
-			$('#loadImage').hide().click();
+			$('#click_hook').click();
 		});
 		return false;
 	},
 	
-	'a.monthnav' : function(e){	
-		$('.phpajaxcalendar_wrapper').load(e.target.href, {limit: 25}, function(){
-		});
+	'a.monthnav' : function(e){
+		$('.phpajaxcalendar_wrapper').html('<div class="ajax_loading">Loading...</div>');
+		$('.phpajaxcalendar_wrapper').load(e.target.href, {limit: 25});
 		return false;
 	}		
 }));

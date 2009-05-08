@@ -14,15 +14,23 @@
 				</ul>
 		</div>
 
-		<div class="notable_posts_list">
-			<h3>Sticky Posts</h3>
-			<ul>
-				<?php
-				foreach ($sticky_posts as $posts)
-					echo '<li><a href="'.url::site("blog/entry/$posts->url").'" rel="blog_ajax">'. $posts->title .'</a></li>';
+		<?php
+			if(! empty($sticky_posts) )
+			{
 				?>
-			</ul>
-		</div>
+				<div class="notable_posts_list">
+					<h3>Sticky Posts</h3>
+					<ul>
+						<?php
+						foreach ($sticky_posts as $posts)
+							echo '<li><a href="'.url::site("blog/entry/$posts->url").'" rel="blog_ajax">'. $posts->title .'</a></li>';
+						?>
+					</ul>
+				</div>
+				<?php
+			}
+			?>
+			
 		
 		<div class="archives_list">
 			<h3>Archives</h3>

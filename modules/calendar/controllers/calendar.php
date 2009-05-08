@@ -37,7 +37,7 @@ class Calendar_Controller extends Controller {
 		# Javascript
 		if($this->client->logged_in())
 			$primary->global_readyJS('
-				$("#loadImage").click(function(){
+				$("#click_hook").click(function(){
 					$().add_toolkit_items("calendar");
 				});			
 			');

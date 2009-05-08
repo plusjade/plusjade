@@ -1,33 +1,29 @@
 
 <style type="text/css">
 	#jade_tool_box{
-		width:750px;
+		width:700px;
+		height:450px;
 		padding:5px;
 		background:#eee;
 		overflow:auto;
 		border:1px solid #ccc;
 	}
 	.tool_box_wrapper{
-		width:170px;
-		height:170px;
-		border:1px solid lightblue;
+		width:160px;
+		height:160px;
 		margin:5px;
 		float:left;
 		background:#fff;
+	}
+	.tool_box_wrapper button{
+		width:100%;
+		height:35px;
+		border:0;
 	}
 	.tool_box_wrapper div{
 		padding:10px;
 		line-height:1.5em;
 		margin-top:15px;
-	}
-	#jade_tool_box label{
-		display:block;
-		padding:10px 0;
-		cursor:cursor;
-		cursor:pointer;
-		background: lightblue url(/assets/images/admin/blue_bg.png) repeat-x bottom left;
-		color:#fff;
-		font-size:1.4em;
 	}
 	#jade_tool_box label:hover,
 	#jade_tool_box label.selected
@@ -56,8 +52,8 @@
 			
 			echo '<div class="tool_box_wrapper">';
 			echo '
-				<button type="submit" name="tool" value="' . $tool->id .' " class="jade_positive" style="width:100%;height:40px">
-					<img src="/assets/images/admin/add.png" alt=""/> Add '.$tool->name.'
+				<button type="submit" name="tool" value="' . $tool->id .' " class="jade_positive">
+					<img src="/assets/images/admin/add.png" alt="Add"/> '.$tool->name.'
 				</button>
 			';
 			echo '<div>'. $tool->desc .'</div>';

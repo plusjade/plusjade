@@ -121,7 +121,7 @@ class Css_Controller extends Controller {
 		valid::id_key($name_id);	
 		valid::id_key($tool_id);		
 		
-		$css_file_path = DOCROOT."data/$this->this->site_name/tools_css";
+		$css_file_path = DOCROOT."data/$this->site_name/tools_css";
 		$db = new Database;
 		$tool		= $db->query("SELECT name FROM tools_list WHERE id='$name_id'")->current();
 		$tool_name	= strtolower($tool->name);

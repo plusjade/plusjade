@@ -65,7 +65,7 @@ textarea.render_html{
 	text-align:center;
 	min-width:800px;
 	width:100%;
-	z-index:999;
+	z-index:99;
 }
 
 /* admin toolbar */
@@ -423,12 +423,15 @@ ul#admin_bar{
 span.msg{
 	color:red;
 }
-
+.error_msg{
+	color:red;
+}
 
 /* --- common tool elements --- */
 
+/* this sets the width for most facebox containers using this header */
 .facebox #common_tool_header{
-	min-width:700px;
+	width:700px;
 	overflow:auto;
 	background: #fff url(/assets/images/admin/sky_bg.png) repeat-x bottom left;
 	margin-bottom:10px;
@@ -597,10 +600,11 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
   background:#fff;
 }
 .facebox .loading {
-  text-align: center;
-  width:500px;
-  height:200px;
-  padding-top:30px;
+	text-align: center;
+	width:500px;
+	height:200px;
+	padding-top:30px;
+	background: #fff url(/assets/images/load.gif) no-repeat 50% 50%;
 }
 .facebox .image {
   text-align: center;
@@ -632,7 +636,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 .facebox_overlayBG {
   background-color: #000;
-  z-index: 99;
+  z-index: 999;
 }
 * html .facebox_overlay { /* ie6 hack */
   position: absolute;
@@ -650,10 +654,10 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	.facebox #ajax_primary{
 		padding-right:10px;
 		width:750px;
+		border:1px solid red;
 		overflow:auto;
 	} 
-
-
+	
 /* --- FORM BUTTONS --- */
 
 .buttons{

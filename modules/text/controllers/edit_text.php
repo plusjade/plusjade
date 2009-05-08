@@ -20,6 +20,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 
 		if($_POST)
 		{
+			echo'<pre>';print_r($_POST);echo'</pre>';die();
 			$data = array(
 				'body'	=> $_POST['body'],		
 			);		
