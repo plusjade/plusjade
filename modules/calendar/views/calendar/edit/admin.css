@@ -1,9 +1,0 @@
-#date_pane{
-	float:left;
-	width:35%; 
-	margin-right:10px;
-}
-#desc_pane{
-	float:left;
-	width:62%;
-}
