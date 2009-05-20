@@ -6,6 +6,6 @@ $('div.post_body').expander({
 $('.get_comments').click(function(){
 	id = $(this).attr('rel');
 	$('#show_comments_'+id).html('<div class="ajax_loading">Loading...</div>');
-	$('#show_comments_'+id).load('/blog/comment/'+id);
+	$('#show_comments_'+id).load('/%VAR%/comment/'+id);
 	return false;
 });

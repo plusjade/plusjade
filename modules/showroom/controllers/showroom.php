@@ -14,7 +14,8 @@ class Showroom_Controller extends Controller {
 		$item		= uri::easy_segment('3');
 		$primary	= new View("public_showroom/index");
 		
-		$parent = $db->query("SELECT * FROM showrooms 
+		$parent = $db->query("
+			SELECT * FROM showrooms 
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();			
@@ -23,7 +24,8 @@ class Showroom_Controller extends Controller {
 		if(	'simple' == $parent->params )
 		{
 			$item_view = new View("public_showroom/items_$parent->view");
-			$categories = $db->query("SELECT id FROM showroom_items 
+			$categories = $db->query("
+				SELECT id FROM showroom_items 
 				WHERE parent_id = '$parent->id' 
 				AND fk_site = '$this->site_id'
 			");		
@@ -34,7 +36,8 @@ class Showroom_Controller extends Controller {
 			}
 			$ids = rtrim($ids, ',');
 			
-			$items = $db->query("SELECT * FROM showroom_items_meta 
+			$items = $db->query("
+				SELECT * FROM showroom_items_meta 
 				WHERE cat_id IN ($ids)
 				AND fk_site = '$this->site_id'
 				ORDER BY position
@@ -53,12 +56,12 @@ class Showroom_Controller extends Controller {
 				$primary->categories = $this->_categories($parent->id);
 				
 				#TODO: Make this configurable frontpage
-				$primary->items = $this->_items_category('Shirts');
+				$primary->items = $this->_items_category($tool_id, 'Shirts');
 			}
 			elseif( empty($item) )
 			{
 				$primary->categories = $this->_categories($parent->id);
-				$primary->items = $this->_items_category($category, $parent->view);
+				$primary->items = $this->_items_category($tool_id, $category, $parent->view);
 			}
 			else
 			{ 
@@ -86,7 +89,8 @@ class Showroom_Controller extends Controller {
 	function _categories($parent_id)
 	{
 		$db = new Database;
-		$items = $db->query("SELECT * FROM showroom_items 
+		$items = $db->query("
+			SELECT * FROM showroom_items 
 			WHERE parent_id = '$parent_id' 
 			AND fk_site = '$this->site_id' 
 			ORDER BY lft ASC 
@@ -96,14 +100,16 @@ class Showroom_Controller extends Controller {
 	}
 	
 	# Get items from a category
-	function _items_category($category, $view='list')
+	function _items_category($tool_id, $category, $view='list')
 	{
 		$db = new Database;
 		$item_view = new View("public_showroom/items_$view");
 		
 		# parent category 		
-		$parent = $db->query("SELECT * FROM showroom_items 
-			WHERE fk_site = '$this->site_id'
+		$parent = $db->query("
+			SELECT * FROM showroom_items
+			WHERE parent_id = '$tool_id'
+			AND fk_site = '$this->site_id'
 			AND name = '$category'
 		")->current();			
 		
@@ -112,7 +118,8 @@ class Showroom_Controller extends Controller {
 			$item_view->img_path = "/data/$this->site_name/assets/images/showroom/$parent->id";
 		
 			#display items in this cat
-			$items = $db->query("SELECT * FROM showroom_items_meta
+			$items = $db->query("
+				SELECT * FROM showroom_items_meta
 				WHERE cat_id = '$parent->id'	
 				AND fk_site = '$this->site_id'	
 				ORDER by position;
@@ -138,7 +145,8 @@ class Showroom_Controller extends Controller {
 		$db = new Database;	
 		$primary = new View('public_showroom/single_item');		
 		#display items in this cat
-		$item_object = $db->query("SELECT * FROM showroom_items_meta 
+		$item_object = $db->query("
+			SELECT * FROM showroom_items_meta 
 			WHERE fk_site = '$this->site_id'
 			AND url = '$item' 
 		")->current();			

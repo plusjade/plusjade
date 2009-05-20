@@ -1,0 +1,28 @@
+.phpajaxcalendar_wrapper table#calendar tr
+{
+	text-align: center;
+}
+
+.phpajaxcalendar_wrapper table#calendar .month
+{
+    width:auto;/* stupid IE */
+}
+
+.phpajaxcalendar_wrapper table#calendar tr.daynames td
+{
+	width: 50px;
+	background: #666;
+	color: #fff;
+}
+
+.phpajaxcalendar_wrapper table#calendar tr.week td
+{
+	height: 40px;
+}
+
+.phpajaxcalendar_wrapper table#calendar td.today
+{
+	color: white;
+	font-weight: bold;
+	background: green;
+}

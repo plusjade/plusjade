@@ -16,7 +16,7 @@
 			$old_month = $item->month;
 		}
 			
-		echo '<div class="archive_post"><span>'. $item->day . ':</span> <a href="'.url::site("blog/entry/$item->url").'" rel="blog_ajax"> '. $item->title .'</a></div>';
+		echo '<div class="archive_post"><span>'. $item->day . ':</span> <a href="'.url::site("$blog_page_name/entry/$item->url").'" rel="blog_ajax"> '. $item->title .'</a></div>';
 	}
 	?>
 </div>

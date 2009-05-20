@@ -56,7 +56,7 @@ class Load_Tool_Core {
 	 * if needed
 	 */
 	function after_add($tool_name, $tool_id)
-	{
+	{		
 		switch ($tool_name)
 		{
 			case 'Navigation':

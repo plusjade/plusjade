@@ -6,16 +6,16 @@
 	<form action="/get/auth" method="POST">
 	
 		<div class="fieldsets">
-			<b>Username</b><br><br>
-			<input type="text" name="username" rel="text_req" style="width:270px">	
+			<b>Username</b><br>
+			<input type="text" name="username" rel="text_req">	
 		</div>
 
 		<div class="fieldsets">
-			<b>Password</b><br><br>
-			<input type="password" name="password" rel="text_req" style="width:270px">
+			<b>Password</b><br>
+			<input type="password" name="password" rel="text_req">
 		</div>
 
-		<div id="login_submit" class="buttons">
+		<div class="buttons">
 			<button type="submit" name="submit" class="jade_positive" accesskey="enter">
 				Log me in buddy!
 			</button>

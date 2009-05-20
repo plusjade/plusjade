@@ -347,6 +347,12 @@ class Page_Controller extends Admin_Controller {
 
 		if($_POST)
 		{
+			/*
+			
+				TODO: 
+				validate page name for cases of root and subpages
+			
+			*/
 			$label = trim($_POST['label']);
 			if(empty($label) )
 				die('Label is required'); #error	
