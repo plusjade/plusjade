@@ -19,15 +19,31 @@ class Page_Controller extends Admin_Controller {
 		$db			= new Database;				
 		$primary	= new View("page/all_pages");
 		
-		$pages = $db->query("SELECT * FROM pages 
+		$pages = $db->query("
+			SELECT * FROM pages 
 			WHERE fk_site = '$this->site_id' 
 			ORDER BY position
 		");			
 		$primary->pages = $pages;
-		echo $primary;	
-		die();
+		$primary->protected_pages = yaml::parse($this->site_name, 'pages_config');
+		die($primary);
 	}
 
+# sort the main menu navigation
+	function navigation()
+	{		
+		$db			= new Database;				
+		$primary	= new View("page/navigation");
+		
+		$pages = $db->query("
+			SELECT * FROM pages 
+			WHERE fk_site = '$this->site_id' 
+			ORDER BY position
+		");			
+		$primary->pages = $pages;
+		$primary->protected_pages = yaml::parse($this->site_name, 'pages_config');
+		die($primary);
+	}
 	
 # ADD page
 	function add()
@@ -40,7 +56,7 @@ class Page_Controller extends Admin_Controller {
 
 			$db = new Database;
 			
-			# Sanitize URL
+			# Sanitize page_name
 			$page_name = trim($_POST['page_name']);
 			if( empty($page_name) )
 				$page_name = strtolower($label);
@@ -56,9 +72,42 @@ class Page_Controller extends Admin_Controller {
 				FROM pages
 				WHERE fk_site = '$this->site_id'
 			")->current();		
-			$name_array = explode(',', $page_names->name_string);		
-			if( in_array($page_name, $name_array) )
-				die('Page name already exists');
+			$page_name_array = explode(',', $page_names->name_string);		
+			
+			# Is this a root or sub_page?
+			if( empty($_POST['sub_page']) )
+			{
+				if( in_array($page_name, $page_name_array) )
+					die('Page name already exists');			
+
+			}
+			else
+			{
+				# Valide for unique sub page_name
+				$sub_filter_array = array();
+				foreach($page_name_array as $key => $name)
+				{
+					$name_array = explode('/',$name);
+				
+					if( 1 < count($name_array) )
+					{
+						$name_node	= array_pop($name_array);
+						$sub_node	= array_pop($name_array);
+						
+						$sub_filter_array[$sub_node][] = $name_node;
+					}
+				}
+				
+				$filter_node = explode('/', $_POST['sub_page']);
+				$filter_node = array_pop($filter_node);
+				
+				if(! empty($sub_filter_array[$filter_node]) )
+					if( in_array($page_name, $sub_filter_array[$filter_node]) )
+						die('Page name already exists');	
+				
+				$page_name = $_POST['sub_page']."/$page_name";
+			}
+			
 			
 			$max = $db->query("
 				SELECT MAX(position) as highest 
@@ -72,23 +121,142 @@ class Page_Controller extends Admin_Controller {
 				'label'		=> $_POST['label'],
 				'position'	=> ++$max->highest,
 			);
-			$db->insert('pages', $data);
+			if(! empty($_POST['menu']) )
+				$data['menu'] = 'yes';
+			
+			$page_id = $db->insert('pages', $data)->insert_id();
+			
+			
+			# is a page_builder submitted?
+			# page builders cannot be on sub_pages
+			if(empty($_POST['sub_page']) AND !empty($_POST['page_builder']) AND '0' != $_POST['page_builder'])
+			{
+				$tools_id = $_POST['page_builder'];
+				# GET tool name
+				$tool = $db->query("
+					SELECT name FROM tools_list WHERE id='$tools_id'
+				")->current();
+				$tool_name = strtolower($tool->name);
+
+				# INSERT row in tool parent table
+				$data = array(
+					'fk_site'	=> $this->site_id
+				);			
+				$tool_id = $db->insert("{$tool_name}s", $data)->insert_id();
+				
+				# INSERT pages_tools row inserting tool parent id
+				$data = array(
+					'page_id'	=> $page_id,
+					'fk_site'	=> $this->site_id,
+					'tool'		=> $tools_id,
+					'tool_id'	=> $tool_id,
+					'position'	=> 1
+				);
+				$db->insert('pages_tools', $data);
+				
+				Load_Tool::after_add($tool->name, $tool_id );
+				
+				# this tool is protected so add page to pages_config.yaml
+				# and update pages row
+				$newline = "\n$page_name:$tool_name:$tool_id,\n";
+				yaml::add_value($this->site_name, 'pages_config', $newline);
+				$db->update('pages', array('protected' => "$tool_name:$tool_id"), array('id' => $page_id));
+				
+				# TODO:
+				# Pass output the facebox so it can load the next step page
+				# echo strtolower($tool->name).'/add/'.$tool_insert->insert_id();			
+			}
+
 			echo 'Page Created!!<br>Updating...'; # success			
 		}
 		else
 		{		
 			$primary = new View("page/new_page");
 			$db = new Database;
+			
+			
 			/*
+			 * SUPER UNIQUE PAGE_NAME VALIDATION HANDLING
+			 * ----------------------------------------------------
 			 * Send all site page_names in javascript formatted array, 
 			 * so the validator can check for duplicates.
 			 */
+			# get a string of all pages names 
 			$page_names = $db->query("
-				SELECT GROUP_CONCAT( CONCAT('\'',page_name,'\'') separator ',') as name_string
+				SELECT GROUP_CONCAT( page_name separator ',') as name_string
 				FROM pages
 				WHERE fk_site = '$this->site_id'
 			")->current();
-			$primary->page_names = $page_names->name_string;
+
+			# The root_filter for root_page names
+			$root_filter = str_replace(',',"','", $page_names->name_string);
+			$primary->root_filter = "'$root_filter'";
+			
+
+			# the sub_filter for sub_page names
+			$page_name_array = explode(',', $page_names->name_string);
+			
+			$sub_filter_array = array();
+			foreach($page_name_array as $key => $page_name)
+			{
+				$name_array = explode('/',$page_name);
+			
+				if( 1 < count($name_array) )
+				{
+					$name_node	= array_pop($name_array);
+					$sub_node	= array_pop($name_array);
+					
+					$sub_filter_array[$sub_node][] = $name_node;
+				}
+			}
+			
+			$sub_filter = "filters['no_filter'] = [];";
+			foreach($sub_filter_array as $key => $value)
+			{
+				$string = implode("','", $value);
+				$string = "'$string'";
+				$sub_filter .= "filters['$key'] = [$string];";
+			}
+			$primary->sub_filter = $sub_filter;
+
+			/*
+			echo '<pre>'; print_r($sub_filter_array); echo '</pre>'; 
+			echo '<pre>'; print_r($page_name_array); echo '</pre>'; 
+			die();
+			*/			
+	
+			
+			# get allowed "sub-able" pages_names
+			$protected_pages	= yaml::parse_name($this->site_name, 'pages_config');
+			$new_string			= str_replace($protected_pages, 'drop', $page_names->name_string);
+			$page_array			= explode(',', $new_string);
+			
+			foreach($page_array as $value)
+			{
+				if('drop' != $value)
+				{
+					$name_array = explode('/',$value);
+					$sub_node = $name_array['0'];
+					if( 1 < count($name_array) )
+					{
+						$sub_node = array_pop($name_array);
+					}					
+					$allowed_pages[] = "$sub_node:$value";
+				}
+			}
+			
+			$primary->allowed_pages = $allowed_pages;		
+			
+			
+			#echo $new_string; 
+			#echo '<pre>';print_r($allowed_pages);echo'</pre>';die();
+			
+			
+			$page_builders = $db->query("
+				SELECT * FROM tools_list WHERE protected = 'yes'
+			");
+			$primary->page_builders = $page_builders; 
+			
 			echo $primary;		
 		}
 		die();
@@ -102,13 +270,20 @@ class Page_Controller extends Admin_Controller {
 	{
 		valid::id_key($page_id);
 		$db = new Database;		
+		$page = $db->query("
+			SELECT page_name FROM pages WHERE id='$page_id'
+		")->current();
+
+		# if deleting a protected page
+		yaml::delete_value($this->site_name, 'pages_config', $page->page_name);
+		
 		$data = array(
 			'id'		=> $page_id,
 			'fk_site'	=> $this->site_id,		
 		);
 		$db->delete('pages', $data);
-		echo 'Page deleted!!'; # success			
-		die();
+		
+		die('Page deleted!!'); # success			
 	}
 
 
@@ -126,28 +301,28 @@ class Page_Controller extends Admin_Controller {
 			$output = rtrim($_POST['output'], '#');	
 			$output = explode('#', $output);
 			
-			if(! empty($output['0']) )
+			if( empty($output['0']) )
+				die('There are no tools to sort');
+	
+			# hash format "scope.guid_id.container.position"
+			foreach($output as $hash)
 			{
-				# hash format "scope.guid.container.position"
-				foreach($output as $hash)
+				$pieces	= explode('.', $hash);
+				
+				# Update the rows
+				$guid 				= strstr($pieces['1'], '_');
+				$guid 				= ltrim($guid, '_');
+				$data['position']	= $pieces['3'];			
+				$data['page_id']	= $page_id;
+				$data['container']	= $pieces['2'];	
+				if( 'global' == $pieces['0'] )
 				{
-					$pieces	= explode('.', $hash);
-					
-					# Update the rows
-					$data['position']	= $pieces['3'];			
-					$data['page_id']	= $page_id;
-					$data['container']	= $pieces['2'];	
-					if( 'global' == $pieces['0'] )
-					{
-						$data['page_id']	= $pieces['2'];
-						$data['container']	= $pieces['2'];
-					}
-					$db->update('pages_tools', $data, "guid = '{$pieces['1']}' AND fk_site = '$this->site_id'");								
-				}	
-				echo 'Order Updated!';
-			}
-			else
-				echo 'There are no tools to sort';
+					$data['page_id']	= $pieces['2'];
+					$data['container']	= $pieces['2'];
+				}
+				$db->update('pages_tools', $data, "guid = '$guid' AND fk_site = '$this->site_id'");								
+			}	
+			echo 'Order Updated!';
 		}
 		die();
 	}
@@ -160,8 +335,7 @@ class Page_Controller extends Admin_Controller {
 		foreach($_GET['page'] as $position => $id)
 			$db->update('pages', array('position' => "$position"), "id = '$id'"); 	
 			
-		echo 'Sort Order Saved!'; # status response	
-		die();
+		die('Sort Order Saved!'); # status response	
 	}
 
 
@@ -196,8 +370,14 @@ class Page_Controller extends Admin_Controller {
 			$name_array = explode(',', $page_names->name_string);		
 			if( in_array($page_name, $name_array) )
 				die('Page name already exists');
-
-			# Update pages
+				
+			# if new page name & page is protected update the page_config file.
+			if($page_name != $_POST['old_page_name'])
+			{
+				yaml::edit_value($this->site_name, 'pages_config', $_POST['old_page_name'], $page_name );
+			}
+			
+			# Update pages table
 			$data = array(
 				'page_name'	=> $page_name,
 				'title'		=> $_POST['title'],
@@ -224,6 +404,20 @@ class Page_Controller extends Admin_Controller {
 			$primary = new View("page/page_settings");	
 			$primary->page = $page;	
 			
+			# Is this a subpage?
+			$page_name	= $page->page_name;
+			$sub_page	= '';
+			$page_directories = explode('/',$page_name);
+			
+			if( 1 < count($page_directories) )
+			{
+				$page_name	=  array_pop($page_directories);
+				$sub_page	= implode('/', $page_directories).'/';
+			}
+			$primary->page_name	= $page_name;	
+			$primary->sub_page	= $sub_page;				
+			
+			
 			/*
 			 * Send all site page_names except this name, in javascript formatted array, 
 			 * so the validator can check for duplicates.
@@ -236,6 +430,11 @@ class Page_Controller extends Admin_Controller {
 			")->current();
 			$primary->page_names = $page_names->name_string;
 			
+
+			# is page protected?
+			$primary->is_protected = FALSE;
+			if(yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+				$primary->is_protected = TRUE;
 			
 			echo $primary;
 		}

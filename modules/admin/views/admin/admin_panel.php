@@ -26,8 +26,9 @@ if (empty($tools_array))
 		<li class="root_list dropdown">
 			<div>Pages &#8595;</div>
 			<ul>
+				<li><img src="<?php echo url::image_path('admin/sitemap.png')?>" alt=""> <a href="/get/page/navigation" rel="facebox">Navigation</a></li>
 				<li><img src="<?php echo url::image_path('admin/page.png')?>" alt=""> <a href="/get/page" rel="facebox">All Pages</a></li>
-				<li><img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="/get/page/add" rel="facebox">New Page</a></li>					
+				<li><img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="/get/page/add" rel="facebox">New Page</a></li>
 			</ul>		
 		</li>
 		
@@ -68,7 +69,7 @@ if (empty($tools_array))
 
 
 		<ul id="cssdropdown" style="display:none">
-			<span id="click_hook" style="display:none"></span>
+			<span id="click_hook" rel="<?php echo $page_id?>" style="display:none"></span>
 			<?php						
 			if( count($tools_array) > 0 )
 			{

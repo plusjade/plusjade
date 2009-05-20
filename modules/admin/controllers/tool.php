@@ -20,8 +20,7 @@ class Tool_Controller extends Controller {
 		$db = new Database;
 		$primary = new View('tool/manage');
 
-		# Get all tool references in pages_tools
-		# owned by this site.
+		# Get all tool references in pages_tools owned by this site.
 		$tools = $db->query("
 			SELECT pages_tools.*, pages.page_name, tools_list.* 
 			FROM pages_tools 
@@ -32,7 +31,12 @@ class Tool_Controller extends Controller {
 		");
 	
 		# Get all pages belonging to this site.
-		$pages = $db->query("SELECT id, page_name FROM pages WHERE fk_site = '$this->site_id' ORDER BY page_name");
+		$pages = $db->query("
+			SELECT id, page_name 
+			FROM pages 
+			WHERE fk_site = '$this->site_id' 
+			ORDER BY page_name
+		");
 		
 		$primary->tools = $tools;
 		$primary->pages = $pages;
@@ -50,25 +54,30 @@ class Tool_Controller extends Controller {
 		valid::id_key($page_id);		
 		$db = new Database;		
 
-		if(! empty($_POST['tool']) )
+		if($_POST)
 		{
 			(int) $id = $_POST['tool'];
 			
 			# GET tool name
-			$tool = $db->query("SELECT name FROM tools_list WHERE id='$id' ")->current();
+			$tool = $db->query("
+				SELECT name, protected FROM tools_list WHERE id='$id'
+			")->current();
 			$table = strtolower($tool->name).'s';
 				
 			# INSERT row in tool parent table
 			$data = array(
 				'fk_site'	=> $this->site_id
 			);			
-			$tool_insert = $db->insert($table, $data);
+			$tool_insert_id = $db->insert($table, $data)->insert_id();
 
 			# GET max position of tools on page			
-			$tools = $db->query("SELECT MAX(position) as highest FROM pages_tools WHERE page_id ='$page_id' ")->current();			
-			if( empty($tools->highest) ) 
-				$highest = 1;
-			else
+			$tools = $db->query("
+				SELECT MAX(position) as highest FROM pages_tools 
+				WHERE page_id ='$page_id'
+			")->current();			
+			
+			$highest = 1;
+			if(! empty($tools->highest) ) 
 				$highest = $tools->highest; 
 			
 			# INSERT pages_tools row inserting tool parent id
@@ -76,26 +85,59 @@ class Tool_Controller extends Controller {
 				'page_id'	=> $page_id,
 				'fk_site'	=> $this->site_id,
 				'tool'		=> $id,
-				'tool_id'	=> $tool_insert->insert_id(),
+				'tool_id'	=> $tool_insert_id,
 				'position'	=> ++$highest
 			);
-			$pages_tools_insert = $db->insert('pages_tools', $data);
+			$db->insert('pages_tools', $data);
 			
-			Load_Tool::after_add($tool->name, $tool_insert->insert_id() );
+			# if tool is protected, add page to pages_config file.
+			if('yes' == $tool->protected)
+			{
+				$page = $db->query("
+					SELECT page_name FROM pages WHERE id = '$page_id'
+				")->current();		
 			
-			# Pass output the facebox
-			echo strtolower($tool->name).'/add/'.$tool_insert->insert_id();
+				$newline = "\n$page->page_name:$tool->name:$tool_insert_id,\n";
+				yaml::add_value($this->site_name, 'pages_config', $newline);
+				$db->update('pages', array('protected' => "$tool->name:$tool_insert_id"), array('id' => $page_id));
+				
+			}
+			
+			Load_Tool::after_add($tool->name, $tool_insert_id );
+			
+			# Pass output the facebox so it can load the next step page
+			echo strtolower($tool->name)."/add/$tool_insert_id";
 
 			die();
 		}	
 		else
 		{			
 			$primary = new View('tool/new_tool');
-			$tools = $db->query('SELECT * FROM tools_list');
+			$tools = $db->query("
+				SELECT * FROM tools_list WHERE protected = 'no'
+			");
+			
+			# is page protected? if not show page builders.
+			$page = $db->query("
+				SELECT page_name FROM pages WHERE id = '$page_id'
+			")->current();			
+			
+			str_replace('/', '', $page->page_name, $count);
+
+			# If not a sub page and does not have builder installed already..
+			if(0 == $count AND !yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+			{
+				$protected_tools = $db->query("
+					SELECT * FROM tools_list WHERE protected = 'yes'
+				");
+				$primary->protected_tools = $protected_tools;			
+			}
+			
+
 			$primary->tools_list = $tools;
+			
 			$primary->page_id = $page_id;
-			echo $primary; 
-			die();
+			die($primary);
 		}		
 	}
 	
@@ -145,11 +187,17 @@ class Tool_Controller extends Controller {
 		valid::id_key($tool_guid);		
 		$db = new Database;	
 	
-		$tool_object = $db->query("SELECT * FROM pages_tools
+		$tool_object = $db->query("
+			SELECT pages_tools.*, tools_list.name, tools_list.protected, pages.page_name
+			FROM pages_tools
 			JOIN tools_list ON pages_tools.tool = tools_list.id
-			WHERE guid = '$tool_guid' AND fk_site='$this->site_id' ")->current();	
+			JOIN pages ON pages_tools.page_id = pages.id
+			WHERE guid = '$tool_guid' 
+			AND pages_tools.fk_site = '$this->site_id'
+		")->current();	
 		
-		if(! is_object($tool_object) ) die();
+		if(! is_object($tool_object) )
+			die('Tool does not exist');
 		
 		$table_parent	= strtolower($tool_object->name).'s';
 		$table_child	= strtolower($tool_object->name).'_items';
@@ -162,11 +210,14 @@ class Tool_Controller extends Controller {
 		$db->delete($table_parent, array('id' => $parent_id, 'fk_site' => $this->site_id) );	
 		
 		# DELETE all tool child items
-		if($tool_object->name != 'Text')
+		if('Text' != $tool_object->name)
 			$db->delete($table_child, array('parent_id' => $parent_id, 'fk_site' => $this->site_id) );	
+
+		# is tool protected?
+		if('yes' == $tool_object->protected)
+			yaml::delete_value($this->site_name, 'pages_config', $tool_object->page_name);
 		
-		echo 'Tool Deleted!<br>Updating...';
-		die();
+		die('Tool Deleted!<br>Updating...');
 	}
 }
 

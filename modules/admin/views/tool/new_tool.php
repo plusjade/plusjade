@@ -23,7 +23,6 @@
 	.tool_box_wrapper div{
 		padding:10px;
 		line-height:1.5em;
-		margin-top:15px;
 	}
 	#jade_tool_box label:hover,
 	#jade_tool_box label.selected
@@ -33,39 +32,76 @@
 </style>
 
 <?php echo form::open("tool/add/$page_id", array('class' => 'custom_ajaxForm') )?>
-
+		
 	<div id="common_tool_header" class="buttons">
 		<div id="common_title">Add New Tool to Page</div>
 	</div>
+		
+	<div id="tab_container">		
+		
+		<ul class="ui-tabs-nav generic_tabs">
+			<li><a href="#fragment-1">Content Tools</a><li>
+			<li><a href="#fragment-2">Page Builders</a><li>
+		</ul>
+		
+		<div id="fragment-1">
 	
-	<div id="common_tool_info">
-		The complete Tool guide, usage instructions, and examples 
-		<br>can be found on our <a href="http://localhost.com/tools" target="_blank">Tools Page</a> <small>(new window)</small>.
-	</div>
-	
-	<div id="jade_tool_box">
-		<?php	
-		foreach($tools_list as $key => $tool)
-		{
-			$checked ='';
-			if('0' == $key ) $checked = 'CHECKED';
+			<div id="jade_tool_box">
+				<?php	
+				foreach($tools_list as $key => $tool)
+				{
+					?>
+					<div class="tool_box_wrapper">
+						<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
+							<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
+						</button>
+						<div><?php echo $tool->desc?></div>
+					</div>
+					<?php
+				}
+				?>
+			</div>
 			
-			echo '<div class="tool_box_wrapper">';
-			echo '
-				<button type="submit" name="tool" value="' . $tool->id .' " class="jade_positive">
-					<img src="/assets/images/admin/add.png" alt="Add"/> '.$tool->name.'
-				</button>
-			';
-			echo '<div>'. $tool->desc .'</div>';
-			echo '</div>';
+		</div>
+
+		<div id="fragment-2" class="ui-tabs-hide">
+			<div id="jade_tool_box">
+				<?php
+				if( empty($protected_tools) )
+				{
+					echo 'Either this is a sub-page or a Page Builder is already installed on this page.';
+				}
+				else
+				{
+					foreach($protected_tools as $key => $tool)
+					{
+						?>
+						<div class="tool_box_wrapper">
+							<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
+								<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
+							</button>
+							<div><?php echo $tool->desc?></div>
+						</div>
+						<?php
+					}
+				}
+				?>
+			</div>
 			
-			unset($checked);
-		}
-		?>
+		</div>
+		
+
+		
 	</div>
+
+
 	
 </form>
 <script type="text/javascript">
+
+	$("#tab_container").tabs();
+	
+	
 	// ADD tool label stuff...
 	$('#jade_tool_box label').click(function(){
 		$('#jade_tool_box label').removeClass('selected');
@@ -74,6 +110,7 @@
 		
 	// ACTIVATE custom ajax form
 	// data = post output from this method (above)
+	// receives the custom url of where the next 'add' page is for the particular tool
 	var options = {
 		success: function(data) {
 			$.get('/get/edit_'+data, function(data) { 

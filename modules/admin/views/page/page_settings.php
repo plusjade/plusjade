@@ -8,20 +8,17 @@ if($page->enable == 'no')
 if($page->menu == 'no')
 	$menu_enable['no'] = 'SELECTED';
 
-	
-
 echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') );
 ?>
-
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="update_page" class="jade_positive">
 			<img src="<?php echo url::image_path("check.png")?>" alt=""/> Save Settings
 		</button>
 		<div id="common_title">Page Settings - <?php echo $page->label?></div>
 	</div>	
-	
-<?php
-	if($page->page_name != 'home')
+	<input type="hidden" name="old_page_name" value="<?php echo $page_name?>">
+	<?php
+	if($page_name != 'home')
 	{		
 		?>
 
@@ -29,9 +26,13 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			<b>Label Name</b><br>
 			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
 			<br><br>
-			<b>Page Link</b><br>
-			<?php echo url::site()?><input type="text" name="page_name" value="<?php echo $page->page_name?>" size="30" maxlength="50">		
+			<b>Page Link</b>
+			 <?php if($is_protected) echo '<span style="color:red">(protected)</span>'?>
+			<br><input type="text" name="page_name" value="<?php echo $page_name?>" size="30" maxlength="50">		
+			<br><?php echo url::site(),$sub_page?>
+			
 			<div id="page_exists" class="aligncenter error_msg"></div>
+		
 		</div>
 		
 		<div class="fieldsets" style="float:right;width:30%;">
@@ -63,7 +64,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
 			<br>
 			<br>
-			<b>Link</b> <?php echo url::site()?><strong><?php echo $page->page_name?></strong>
+			<b>Link</b> <?php echo url::site()?><strong><?php echo $page_name?></strong>
 		</div>
 		
 		<div class="fieldsets" style="float:right;width:30%">
@@ -115,7 +116,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		},
 		success: function(data) {
 			$.facebox(data, "status_reload", "facebox_2");
-			window.location = '<?php url::site()?>' + sent_page;							
+			window.location = '<?php echo url::site()?>' + sent_page;							
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);

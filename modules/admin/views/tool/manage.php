@@ -49,7 +49,7 @@
 				<td class="row_page">Page <b><?php echo $page_name?></b></td>
 				<td class="row_change"><a href="/get/tool/move/<?php echo $tool->guid?>" rel="facebox" id="blah">move</a></td>
 				</td>
-				<td class="row_delete"><a href="/get/tool/delete/<?php echo $tool->guid?>" class="jade_delete_tool">delete!</a></td>
+				<td class="row_delete"><a href="/get/tool/delete/<?php echo $tool->guid?>" rel="facebox" id="2" class="jade_delete_tool">delete!</a></td>
 			</tr>
 		
 		<?php		
