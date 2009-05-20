@@ -52,7 +52,7 @@ abstract class Template_Controller extends Controller {
 				'facebox/public_multi.js',
 				'ui/ui_latest_lite.js',
 				'ajax_form/ajax_form.js',
-				'fckeditor/fckeditor.js',
+				'jw/jwysiwyg.js',		#'fckeditor/fckeditor.js',
 				'swfupload/swfupload.js',
 				'admin/init.js'	
 			);

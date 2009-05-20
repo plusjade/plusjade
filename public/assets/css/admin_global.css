@@ -1,32 +1,18 @@
 /*
- * All administrative views load except inline page toolbars 
- * IN THE FACEBOX, so limit to facebox
- *
- *
- *
+ * all admin views loading inside The facebox
+ * plus admin controllers views.
  */
-	/* ------------ reset base styles  ------------*/
+
+/* ------------ Facebox Reset base styles  ------------*/
 .facebox {
 	font-size: 12px !important;
 	font-family:verdana, arial, "sans serif" !important;
 	color:#333 !important;
 }	
-/*
-.facebox a {border:0 !important; color:blue !important; background:transparent !important;}
-.facebox a:hover {color:orange !important;}
-*/
-.facebox img {border:0;}
-.facebox h1,
-.facebox h2, 
-.facebox h3,
-.facebox h4,
-.facebox h5,
-.facebox h6{
-	font-size:1em !important; 
-	padding:0 !important; 
-	margin:0 !important; 
-	margin-bottom:10px !important;
-	}
+.facebox img {border:0}
+.facebox h1,.facebox h2, .facebox h3,.facebox h4,.facebox h5,.facebox h6{
+	font-size:1em !important; padding:0 !important; margin:0 !important; margin-bottom:10px !important;
+}
 .facebox h1{font-size:1.6em !important; color:#0c7ced !important;}
 .facebox h2{font-size:1.4em !important; color:#7c78d3 !important;}
 .facebox h3{font-size:1.2em !important;}
@@ -34,528 +20,9 @@
 .facebox h5{font-size:1em !important;}
 .facebox dt{font-weight:bold !important;}
 
-
-/* textarea defaults */
-textarea.render_html div.wysiwyg iframe{
-	height:370px !important;
-}
-textarea.render_html div.wysiwyg{
-	height:420px !important;
-	width:97% !important;
-}
-
-textarea.render_html{
-	width:99% !important;
-	height:300px !important;
-}
-
-/* --- Top Admin Panel --- */
-#admin_bar_wrapper a{
-	background:transparent;
-}
-#admin_bar_wrapper a:hover{
-}
-#admin_bar_wrapper{
-	position:fixed;
-	margin:0;		 
-	top:0;
-	left:0;
-	font-size:12px !important;
-	font-family: verdana !important;
-	text-align:center;
-	min-width:800px;
-	width:100%;
-	z-index:99;
-}
-
-/* admin toolbar */
-ul#admin_bar{
-	margin:0 auto;
-	padding:0;
-	min-width:800px;
-	width:80%;
-	height:30px;
-	text-align:left;
-	background: #fff url(/assets/images/admin/orange_bg.png) repeat-x top left;
-	color:#fff;
-	border:2px solid green;
-	border-top:0;
-	list-style:none;
-}
-
-
-#admin_bar li.root_list{
-	display:block;
-	float:left;
-	background: #fff url(/assets/images/admin/orange_bg.png) repeat-x top left;
-	height:30px;
-	width:100px;
-	padding:0;
-	margin:0;
-}
-#admin_bar li.root_list div{
-	width:100px;
-	padding:8px;
-}
-#admin_bar li.dropdown div{
-	font-weight:bold;
-	cursor:pointer;
-	cursor:hand;
-}
-#admin_bar li.dropdown div:hover{
-	color:black;
-	text-decoration:underline;
-}
-#admin_bar li.root_list div a{
-	color:#fff;
-}
-#admin_bar li.root_list div a:hover{
-	color:#000;
-}
-#admin_bar li.root_list ul{	
-	display:none;
-	position:absolute;
-	clear:both;
-	width:102px;
-	list-style:none;
-	margin:0;
-	padding:3px;
-	line-height:2em;
-	background:#fff;
-	border:1px solid #777;
-}
-
-
-#admin_bar div.title_tag{
-	color:#fff;
-	font-weight:bold;
-	background: #7ebd40 url(/assets/images/admin/green_bg.png) repeat-x top left !important;
-}
-
-
-
-#tool_bar_wrapper{
-
-}
-
-/* "on this page" toolbar wrapper */
-#tool_bar_wrapper table td {
-	padding:8px 0;
-	text-align:center;
-	background: #fff url(/assets/images/admin/sky_bg.png) repeat-x bottom left;
-}
-#tool_bar_wrapper table td.title {
-	background: #7ebd40 url(/assets/images/admin/green_bg.png) repeat-x bottom left;
-	color:#fff;
-}
-#tool_bar_wrapper table{
-	clear:both;
-	border-collapse:collapse;
-	width:100%;
-	padding:10px;
-	margin: 0 auto;
-	min-width:500px;
-	width:60%;
-	background:#fff;
-	color:#333;
-	border:2px solid green;
-	border-top:0;
-}
-
-#tool_bar_wrapper a{
-	color:red;
-	font-weight:bold;
-}
-#tool_bar_wrapper a:hover{
-	background:#7ebd40;
-	color:#333;	
-}
-
-
-/* toggle show/hide tool_panel */
-#hide_link {
-	display:none;
-	position:fixed; 
-	top:0;
-	left:80%;
-	width:100px;
-	text-align:center;
-}
-#hide_link a {
-	background:orange;
-	color:#fff;
-	display:block;
-	width:70px;
-	padding:7px 0;
-	text-decoration:none;
-	border:1px solid green;
-	border-top:0;
-}
-#hide_link a:hover {
-	background:#fff;
-	color:red;
-}
-
-/* CONTAINER_WRAPPER on sort start */
-.highlight_containers{
-	padding:10px !important;
-	border:1px solid #ccc !important;
-	background:#eee !important;
-	min-height:300px !important;
-}
-.CONTAINER_placeholder{
-	background:#ffffcc;
-	display:block;
-	height:50px;
-	border:1px solid orange;
-}
-.sort_active{
-	width:200px !important;
-	overflow:hidden !important;
-}
-.sort_active ul{
-	display:none !important;
-}
-/* Admin Javascript Prepended Tool Toolbar */
-.jade_toolbar_wrapper{
-	clear:both;
-	font-size:12px !important;
-	font-family: verdana !important;	
-	margin-bottom:7px;
-	z-index:200 !important;
-}
-.jade_toolbar_wrapper table{
-	background: #d52020 url(/assets/images/admin/red_bg.png) repeat-x bottom left;
-	border-collapse:collapse;
-	width:100%;
-	height:30px;
-	border:1px solid #777;
-	
-}
-.jade_toolbar_wrapper td{
-	padding:0 10px;
-}
-.jade_toolbar_wrapper td.actions_wrapper{
-	width:100px;
-}
-
-.jade_toolbar_wrapper a.actions_link{
-	display:block;
-	color:white;
-	text-align:right;
-	text-decoration:none;
-}
-
-.jade_toolbar_wrapper ul.toolkit_dropdown{
-	display:none;
-	clear:both;
-	position:absolute;
-	width:100px;
-	border:1px solid #333;
-	list-style:none;
-	margin:0;
-	padding:5px;
-	background:#fff;
-	line-height:2em;
-	z-index:200;
-}
-.jade_toolbar_wrapper ul.toolkit_dropdown li{
-	display:block;	
-}
-
-.jade_toolbar_wrapper ul.toolkit_dropdown:hover{
-	display:block;
-}
-
-
-.jade_toolbar_wrapper span.name{
-	float:left;
-	color:white;
-	font-weight:bold;
-	cursor:move;
-
-}
-
-.jade_toolbar_wrapper ul a{
-	color:#333 !important;
-	text-decoration:none;
-}
-.jade_toolbar_wrapper ul a:hover{
-	color:red !important;
-}
-.jade_toolbar_wrapper a span{
-	ext-decoration:underline;
-}
-
-
-.jade_delete_tool{
-
-}
-.jade_toolbar_wrapper a.toggle_scope{
-
-}
-.jade_toolbar_wrapper a.toggle_scope:hover{
-	olor:black;
-}
-
-	/* Tool Item toolbar */	
-	.jade_admin_item_edit{
-		text-align:right;
-		height:20px;
-		padding:3px;
-		background:lightblue url('/assets/images/admin/blue_bg.png') repeat-x bottom left;
-	}
-	.jade_admin_item_edit a{
-		color:#fff;
-	}
-	.jade_admin_item_edit a:hover{
-		color:#000;
-	}
-
-
-	
-/* --- generic tabs and lists --- */
-
-	/* --- ui tabs --- */	
-.ui-tabs-hide { 
-	display: none; 
-}
-.ui-tabs-nav{
-	list-style:none;
-	margin:0;
-	padding:0;	
-}
-
-	/* sortable link menu lists  */
-	
-.facebox #generic_sortable_list, .generic_sortable_list {
-	clear:both;
-	padding:10px;
-}
-.facebox #generic_sortable_list li, .generic_sortable_list li{
-	margin:0;
-	padding:0;
-	margin-bottom:5px;
-	clear:both;
-}
-.facebox #generic_sortable_list li table, .generic_sortable_list li table {
-	width:100%;
-	background:#e3eff3;
-	margin:0;
-	padding:0;
-	border:1px solid lightblue;		
-}
-.facebox #generic_sortable_list .not_enabled table{
-	background:#eee;
-	border:1px solid #ccc;	
-}
-.facebox #generic_sortable_list .no_menu table{
-	background:#eee;
-}
-.facebox #generic_sortable_list .no_access table{
-	background:#ffcccc;
-}
-.facebox #generic_sortable_list li table td.right{
-	text-align:right;
-}
-.facebox #generic_sortable_list li table img.handle {
-	cursor: move;
-}
-.facebox #generic_sortable_list li a, .generic_sortable_list li a{
-	display:block;
-	color:#333;
-	padding:5px;
-	text-decoration:none;
-}
-.facebox #generic_sortable_list li a:hover,
-.facebox #generic_sortable_list li a.selected,
-.facebox #generic_sortable_list li.ui-tabs-selected a{
-	background:#ffffcc;
-}
-.facebox #generic_sortable_list li a small{
-	color:#999
-}
-.facebox #generic_sortable_list .drag_box{
-	background:lightblue;
-}
-.facebox #generic_sortable_list .drag_box:hover{
-	background:#66cc66;
-}
-
-/* --- input fields --- */
-/* these are used in root auth page as well */
-
-.fieldsets{
-	padding-bottom:10px;
-	margin-bottom:10px;
-	overflow:hidden;
-}
-.fieldsets b{
-	font-size:1.2em;
-	color:blue;
-	font-family: 'Lucida Console', Monaco, monospace;
-}
-.fieldsets input, .fieldsets select{
-	padding:5px;
-	font-weight:normal;
-}
-.big{
-	font-size:1.3em;
-}
-.full_width{
-	width:98%;
-}
-
-.huge input, .huge b{
-	font-size:2em;
-	padding:10px;
-}
-
-.full_width{
-	width:98%;
-}
-
-
-.input_error{
-	background:pink !important;
-	border:1px solid red !important;
-}
-span.msg{
-	color:red;
-}
-.error_msg{
-	color:red;
-}
-
-/* --- common tool elements --- */
-
-/* this sets the width for most facebox containers using this header */
-.facebox #common_tool_header{
-	width:700px;
-	overflow:auto;
-	background: #fff url(/assets/images/admin/sky_bg.png) repeat-x bottom left;
-	margin-bottom:10px;
-	padding:6px;
-	
-}
-.facebox #common_title{
-	font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-	padding-top:9px;
-	font-weight:bold;
-	line-height:130%;
-	font-size:1.6em;
-	color:green;
-}
-
-.facebox #common_tool_info{
-	margin-bottom:10px;
-	text-align:center;
-}
-.facebox .common_sub_header{
-	font-size:1.2em;
-	padding:5px;
-	background:#555;
-	color:#fff;
-	margin-bottom:15px;
-}
-.facebox #common_module_menu_bar{
-	padding:5px;
-	background:#ccc;
-	margin-bottom:10px;
-}
-.facebox #home_require_message{
-	text-align:center;
-	font-weight:bold;
-	color:red;
-	font-size:1.2em;
-}
-
-
-/* --- jwysiwg_texteditor  --- */
-	
-div.wysiwyg { border: 1px solid #cccccc; padding: 5px; background-color: #ffffff; }
-div.wysiwyg * { margin: 0; padding: 0; }
-
-div.wysiwyg ul.panel { border-bottom: 1px solid #cccccc; float: left; width: 100%; padding: 0 0 4px 0; }
-div.wysiwyg ul.panel li { list-style-type: none; float: left; margin: 0 2px;  background: #ffffff;}
-div.wysiwyg ul.panel li.separator { height: 16px; margin: 0 4px; border-left: 1px solid #cccccc; }
-div.wysiwyg ul.panel li a { opacity: 0.6; display: block; width: 16px; height: 16px; background: url('/assets/images/jquery.wysiwyg.gif') no-repeat -64px -80px; border: 0; cursor: pointer; padding: 1px; }
-div.wysiwyg ul.panel li a:hover, div.wysiwyg ul.panel li a.active { opacity: 0.99; }
-div.wysiwyg ul.panel li a.active { background-color: #f9f9f9; border: 1px solid #cccccc; border-left-color: #aaaaaa; border-top-color: #aaaaaa; padding: 0; }
-
-div.wysiwyg ul.panel li a.bold { background-position: 0 -16px; }
-div.wysiwyg ul.panel li a.italic { background-position: -16px -16px; }
-div.wysiwyg ul.panel li a.strikeThrough { background-position: -32px -16px; }
-div.wysiwyg ul.panel li a.underline { background-position: -48px -16px; }
-
-div.wysiwyg ul.panel li a.justifyLeft { background-position: 0 0; }
-div.wysiwyg ul.panel li a.justifyCenter { background-position: -16px 0; }
-div.wysiwyg ul.panel li a.justifyRight { background-position: -32px 0; }
-div.wysiwyg ul.panel li a.justifyFull { background-position: -48px 0; }
-
-div.wysiwyg ul.panel li a.indent { background-position: -64px 0; }
-div.wysiwyg ul.panel li a.outdent { background-position: -80px 0; }
-
-div.wysiwyg ul.panel li a.subscript { background-position: -64px -16px; }
-div.wysiwyg ul.panel li a.superscript { background-position: -80px -16px; }
-
-div.wysiwyg ul.panel li a.undo { background-position: 0 -64px; }
-div.wysiwyg ul.panel li a.redo { background-position: -16px -64px; }
-
-div.wysiwyg ul.panel li a.insertOrderedList { background-position: -32px -48px; }
-div.wysiwyg ul.panel li a.insertUnorderedList { background-position: -16px -48px; }
-div.wysiwyg ul.panel li a.insertHorizontalRule { background-position: 0 -48px; }
-
-div.wysiwyg ul.panel li a.h1 { background-position: 0 -32px; }
-div.wysiwyg ul.panel li a.h2 { background-position: -16px -32px; }
-div.wysiwyg ul.panel li a.h3 { background-position: -32px -32px; }
-div.wysiwyg ul.panel li a.h4 { background-position: -48px -32px; }
-div.wysiwyg ul.panel li a.h5 { background-position: -64px -32px; }
-div.wysiwyg ul.panel li a.h6 { background-position: -80px -32px; }
-
-div.wysiwyg ul.panel li a.cut { background-position: -32px -64px; }
-div.wysiwyg ul.panel li a.copy { background-position: -48px -64px; }
-div.wysiwyg ul.panel li a.paste { background-position: -64px -64px; }
-
-div.wysiwyg ul.panel li a.increaseFontSize { background-position: -16px -80px; }
-div.wysiwyg ul.panel li a.decreaseFontSize { background-position: -32px -80px; }
-
-div.wysiwyg ul.panel li a.createLink { background-position: -80px -48px; }
-div.wysiwyg ul.panel li a.insertImage { background-position: -80px -80px; }
-
-div.wysiwyg ul.panel li a.html { background-position: -48px -48px; }
-div.wysiwyg ul.panel li a.removeFormat { background-position: -80px -64px; }
-
-div.wysiwyg ul.panel li a.empty { background-position: -64px -80px; }
-
-div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
-
-
-
-
-/*	---------------
-	Stuff likely also available for public use
-	---------------
- */
- 
- 
- 
-/*
- * facebox css needed to properly display facebox
- *
- */
-/* --- facebox --- */
-.facebox form{
-	min-height:375px;
-	min-width:700px;
-}
-#facebox_base{
-	z-index: 99;
-}
-#facebox_2{
-	z-index: 200;
-}
-
+/* --------------- facebox ---------------*/
+#facebox_base{z-index: 99}
+#facebox_2{z-index: 200}
 .facebox .b {background:url(/assets/images/facebox/b.png)}
 .facebox .tl {background:url(/assets/images/facebox/tl.png)}
 .facebox .tr {background:url(/assets/images/facebox/tr.png)}
@@ -568,15 +35,9 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
   z-index: 99;
   text-align: left; 
 }
-.facebox .popup {
-  position: relative;
-}
-.facebox table {
-  border-collapse: collapse;
-}
-.facebox table div.content{
-	overflow:hidden;
-}
+.facebox .popup {position: relative;}
+.facebox table {border-collapse: collapse;}
+.facebox table div.content{overflow:hidden;}
 .facebox table div.status_reload,
 .facebox table div.status_close
 {
@@ -631,13 +92,8 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
   height:100%;
   width:100%;
 }
-.facebox_hide {
-  z-index:-100;
-}
-.facebox_overlayBG {
-  background-color: #000;
-  z-index: 999;
-}
+.facebox_hide {z-index:-100}
+.facebox_overlayBG {background-color: #000;z-index: 999;}
 * html .facebox_overlay { /* ie6 hack */
   position: absolute;
   height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
@@ -650,6 +106,8 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 		height:200px;
 		font-weight:bold;
 		line-height:2em;
+		padding:5px;
+		overflow:hidden;
 	}
 	.facebox #ajax_primary{
 		padding-right:10px;
@@ -658,6 +116,320 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 		overflow:auto;
 	} 
 	
+
+/* --------------- Top Admin Panel --------------- */
+
+#admin_bar_wrapper a{
+	background:transparent;
+}
+#admin_bar_wrapper a:hover{
+}
+#admin_bar_wrapper{
+	position:fixed;
+	margin:0;		 
+	top:0;
+	left:0;
+	min-width:800px;
+	width:100%;
+	font-size:12px !important;
+	font-family: verdana !important;
+	text-align:center;
+	z-index:99;
+}
+
+/* admin toolbar */
+ul#admin_bar{
+	margin:0 auto;
+	padding:0;
+	min-width:800px;
+	width:80%;
+	height:30px;
+	text-align:left;
+	background: #fff url(/assets/images/admin/orange_bg.png) repeat-x top left;
+	color:#fff;
+	border:2px solid green;
+	border-top:0;
+	list-style:none;
+}
+#admin_bar li.root_list{
+	display:block;
+	float:left;
+	background: #fff url(/assets/images/admin/orange_bg.png) repeat-x top left;
+	height:30px;
+	width:100px;
+	padding:0;
+	margin:0;
+}
+#admin_bar li.root_list div{
+	width:100px;
+	padding:8px;
+}
+#admin_bar li.dropdown div{
+	font-weight:bold;
+	cursor:pointer;
+	cursor:hand;
+}
+#admin_bar li.dropdown div:hover{
+	color:black;
+	text-decoration:underline;
+}
+#admin_bar li.root_list div a{
+	color:#fff;
+}
+#admin_bar li.root_list div a:hover{
+	color:#000;
+}
+#admin_bar li.root_list ul{	
+	display:none;
+	position:absolute;
+	clear:both;
+	width:102px;
+	list-style:none;
+	margin:0;
+	padding:3px;
+	line-height:2em;
+	background:#fff;
+	border:1px solid #777;
+}
+#admin_bar div.title_tag{
+	color:#fff;
+	font-weight:bold;
+	background: #7ebd40 url(/assets/images/admin/green_bg.png) repeat-x top left !important;
+}
+#tool_bar_wrapper{
+
+}
+
+/* --- second admin bar: "on this page" toolbar wrapper --- */
+#tool_bar_wrapper table td {
+	padding:8px 0;
+	text-align:center;
+	background: #fff url(/assets/images/admin/sky_bg.png) repeat-x bottom left;
+}
+#tool_bar_wrapper table td.title {
+	background: #7ebd40 url(/assets/images/admin/green_bg.png) repeat-x bottom left;
+	color:#fff;
+}
+#tool_bar_wrapper table{
+	clear:both;
+	border-collapse:collapse;
+	width:100%;
+	padding:10px;
+	margin: 0 auto;
+	min-width:500px;
+	width:60%;
+	background:#fff;
+	color:#333;
+	border:2px solid green;
+	border-top:0;
+}
+#tool_bar_wrapper a{
+	color:red;
+	font-weight:bold;
+}
+#tool_bar_wrapper a:hover{
+	background:#7ebd40;
+	color:#333;	
+}
+
+
+/* --- toggle show/hide tool_panel --- */
+#hide_link {
+	display:none;
+	position:fixed; 
+	top:0;
+	left:80%;
+	width:100px;
+	text-align:center;
+}
+#hide_link a {
+	background:orange;
+	color:#fff;
+	display:block;
+	width:70px;
+	padding:7px 0;
+	text-decoration:none;
+	border:1px solid green;
+	border-top:0;
+}
+#hide_link a:hover {
+	background:#fff;
+	color:red;
+}
+
+/* --- Javascript Prepended edit Tool Toolbar --- */
+.jade_toolbar_wrapper{
+	clear:both;
+	font-size:12px !important;
+	font-family: verdana !important;	
+	margin-bottom:7px;
+	z-index:200 !important;
+}
+.jade_toolbar_wrapper table{
+	background: #d52020 url(/assets/images/admin/red_bg.png) repeat-x bottom left;
+	border-collapse:collapse;
+	width:100%;
+	height:30px;
+	border:1px solid #777;	
+}
+.jade_toolbar_wrapper td{
+	padding:0 10px;
+}
+.jade_toolbar_wrapper td.actions_wrapper{
+	width:100px;
+}
+.jade_toolbar_wrapper a.actions_link{
+	display:block;
+	color:white;
+	text-align:right;
+	text-decoration:none;
+}
+.jade_toolbar_wrapper ul.toolkit_dropdown{
+	display:none;
+	clear:both;
+	position:absolute;
+	width:100px;
+	border:1px solid #333;
+	list-style:none;
+	margin:0;
+	padding:5px;
+	background:#fff;
+	line-height:2em;
+	z-index:200;
+}
+.jade_toolbar_wrapper ul.toolkit_dropdown li{
+	display:block;	
+}
+.jade_toolbar_wrapper ul.toolkit_dropdown:hover{
+	display:block;
+}
+.jade_toolbar_wrapper span.name{
+	float:left;
+	color:white;
+	font-weight:bold;
+	cursor:move;
+}
+.jade_toolbar_wrapper ul a{
+	color:#333 !important;
+	text-decoration:none;
+}
+.jade_toolbar_wrapper ul a:hover{
+	color:red !important;
+}
+.jade_toolbar_wrapper a span{
+	ext-decoration:underline;
+}
+.jade_delete_tool{
+
+}
+.jade_toolbar_wrapper a.toggle_scope{
+
+}
+.jade_toolbar_wrapper a.toggle_scope:hover{
+	olor:black;
+}
+
+/* --- Tool Item toolbar --- */	
+.jade_admin_item_edit{
+	text-align:right;
+	height:20px;
+	padding:3px;
+	background:lightblue url('/assets/images/admin/blue_bg.png') repeat-x bottom left;
+}
+.jade_admin_item_edit span{
+	color:#fff;
+	float:left;
+}
+.jade_admin_item_edit a{
+	color:#fff;
+}
+.jade_admin_item_edit a:hover{
+	color:#000;
+}
+
+/* --------------- CONTAINER_WRAPPER on sort start --------------- */
+.highlight_containers{
+	padding:10px !important;
+	border:1px solid #ccc !important;
+	background:#eee !important;
+	min-height:300px !important;
+}
+.CONTAINER_placeholder{
+	background:#ffffcc;
+	display:block;
+	height:50px;
+	border:1px solid orange;
+}
+.sort_active{
+	width:200px !important;
+	overflow:hidden !important;
+}
+.sort_active ul{
+	display:none !important;
+}
+
+/* --------------- FORMS AND INPUT FIELDS --------------- */
+.fieldsets{
+	padding-bottom:10px;
+	margin-bottom:10px;
+	overflow:hidden;
+}
+.fieldsets b{
+	font-size:1.2em;
+	color:blue;
+	font-family: 'Lucida Console', Monaco, monospace;
+}
+.fieldsets input, .fieldsets select{
+	padding:5px;
+	font-weight:normal;
+}
+.full_width{
+	width:98%;
+}
+
+.big input{
+	font-size:1.4em;
+	padding:10px;
+}
+.big b{
+	font-size:1.4em;
+}
+
+.huge input, .huge b{
+	font-size:2em;
+	padding:10px;
+}
+
+.full_width{
+	width:98%;
+}
+
+/* --- textarea defaults --- */
+textarea.render_html div.wysiwyg iframe{
+	height:370px !important;
+}
+textarea.render_html div.wysiwyg{
+	height:420px !important;
+	width:97% !important;
+}
+
+textarea.render_html{
+	width:99% !important;
+	height:300px !important;
+}
+
+/* form validation messages */
+.input_error{
+	background:pink !important;
+	border:1px solid red !important;
+}
+span.msg{
+	color:red;
+}
+.error_msg{
+	color:red;
+}
+
 /* --- FORM BUTTONS --- */
 
 .buttons{
@@ -666,7 +438,6 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 .buttons a, .buttons button{
     display:block;
-	float:right;
     background: blue url(/assets/images/admin/blue_bg.png) repeat-x bottom left;
 	border:1px solid #336699;
     color:#fff;	
@@ -742,34 +513,203 @@ button.jade_positive, .buttons a.jade_positive{
 
 
 
+/* --- jwysiwg_texteditor  --- */
+	
+div.wysiwyg { border: 1px solid #cccccc; padding: 5px; background-color: #ffffff; }
+div.wysiwyg * { margin: 0; padding: 0; }
+
+div.wysiwyg ul.panel { border-bottom: 1px solid #cccccc; float: left; width: 100%; padding: 0 0 4px 0; }
+div.wysiwyg ul.panel li { list-style-type: none; float: left; margin: 0 2px;  background: #ffffff;}
+div.wysiwyg ul.panel li.separator { height: 16px; margin: 0 4px; border-left: 1px solid #cccccc; }
+div.wysiwyg ul.panel li a { opacity: 0.6; display: block; width: 16px; height: 16px; background: url('/assets/images/jquery.wysiwyg.gif') no-repeat -64px -80px; border: 0; cursor: pointer; padding: 1px; }
+div.wysiwyg ul.panel li a:hover, div.wysiwyg ul.panel li a.active { opacity: 0.99; }
+div.wysiwyg ul.panel li a.active { background-color: #f9f9f9; border: 1px solid #cccccc; border-left-color: #aaaaaa; border-top-color: #aaaaaa; padding: 0; }
+
+div.wysiwyg ul.panel li a.bold { background-position: 0 -16px; }
+div.wysiwyg ul.panel li a.italic { background-position: -16px -16px; }
+div.wysiwyg ul.panel li a.strikeThrough { background-position: -32px -16px; }
+div.wysiwyg ul.panel li a.underline { background-position: -48px -16px; }
+
+div.wysiwyg ul.panel li a.justifyLeft { background-position: 0 0; }
+div.wysiwyg ul.panel li a.justifyCenter { background-position: -16px 0; }
+div.wysiwyg ul.panel li a.justifyRight { background-position: -32px 0; }
+div.wysiwyg ul.panel li a.justifyFull { background-position: -48px 0; }
+
+div.wysiwyg ul.panel li a.indent { background-position: -64px 0; }
+div.wysiwyg ul.panel li a.outdent { background-position: -80px 0; }
+
+div.wysiwyg ul.panel li a.subscript { background-position: -64px -16px; }
+div.wysiwyg ul.panel li a.superscript { background-position: -80px -16px; }
+
+div.wysiwyg ul.panel li a.undo { background-position: 0 -64px; }
+div.wysiwyg ul.panel li a.redo { background-position: -16px -64px; }
+
+div.wysiwyg ul.panel li a.insertOrderedList { background-position: -32px -48px; }
+div.wysiwyg ul.panel li a.insertUnorderedList { background-position: -16px -48px; }
+div.wysiwyg ul.panel li a.insertHorizontalRule { background-position: 0 -48px; }
+
+div.wysiwyg ul.panel li a.h1 { background-position: 0 -32px; }
+div.wysiwyg ul.panel li a.h2 { background-position: -16px -32px; }
+div.wysiwyg ul.panel li a.h3 { background-position: -32px -32px; }
+div.wysiwyg ul.panel li a.h4 { background-position: -48px -32px; }
+div.wysiwyg ul.panel li a.h5 { background-position: -64px -32px; }
+div.wysiwyg ul.panel li a.h6 { background-position: -80px -32px; }
+
+div.wysiwyg ul.panel li a.cut { background-position: -32px -64px; }
+div.wysiwyg ul.panel li a.copy { background-position: -48px -64px; }
+div.wysiwyg ul.panel li a.paste { background-position: -64px -64px; }
+
+div.wysiwyg ul.panel li a.increaseFontSize { background-position: -16px -80px; }
+div.wysiwyg ul.panel li a.decreaseFontSize { background-position: -32px -80px; }
+
+div.wysiwyg ul.panel li a.createLink { background-position: -80px -48px; }
+div.wysiwyg ul.panel li a.insertImage { background-position: -80px -80px; }
+
+div.wysiwyg ul.panel li a.html { background-position: -48px -48px; }
+div.wysiwyg ul.panel li a.removeFormat { background-position: -80px -64px; }
+
+div.wysiwyg ul.panel li a.empty { background-position: -64px -80px; }
+
+div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 
 
 
+/* --------------- generic tabs and lists --------------- */
 
+	/* --- ui tabs --- */	
+.ui-tabs-hide { 
+	display: none; 
+}
+.ui-tabs-nav{
+	list-style:none;
+	margin:0;
+	padding:0;	
+}
 
+.generic_tabs{
+	padding:8px 0;
+}
 
+.generic_tabs li{
+	display:inline;
+	margin-right:2px;
+}
+.generic_tabs li a{
+	text-decoration:none;
+	padding:7px 15px;
+	background:#ffffcc;
+	border:1px solid orange;
+	border-bottom:0;
+}
+.generic_tabs li a:hover,
+.generic_tabs li.ui-tabs-selected a{
+	color:#fff;
+	background:orange;
+}
+	
+	/* sortable link menu lists  */
+	
+.facebox #generic_sortable_list, .generic_sortable_list {
+	clear:both;
+	padding:10px;
+}
+.facebox #generic_sortable_list li, .generic_sortable_list li{
+	margin:0;
+	padding:0;
+	margin-bottom:5px;
+	clear:both;
+}
+.facebox #generic_sortable_list li table, .generic_sortable_list li table {
+	width:100%;
+	background:#e3eff3;
+	margin:0;
+	padding:0;
+	border:1px solid lightblue;		
+}
+.facebox #generic_sortable_list .not_enabled table{
+	background:#eee;
+	border:1px solid #ccc;	
+}
+.facebox #generic_sortable_list .no_menu table{
+	background:#eee;
+}
+.facebox #generic_sortable_list .no_access table{
+	background:#ffcccc;
+}
+.facebox #generic_sortable_list li table td.right{
+	text-align:right;
+}
+.facebox #generic_sortable_list li table img.handle {
+	cursor: move;
+}
+.facebox #generic_sortable_list li a, .generic_sortable_list li a{
+	display:block;
+	color:#333;
+	padding:5px;
+	text-decoration:none;
+}
+.facebox #generic_sortable_list li a:hover,
+.facebox #generic_sortable_list li a.selected,
+.facebox #generic_sortable_list li.ui-tabs-selected a{
+	background:#ffffcc;
+}
+.facebox #generic_sortable_list li a small{
+	color:#999
+}
+.facebox #generic_sortable_list .drag_box{
+	background:lightblue;
+}
+.facebox #generic_sortable_list .drag_box:hover{
+	background:#66cc66;
+}
 
+/* --------------- common tool elements --------------- */
 
+/* this sets the width for most facebox containers using this header */
+.facebox #common_tool_header{
+	width:700px;
+	overflow:auto;
+	background: #fff url('/assets/images/admin/sky_bg.png') repeat-x bottom left;
+	margin-bottom:10px;
+	padding:6px;
+	
+}
+.facebox #common_tool_header button{
+	float:right;
+}
+.facebox #common_title{
+	font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+	padding-top:9px;
+	font-weight:bold;
+	line-height:130%;
+	font-size:1.6em;
+	color:green;
+}
 
+.facebox #common_tool_info{
+	margin-bottom:10px;
+	text-align:center;
+}
+.facebox .common_sub_header{
+	font-size:1.2em;
+	padding:5px;
+	background:#555;
+	color:#fff;
+	margin-bottom:15px;
+}
+.facebox #common_module_menu_bar{
+	padding:5px;
+	background:#ccc;
+	margin-bottom:10px;
+}
+.facebox #home_require_message{
+	text-align:center;
+	font-weight:bold;
+	color:red;
+	font-size:1.2em;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* admin views */
-
+/* ----------------------- admin views ----------------------- */
 .enabled_yes{
 	border:2px solid green;
 	background:#d9f2d3;
@@ -817,132 +757,6 @@ button.jade_positive, .buttons a.jade_positive{
 	border:1px solid lightblue;
 }	
 
-	/*  --- theme_panel.php --- */ 
-#theme_global_wrapper{
-	width:40%;
-	float:left;
-	text-align:center;
-}
-#css_block, #master_block{
-	padding:10px;
-	margin-bottom:7px;
-}
-#theme_layout_wrapper{
-	float:right;
-	width:55%;
-	text-align:center;
-	background:#eee;
-}
-#theme_layout_wrapper div{
-	border:1px solid #7ebd40;
-	margin:5px auto;
-	width:90%;
-}
-#theme_layout_wrapper p{
-	display:block;
-	margin:0;
-	padding:5px;
-	color:#fff;
-	background:#777;
-}
-#theme_layout_wrapper div span{
-	display:block;
-	margin-bottom:3px;
-	text-align:left;
-	padding:3px 5px;
-	background:#7ebd40;
-	color:#fff;
-}
-#theme_layout_wrapper a,
-#theme_global_wrapper a{
-	display:block;
-	padding:5px;
-}
-#theme_layout_wrapper a:hover,
-#theme_global_wrapper a:hover{
-	color:green;
-}
-#header_block{
-	min-height:90px;
-}
-#menu_block{
-	min-height:70px;
-}
-#content_block{
-	min-height:130px;
-}
-#footer_block{
-	min-height:90px;
-}
-	
-#help_alert{
-	float:right;
-	width:200px;
-	background:#ffd1d1;
-	text-align:center;
-}
-#theme_tag{
-	display:block;
-	text-align:right;
-	padding:10px;
-	margin-bottom:10px;
-	background:#ffffcc;
-	font-size:1.4em;
-	color:#57a7e5;
-}
-#theme_tag span{
-	float:left;
-}
-.general_container{
-	padding:10px; 
-	margin:0 10px;
-	margin-bottom:10px;
-	border:1px dashed #ccc;
-	background:#fff;
-}
-
-.custom_file{
-	background:#e3eff3;
-	border-bottom:1px solid #99d35f;
-}
-.gray_module{
-	background:#eee;
-	border-bottom:1px solid #ccc;
-}
-.theme_file, .root_file{
-	background:#fff;
-	border-bottom:1px solid #ccc;
-}
-
-
-
-.file_stuff{
-	line-height:1.4em;
-	margin:5px 0;
-	_border:1px solid red;
-}
-
-.file_list{
-	margin-left:20px;
-}
-.left_pane{
-	float:left;
-	width:40%;
-	padding:10px 0;
-	padding-left:25px;
-}
-.folder_border{
-	border-right:1px dashed #ccc;
-}
-.code{
-	color:red;
-}
-.indent{
-	padding:10px 0;
-	padding-left:20px;
-}
-
-
 
 /* tool/manage view*/
 
@@ -973,7 +787,6 @@ th{
 .row_wrapper{
 	padding:10px 5px;
 	margin-bottom:5px;
-
 }
 .safe td{
 	background:#e3eff3;

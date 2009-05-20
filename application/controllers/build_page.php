@@ -13,42 +13,17 @@ class Build_Page_Controller extends Template_Controller {
 		parent::__construct();
 	}
   
-	function _index()
+	# $page = (object) pages table row
+	function _index($page)
 	{
-		$db	= new Database;
-
-		# get the page_name
-		$pieces = explode('/', $_SERVER['REQUEST_URI']);
-		$page_name = $main	= ( empty($pieces['1']) ) ? 'home' : $pieces['1'];
-		
-		/*
-		#PAGE NAME CHECKS (reserved names are "showroom" and "blog" )
-		if('showroom' != $page_name AND 'blog' != $page_name AND 'calendar' != $page_name )
-		{
-			$page_name = strstr($_SERVER['REQUEST_URI'], '/');
-			$page_name = ltrim($page_name, '/');
-		}
-		*/
-		
-		# Grant access to all pages if logged in.
-		$check_enabled = " AND enable = 'yes' ";
-		if( $this->client->logged_in() )
-			$check_enabled = '';
-			
-		# Grab the page row
-		$page = $db->query("SELECT * FROM pages 
-			WHERE fk_site = '$this->site_id' 
-			AND page_name = '$page_name'
-			$check_enabled
-		")->current();
-		
-		# if page doesnt exist
-		if (! is_object($page) )
+		# deny access to disabled pages if not logged in
+		if('no' == $page->enable AND !$this->client->logged_in() )
 		{
 			Event::run('system.404');
-			die('Page Not Found');
+			die('Page Not Found');		
 		}
-		
+	
+		$db	= new Database;
 		$containers_array		= array(' ',' ',' ',' ',' ');
 		$_SESSION['js_files']	= array();
 		$tools_array			= array();
@@ -66,7 +41,8 @@ class Build_Page_Controller extends Template_Controller {
 		 * Grab tools for this page in pages_tools table
 		 * 0-10 are reserved for global tools. we only use 1-5
 		 */		 
-		$tools = $db->query("SELECT * FROM pages_tools 
+		$tools = $db->query("
+			SELECT * FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
 			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page->id')
 			AND fk_site = '$this->site_id'
@@ -74,6 +50,7 @@ class Build_Page_Controller extends Template_Controller {
 		");
 
 		# Load Admin CSS and Javascript (if logged in)
+		# _load_admin() is in the template_controller
 		$admin_mode = $this->_load_admin();
 		
 		if( $tools->count() > 0 )
@@ -91,7 +68,7 @@ class Build_Page_Controller extends Template_Controller {
 					$append		= '</span>';
 				}
 				
-				# Create unique Tool array for CSS	
+				# Create unique Tool array so we can fetch the css for each tool	
 				$all_tools[] = "$tool->tool.$tool->tool_id";
 
 				# Throw tool into admin panel array
@@ -116,9 +93,9 @@ class Build_Page_Controller extends Template_Controller {
 			}
 			
 			# Load Tools Public CSS
-			$all_tools = implode('-', $all_tools);
+			$all_tools_string = implode('-', $all_tools);
 			
-			$this->template->linkCSS("get/css/tools/$all_tools", url::site() );			
+			$this->template->linkCSS("get/css/tools/$all_tools_string", url::site() );			
 		}
 		
 		
@@ -155,7 +132,7 @@ class Build_Page_Controller extends Template_Controller {
 		# Send the containers to the view (shell)
 		$this->template->containers = $containers_array;			
 		
-		# needed to hide 404 not found on controller name
+		# needed to hide 404 not found on controller name (its really a page_name)
 		Event::clear('system.404');
 		
 		# needed to enable auto rendering of controllers

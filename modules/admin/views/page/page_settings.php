@@ -17,11 +17,11 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		<div id="common_title">Page Settings - <?php echo $page->label?></div>
 	</div>	
 	<input type="hidden" name="old_page_name" value="<?php echo $page_name?>">
+	<input type="hidden" name="sub_page" value="<?php echo $sub_page?>">
 	<?php
 	if($page_name != 'home')
 	{		
 		?>
-
 		<div class="fieldsets" style="float:left;width:65%;">
 			<b>Label Name</b><br>
 			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">

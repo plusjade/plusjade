@@ -15,6 +15,7 @@ class Auth_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		$this->template->linkCSS('css/admin_global.css');
 		$this->template->linkCSS('css/auth.css');
 		$this->template->linkJS('ui/ui_latest_lite.js');	
 	}
@@ -189,8 +190,8 @@ class Auth_Controller extends Template_Controller {
 							
 							# create db sites record
 							$data = array(
-								'url'	=> $_POST['username'],
-								'theme'	=> 'redcross',		
+								'subdomain'	=> $_POST['username'],
+								'theme'		=> 'base',		
 							);
 							$query = $db->insert('sites', $data);
 							$sites_insert_id = $query->insert_id();

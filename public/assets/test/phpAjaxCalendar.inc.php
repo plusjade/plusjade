@@ -1,34 +1,76 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
-	/* 
-	 *  Ryboe Ajax Calendar
-	 *
-	 *    Version: 0.03
-	 *
-	 *  
-	 *  Author: Sean Sullivan
-	 *  Website: www.ryboe.com
-	 *  Copyright 2008 Sean Sullivan under the GNU GENERAL PUBLIC [GPL] LICENSE: http://www.gnu.org/licenses/gpl.txt
-	 *
-	 *  Copyright 2008 Dave Brondsema http://brondsema.net
-	*/
-class Calendar_Core {
+<?PHP
+// 
+//  Ryboe Ajax Calendar
+//
+//    Version: 0.03
+//
+//  
+//  Author: Sean Sullivan
+//  Website: www.ryboe.com
+//  Copyright 2008 Sean Sullivan under the GNU GENERAL PUBLIC [GPL] LICENSE: http://www.gnu.org/licenses/gpl.txt
+//
+//  Copyright 2008 Dave Brondsema http://brondsema.net
 
-	# SIMPLE		
-	function day_function($calendar_page_name, $year, $month, $day, $date_data)
+class Ajax_Calendar {
+
+/*
+ * Define custom callback functions (optional)
+ */
+	# using a callback function like this is optional
+	public function day_details($y,$m,$d) {
+		# blank cells before day 1 or after day 30/31
+		if ($day == '') {
+			echo '&nbsp;'; # for IE table cells
+		}
+		echo "$d";
+		if ($m == 1 and $d == 1) {
+			echo "<br/><em>New Year's Day!</em>";
+		}
+	}
+
+	/*
+	 * Build links to events to fetch data from a database	 
+	 * This is a simple callback function that will make the dates that have 
+	 * events associated with them linkable. The link can then query the database
+	 * directly to fetch a list of said events.
+	 * A simple ajax example @ http://plusjade.com/calendar
+	 
+		params $year, $month, $day (int)	
+			= numerical values for year/month/day
+		params $data_data
+			= The key/value pair associated with this date,
+			coming from the given $date_array we sent to $calendar->getPhpAjaxCalendarCore();
+	 */
+	function link_to_events($year, $month, $day, $date_data)
 	{
 		# blank cells before day 1 or after day 30/31
 		if ($day == '')
 			echo '&nbsp;'; # for IE table cells
-			
+		
+		# Your date_array should tell us how many events are on the given day...
 		if( '0' < $date_data )
 		{
-			echo "<a href='/$calendar_page_name/day/$year/$month/$day'".' rel="ajax" class="day_link_simple">'. $day .'</a>';
+			echo '<a href="/calendar/list_events/'."$year/$month/$day".'" class="day_link">'. $day .'</a>';
 		}
 		else
 			echo '<div class="day_simple">'.$day.'</div>';
 	}	
-
-	function getPhpAjaxCalendar($calendar_page_name, $month, $year, $date_array=NULL, $day_function=NULL)
+	
+/*
+ * Build the Calendar html output
+ * @ param $month (int)
+		= numerical month indicator
+ * @ param $year (int)
+		= numerical year indicator
+ * @ param $date_array (array)
+		= optional array containing key/value pairs
+		for all dates in the current month such as date/"date event data".
+ * @ param $day_function (string)
+		= optional callback function to invoke
+		must pass the name of the method you wish to call.
+ */
+ 
+	public function getPhpAjaxCalendarCore($month, $year, $date_array=NULL, $day_function=null)
 	{
 		// Use the PHP time() function to find out the timestamp for the current time
 		$current_time = time();
@@ -154,50 +196,40 @@ class Calendar_Core {
 		echo <<<EOS
 		<table id="calendar">
 		<tr>
-			<td><a href="/$calendar_page_name/month/$prev_year/$prev_month" class="monthnav">&laquo; Last</a></td>
+			<td><a href="?month=$prev_month&year=$prev_year" class="monthnav">&laquo; Prev</a></td>
 			<td colspan="5" class="month">$month_name $year</td>
-			<td><a href="/$calendar_page_name/month/$next_year/$next_month" class="monthnav">Next &raquo;</a></td>
+			<td><a href="?month=$next_month&year=$next_year" class="monthnav">Next &raquo;</a></td>
 		</tr>
 		<tr class="daynames"> 
 			<td>S</td><td>M</td><td>T</td><td>W</td><td>T</td><td>F</td><td>S</td>
 		</tr>
 EOS;
-			
-		foreach($weeks AS $week)
-		{
+		
+		foreach($weeks AS $week){
 			echo '<tr class="week">'; 
-			
 			foreach($week as $day)
 			{
-				# Highlight days with events 
-				$has_events = '';
-				if(! empty($day) AND !empty($date_array[$day]) )
-					$has_events = 'has_events';
-				
-				# Highlight the current day
 				if($day == date('d', $current_time) && $month == date('m', $current_time) && $year == date('Y', $current_time))
 					echo '<td class="today">';
 				else
-					echo '<td class="days '.$has_events.'">';
-				
-				
-				if (NULL == $day_function OR empty($date_array[$day]) )
-				{
-					echo '<div class="day_simple">'.$day.'</div>';
+					echo '<td class="days">';
+				if (null == $day_function OR empty($date_array[$day])) {
+					echo $day;
+				} else {
+					/* Calls user function from this class,
+					 * Sends appropriate date data from date_array
+					 */
+					call_user_func(array($this, $day_function), $year, $month, $day, $date_array[$day]);
 				}
-				else
-				{					
-					call_user_func(array($this, $day_function ), $calendar_page_name, $year, $month, $day, $date_array[$day]);
-				}				
-	
 				echo '</td>';
 			}
 			echo '</tr>';
 		}
-
+		
 		echo '</table>';
 		
 		return ob_get_clean();
 	}
-
-} // End Calendar
+	
+}
+?>

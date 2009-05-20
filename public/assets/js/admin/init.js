@@ -21,14 +21,14 @@ $(document).ready(function()
 		return false;		
 	});
 
-	// Click away removes open toolbars
+	// Click away hides open toolbars
 	$('body:not(.jade_toolbar_wrapper)').click(function(){
 		$('li.dropdown ul').hide();
 		$('.actions_wrapper ul').hide();
 	});
 
 
-	// ADD Tool toolkit to all tools
+	// ADD redbar Tool toolkit to all tools
 	// -----------------------------------
 	 $(".common_tool_wrapper").each(function(i){
 		++i;
@@ -45,7 +45,7 @@ $(document).ready(function()
 		return false;
 	});
 	
-	/* ADD tool-item toolkits
+	/* ADD blue tool-item toolkits
 	 * selector format: .tool_wrapper .tool_item
 	 * -----------------------------------
 	 */
@@ -56,7 +56,7 @@ $(document).ready(function()
 			var id		= $(this).attr("rel");
 			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
 			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="'+tool+'_item_'+id+'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
+			var toolbar	= '<div class="jade_admin_item_edit"><span>'+ tool +' item</span>'+ edit +' ' + del + '</div>';
 					
 			$(this).prepend(toolbar);			
 		});
@@ -93,25 +93,12 @@ $(document).ready(function()
 			}, false, "facebox_"+pane);
 			return false;
 		},
-		
-		// img facebox links
-		".imgfacebox": function(e){
-			var pane = "base"; 	// loads in "base" unless otherwise noted via id
-			var href = $(e.target).parent().attr("href");
-			if(e.target.id) var pane = "2";		
-			$.facebox(function(){
-					$.get(href, function(data){
-						$.facebox(data, false, "facebox_"+pane);
-					});
-			}, false, "facebox_"+pane);
-			return false;
-		},
-		
-		// DELETE single item link		
+
+		// DELETE tool or tool item link		
 		"a.js_admin_delete": function(e) {
 			var url = $(e.target).attr("href");
 			var rel	= $(e.target).attr('rel');
-			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><br><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a><br><br><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Item</a></div>';	
+			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><p><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a></p><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Item</a></div>';	
 			$.facebox(data, "confirm_facebox", "confirm_dialog");
 			return false;		
 		},
@@ -136,24 +123,30 @@ $(document).ready(function()
 
 	}));
 	
-	// ACTIVATE default ajax forms in all facebox windows
-	// Can delegate on the submit event but we'll keep it as is fornow.
+	/*
+	 * ACTIVATE default ajax forms in all facebox windows
+	 * Can delegate on the submit event but we'll keep it as is for now.
+	 * ---------------------------------------------------------------------
+	 */
 	$(document).bind('reveal.facebox', function(){		
-			var options = {
-				beforeSubmit: function(){
-					if(! $(".ajaxForm input").jade_validate() )
-						return false;
-				},
-				success: function(data) {
-					$.facebox(data, "status_reload", "facebox_2");
-					//location.reload();							
-				}					
-			};
-	
+		// Activate wysiwyg editor.
+		/*
 		$('textarea').fck({
 			path: '/assets/js/fckeditor/'
 			, toolbar:'Plusjade'
-		});	
+		});
+		*/
+		$('textarea.render_html').wysiwyg();
+		var options = {
+			beforeSubmit: function(){
+				if(! $(".ajaxForm input").jade_validate() )
+					return false;
+			},
+			success: function(data) {
+				$.facebox(data, "status_reload", "facebox_2");
+				location.reload();							
+			}					
+		};
 		$(".ajaxForm").ajaxForm(options);
 		
 		
@@ -165,12 +158,9 @@ $(document).ready(function()
 	});
 
 	
-	
-/*
-	test area 
-*/	
 
 	// ACTIVATE sortable containers
+	// -------------------------------------------------
 	for(i=1;i<=5;i++){
 		$(".container_"+i).addClass("CONTAINER_WRAPPER").attr("rel",i);
 	}
@@ -196,6 +186,30 @@ $(document).ready(function()
 		stop: function(event, ui) {
 			$('.CONTAINER_WRAPPER').toggleClass('highlight_containers');
 			$(ui.item).toggleClass('sort_active').children('div:last').show();
+		},
+		update: function(event, ui){			
+			var output = '';
+			page_id = $('#click_hook').attr("rel");
+			
+			$(".CONTAINER_WRAPPER").each(function(){
+				var container = $(this).attr("rel");
+				var kids = $(this).children("span.common_tool_wrapper");
+				
+				$(kids).each(function(i){
+					var scope = $(this).attr("rel");
+					output += scope + "." + this.id + "." + container + "." + i + "#";
+				});
+			});
+			$.facebox(function() {
+					$.post("/get/page/tools/"+page_id, {output: output}, function(data){
+						$.facebox(data, "status_close", "facebox_2");
+						setTimeout('$.facebox.close()', 1000);
+					})
+				}, 
+				"status_close", 
+				"facebox_2"
+			);
+			
 		}
 		//revert: true
 	});	
@@ -226,7 +240,7 @@ $(document).ready(function()
 	
 	
 	// SAVE container tool-position results
-	var output = "";	
+	var output = '';	
 	$("#get_tool_sort").click(function(){
 		page_id = $(this).attr("rel");
 		
@@ -239,8 +253,7 @@ $(document).ready(function()
 				output += scope + "." + this.id + "." + container + "." + i + "#";
 			});
 		});
-		//alert(output); return false;					
-
+		//alert(output); return false;
 		$.facebox(function() {
 				$.post("/get/page/tools/"+page_id, {output: output}, function(data){
 					$.facebox(data, "status_close", "facebox_2");
@@ -249,7 +262,7 @@ $(document).ready(function()
 			}, 
 			"status_close", 
 			"facebox_2"
-		);
+		);	
 	});		
 	
 	/*

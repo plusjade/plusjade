@@ -1,26 +1,32 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 	/* 
 	 * Case A: Is Public Ajax Request.
-	 * Parse to appropriate public tool controller
-	 * Optimize ajax queries. 
-	 * Bypass as much code as possible..
+	 * 	Parse to appropriate public tool controller
+	 * 	Optimize ajax queries. 
+	 * 	Bypass as much code as possible..
 	 * 
 	*/
 class Ajax_Core {
 
-	public function showroom($url_array)
+	/* 
+		is showroom tool
+	*/
+	public function showroom($url_array, $tool_id)
 	{
 		$category	= @$url_array['2'];
 		$item		= @$url_array['3'];	
 		$showroom	= new Showroom_Controller();
 		
 		if(! empty($category) AND empty($item) )
-			return $showroom->_items_category($category);
+			return $showroom->_items_category($tool_id, $category);
 		elseif(! empty($category) AND !empty($item) )
 			return $showroom->_item($category, $item);		
 	}
 
-	public function blog($url_array)
+	/* 
+		is blog tool
+	*/
+	public function blog($url_array, $tool_id)
 	{
 		$action	= @$url_array['2'];
 		$value	= @$url_array['3'];	
@@ -52,8 +58,11 @@ class Ajax_Core {
 				break;
 		}
 	}
-	
-	public function calendar($url_array)
+
+	/* 
+		is calendar tool
+	*/	
+	public function calendar($url_array, $tool_id)
 	{
 		$action	= @$url_array['2'];
 		$year	= @$url_array['3'];
@@ -63,18 +72,19 @@ class Ajax_Core {
 		
 		if('month' == $action)
 		{
-			return $calendar->month($year, $month);
+			return $calendar->month($tool_id, $year, $month);
 		}
 		elseif('day' == $action)
 		{
-			return $calendar->day($year, $month, $day);
+			return $calendar->day($tool_id, $year, $month, $day);
 		}
 	}
 	
-	# Fail silently
+	/* 
+		Fail Silently
+	*/
 	public function __call($method, $args)
 	{
-		echo "undefined Method: '$method'"; #delete in production
-		die();
+		die("undefined Method: '$method'"); #delete in production
 	}
 } # End

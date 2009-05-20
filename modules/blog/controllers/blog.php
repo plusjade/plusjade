@@ -14,6 +14,7 @@ class Blog_Controller extends Controller {
    */
 	function _index($tool_id)
 	{
+		$blog_page_name = uri::easy_segment('1');
 		$action	= uri::easy_segment('2');
 		$value	= uri::easy_segment('3');
 		$value2	= uri::easy_segment('4');
@@ -30,6 +31,7 @@ class Blog_Controller extends Controller {
 		
 		$primary = new View("public_blog/index");
 		$primary->tool_id = $tool_id;
+		$primary->set_global('blog_page_name', $blog_page_name);
 		$primary->tags = $this->_get_tags($tool_id);
 		$primary->sticky_posts = $this->_get_sticky_posts($parent->sticky_posts);
 		$primary->recent_comments = $this->_get_recent_comments($tool_id);
@@ -77,7 +79,7 @@ class Blog_Controller extends Controller {
 				$content->items = $items;
 				
 				$primary->add_root_js_files('expander/expander.js');
-				$primary->readyJS('blog', 'multiple_posts');		
+				$primary->readyJS('blog', 'multiple_posts', $blog_page_name);		
 				break;
 		}
 		#Javascript
@@ -116,7 +118,8 @@ class Blog_Controller extends Controller {
 		
 		$content->item = $item;	
 		$content->comments = $this->_get_comments($item->id, $item->parent_id);
-	
+		$content->blog_page_name = uri::easy_segment('1');
+		
 		return $content;
 	}
 
@@ -142,7 +145,7 @@ class Blog_Controller extends Controller {
 		$content->items = $items;
 		#Javascript
 		$content->add_root_js_files('expander/expander.js');
-		$content->readyJS('blog', 'multiple_posts');		
+		$content->readyJS('blog', 'multiple_posts', uri::easy_segment('1'));		
 		return $content;		
 	}
 	
@@ -214,6 +217,7 @@ class Blog_Controller extends Controller {
 		$content->comments = $comments;
 		$content->item_id = $post_id;
 		$content->tool_id = $tool_id;
+		$content->blog_page_name = uri::easy_segment('1');
 		
 		# Javascript 
 		# TODO: this is being duplicated on all posts,

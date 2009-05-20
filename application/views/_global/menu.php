@@ -9,7 +9,8 @@
 */
 
 $db		= new Database;	
-$menus	= $db->query("SELECT page_name, label FROM pages 
+$menus	= $db->query("
+	SELECT page_name, label FROM pages 
 	WHERE fk_site = '$this->site_id' 
 	AND menu = 'yes' 
 	AND enable = 'yes'

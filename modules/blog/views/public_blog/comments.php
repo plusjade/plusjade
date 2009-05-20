@@ -1,7 +1,7 @@
 
 <div id="post_comments_<?php echo $item_id?>" class="posts_comments">
 
-	<form action="<?php echo url::site("blog/comment/$item_id")?>" method="POST" class="public_ajaxForm">
+	<form action="<?php echo url::site("$blog_page_name/comment/$item_id")?>" method="POST" class="public_ajaxForm">
 		<input type="hidden" name="tool_id" value="<?php echo $tool_id?>">
 		
 		<div class="comment_wrapper_title">Comments</div>

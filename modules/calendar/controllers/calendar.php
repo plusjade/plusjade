@@ -9,8 +9,7 @@ class Calendar_Controller extends Controller {
 
 	function _index($tool_id)
 	{
-		valid::id_key($tool_id);		
-		$primary	= new View('public_calendar/index');	
+		$primary	= new View('public_calendar/index');
 		$action		= uri::easy_segment('2');
 		$year		= uri::easy_segment('3');
 		$month		= uri::easy_segment('4');
@@ -19,18 +18,18 @@ class Calendar_Controller extends Controller {
 		switch($action)
 		{
 			case 'month':				
-				$primary->calendar = $this->month($year, $month);
+				$primary->calendar = $this->month($tool_id, $year, $month);
 				break;
 				
 			case 'day':
-				$primary->calendar = $this->month($year, $month);
-				$primary->events = $this->day($year, $month, $day);
+				$primary->calendar = $this->month($tool_id, $year, $month);
+				$primary->events = $this->day($tool_id, $year, $month, $day);
 				break;
 				
 			default:
 				$year	= date('Y');
 				$month	= date('m');	
-				$primary->calendar = $this->month($year, $month);
+				$primary->calendar = $this->month($tool_id, $year, $month);
 				break;
 		}
 		
@@ -47,44 +46,53 @@ class Calendar_Controller extends Controller {
 	}
 
 	# Ajax query for month (last and next buttons)
-	function month($year=NULL, $month=NULL)
+	function month($tool_id, $year=NULL, $month=NULL)
 	{
+		valid::id_key($tool_id);
 		valid::year($year);
 		valid::month($month);
 		$calendar	= new Calendar;
 		$db			= new Database;
 		$date_array = array();
+		$calendar_page_name	= uri::easy_segment('1');
 		
 		# Create array for dates associated with this month
-		$dates = $db->query("SELECT * FROM calendar_items 
+		$dates = $db->query("
+			SELECT day FROM calendar_items 
 			WHERE fk_site = '$this->site_id'
+			AND parent_id = '$tool_id'
 			AND year = '$year'
 			AND month = '$month'
 			ORDER BY day
 		");		
+		
+		/*
+		 * Create an array with key/value pairs = day/number of events on day
+		 * This lets the calendar know which dates to show links for.
+		 */
 
-		# Count events
+		for($x=0; $x<=31; ++$x)
+			$date_array[$x] = 0;
+
 		foreach($dates as $date)
-		{
-			if(! empty($date_array[$date->day]) )
-				(int) ++$date_array[$date->day];
-			else
-				(int) $date_array[$date->day] = '1';
-		}
-		return $calendar->getPhpAjaxCalendar($month, $year, $date_array, 'day_function');
+			(int) ++$date_array[$date->day];
+	
+		return $calendar->getPhpAjaxCalendar($calendar_page_name, $month, $year, $date_array, 'day_function');
 	}
 	
 	
 # Ajax get a list of events for a certain date
-	public function day($year=NULL, $month=NULL, $day=NULL)
+	public function day($tool_id, $year=NULL, $month=NULL, $day=NULL)
 	{
 		valid::year($year);
 		valid::month($month);
 		valid::day($day);
 		$db = new Database;
 		
-		$events = $db->query("SELECT * FROM calendar_items 
+		$events = $db->query("
+			SELECT * FROM calendar_items 
 			WHERE fk_site = '$this->site_id'
+			AND parent_id = '$tool_id'
 			AND year = '$year'  
 			AND month = '$month'
 			AND day = '$day'
@@ -96,13 +104,14 @@ class Calendar_Controller extends Controller {
 		return $primary;
 	}
 
-	
+	# not in use
 	public function event($id=NULL)
 	{
 		valid::id_key($id);
 		$db = new Database;
 		
-		$event = $db->query("SELECT * FROM calendar_items 
+		$event = $db->query("
+			SELECT * FROM calendar_items 
 			WHERE id = '$id' 
 			AND fk_site = '$this->site_id'
 		")->current();

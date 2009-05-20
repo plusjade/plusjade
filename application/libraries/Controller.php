@@ -25,10 +25,10 @@ abstract class Controller_Core {
 		$session	= Session::instance();
 		$site_name	= $_SESSION['site_name'];
 		
-		$identifer = file_get_contents(DATAPATH . "$site_name/protected/identifer.yaml");
-		$identifer = explode(',',$identifer);
+		$site_config = file_get_contents(DATAPATH . "$site_name/protected/site_config.yaml");
+		$site_config = explode(',',$site_config);
 		$keys = array();
-		foreach($identifer as $string)
+		foreach($site_config as $string)
 		{
 			$value	= strstr($string ,':');
 			$keys[]	= ltrim($value, ':');
