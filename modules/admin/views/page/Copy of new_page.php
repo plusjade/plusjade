@@ -1,6 +1,6 @@
 <style type="text/css">	
 	#new_page_wrapper .pane_left{
-		width:51%;
+		width:42%;
 		float:left;	
 	}
 	.sub_options, .root_options{
@@ -8,7 +8,7 @@
 		padding:10px;
 	}
 	#new_page_wrapper .pane_right{
-		width:42%;
+		width:51%;
 		float:right
 	}
 
@@ -36,8 +36,40 @@
 	</div>	
 
 	<div id="new_page_wrapper" class="fieldsets big">
-
+		
 		<div class="pane_left">
+			<input type="radio" name="page_type" value="root" CHECKED> <b>Add Root Page</b>
+			<div class="root_options">
+				Install Page Builder?<br><br>
+				<select name="page_builder">
+					<option value="0">none - (blank page)</option>
+					<?php 
+					foreach($page_builders as $tool)
+					{
+						echo "<option value='$tool->id'>$tool->name</option>";
+					}
+					?>
+				</select>	
+			</div>
+			
+			<p style="text-align:center;font-size:1.6em;">OR</p>
+			
+			<input type="radio" name="page_type" value="sub"> <b>Add Sub Page</b> 
+			<div class="sub_options">
+				Sub page of...<br><br>
+				<select name="sub_page" disabled="disabled">
+					<?php 
+					foreach($allowed_pages as $page)
+					{
+						$pieces = explode(':',$page);
+						echo "<option value='$pieces[1]' rel='$pieces[0]'>$pieces[1]</option>";
+					}
+					?>
+				</select>				
+			</div>
+		</div>
+		
+		<div class="pane_right">
 			<b>Page Label</b>
 			<br><input id="" type="text" name="label" value="" rel="text_req" maxlength="50" style="width:330px">
 			<br><br>
@@ -51,41 +83,46 @@
 			</p>
 		</div>
 		
-		<div class="pane_right">
-			
-			<?php
-			if(! empty($page_builders) )
-			{
-				?>
-				<div class="root_options">
-					Install Page Builder?<br><br>
-					<select name="page_builder">
-						<option value="0">none - (blank page)</option>
-						<?php 
-						foreach($page_builders as $tool)
-						{
-							echo "<option value='$tool->id'>$tool->name</option>";
-						}
-						?>
-					</select>	
-				</div>
-				<?php
-			}
-			?>
-		</div>
-		
-
-		
 	</div>
 	
 	<div id="new_page_url">
 		Your new page URL:
-		<br><b><?php echo url::site($path_string)?>/<span id="link_example"></span></b>
+		<br><b><?php echo url::site()?><span id="sub_page_example"></span><span id="link_example"></span></b>
 	</div>	
 
 </form>	
 <script type="text/javascript">
-
+	
+	// if sub_page update the url example
+	function update_sub_page(){
+		value = $("select[name='sub_page'] option:selected").text();
+		$('span#sub_page_example').html(value +'/');
+	}
+	
+	
+	/* 
+	 * toggle root or sub page options
+	 *
+	 */
+	$("input[name='page_type']").click(function(){
+		value = $(this).val();
+		if('root' == value){
+			$("select[name='sub_page']").attr('disabled','disabled');
+			$("select[name='page_builder']").removeAttr('disabled');
+			$('span#sub_page_example').html('');
+		}
+		if('sub' == value){
+			$("select[name='sub_page']").removeAttr('disabled');
+			$("select[name='page_builder']").attr('disabled','disabled');
+			update_sub_page();
+		}
+	});
+	
+	// if sub_page update the url example
+	$("select[name='sub_page']").change(function(){
+		update_sub_page();
+	});	
+	
 	
 	// if page_builder, update the name/label/url views
 	$("select[name='page_builder']").change(function(){	

@@ -15,17 +15,91 @@ class Page_Controller extends Admin_Controller {
 
 # Manage all site pages 
 	function index()
-	{		
+	{
 		$db			= new Database;				
 		$primary	= new View("page/all_pages");
+		/*
+		$page_names = $db->query("
+			SELECT GROUP_CONCAT( page_name separator ',') as name_string
+			FROM pages
+			WHERE fk_site = '$this->site_id'
+			ORDER BY page_name
+		")->current();		
+		$page_name_array = explode(',', $page_names->name_string);
+		*/
 		
-		$pages = $db->query("
-			SELECT * FROM pages 
-			WHERE fk_site = '$this->site_id' 
-			ORDER BY position
-		");			
-		$primary->pages = $pages;
-		$primary->protected_pages = yaml::parse($this->site_name, 'pages_config');
+		/*
+			most likely will use this one in order to get more data
+			into the array for viewing.
+			is in menu, is disabled, page_id, etc
+		*/
+		$page_names = $db->query("
+			SELECT page_name
+			FROM pages
+			WHERE fk_site = '$this->site_id'
+		");
+		# build the page array, insert all pertinent data.
+		$page_name_array = array();
+		foreach($page_names as $page)
+		{
+			$page_name_array[] = $page->page_name;
+		}
+		
+		#sort the page_name array by most sub_directories to least.
+		function cmp($a, $b)
+		{
+			str_replace('/','_', $a, $count_a);
+			str_replace('/','_', $b, $count_b);
+			
+			if ($count_a == $count_b)
+				return 0;
+
+			return ($count_a < $count_b) ? 1 : -1;
+		}
+		usort($page_name_array, 'cmp');
+		
+		# create an associative array to model the nested directories
+		$files_array = array();	
+		foreach($page_name_array as $page)
+		{
+			$node_array = explode('/',$page);
+			$count = count($node_array);
+			$last_node = array_pop($node_array);
+			$one	= @$node_array['0'];
+			$two	= @$node_array['1'];
+			$three	= @$node_array['2'];
+			$four	= @$node_array['3'];
+			
+			switch($count)
+			{
+				case '1':
+					$files_array[] = $last_node;
+					break;
+				case '2':
+					$files_array[$one][] = $last_node;
+					break;				
+				case '3':
+					$files_array[$one]["$one/$two"][] = $last_node;
+					break;		
+				case '4':
+					$files_array[$one]["$one/$two"]["$one/$two/$three"][] = $last_node;
+					break;	
+				case '5':
+					$files_array[$one]["$one/$two"]["$one/$two/$three"]["$one/$two/$three/$four"][] = $last_node;
+					break;
+			}
+		}	
+
+		# TODO: 
+			# tag protected pages ...
+			# $primary->protected_pages = yaml::parse($this->site_name, 'pages_config');
+			
+		# troubleshooting...
+		#echo'<pre>';print_r($page_name_array);echo'</pre>';
+		#echo'<pre>';print_r($files_array);echo'</pre>';die();
+		
+		# pass the nested-directory array model...
+		$primary->files_array =  $files_array;
 		die($primary);
 	}
 
@@ -39,7 +113,7 @@ class Page_Controller extends Admin_Controller {
 			SELECT * FROM pages 
 			WHERE fk_site = '$this->site_id' 
 			ORDER BY position
-		");			
+		");		
 		$primary->pages = $pages;
 		$primary->protected_pages = yaml::parse($this->site_name, 'pages_config');
 		die($primary);
@@ -173,14 +247,21 @@ class Page_Controller extends Admin_Controller {
 		{		
 			$primary = new View("page/new_page");
 			$db = new Database;
+
+			$path_string = $_GET['path_string'];
+			$primary->path_string = $path_string;
+			$path_array = explode('/', $path_string);
 			
+			# if the path is root...
+			if( empty($path_string) )
+			{
+				$page_builders = $db->query("
+					SELECT * FROM tools_list WHERE protected = 'yes'
+				");
+				$primary->page_builders = $page_builders;
+			}
 			
-			/*
-			 * SUPER UNIQUE PAGE_NAME VALIDATION HANDLING
-			 * ----------------------------------------------------
-			 * Send all site page_names in javascript formatted array, 
-			 * so the validator can check for duplicates.
-			 */
+
 			# get a string of all pages names 
 			$page_names = $db->query("
 				SELECT GROUP_CONCAT( page_name separator ',') as name_string
@@ -224,39 +305,6 @@ class Page_Controller extends Admin_Controller {
 			echo '<pre>'; print_r($page_name_array); echo '</pre>'; 
 			die();
 			*/			
-	
-			
-			# get allowed "sub-able" pages_names
-			$protected_pages	= yaml::parse_name($this->site_name, 'pages_config');
-			$new_string			= str_replace($protected_pages, 'drop', $page_names->name_string);
-			$page_array			= explode(',', $new_string);
-			
-			foreach($page_array as $value)
-			{
-				if('drop' != $value)
-				{
-					$name_array = explode('/',$value);
-					$sub_node = $name_array['0'];
-					if( 1 < count($name_array) )
-					{
-						$sub_node = array_pop($name_array);
-					}					
-					$allowed_pages[] = "$sub_node:$value";
-				}
-			}
-			
-			$primary->allowed_pages = $allowed_pages;		
-			
-			
-			#echo $new_string; 
-			#echo '<pre>';print_r($allowed_pages);echo'</pre>';die();
-			
-			
-			$page_builders = $db->query("
-				SELECT * FROM tools_list WHERE protected = 'yes'
-			");
-			$primary->page_builders = $page_builders; 
-			
 			echo $primary;		
 		}
 		die();
