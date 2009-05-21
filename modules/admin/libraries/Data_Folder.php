@@ -81,7 +81,7 @@ class Data_Folder_Core {
 	 $recurse	= true to recurse all subdirectories
 	 $omit 		= any directory name you wish to omit
 	 */
-	 function get_file_list($dir, $parent = 'root', $recurse=false, $omit = null) 
+	 static function get_file_list($dir, $parent = 'root', $recurse=false, $omit = null) 
 	 { 
 		$retval = array(); 	
 		# add trailing slash if missing 	
@@ -99,7 +99,7 @@ class Data_Folder_Core {
 			if(is_dir("$dir$entry")) 
 			{
 				if($recurse && is_readable("$dir$entry/"))
-					$retval[$entry] = $this->get_file_list("$dir$entry/", $entry, true);	 
+					$retval[$entry] = self::get_file_list("$dir$entry/", $entry, true);	 
 			} 
 			elseif( is_readable("$dir$entry") && $entry != 'Thumbs.db' ) 
 				array_push($retval, $entry);			 
