@@ -16,20 +16,24 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		</button>
 		<div id="common_title">Page Settings - <?php echo $page->label?></div>
 	</div>	
-	<input type="hidden" name="old_page_name" value="<?php echo $page_name?>">
-	<input type="hidden" name="sub_page" value="<?php echo $sub_page?>">
+	<input type="hidden" name="old_page_name" value="<?php echo $filename?>">
+	<input type="hidden" name="directory" value="<?php echo $directory?>">
+	
 	<?php
-	if($page_name != 'home')
+	if($filename != 'home')
 	{		
 		?>
+		<div style="text-align:center;padding:5px;">
+			Page URL: <?php echo url::site(),$directory?><span></span>
+		</div>
+		
 		<div class="fieldsets" style="float:left;width:65%;">
 			<b>Label Name</b><br>
 			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
 			<br><br>
 			<b>Page Link</b>
-			 <?php if($is_protected) echo '<span style="color:red">(protected)</span>'?>
-			<br><input type="text" name="page_name" value="<?php echo $page_name?>" size="30" maxlength="50">		
-			<br><?php echo url::site(),$sub_page?>
+			<?php if($is_protected) echo '<span style="color:red">(protected)</span>'?>
+			<br><input type="text" name="page_name" value="<?php echo $filename?>" size="30" maxlength="50">		
 			
 			<div id="page_exists" class="aligncenter error_msg"></div>
 		
@@ -41,7 +45,8 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 				<option value="yes" <?php echo $page_enable['yes']?>>Allow Access</option>
 				<option value="no" <?php echo $page_enable['no']?>>No Access</option>
 			</select> <span><img src="<?php echo url::image_path("admin/enabled_$page->enable.png")?>" alt=""></span>
-			<br><br>
+			<br>
+			<br>
 			<b>Menu Link</b><br>
 			<select name="menu" class="enabled_<?php echo $page->menu?>">
 				<option value="yes" <?php echo $menu_enable['yes']?>>Show in Menu</option>
@@ -55,24 +60,25 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	else
 	{
 		?>
-		<div id="home_require_message">**Home page is required**</div> 
 		<input type="hidden" name="page_name" value="home">
 		<input type="hidden" name="enable" value="yes">		
+		
+		<div id="home_require_message">**Home page is required**</div> 
+		<?php echo url::site()?><strong><?php echo $filename?></strong>
 
 		<div class="fieldsets" style="float:left;width:65%">
 			<b>Page Name</b> (in menu)<br>
 			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
-			<br>
-			<br>
-			<b>Link</b> <?php echo url::site()?><strong><?php echo $page_name?></strong>
 		</div>
 		
 		<div class="fieldsets" style="float:right;width:30%">
-			<b>Menu Link</b><br>
+			<b>Menu Link</b>
+			<br>
 			<select name="menu" class="enabled_<?php echo $page->menu?>">
 				<option value="yes" <?php echo $menu_enable['yes']?>>Show in Menu</option>
 				<option value="no" <?php echo $menu_enable['no']?>>Do Not Show</option>
-			</select> <span><img src="<?php echo url::image_path("admin/enabled_$page->menu.png")?>"></span>
+			</select> 
+			<span><img src="<?php echo url::image_path("admin/enabled_$page->menu.png")?>"></span>
 		</div>
 		<?php
 	}
@@ -100,7 +106,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		}
 		return false;
 	}
-	var v_array = [<?php echo $page_names?>];
+	var v_array = [<?php echo $page_filter_js?>];
 
 	var options = {
 		beforeSubmit: function(){
@@ -116,12 +122,13 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		},
 		success: function(data) {
 			$.facebox(data, "status_reload", "facebox_2");
-			window.location = '<?php echo url::site()?>' + sent_page;							
+			//window.location = '<?php echo url::site()?>' + sent_page;							
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);
 		
-		
+	
+	
 	$("input[name='label']").keyup(function(){
 		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
 		$("input[name='page_name']").val(input);
@@ -132,6 +139,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		$(this).val(input);
 	});
 
+	// visibility select dropdowns
 	$("select[name='enable'], select[name='menu']").change(function(){	
 		value = $('option:selected',this).val();
 		if('yes' == value)
