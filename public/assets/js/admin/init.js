@@ -116,7 +116,7 @@ $(document).ready(function()
 			$.get(url, function(data) {
 				$('#' + el).remove();
 				$.facebox(data, "status_close", "confirm_dialog")
-				setTimeout('$.facebox.close()', 1000);					
+				setTimeout('$.facebox.close()', 1000);				
 			});
 			return false;
 		}
@@ -206,8 +206,8 @@ $(document).ready(function()
 						setTimeout('$.facebox.close()', 1000);
 					})
 				}, 
-				"status_close", 
-				"facebox_2"
+				'status_close', 
+				'facebox_2'
 			);
 			
 		}
@@ -250,7 +250,7 @@ $(document).ready(function()
 			
 			$(kids).each(function(i){
 				var scope = $(this).attr("rel");
-				output += scope + "." + this.id + "." + container + "." + i + "#";
+				output += scope + '.' + this.id + '.' + container + '.' + i + '#';
 			});
 		});
 		//alert(output); return false;

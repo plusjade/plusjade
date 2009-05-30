@@ -4,11 +4,6 @@
  */
 
 /* ------------ Facebox Reset base styles  ------------*/
-.facebox {
-	font-size: 12px !important;
-	font-family:verdana, arial, "sans serif" !important;
-	color:#333 !important;
-}	
 .facebox img {border:0}
 .facebox h1,.facebox h2, .facebox h3,.facebox h4,.facebox h5,.facebox h6{
 	font-size:1em !important; padding:0 !important; margin:0 !important; margin-bottom:10px !important;
@@ -23,23 +18,22 @@
 /* --------------- facebox ---------------*/
 #facebox_base{z-index: 99}
 #facebox_2{z-index: 200}
-.facebox .b {background:url(/assets/images/facebox/b.png)}
-.facebox .tl {background:url(/assets/images/facebox/tl.png)}
-.facebox .tr {background:url(/assets/images/facebox/tr.png)}
-.facebox .bl {background:url(/assets/images/facebox/bl.png)}
-.facebox .br {background:url(/assets/images/facebox/br.png)}
 .facebox {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 99;
   text-align: left; 
+	width:100%;
+	font-size: 12px !important;
+	font-family:verdana, arial, "sans serif" !important;
+	color:#333 !important;
+	
 }
 .facebox .popup {position: relative;}
-.facebox table {border-collapse: collapse;}
-.facebox table div.content{overflow:hidden;}
-.facebox table div.status_reload,
-.facebox table div.status_close
+.facebox div.content{overflow:hidden;}
+.facebox div.status_reload,
+.facebox div.status_close
 {
 	width:300px;
 	height:200px;
@@ -49,18 +43,34 @@
 	overflow:hidden;
 	text-align:center;
 }
-.facebox table div.status_reload{
+.facebox div.status_reload{
 	background:url('/assets/images/load.gif') no-repeat 50% 50%;
 }
-.facebox td {
-  border-bottom: 0;
-  padding: 0;
+.facebox .close_wrapper {
+	overflow:hidden;
+	margin:0 10px;
+}
+.facebox  .close_wrapper .close{
+	display:block;
+	height:28px;
+	width:70px;
+	float:right;
+	padding:5px 5px 0 5px;
+	background:#fff;
 }
 .facebox .body {
-  padding:10px;
-  background:#fff;
+	background:#fff;
+	margin:0 10px;
+	border:2px solid #ccc;
+}
+.facebox .content{
+	margin:auto;
+	width:800px;
+	background:#fff;
+	padding:15px;
 }
 .facebox .loading {
+	margin:0 auto;
 	text-align: center;
 	width:500px;
 	height:200px;
@@ -74,17 +84,7 @@
   border: 0;
   margin: 0;
 }
-.facebox .footer {
-  border-bottom: 1px solid lightblue;
-  padding-bottom: 5px;
-  text-align: right;
-}
-.facebox .tl, .facebox .tr, .facebox .bl, .facebox .br {
-  height: 10px;
-  width: 10px;
-  overflow: hidden;
-  padding: 0;
-}
+
 .facebox_overlay {
   position: fixed;
   top: 0px;
@@ -101,6 +101,7 @@
 
 /* facebox custom class views*/
 	.confirm_facebox{
+		margin:0 auto;
 		text-align:center;
 		width:300px;
 		height:200px;
@@ -442,7 +443,7 @@ span.msg{
 	border:1px solid #336699;
     color:#fff;	
     font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-    font-size:1.6em;
+    font-size:1.4em;
     line-height:130%;
     text-decoration:none;
     font-weight:bold;
@@ -587,7 +588,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 
 .generic_tabs{
-	padding:8px 0;
+	padding:7px 0 !important;
 }
 
 .generic_tabs li{
@@ -598,7 +599,6 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	text-decoration:none;
 	padding:7px 15px;
 	background:#ffffcc;
-	border:1px solid orange;
 	border-bottom:0;
 }
 .generic_tabs li a:hover,
@@ -667,12 +667,11 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 
 /* this sets the width for most facebox containers using this header */
 .facebox #common_tool_header{
-	width:700px;
-	overflow:auto;
-	background: #fff url('/assets/images/admin/sky_bg.png') repeat-x bottom left;
+	overflow:hidden;
+	ackground: #fff url('/assets/images/admin/bright_blue_bg.png') repeat-x bottom left;
 	margin-bottom:10px;
-	padding:6px;
-	
+	padding-bottom:10px;
+	border-bottom:1px dashed #999;
 }
 .facebox #common_tool_header button{
 	float:right;
@@ -682,8 +681,8 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	padding-top:9px;
 	font-weight:bold;
 	line-height:130%;
-	font-size:1.6em;
-	color:green;
+	font-size:1.5em;
+	color:#000;
 }
 
 .facebox #common_tool_info{
@@ -759,10 +758,18 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 
 
 /* tool/manage view*/
-
+#all_tools_wrapper{
+	float:right;
+	border:1px solid #ccc;
+	background:#eee;
+	width:600px;
+	height:400px;
+	overflow:auto;
+}
 #all_tools_table{
-	width:90%;
+	width:95%;
 	margin:0 auto;
+	border-collapse:collapse;
 }
 .row_guid{
 	width:70px;

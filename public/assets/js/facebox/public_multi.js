@@ -22,40 +22,25 @@
 
   $.extend($.facebox, {
     settings: {
-      opacity      : 0.25,
+      opacity      : 0.35,
       overlay      : true,
       loadingImage : '/assets/images/facebox/loading.gif',
       closeImage   : '/assets/images/facebox/closelabel.gif',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
 	  id		   : 'facebox_base',
       faceboxHtml  : '\
-    <div class="facebox" style="display:none;"> \
-      <div class="popup"> \
-        <table> \
-          <tbody> \
-            <tr> \
-              <td class="tl"/><td class="b"/><td class="tr"/> \
-            </tr> \
-            <tr> \
-              <td class="b"/> \
-              <td class="body"> \
-                <div class="footer"> \
-                  <a href="#" class="close"> \
-                    <img src="/facebox/closelabel.gif" title="close" class="close_image" /> \
-                  </a> \
-                </div> \
-                <div class="content"> \
-                </div> \
-              </td> \
-              <td class="b"/> \
-            </tr> \
-            <tr> \
-              <td class="bl"/><td class="b"/><td class="br"/> \
-            </tr> \
-          </tbody> \
-        </table> \
-      </div> \
-    </div>'
+	<div class="facebox" style="display:none;"> \
+		<div class="popup">\
+			<div class="close_wrapper"> \
+				<a href="#" class="close"> \
+					<img src="/facebox/closelabel.gif" title="close" class="close_image" /> \
+				</a> \
+			</div> \
+			<div class="body"> \
+				<div class="content"></div> \
+			</div>\
+		</div> \
+	</div>'
     },
 
     loading: function() {
@@ -68,8 +53,9 @@
         append('<div class="loading">Loading...</div>')
 		//append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
       $('#'+$.facebox.settings.id).css({
-        top:	getPageScroll()[1] + (getPageHeight() / 10),
-        left:	getPageWidth() / 2 - ($('#'+$.facebox.settings.id).width() / 2)
+		top:	getPageScroll()[1], //+ (getPageHeight() / 10)
+        left:0
+		//left:	getPageWidth() / 2 - ($('#'+$.facebox.settings.id).width() / 2)
       }).show()
 
       $(document).bind('keydown.facebox', function(e) {
@@ -87,12 +73,21 @@
       $('#'+$.facebox.settings.id+' .loading').remove()
       $('#'+$.facebox.settings.id+' .body').children().fadeIn('normal')
 	  var zi = 100 + ($(".facebox").length * 2);
-      $('#'+$.facebox.settings.id).css('z-index', zi).css('left', $(window).width() / 2 - ($('#'+$.facebox.settings.id+' table').width() / 2))
-      $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
+      
+	 // $('#'+$.facebox.settings.id).css('z-index', zi).css('left', $(window).width() / 2 - ($('#'+$.facebox.settings.id+' .body').width() / 2))
+	  $('#'+$.facebox.settings.id).css('z-index', zi)
+            
+	  
+	  $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
 
+	  /*
 	  $(window).resize(function(){
 		$('#'+$.facebox.settings.id).css("left", getPageWidth() / 2 - ($('#'+$.facebox.settings.id+' table').width() / 2));
-	  });	 
+	  });
+	  */
+	  $(window).scroll(function(){
+		$('#'+$.facebox.settings.id).css("top", getPageScroll()[1]);
+	  });	
 	},
 
     close: function(id) {
