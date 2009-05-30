@@ -99,8 +99,6 @@ class Tool_Controller extends Controller {
 			
 				$newline = "\n$page->page_name:$tool->name:$tool_insert_id,\n";
 				yaml::add_value($this->site_name, 'pages_config', $newline);
-				$db->update('pages', array('protected' => "$tool->name:$tool_insert_id"), array('id' => $page_id));
-				
 			}
 			
 			Load_Tool::after_add($tool->name, $tool_insert_id );
@@ -121,21 +119,21 @@ class Tool_Controller extends Controller {
 			$page = $db->query("
 				SELECT page_name FROM pages WHERE id = '$page_id'
 			")->current();			
-			
-			str_replace('/', '', $page->page_name, $count);
 
 			# If not a sub page and does not have builder installed already..
-			if(0 == $count AND !yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+			
+			if( FALSE !== strpos($page->page_name, '/') )
+				$protected_tools = 'Page builders cannot be placed on sub pages';
+			elseif( yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
+				$protected_tools = 'A page builder already exists on this page.';
+			else
 			{
 				$protected_tools = $db->query("
 					SELECT * FROM tools_list WHERE protected = 'yes'
-				");
-				$primary->protected_tools = $protected_tools;			
+				");		
 			}
-			
-
+			$primary->protected_tools = $protected_tools;
 			$primary->tools_list = $tools;
-			
 			$primary->page_id = $page_id;
 			die($primary);
 		}		

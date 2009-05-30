@@ -1,32 +1,37 @@
 
 <style type="text/css">
-	#jade_tool_box{
-		width:700px;
-		height:450px;
+	#tool_list_wrapper{
+		float:left;
+		width:180px;
+	}
+	#tool_list_wrapper ul{
+		line-height:1.5em;
+	}
+	#tool_view_wrapper{
+		float:right;
+		height:360px;
 		padding:5px;
 		background:#eee;
 		overflow:auto;
 		border:1px solid #ccc;
+		width:600px;
 	}
-	.tool_box_wrapper{
-		width:160px;
-		height:160px;
-		margin:5px;
-		float:left;
-		background:#fff;
+	.each_tool{
+		display:none;
+		margin:5px;	
 	}
-	.tool_box_wrapper button{
-		width:100%;
-		height:35px;
+	.each_tool button{
+		width:200px;;
+		height:30px;
 		border:0;
 	}
-	.tool_box_wrapper div{
+	.each_tool div.desc{
+		margin-top:10px;
 		padding:10px;
-		line-height:1.5em;
+		background:#fff;
 	}
 	#jade_tool_box label:hover,
-	#jade_tool_box label.selected
-	{	
+	#jade_tool_box label.selected{	
 		background: #7ebd40 url(/assets/images/admin/light_green_bg.png) repeat-x bottom left;
 	}
 </style>
@@ -37,77 +42,73 @@
 		<div id="common_title">Add New Tool to Page</div>
 	</div>
 		
-	<div id="tab_container">		
-		
-		<ul class="ui-tabs-nav generic_tabs">
-			<li><a href="#fragment-1">Content Tools</a><li>
-			<li><a href="#fragment-2">Page Builders</a><li>
+	<div id="tool_list_wrapper">
+		<h3>Content Tools</h3>
+		<ul>
+		<?php 
+			foreach($tools_list as $key => $tool)
+				echo "<li><a href='#' rel='$tool->id'>$tool->name</a></li>";
+		?>
 		</ul>
 		
-		<div id="fragment-1">
+		<h3>Page Builders</h3>
+		<?php
+			if( is_object($protected_tools) )
+			{
+				echo '<ul>';
+				foreach($protected_tools as $key => $tool)
+					echo "<li><a href='#' rel='$tool->id'>$tool->name</a></li>";
+			
+				echo '</ul>';
+			}
+			else
+				echo "<small>$protected_tools</small>";
+		?>		
+	</div>
 	
-			<div id="jade_tool_box">
-				<?php	
-				foreach($tools_list as $key => $tool)
-				{
-					?>
-					<div class="tool_box_wrapper">
-						<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
-							<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
-						</button>
-						<div><?php echo $tool->desc?></div>
-					</div>
-					<?php
-				}
-				?>
+	<div id="tool_view_wrapper">		
+		<?php	
+		foreach($tools_list as $key => $tool)
+		{
+			?>
+			<div id="tool_<?php echo $tool->id?>" class="each_tool">
+				<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
+					<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
+				</button>
+				<div class="desc"><?php echo $tool->desc?></div>
 			</div>
-			
-		</div>
-
-		<div id="fragment-2" class="ui-tabs-hide">
-			<div id="jade_tool_box">
+			<?php
+		}
+		
+		if( is_object($protected_tools) )
+		{
+			foreach($protected_tools as $key => $tool)
+			{
+				?>
+				<div id="tool_<?php echo $tool->id?>" class="each_tool">
+					<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
+						<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
+					</button>
+					<div class="desc"><?php echo $tool->desc?></div>
+				</div>
 				<?php
-				if( empty($protected_tools) )
-				{
-					echo 'Either this is a sub-page or a Page Builder is already installed on this page.';
-				}
-				else
-				{
-					foreach($protected_tools as $key => $tool)
-					{
-						?>
-						<div class="tool_box_wrapper">
-							<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
-								<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
-							</button>
-							<div><?php echo $tool->desc?></div>
-						</div>
-						<?php
-					}
-				}
-				?>
-			</div>
-			
-		</div>
-		
+			}
+		}
+		?>
 
-		
 	</div>
 
-
-	
 </form>
 <script type="text/javascript">
-
-	$("#tab_container").tabs();
-	
-	
-	// ADD tool label stuff...
-	$('#jade_tool_box label').click(function(){
-		$('#jade_tool_box label').removeClass('selected');
-		$(this).addClass('selected');
+	$('#tool_1').show();
+	$('#tool_list_wrapper a').click(function(){
+		id = $(this).attr('rel');	
+		$('div.each_tool').hide(); 
+		$('#tool_'+id).show();
+		return false;
 	});
-		
+	
+
 	// ACTIVATE custom ajax form
 	// data = post output from this method (above)
 	// receives the custom url of where the next 'add' page is for the particular tool

@@ -13,8 +13,8 @@ function _link($type, $page)
 }
 */
 ?>
-<div id="common_tool_header" class="buttons" style="width:750px">
-	<a href="/get/theme/change" rel="facebox" class="jade_positive">Change Theme</a>	
+<div id="common_tool_header" class="buttons">
+	<a href="/get/theme/change" rel="facebox" class="jade_positive floatright">Change Theme</a>	
 	<div id="common_title">Current Theme: <?php echo ucwords($this->theme)?></div>
 </div>
 

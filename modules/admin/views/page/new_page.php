@@ -20,9 +20,7 @@
 		color:#333;
 		font-size:1.4em;
 	}
-	#link_example,
-	#sub_page_example{
-		
+	#link_example{
 		color:green;
 	}	
 </style>
@@ -46,16 +44,17 @@
 			<div id="page_exists" class="aligncenter error_msg"></div>
 		
 			<p style="line-height:1.6em">
-				Add this page to primary menu?
+				Add to Main Menu?
 				<br><input type="checkbox" name="menu"> Yes!
 			</p>
 		</div>
 		
-		<div class="pane_right">
-			
+		<div class="pane_right">		
 			<?php
+			$slash = '/'; # add slash if not a root page.
 			if(! empty($page_builders) )
 			{
+				$slash = '';
 				?>
 				<div class="root_options">
 					Install Page Builder?<br><br>
@@ -63,9 +62,7 @@
 						<option value="0">none - (blank page)</option>
 						<?php 
 						foreach($page_builders as $tool)
-						{
 							echo "<option value='$tool->id'>$tool->name</option>";
-						}
 						?>
 					</select>	
 				</div>
@@ -74,16 +71,16 @@
 			?>
 		</div>
 		
-
-		
 	</div>
 	
 	<div id="new_page_url">
 		Your new page URL:
-		<br><b><?php echo url::site($path_string)?>/<span id="link_example"></span></b>
+		<br><b><?php echo url::site()."$directory$slash"?><span id="link_example">...</span></b>
 	</div>	
-
+	<input type="hidden" name="directory" value="<?php echo $directory?>">
 </form>	
+
+<?php if('' == $directory) $directory = 'ROOT' # for javascript?>
 <script type="text/javascript">
 
 	
@@ -125,15 +122,9 @@
 		return false;
 	}
 	
-	// if root page use root_filter
-	var root_filter = [<?php echo $root_filter?>];
-	
-	
-	// collection of sub_filters (sub_page_filters)
-	var filters = new Object;
-	<?php echo $sub_filter?>
-
-	
+	// load the page_name filter
+	var filter = [<?php echo $filter?>];
+		
 	/* 
 	 * custom ajax form, validates inputs and unique page_names
 	 *
@@ -144,16 +135,7 @@
 				return false
 
 			sent_page = $("input[name='page_name']").val();				
-			sub_node = $("select[name='sub_page']:enabled option:selected").attr('rel');
-			
-			if(sub_node){
-				if(filters[sub_node])
-					filter_duplicates = filters[sub_node].in_array(sent_page);
-				else
-					filter_duplicates = false;
-			}
-			else
-				filter_duplicates = root_filter.in_array(sent_page);
+			filter_duplicates = filter.in_array(sent_page);
 			
 			if(filter_duplicates) {
 				$('#page_exists').html('Page name already exists');
@@ -162,13 +144,15 @@
 			}
 		},
 		success: function(data) {
-			$.facebox(data, "status_reload", "facebox_2");
-			sub_page = $('#sub_page_example').html();			
-			window.location = '<?php echo url::site()?>' + sub_page + sent_page;						
+			directory = '<?php echo $directory?>';
+			path_for_css = directory.replace(/\//g,'_');
+
+			$('div.'+path_for_css).append(data);
+			$.facebox('Page added!', "status_reload", "facebox_2");
+			setTimeout('$.facebox.close("facebox_2")', 500);			
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);
 	
-
 	
 </script>

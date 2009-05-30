@@ -1,8 +1,7 @@
 
 <style type="text/css">
 	#jade_tool_box{
-		width:700px;
-		height:450px;
+		height:400px;
 		padding:5px;
 		background:#eee;
 		overflow:auto;
@@ -10,14 +9,14 @@
 	}
 	.tool_box_wrapper{
 		width:160px;
-		height:160px;
+		height:140px;
 		margin:5px;
 		float:left;
 		background:#fff;
 	}
 	.tool_box_wrapper button{
 		width:100%;
-		height:35px;
+		height:30px;
 		border:0;
 	}
 	.tool_box_wrapper div{

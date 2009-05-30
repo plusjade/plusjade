@@ -1,112 +1,103 @@
-<?php
-	function show_files($node_array)
-	{		
-		$counter = 5;
-		foreach($node_array as $key => $name)
-		{
-			if( is_array($name) )
-			{
-				$class = str_replace('/','_',$key, $count);
-				if(0 < $count )
-				{
-					$last_node = strrchr($key, '/');
-					$last_node = trim($last_node, '/');
-				}
-				else
-					$last_node = $key;
-					
-				echo '<div class="asset">';
-					echo '<img src="'. url::image_path('admin/folder.png') ."\" alt=''> ";
-					echo '(' .count($name). ')<br>';
-					echo '<a href="/'. $key .'" rel="'. $key .'" class="open_folder">'.$last_node.'</a>';
-				echo '</div>';
-				
-				echo '<div class="'. $class .' sub_folders">';
-					echo show_files($name);
-				echo '</div>';
-			}
-			else
-			{
-				echo '<div class="asset">';
-					echo '<img src="'.url::image_path('admin/page.png')."\" alt=''><br>$name";
-				echo '</div>';
-			}
-			
-			++$counter;
-			if( 0 == $counter%5 )
-				echo '<div class="clearboth"></div>';
-		}
-	}
-?>
+
 <style type="text/css">
-#page_browser_wrapper .breadcrumb{
-	padding:2px;
+#page_browser_wrapper .breadcrumb_wrapper{
 	font-size:1.2em;
+	font-weight:bold;
 }
+#page_browser_wrapper .breadcrumb_wrapper a{
+}
+
+#page_browser_wrapper #legend{
+	float:left;
+	width:200px;
+	padding:5px;
+}
+
 #directory_window{
+	height:350px;
+	width:460px;
+	float:right;
 	padding:10px;
-	margin:10px;
-	border:1px solid #ccc;
-	min-height:300px;
 	overflow:auto;
-	background:#eee;
+	order:1px solid #99ccff;
+	background:#e2effc;
 }
 #directory_window div.asset{
-	width:90px;
-	height:80px;
-	border:1px solid #ccc;
-	padding:5px;
 	margin:3px;
-	float:left;
-	background:#fff;
+	overflow:auto;
 }
-#directory_window div.asset img{
-
+.folder_bar, .page_icon, .page_bar{
+	padding:4px;
 }
-	
 #directory_window div.sub_folders{
 	display:none;
-	margin:10px;
-	border:1px solid red;
 }
-#page_browser_wrapper .actions{
+.enabled{
+	background:#fff;
+	border:1px solid #99ccff;
+}
+.hidden{
+	background:#f2f1f1;
+	border:1px solid #ccc;
+}
+.disabled{
+	background:#fbe2e2;
+	border:1px solid pink;
+}
+
+.folder_bar{
+	background:lightgreen;
+	width:25px;
+	float:left;
+}
+.page_bar{
+	float:right;
+}
+.page_bar div{
+	float:left;
 	text-align:right;
+	order:1px solid red;
+	width:25px;
+	min-height:10px;
+	overflow:auto;
+}
+.page_icon{
+	float:left;
+	padding:3px;
 }
 </style>
-<div id="common_tool_header" class="buttons">
-	<div id="common_title">All Site Pages</div>
-</div>
-
-<div id="common_tool_info">
-	Load pages for editing by clicking on the page name link.
-	<br><b style="color:#ccc">Gray</b> links are accessible but not on the menu.
-	<br><b style="color:red">Red</b> links are not publicly accessible.
-</div>
-
 
 <div id="page_browser_wrapper">
 
-	<div class="breadcrumb">
-		<a href="#" rel="ROOT" class="open_folder"><?php echo url::site()?></a><span id="update_url" rel=""></span>
-	</div>
-
-	<div class="actions">
-		<img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="get/page/add" class="new_page">Create Page</a>
-		<img src="<?php echo url::image_path('admin/folder_add.png')?>" alt=""> <a href="get/page/add" class="new_page">Create Folder</a>
+	<div id="common_tool_header" class="breadcrumb_wrapper">
+		<a href="#" rel="ROOT" class="open_folder"><?php echo url::site()?></a><span id="breadcrumb" rel=""></span>
 	</div>
 	
-	<div id="directory_window">
-
+	<div id="legend">
+		<img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="/get/page/add" class="new_page">New Page</a>
+		
+		<br><br>
+		
+		<h3>Key</h3>
+		<small>
+			<img src="<?php echo url::image_path('admin/magnifier.png')?>" alt=""> Load page.
+			<br><img src="<?php echo url::image_path('admin/cog_edit.png')?>" alt=""> Edit page settings.
+			<br><img src="<?php echo url::image_path('admin/folder_add.png')?>" alt=""> Create folder from page name
+			<br><img src="<?php echo url::image_path('admin/delete.png')?>" alt=""> Delete page.	
+			<br>
+			<br><b style="color:#ccc">Gray:</b> accessible but not in menu.
+			<br><b style="color:red">Red:</b> not publicly accessible.
+		</small>
 	</div>
-
-	<div class="ROOT" style="display:none">
-		<?php echo show_files($files_array);?>
-	</div>	
+	
+	<div id="directory_window" rel="ROOT">
+		<?php echo $files_structure?>
+	</div>
 
 </div>
 
 <script type="text/javascript">
-	$('#directory_window').html($('div.ROOT').html());
+	$('div.ROOT').show();
 
 	function strstr( haystack, needle, bool ) {
 		// http://kevin.vanzonneveld.net
@@ -130,12 +121,17 @@
 		}
 	}
 	
+	// assign click delegation
 	$('#page_browser_wrapper').click($.delegate({
-		'a.open_folder': function(e){
+		
+		'.open_folder': function(e){
 			path = $(e.target).attr('rel');
 			klass = path.replace(/\//g,'_');
-			$('#directory_window').html($('div.'+klass).html());		
-
+			
+			$('div.sub_folders').hide();
+			$('#directory_window').attr('rel',klass);		
+			$('div.'+klass).show();
+			
 			if('ROOT' == path){
 				folder_string = '';
 				path = '';
@@ -149,24 +145,68 @@
 					folder_string += ' &#8594 <a href="/'+ result_string +'" rel="'+ result_string +'" class="open_folder">'+ folder_array[i] +'</a>';
 				}
 			}
-			$('#update_url').attr('rel',path).html(folder_string);
-			
+			$('#breadcrumb').attr('rel',path).html(folder_string);
 			return false;
 		},
 		
 		'a.new_page': function(e){
 			$.facebox(function(){
-				path = $('#update_url').attr('rel');
+				path = $('#breadcrumb').attr('rel');
 				
 				$.get(e.target.href,
 				{
-					path_string: path
+					directory: path
 				}, 
 				function(data){
 					$.facebox(data, false, 'facebox_2');
 				});
 			}, false, 'facebox_2');
 			return false;
+		},
+		
+		// make img click execute as its parent alink
+		'img.delete_page': function(e){
+			if (confirm("This cannot be undone! Delete this page?")) {
+				$.parent = $(e.target).parent('a');
+				id = $.parent.attr('id');
+				url = $.parent.attr('href');
+				
+				$.get(url, function(){
+					klass = $('#page_wrapper_'+id).parent().attr('rel');
+					// remove from container
+					$('#page_wrapper_'+ id).remove();
+				});
+			}
+			return false;
+		},
+		
+		'img.img_facebox': function(e){
+			$.parent = $(e.target).parent('a');
+			url = $.parent.attr('href');
+
+			$.facebox(function(){
+					$.get(url, function(data){
+						$.facebox(data, false, 'facebox_2');
+					});
+			}, false, 'facebox_2');
+			return false;
+		},
+		
+		'img.folderize': function(e){
+			folder_path = $(e.target).attr('rel');
+			id = $(e.target).attr('id');
+			klass = folder_path.replace(/\//g,'_');
+			html = '<div class="folder_bar"><a href="/'+ folder_path +'" rel="'+ folder_path +'" class="open_folder" ><img src="<?php echo url::image_path('admin/folder.png')?>" rel="'+ folder_path +'" class="open_folder" alt=""></a></div>';
+			
+			
+			$('#page_wrapper_'+id).prepend(html);
+			
+			container = '<div class="'+ klass +' sub_folders"></div>';
+			$('#directory_window').prepend(container);
+			$(e.target).remove();
+			return false;
 		}
+		
 	}));
+
 </script>
