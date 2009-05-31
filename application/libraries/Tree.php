@@ -55,7 +55,7 @@ class Tree_Core {
 				switch($tool_name)
 				{
 					case 'navigation' :
-					$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span>'; 
+					$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span> <small>('. $item->type .') '. $item->data .'</small>'; 
 			
 					break;
 					case 'showroom' :
@@ -75,26 +75,21 @@ class Tree_Core {
 						{
 							case 'none':
 								$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span>'; 
-							break;
-
+								break;
 							case 'page':
 								$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="'. url::site($item->data) .'">' . $item->display_name . '</a></span>'; 						
-							break;
-							
+								break;
 							case 'url':
-								$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="http://'. $item->data .'">' . $item->display_name . '</a></span>'; 
-						
-							break;	
-							
+								$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="http://'. $item->data .'">' . $item->display_name . '</a></span>'; 	
+								break;	
 							case 'email':
 								$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="mailto:'.$item->data.'">' . $item->display_name . '</a></span>'; 
-							break;					
+								break;					
 						}
-					break;
-					
+						break;
 					case 'showroom';				
 						$entry =' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/showroom/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
-					break;
+						break;
 				}
 			}
 			
@@ -110,7 +105,7 @@ class Tree_Core {
 				}
 				elseif( TRUE === $admin)
 				{
-					echo '<ul class="simpleTree">',"\n",'<li class="root" id="1"><span>Navigation Root</span>';				
+					echo '<ul class="simpleTree">',"\n",'<li class="root" id="1"><span>(Root)</span>';				
 				}
 			}			
 			else
@@ -203,10 +198,10 @@ class Tree_Core {
 /*
  * Saves the nested positions of the menu links
  * Can also delete any links removed from the list.
- * $parent_table = name of the parent table
- * $item_table = name of the items table
- * $tool_id = tool id
- * $output = unformatted string from ul list
+ * $parent_table	= name of the parent table
+ * $item_table		= name of the items table
+ * $tool_id			= tool id
+ * $output			= unformatted string from ul list
  */ 
 	function save_tree($parent_table, $item_table, $tool_id, $raw_output)
 	{
@@ -221,7 +216,8 @@ class Tree_Core {
 		
 		# Get parent table to find children 
 		# *root_id* of the root child.
-		$parent_object = $db->query("SELECT * FROM $parent_table 
+		$parent_object = $db->query("
+			SELECT * FROM $parent_table 
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();

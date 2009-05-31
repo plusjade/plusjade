@@ -3,7 +3,24 @@
 #add_links_form p span{
 	display:none;
 }
+#left_wrapper{
+	float:left;
+	width:180px;
+}
+ul#actions_list{
+	margin-top:10px;
+	display:none;
+	line-height:1.6em;
+}
+#admin_navigation_wrapper{
+	float:right;
+	width:550px;
+	height:350px;
+	overflow:auto;
+	padding:10px;
+	border:1px solid red;
 
+}
 
 
 
@@ -47,41 +64,37 @@
 	margin-left:-16px;
 	background: url(/assets/images/navigation/root.gif) no-repeat 16px 0 #ffffff;
 }
-.simpleTree .line
-{
+.simpleTree .line,
+.simpleTree .line-last,
+.simpleTree .line-over,
+.simpleTree .line-over-last{
 	margin:0 0 0 -16px;
-	padding:0;
 	line-height: 3px;
-	height:6px;
 	font-size:3px;
+	height:3px;
+}
+.simpleTree .line-expand{
+	height:10px;
+	padding:3px 0;
+	margin:2px;
+	border:1px solid green;
+	background:lightgreen;
+}
+
+.simpleTree .line{
 	background: #ffffcc url(/assets/images/navigation/line_bg.gif) 0 0 no-repeat transparent;
 }
-.simpleTree .line-last
-{
-	margin:0 0 0 -16px;
-	padding:0;
-	line-height: 3px;
-	height:6px;
-	font-size:3px;
+.simpleTree .line-last{
 	background: #ffffcc url(/assets/images/navigation/spacer.gif) 0 0 no-repeat transparent;
 }
-.simpleTree .line-over
-{
-	margin:0 0 0 -16px;
-	padding:0;
-	line-height: 3px;
-	height:3px;
-	font-size:3px;
-	background: url(/assets/images/navigation/line_bg_over.gif) 0 0 no-repeat transparent;
+.simpleTree .line-over{
+	background:orange !important;
+	border:1px solid orange !important;
+
 }
-.simpleTree .line-over-last
-{
-	margin:0 0 0 -16px;
-	padding:0;
-	line-height: 3px;
-	height:3px;
-	font-size:3px;
-	background: url(/assets/images/navigation/line_bg_over_last.gif) 0 0 no-repeat transparent;
+.simpleTree .line-over-last{
+	background:orange !important;
+	border:1px solid orange !important;
 }
 .simpleTree .folder-open
 {
@@ -146,6 +159,7 @@
 }
 #drag_container
 {
+	z-index:9999;
 	background:#ffffff;
 	color:#000;
 	font: normal 11px arial, tahoma, helvetica, sans-serif;

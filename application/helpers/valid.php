@@ -17,8 +17,8 @@ class valid_Core {
 	{
 		if( NULL == $id OR !is_numeric($id) )
 		{
-			Event::run('system.404');
-			die();
+			die('invalid input');
+			#die(Event::run('system.404'));
 		}
 		return $id;
 	}	

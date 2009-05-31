@@ -1,85 +1,112 @@
-
-<?php
-function page_select($pages, $id)
-{
-	ob_start();
-	echo '<select name="data[' , $id , ']" disabled="disabled">';
-	
-	foreach ($pages as $page)
-		echo '<option>', $page->page_name ,'</option>';
-
-	echo '</select>';
-	
-	return ob_get_clean();
-}
-?>
 <style type="text/css">
 	.each_link_wrapper{
-		border:1px solid red;
 		padding:5px;
+	}
+	.tier{
+		margin:5px auto;
+		width:400px;
+		padding:5px;
+		text-align:right;
+		order:1px solid #ccc;
+	}
+	.hide{
+		display:none;
 	}
 </style>
 
-<form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" id="add_links_form" style="min-height:300px;">	
+<form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form" style="min-height:300px;">	
+	<input type="hidden" name="local_parent" value="<?php echo $local_parent?>">
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive">
-			<img src="<? echo url::image_path('check.png')?>" alt=""/> Add Links
+			<img src="<? echo url::image_path('check.png')?>" alt=""/> Add element
 		</button>
-		<div id="common_title">Add Links to Navigation</div>
+		<div id="common_title">Add element to Navigation</div>
 	</div>	
 	
 	<div id="common_tool_info">
-		Add as many links as you want. You can arrange them later!
+		Choose which kind of element you wish to add.
 	</div>
 	
 	<div class="fieldsets">
-		<?php
-		for($x=0; $x<3; ++$x)
-		{
-			?>
-			<p id="clone_<?php echo $x?>" class="each_link_wrapper">
-				Label <input type="text" name="item[<?php echo $x?>]" rel="text_req">
-				
-				<img src="<?php echo url::image_path('admin/bullet_go.png')?>" alt="next">  
-				Type:
-				<select class="toggle_type" rel="<?php echo $x?>" name="type[<?php echo $x?>]">
-					<option value="none">Label (no link)</option>
-					<option value="page">Link to +Jade Page</option>
-					<option value="url">Link to external Page</option>
-					<option value="email">Link to email address</option>
-					<option value="file">Link to +Jade file</option>	
+		
+		<div class="tier">
+			Type:
+			<select class="toggle_type" name="type" style="width:250px">
+				<option value="none">Label (no link)</option>
+				<option value="page">Link to +Jade Page</option>
+				<option value="url">Link to external Page</option>
+				<option value="email">Link to email address</option>
+				<option value="file">Link to +Jade file</option>	
+			</select>
+			<br><img src="<?php echo url::image_path('admin/arrow_right_down.png')?>" alt="next">  
+		</div>
+		
+		<div class="tier">
+			Label <input type="text" name="item" rel="text_req" style="width:250px">
+		</div>
+		
+		<div class="tier">		
+			<span id="page"  class="hide">Page:
+				<select name="data" disabled="disabled">
+					<?php
+					foreach ($pages as $page)
+						echo '<option>', $page->page_name ,'</option>';
+					?>
 				</select>
-				
-				<img src="<? echo url::image_path('admin/bullet_go.png')?>" alt="next"> 
-				
-				<span id="page_<?php echo $x?>"  class="hide_<?php echo $x?>">Page: <?php echo page_select($pages, $x)?></span>
-				<span id="url_<?php echo $x?>" class="hide_<?php echo $x?>">http://<input type="text" name="data[<?php echo $x?>]" disabled="disabled"></span>
-				<span id="email_<?php echo $x?>" class="hide_<?php echo $x?>">mailto:<input type="text" name="data[<?php echo $x?>]" disabled="disabled"></span>
-			</p>
-			<?php
-		}
-		?>
+			</span>
+			<span id="url" class="hide">http://<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="email" class="hide">mailto:<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
+		</div>
+		
 	</div>
 </form>
 
 <script type="text/javascript">
-
-	$('#clone_1').clone().appendTo('.facebox .fieldsets');
-	
 	$(".facebox .toggle_type").each(function(){
-		var field_id = $(this).attr("rel");
-		
 		$(this).change(function(){
-			var span = "#" + $(this).val() + "_" + field_id;
+			var span = "#" + $(this).val();
+
+			// Disable all @ start
+			$(".hide").hide();
+			$(".hide > :input").attr("disabled","disabled");
 			
-			// Disable to start over
-			$(".hide_" + field_id).hide();
-			$(".hide_" + field_id + " > :input").attr("disabled","disabled").removeAttr("rel");
-			
-			// Enable selection
-			$(span + " > :input").removeAttr("disabled").attr("rel","text_req");
+			// Enable single input
+			$(span + " > :input").removeAttr("disabled");
 			$(span).show();
 		});
 	});
+
+	
+	
+	/* 
+	 * custom ajax form response needs to populate the nested li list.
+	 *
+	 */		
+	var options = {
+		beforeSubmit: function(){					
+			if(! $(".custom_ajaxForm input:enabled").jade_validate() )
+				return false;
+			/*	
+			type = $("select[name='type'] > option:selected").val();			
+			
+			if('none' == type)
+				text = $("input[name='item']").val();
+			else
+				text = $("[name='data']:enabled").val();
+			*/
+			
+			text = $("input[name='item']").val();
+		},
+		success: function(data) {
+			$simpleTreeCollection.get(0).addNode(data, text);
+			$.facebox('Element added!', "status_reload", "facebox_2");
+			setTimeout('$.facebox.close("facebox_2")', 500);			
+		}					
+	};
+	$(".custom_ajaxForm").ajaxForm(options);
+	
+
+
+
 </script>
