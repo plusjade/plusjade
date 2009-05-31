@@ -38,13 +38,9 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
+			die('99'); # sample data return of insert_id
 			$db = new Database;
-			/*
-			echo'<pre>';print_r($_POST['item']);echo'</pre>';		
-			echo'<pre>';print_r($_POST['type']);echo'</pre>';
-			echo'<pre>';print_r($_POST['data']);echo'</pre>';
-			die();
-			*/
+
 			# Get parent
 			$parent	= $db->query("SELECT * FROM navigations 
 				WHERE id = '$tool_id' 
@@ -69,16 +65,21 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			Tree::rebuild_tree('navigation_items', $parent->root_id, '1');
 			echo 'Links added'; #status message
 		}
-		else
+		elseif($_GET)
 		{
+			# GET must come from ajax request @ view(edit_navigation/manage)
+			$local_parent = valid::id_key(@$_GET['local_parent']);
+			
 			$primary = new View('edit_navigation/new_item');
 			$db = new Database;
-			$pages = $db->query("SELECT page_name FROM pages 
+			$pages = $db->query("
+				SELECT page_name FROM pages 
 				WHERE fk_site = '$this->site_id'
 				ORDER BY page_name
 			");			
 			$primary->pages = $pages;
-			$primary->tool_id = $tool_id;	
+			$primary->tool_id = $tool_id;
+			$primary->local_parent = $local_parent;				
 			echo $primary;
 		}
 		die();		
@@ -104,25 +105,37 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	public function edit($id=NULL)
 	{
 		valid::id_key($id);		
-		$db = new Database;
-
-		if(! empty($_POST['title']) )
+	
+		if($_POST)
 		{
-			$data = array(
-				'title'	=> $_POST['title'],
-				'desc'	=> $_POST['desc'],		
-			);		
-			$db->update('calendar_items', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			echo 'Event Saved<br>Updating...';
+			die('successful test');
 		}
 		else
-		{		
-			$parent = $db->query("SELECT * FROM calendar_items WHERE id = '$id' AND fk_site = '$this->site_id' ")->current();			
-			$primary = new View("edit_navigation/single_item");
-			$primary->item = $parent;
-			echo $primary;
-		}	
-		die();		
+		{
+			$primary = new View('edit_navigation/edit_item');
+			$db = new Database;
+		
+			$item = $db->query("
+				SELECT * FROM navigation_items 
+				WHERE id = '$id'
+				AND fk_site = '$this->site_id'
+			")->current();
+			
+			if(! is_object($item) )
+				die('element does not exist');
+				
+				
+			$pages = $db->query("
+				SELECT page_name FROM pages 
+				WHERE fk_site = '$this->site_id'
+				ORDER BY page_name
+			");
+			
+			$primary->item = $item;
+			$primary->pages = $pages;
+			
+			die($primary);
+		}
 	}
 	
 	public function delete($id=NULL)

@@ -84,9 +84,13 @@
 	  $(window).resize(function(){
 		$('#'+$.facebox.settings.id).css("left", getPageWidth() / 2 - ($('#'+$.facebox.settings.id+' table').width() / 2));
 	  });
-	  */
+	 
 	  $(window).scroll(function(){
 		$('#'+$.facebox.settings.id).css("top", getPageScroll()[1]);
+	  });	
+	   */
+ 	  $(window).scroll(function(){
+		$('div.facebox').css("top", getPageScroll()[1]);
 	  });	
 	},
 
