@@ -49,6 +49,8 @@
 .facebox .close_wrapper {
 	overflow:hidden;
 	margin:0 10px;
+	position:relative;
+	top:2px;
 }
 .facebox  .close_wrapper .close{
 	display:block;
@@ -57,6 +59,8 @@
 	float:right;
 	padding:5px 5px 0 5px;
 	background:#fff;
+	border:2px solid #ccc;
+	border-bottom:0;
 }
 .facebox .body {
 	background:#fff;
