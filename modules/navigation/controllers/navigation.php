@@ -18,25 +18,32 @@ class Navigation_Controller extends Controller {
 		$primary	= new View('public_navigation/index');	
 		$db			= new Database;
 		
-		$parent	= $db->query("SELECT * FROM navigations 
+		$parent	= $db->query("
+			SELECT * FROM navigations 
 			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id' ")->current();
+			AND fk_site = '$this->site_id'
+		")->current();
 			
-		$items	= $db->query("SELECT * FROM navigation_items 
+		$items	= $db->query("
+			SELECT * FROM navigation_items 
 			WHERE parent_id = '$parent->id' 
 			AND fk_site = '$this->site_id' 
 			ORDER BY lft ASC
 		");		
 		
-		
+		# TODO: change this to only logged in view
+		if('0' == $items->count() )
+			return '(no items)';
+			
+			
 		$primary->parent = $parent;
+		
+		# node_generation function is contained in the tree class...
 		$primary->tree = Tree::display_tree('navigation', $items);
 		
 		# Javascript
 		if( $this->client->logged_in() )
 			$primary->add_root_js_files('simple_tree/jquery.simple.tree.js');
-		
-		# $primary->global_readyJS('');
 		
 		return $primary;
 	}

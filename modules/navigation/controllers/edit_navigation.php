@@ -18,15 +18,21 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		valid::id_key($tool_id);
 		$primary	= new View('edit_navigation/manage');
 		$db			= new Database;	
-		$items		= $db->query("SELECT * FROM navigation_items 
+		$items		= $db->query("
+			SELECT * FROM navigation_items 
 			WHERE parent_id = '$tool_id' 
 			AND fk_site = '$this->site_id' 
 			ORDER BY lft ASC
-		");				
+		");
+
+		function render_node_navigation($item)
+		{
+			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span> <small style="display:none">Type: '. $item->type .' <br> Data: '. $item->data .'</small>'; 
+		}
+		
 		$primary->tree = Tree::display_tree('navigation', $items, TRUE);
 		$primary->tool_id = $tool_id;	
-		echo $primary;
-		die();
+		die($primary);
 	}
 
 /*
@@ -38,38 +44,39 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
-			die('99'); # sample data return of insert_id
 			$db = new Database;
 
 			# Get parent
-			$parent	= $db->query("SELECT * FROM navigations 
+			$parent	= $db->query("
+				SELECT * FROM navigations 
 				WHERE id = '$tool_id' 
-				AND fk_site = '$this->site_id' ")->current();
-			
-			foreach($_POST['item'] as $key => $item)
-			{			
-				$data_string = ( empty($_POST['data'][$key]) ) ? '' : $_POST['data'][$key];
+				AND fk_site = '$this->site_id'
+			")->current();	
+			if(! is_object($parent) )
+				die('does not exist');
+				
+			$data_string = ( empty($_POST['data']) ) ? '' : $_POST['data'];
 
-				$data = array(
-					'parent_id'		=> $tool_id,
-					'fk_site'		=> $this->site_id,
-					'display_name'	=> $item,
-					'type'			=> $_POST['type'][$key],
-					'data'			=> $data_string,
-					'local_parent'	=> $parent->root_id,
-					'position'		=> '0'
-				);	
-				$db->insert('navigation_items', $data); 	
-			}
+			$data = array(
+				'parent_id'		=> $tool_id,
+				'fk_site'		=> $this->site_id,
+				'display_name'	=> $_POST['item'],
+				'type'			=> $_POST['type'],
+				'data'			=> $data_string,
+				'local_parent'	=> $_POST['local_parent'],
+			);	
+			$insert_id = $db->insert('navigation_items', $data)->insert_id(); 	
+			
 			# Update left and right values
 			Tree::rebuild_tree('navigation_items', $parent->root_id, '1');
-			echo 'Links added'; #status message
+			
+			die("$insert_id");#output to javascript
 		}
 		elseif($_GET)
 		{
 			# GET must come from ajax request @ view(edit_navigation/manage)
-			$local_parent = valid::id_key(@$_GET['local_parent']);
-			
+			$local_parent = valid::id_key($_GET['local_parent']);
+	
 			$primary = new View('edit_navigation/new_item');
 			$db = new Database;
 			$pages = $db->query("
@@ -79,10 +86,10 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			");			
 			$primary->pages = $pages;
 			$primary->tool_id = $tool_id;
-			$primary->local_parent = $local_parent;				
-			echo $primary;
-		}
-		die();		
+			$primary->local_parent = $local_parent;	
+
+			die($primary);
+		}	
 	}
 
 /*
@@ -90,7 +97,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
  * Can also delete any links removed from the list.
  *
  */ 
-	function save_sort($tool_id)
+	function save_tree($tool_id=NULL)
 	{
 		if($_POST)
 		{
@@ -105,15 +112,20 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	public function edit($id=NULL)
 	{
 		valid::id_key($id);		
-	
+		$db = new Database;
 		if($_POST)
 		{
-			die('successful test');
+			$data = array(
+				'display_name'	=> $_POST['item'],
+				'type'			=> $_POST['type'],
+				'data'			=> @$_POST['data'],
+			);	
+			$db->update( 'navigation_items', $data, array('id' => $id, 'fk_site' => $this->site_id) ); 	
+			die('Changes Saved!');
 		}
 		else
 		{
 			$primary = new View('edit_navigation/edit_item');
-			$db = new Database;
 		
 			$item = $db->query("
 				SELECT * FROM navigation_items 
@@ -154,16 +166,42 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 				'title'	=> $_POST['title'],
 			);		
 			$db->update('navigations', $data, "id = '$tool_id' AND fk_site = '$this->site_id'");
-			echo 'Settings Saved!<br>Updating...';	
+			die('Settings Saved!<br>Updating...');	
 		}
 		else
 		{
 			$primary = new View("edit_navigation/settings");
 			$parent = $db->query("SELECT * FROM navigations WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();			
 			$primary->parent = $parent;
-			echo $primary;
-		}
-		die();				
+			die($primary);
+		}			
 	}
-	
+
+
+/*
+ * Need to add a root child to items list for every other
+ * child to belong to
+ * Add root child id to parent for easier access.
+ */		 
+	static function _tool_adder($tool_id, $site_id)
+	{
+		$db = new Database;
+		$data = array(
+			'parent_id'		=> $tool_id,
+			'fk_site'		=> $site_id,
+			'display_name'	=> 'ROOT',
+			'type'			=> 'none',
+			'local_parent'	=> '0',
+			'position'		=> '0'
+		);	
+		$root_insert_id = $db->insert('navigation_items', $data)->insert_id(); 	
+		
+		$db->update('navigations', 
+			array( 'root_id' => $root_insert_id ), 
+			array( 'id' => $tool_id, 'fk_site' => $site_id ) 
+		);
+		
+		# which method to invoke after?
+		return 'manage';
+	}
 }
