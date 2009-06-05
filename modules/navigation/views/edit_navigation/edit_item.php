@@ -37,7 +37,6 @@
 	</div>	
 	
 	<div id="common_tool_info">
-		=D
 	</div>
 	
 	<div class="fieldsets">
@@ -76,8 +75,8 @@
 					?>
 				</select>
 			</span>
-			<span id="url" class="hide">http://<input type="text" name="data" value= "<?php echo $data['url']?>" disabled="disabled" rel="text_req" style="width:250px"></span>
-			<span id="email" class="hide">mailto:<input type="text" name="data" value= "<?php echo $data['email']?>" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="url" class="hide">http://<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="email" class="hide">mailto:<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="text_req" style="width:250px"></span>
 		</div>
 		
 	</div>
@@ -104,38 +103,21 @@
 	});
 
 	
-	/* 
+	/*
 	 * custom ajax form response needs to populate the nested li list.
 	 *
-	 */		
+	 */
 	var options = {
 		beforeSubmit: function(){
 			if(! $(".custom_ajaxForm input:enabled").jade_validate() )
-				return false;
-			/*	
-			type = $("select[name='type'] > option:selected").val();			
-			
-			if('none' == type)
-				text = $("input[name='item']").val();
-			else
-				text = $("[name='data']:enabled").val();
-			*/
-			
-			text = $("input[name='item']").val();
+				return false;			
 		},
-		success: function(data) {
+		success: function(data) {	
+			text = $("input[name='item']").val();
 			$('li span.active').html(text);
-			
-			//$simpleTreeCollection.get(0).addNode(data, text);
 			$.facebox('Changes Saved!', "status_reload", "facebox_2");
 			setTimeout('$.facebox.close("facebox_2")', 500);			
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);
-	
-
-	
-	
-	
-
 </script>

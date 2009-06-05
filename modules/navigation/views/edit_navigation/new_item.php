@@ -9,17 +9,14 @@
 		text-align:right;
 		order:1px solid #ccc;
 	}
-	.hide{
-		display:none;
-	}
 </style>
 
 <form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form" style="min-height:300px;">	
 	<input type="hidden" name="local_parent" value="<?php echo $local_parent?>">
-	
+
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive">
-			<img src="<? echo url::image_path('check.png')?>" alt=""/> Add element
+			<img src="<? echo url::image_path('check.png')?>" alt=""/> Create Element
 		</button>
 		<div id="common_title">Add element to Navigation</div>
 	</div>	
@@ -47,7 +44,7 @@
 		</div>
 		
 		<div class="tier">		
-			<span id="page"  class="hide">Page:
+			<span id="page" style="display:none">Page:
 				<select name="data" disabled="disabled">
 					<?php
 					foreach ($pages as $page)
@@ -55,20 +52,20 @@
 					?>
 				</select>
 			</span>
-			<span id="url" class="hide">http://<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
-			<span id="email" class="hide">mailto:<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="url" style="display:none">http://<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="email" style="display:none">mailto:<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
 		</div>
 		
 	</div>
 </form>
 
-<script type="text/javascript">
+<script type="text/javascript">	
 	$(".facebox .toggle_type").each(function(){
 		$(this).change(function(){
 			var span = "#" + $(this).val();
 
 			// Disable all @ start
-			$(".hide").hide();
+			$(".tier span").hide();
 			$(".hide > :input").attr("disabled","disabled");
 			
 			// Enable single input
@@ -99,7 +96,9 @@
 			text = $("input[name='item']").val();
 		},
 		success: function(data) {
+		
 			$simpleTreeCollection.get(0).addNode(data, text);
+			
 			$.facebox('Element added!', "status_reload", "facebox_2");
 			setTimeout('$.facebox.close("facebox_2")', 500);			
 		}					

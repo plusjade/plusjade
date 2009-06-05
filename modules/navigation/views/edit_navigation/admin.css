@@ -9,7 +9,6 @@
 }
 ul#actions_list{
 	margin-top:10px;
-	display:none;
 	line-height:1.6em;
 }
 #admin_navigation_wrapper{
@@ -18,8 +17,7 @@ ul#actions_list{
 	height:350px;
 	overflow:auto;
 	padding:10px;
-	border:1px solid red;
-
+	border:1px solid #ccc;
 }
 
 
@@ -28,7 +26,6 @@ ul#actions_list{
 {	
 	margin:0;
 	padding:0;
-	
 	/*
 	overflow:auto;
 	width: 250px;
@@ -150,9 +147,10 @@ ul#actions_list{
 {
 	cursor: default;
 }
-.simpleTree .active
+.simpleTree .active,
+.simpleTree li span:hover
 {
-	cursor: default;
+	cursor: move;
 	background-color:#F7BE77;
 	padding:0px 2px;
 	border: 1px dashed #444;

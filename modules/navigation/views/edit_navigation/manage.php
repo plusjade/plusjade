@@ -6,14 +6,14 @@
 </div>
 
 <div id="left_wrapper">
-	Click on an element to select it.
-	<br>Once selected you can add, edit, or delete items.
-	
+	Click an element to select it.
 	<ul id="actions_list">	
 		<li><a href="/get/edit_navigation/add/<?php echo $tool_id?>" id="add_node">Add Child Element</a></li>
 		<li><a href="/get/edit_navigation/edit/" id="edit_node">Edit Element</a></li>
 		<li><a href="#" id="delete_node">Delete Element</a></li>
 	</ul>
+	
+	<div id="element_data"></div>
 </div>
 
 <div id="admin_navigation_wrapper">
@@ -25,34 +25,38 @@
 		active = false;
 		$('li span.active').each(function(){
 			active = $(this).parent().attr('rel');
-		});	
-		if(!active)
-			return false;
-
+		});
 		return active;
 	};
 	
 	// initiliaze simpleTree
-	$simpleTreeCollection = $(".facebox .simpleTree").simpleTree({
-		autoclose: true,
-		animate:true
+	$simpleTreeCollection = $(".facebox .simpleTree").simpleTree();
+	
+	$("li.root > span").click(function(){
+		$('span.active').removeClass('active').addClass('text');
+		$(this).addClass('active');
+		
 	});
-
+	
+	
 	/*
 		delegate element click actions
 	*/
+	ROOT = $('.simpleTree > li.root').attr('rel');
 	$('#actions_list').click($.delegate({
+		
 		// add element
 		"a#add_node": function(e){
-			if( !get_active_node() ){
+			el_id = get_active_node();
+			
+			if(! el_id ){
 				alert('Select an item to add element to.');
 				return false;
 			}
 			
 			url = $(e.target).attr('href');
-			local_parent = get_active_node();	
 			$.facebox(function() {
-					$.get(url, {local_parent: local_parent}, 
+					$.get(url, {local_parent: el_id}, 
 						function(data){
 							$.facebox(data, false, "facebox_2");
 					})
@@ -65,13 +69,18 @@
 		
 		// edit active element
 		"a#edit_node": function(e){
-			if( !get_active_node() ){
+			el_id = get_active_node();
+			
+			if(! el_id ){
 				alert('Select an item to edit.');
+				return false;
+			}
+			else if(ROOT == el_id){
+				alert('You cannot edit the root node.');
 				return false;
 			}
 			
 			url = $(e.target).attr('href');
-			el_id = get_active_node();	
 			$.facebox(function() {
 					$.get(url+el_id, function(data){
 						$.facebox(data, false, "facebox_2");
@@ -80,20 +89,19 @@
 				false, 
 				'facebox_2'
 			);
-			return false;			
-		
-		
+			return false;
 		},
+		
 		// delete active element
-		"a#delete_node": function(e){
-			if(!get_active_node()){
+		"a#delete_node": function(e){		
+			el_id = get_active_node();
+			
+			if(! el_id )
 				alert('Select an item to delete.');
-				return false;
-			}
-			else{
-				if(confirm("Remove element from the list? \n NOTE: Elements are not deleted until you click \"Save Changes\""))
-					$simpleTreeCollection.get(0).delNode();
-			}			
+			else if( ROOT == el_id )
+				alert('You cannot delete the root node.');
+			else if( confirm("Remove element from the list? \n NOTE: Elements are not deleted until you click \"Save Changes\"") )
+				$simpleTreeCollection.get(0).delNode();		
 			return false;
 		}
 		
@@ -103,6 +111,8 @@
 	// Gather and send nest data.
 	// ------------------------
 	$(".facebox #link_save_sort").click(function() {
+		$.facebox('Saving Tree...', "status_reload", "facebox_2");
+		
 		var output = "";
 		var tool_id = $(this).attr("rel");
 		
@@ -113,18 +123,17 @@
 			
 			// Data set format: "id:local_parent_id:position#"
 			$kids.each(function(i){
-				output += $(this).attr("rel") + ":" + parentId + ":" + i + "#";
+				output += $(this).attr('rel') + ':' + parentId + ':' + i + "|";
 			});
 		});
 		//alert (output); return false;
-		$.facebox(function() {
-				$.post("/get/edit_navigation/save_sort/"+tool_id, {output: output}, function(data){
-					$.facebox(data, "status_reload", "facebox_response");
-					location.reload();
-				})
-			}, 
-			"status_reload", 
-			"facebox_response"
-		);
+		
+		$.post('/get/edit_navigation/save_tree/'+tool_id,
+			{output: output},
+			function(data){
+				$.facebox.close();
+				$().jade_update_tool_html('update', 'navigation', tool_id, data);	
+			}
+		)		
 	});		
 </script>
