@@ -110,11 +110,22 @@
 	
 
 	// ACTIVATE custom ajax form
-	// data = post output from this method (above)
+	// tool_data = post output from this method (above)
 	// receives the custom url of where the next 'add' page is for the particular tool
 	var options = {
-		success: function(data) {
-			$.get('/get/edit_'+data, function(data) { 
+		success: function(tool_data) {
+			/* 
+				the data we get back should be JSON (when i learn it)
+				data format:
+				toolname:next_step:tool_id:tool_guid
+				TODO: clean this up, its too cryptic
+			*/
+			
+			tool_data = tool_data.split(':');
+			// load up the add-item method
+			$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
+			{guid : tool_data[3]},
+			function(data){ 
 				$.facebox(data, false, 'facebox_base')				
 			});					
 		}					

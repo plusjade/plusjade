@@ -4,7 +4,7 @@ class Tool_Controller extends Controller {
 	/**
 	 *	SCOPE: Performs CRUD for tools
 	 *	Tools belong to pages, but manipulating tools themselves,
-	 *  Should be scoped OUT of page manipulation
+	 *  Should be separate from page manipulation
 	 *
 	 */
 	
@@ -40,8 +40,7 @@ class Tool_Controller extends Controller {
 		
 		$primary->tools = $tools;
 		$primary->pages = $pages;
-		echo $primary;
-		die();
+		die($primary);
 	}
 
 /*
@@ -50,7 +49,7 @@ class Tool_Controller extends Controller {
  *
  */
 	function add($page_id=NULL)
-	{
+	{		
 		valid::id_key($page_id);		
 		$db = new Database;		
 
@@ -63,7 +62,8 @@ class Tool_Controller extends Controller {
 				SELECT name, protected FROM tools_list WHERE id='$id'
 			")->current();
 			$table = strtolower($tool->name).'s';
-				
+
+			
 			# INSERT row in tool parent table
 			$data = array(
 				'fk_site'	=> $this->site_id
@@ -88,7 +88,7 @@ class Tool_Controller extends Controller {
 				'tool_id'	=> $tool_insert_id,
 				'position'	=> ++$highest
 			);
-			$db->insert('pages_tools', $data);
+			$tool_guid = $db->insert('pages_tools', $data)->insert_id();
 			
 			# if tool is protected, add page to pages_config file.
 			if('yes' == $tool->protected)
@@ -101,12 +101,20 @@ class Tool_Controller extends Controller {
 				yaml::add_value($this->site_name, 'pages_config', $newline);
 			}
 			
-			Load_Tool::after_add($tool->name, $tool_insert_id );
-			
-			# Pass output the facebox so it can load the next step page
-			echo strtolower($tool->name)."/add/$tool_insert_id";
+			#$tool = Load_Tool::factory($tool->name);
+			#$tool->_tool_adder($tool_insert_id);
+			# NOTE! call_user_func is supposed to be really slow so optimized later...
+			$goto = call_user_func(
+				array("Edit_{$tool->name}_Controller", '_tool_adder'),
+				$tool_insert_id,
+				$this->site_id
+			);		
 
-			die();
+			# Pass output to javascript @tool view "add" 
+			# so it can load the next step page
+			# toolname:next_step:tool_id:tool_guid
+			
+			die(strtolower($tool->name).":$goto:$tool_insert_id:$tool_guid");
 		}	
 		else
 		{			
@@ -133,6 +141,8 @@ class Tool_Controller extends Controller {
 				");		
 			}
 			$primary->protected_tools = $protected_tools;
+			
+			
 			$primary->tools_list = $tools;
 			$primary->page_id = $page_id;
 			die($primary);
@@ -155,7 +165,7 @@ class Tool_Controller extends Controller {
 				'page_id'	=> $_POST['new_page']
 			);
 			$db->update('pages_tools', $data, array( 'guid' => "$tool_guid", 'fk_site' => "$this->site_id" ) );			
-			echo 'Tool moved!!';
+			die('Tool moved!!');
 		}
 		else
 		{
@@ -163,13 +173,11 @@ class Tool_Controller extends Controller {
 			$pages		= $db->query("SELECT id, page_name FROM pages WHERE fk_site = '$this->site_id' ORDER BY page_name");
 			$primary->pages = $pages;
 			$primary->tool_guid = $tool_guid;
-			echo $primary;	
+			die($primary);	
 		}
-		die();
 	}
 	
-	
-	
+
 /*
  *	Delete single tool, both parent and children.
  *  Deletes the page reference in pages_tools as well.
@@ -217,6 +225,56 @@ class Tool_Controller extends Controller {
 		
 		die('Tool Deleted!<br>Updating...');
 	}
-}
 
-/* End of file tools.php */
+	
+/*
+ * get the rendered html of a single tool 
+ * used to insert updated tool data into the DOM via ajax
+ */	
+	function html($toolname=NULL, $tool_id=NULL)
+	{
+		valid::id_key($tool_id);
+		
+		# probably should query this in the db...
+		$toolname= ucwords($toolname);
+		$tool_object = Load_Tool::factory($toolname);
+		
+		die( $tool_object->_index($tool_id) );
+	}
+
+
+/*
+ * output red tool toolkit html
+ * used in view(admin/admin_panel)
+ * also when when adding a <new> tool html into the DOM
+ */		
+	function toolkit($tool_guid=NULL)
+	{
+		valid::id_key($tool_guid);
+		
+		$primary = new View('tool/toolkit_html');
+		$db = new Database;
+		
+		$tool_data = $db->query("
+			SELECT pages_tools.*, tools_list.name 
+			FROM pages_tools
+			JOIN tools_list ON tools_list.id = pages_tools.tool
+			WHERE pages_tools.guid = '$tool_guid'
+			AND pages_tools.fk_site = '$this->site_id'
+		")->current();
+		$data_array = array(
+			'guid'		=> $tool_data->guid,
+			'name'		=> $tool_data->name,
+			'name_id'	=> $tool_data->tool,
+			'tool_id'	=> $tool_data->tool_id,
+		);	
+		/*
+		 * guid			is for pages_tools table
+		 * name			defines the tool table (plural) ex: album(s)
+		 * name_id		tools_list id of the tool
+		 * tool_id		gets the tool from the tool table
+		 */
+		$primary->data_array = $data_array;
+		die($primary);
+	}
+}

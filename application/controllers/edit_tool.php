@@ -14,8 +14,7 @@ abstract class Edit_Tool_Controller extends Controller {
 		if(! $this->client->logged_in()
 			OR $this->client->get_user()->client_site_id != $this->site_id )
 		{
-			echo 'Please login';
-			die();
+			die('Please login');
 		}
 		
 		# Controller variables
@@ -103,7 +102,8 @@ abstract class Edit_Tool_Controller extends Controller {
 		$table = $toolname.'s';		
 
 		$parent = $this->_grab_tool_parent($toolname, $tool_id);		
-		$query = "SELECT * FROM {$toolname}_items 
+		$query = "
+			SELECT * FROM {$toolname}_items 
 			$join 
 			WHERE parent_id = '$parent->id' 
 			AND fk_site = '$this->site_id' 
@@ -119,13 +119,11 @@ abstract class Edit_Tool_Controller extends Controller {
 		}
 		else
 		{
-			if( is_object($parent) )
-			{
-				$primary = new View("edit_$toolname/new_item");			
-				$primary->tool_id = $parent->id;
-			}
-			else
+			if( !is_object($parent) )
 				die();
+
+			$primary = new View("edit_$toolname/new_item");			
+			$primary->tool_id = $parent->id;
 		}
 		return $primary;		
 	}	
@@ -139,7 +137,8 @@ abstract class Edit_Tool_Controller extends Controller {
 	function _view_add_single($toolname, $tool_id)
 	{
 		$primary = new View("edit_$toolname/new_item");
-		$primary->tool_id = $tool_id;			
+		$primary->tool_id = $tool_id;
+		$primary->hidden_guid = Load_Tool::is_get_guid(@$_GET['guid']);		
 		return $primary;
 	}
 
@@ -196,7 +195,7 @@ abstract class Edit_Tool_Controller extends Controller {
  * $table module table this updates
  *
  */
-	function _save_sort_common($item_array, $table)
+	static function _save_sort_common($item_array, $table)
 	{
 		(array) $item_array;	
 		$db = new Database;	
@@ -221,8 +220,7 @@ abstract class Edit_Tool_Controller extends Controller {
 
 	public function __call($method, $id)
     {
-		echo 'non existent method';
-		die();
+		die('non existent method');
 	}
 	
 } # End Template_Controller

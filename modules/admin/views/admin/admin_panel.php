@@ -68,10 +68,10 @@ if (empty($tools_array))
 		</tr></table>		
 
 
-		<ul id="cssdropdown" style="display:none">
+		<div style="display:none">
 			<span id="click_hook" rel="<?php echo $page_id?>" style="display:none"></span>
 			<?php						
-			if( count($tools_array) > 0 )
+			if( '0' < count($tools_array) )
 			{
 				/*
 				 * THIS IS HIDDEN: Exists so JS can grab html.
@@ -82,24 +82,12 @@ if (empty($tools_array))
 				 * tool_id		gets the tool from the tool table
 				 */
 				foreach($tools_array as $db_position => $data_array)
-				{									
-					echo '<li id="toolkit_' , $data_array['guid'] , '">';	
-						echo'<table><tr><td class="name_wrapper">';
-						echo '<span class="name">', ucwords($data_array['name']) , '</span>';					
-						echo '</td><td class="actions_wrapper">';
-						echo '<a href="#" class="actions_link"><img src="'. url::image_path('admin/cog_edit.png') .'" alt=""> Edit</a>';
-					
-						echo '<ul class="toolkit_dropdown">';
-							echo View::factory('edit_'.$data_array['name'].'/toolbar' , array( 'identifer' => $data_array['tool_id'] ) );
-							echo '<li><img src="'. url::image_path('admin/css_add.png') .'" alt="CSS"> <a href="/get/css/edit/' , $data_array['name_id'] , '/' , $data_array['tool_id'] , '" rel="facebox">Edit CSS</a></li>';
-							echo '<li><img src="'. url::image_path('admin/delete.png') .'" alt="delete!"> <a href="/get/tool/delete/' , $data_array['guid'] , '" class="js_admin_delete" rel="guid_',$data_array['guid'],'">Delete</a></li>';	
-						echo '</ul>';
-						echo '</td></tr></table>';
-					echo '</li>';
+				{
+					echo View::factory('tool/toolkit_html', array('data_array'=> $data_array));
 				}
 			}
 			?>
-		</ul>		
+		</div>		
 	</div>
 </div>
 
