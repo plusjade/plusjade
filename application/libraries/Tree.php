@@ -37,7 +37,7 @@ class Tree_Core {
 	 *    $items are required to have lft/rgt values
 	 * 
 	*/
-	static function display_tree($tool_name, $items, $admin=FALSE)
+	static function display_tree($toolname, $items, $admin=FALSE)
 	{	  
 		# start with an empty $right stack
 		$right		= array();	
@@ -65,8 +65,8 @@ class Tree_Core {
 			$old	= $compare[$q-1];
 
 			# generate output for each node	
-			if( is_callable("render_node_$tool_name") )
-				$entry = call_user_func("render_node_$tool_name", $item);
+			if( is_callable("render_node_$toolname") )
+				$entry = call_user_func("render_node_$toolname", $item);
 			else
 				$entry = call_user_func(array('Tree', 'render_node_navigation'), $item);
 			

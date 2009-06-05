@@ -1,7 +1,7 @@
 
-$('.phpajaxcalendar_wrapper').click($.delegate({
+$('body').click($.delegate({
 
-	'a[rel*=ajax]' : function(e){		
+	'.phpajaxcalendar_wrapper a[rel*=ajax]' : function(e){		
 		$('a[rel*=ajax]').removeClass('selected');
 		$(e.target).addClass('selected');
 		
@@ -12,7 +12,7 @@ $('.phpajaxcalendar_wrapper').click($.delegate({
 		return false;
 	},
 	
-	'a.monthnav' : function(e){
+	'.phpajaxcalendar_wrapper a.monthnav' : function(e){
 		$('.phpajaxcalendar_wrapper').html('<div class="ajax_loading">Loading...</div>');
 		$('.phpajaxcalendar_wrapper').load(e.target.href, {limit: 25});
 		return false;

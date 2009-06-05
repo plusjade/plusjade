@@ -61,7 +61,7 @@ class Build_Page_Controller extends Template_Controller {
 				# If Logged in wrap classes around tools for Javascript
 				# TODO: consider this with javascript
 				if( $this->client->logged_in() )
-				{			
+				{		
 					$scope = 'local';
 					if( '5' >= $tool->page_id ) $scope = 'global';
 		
@@ -79,11 +79,13 @@ class Build_Page_Controller extends Template_Controller {
 					'name_id'	=> $tool->tool,
 					'tool_id'	=> $tool->tool_id,
 				);
-
+				
+				$js_tool_init = strtolower($tool->name)."_init_$tool->tool_id";
+				
 				# Create Tool object
 				$tool_object  = $prepend;				
 				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
-				$tool_object .= $append;
+				$tool_object .= "$append <span id='$js_tool_init' style='display:none'></span>";
 				
 				# Add tools to correct container.				
 				$index = $tool->container;

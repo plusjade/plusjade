@@ -75,6 +75,7 @@ class valid_Core {
 	 */
 	static function filter_php_url($string)
 	{
+		$string = trim($string);
 		return preg_replace("/[^-a-z0-9_]/i", '-', (string) $string);
 	}
 	

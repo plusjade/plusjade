@@ -1,4 +1,5 @@
-<form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" class="ajaxForm">
+
+<form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" class="ajaxForm" rel="calendar-<?php echo $tool_id?>">
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_item" class="jade_positive">

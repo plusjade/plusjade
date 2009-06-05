@@ -20,64 +20,57 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	{
 		valid::id_key($tool_id);
 		$db = new Database;
-		$parent = $db->query("SELECT * FROM showrooms 
+		$parent = $db->query("
+			SELECT * FROM showrooms 
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();			
 
 		#show category list.
 		$primary = new View("edit_showroom/manage_showroom");
-		$items = $db->query("SELECT * FROM showroom_items 
+		$items = $db->query("
+			SELECT cat.*, COUNT(items.id) AS item_count
+			FROM showroom_items AS cat
+			LEFT JOIN showroom_items_meta AS items ON cat.id = items.cat_id
 			WHERE parent_id = '$parent->id' 
-			AND fk_site = '$this->site_id' 
-			ORDER BY lft ASC 
-		");		
+			AND cat.fk_site = '$this->site_id'
+			GROUP BY cat.id
+			ORDER BY cat.lft ASC 
+		");
+
+		function render_node_showroom($item)
+		{
+			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->name . ' <small>('. $item->item_count .')</small></span>'; 
+		}
+		
 		$primary->tree = Tree::display_tree('showroom', $items, TRUE);		
 		$primary->tool_id = $tool_id;
-		echo $primary;
-		die();
+		die($primary);
 	}
 
 	
-	function items($tool_id=NULL)
-	{
-		valid::id_key($tool_id);
-		$primary = new View('edit_showroom/manage_items');
-		$db = new Database;
-		
-		# Get list of categories
-		$categories = $db->query("SELECT id, name FROM showroom_items
-			WHERE parent_id = '$tool_id' AND fk_site = '$this->site_id'
-			AND local_parent != '0'
-			ORDER BY lft ASC
-		");	
-		$primary->categories = $categories;
-		echo $primary;
-		die();
-	}
-
-	function list_items($cat_id=NULL)
+	function items($cat_id=NULL)
 	{
 		valid::id_key($cat_id);
 		$db = new Database;
-		$primary = new View('edit_showroom/list');
+		$primary = new View('edit_showroom/manage_items');
 		
 		#display items in this cat
-		$items = $db->query("SELECT * FROM showroom_items_meta 
-			WHERE cat_id = '$cat_id' AND fk_site = '$this->site_id'
+		$items = $db->query("
+			SELECT * FROM showroom_items_meta 
+			WHERE cat_id = '$cat_id' 
+			AND fk_site = '$this->site_id'
 			ORDER by position;
 		");			
 		
-		if( count($items) > 0 )
-		{
-			$primary->items = $items;
-			echo $primary;
-		}
-		else
-			echo 'No items. Check back soon!';
-			
-		die();		
+		if( '0' == count($items) )
+			die('No items. Check back soon!');	
+
+		$primary->items = $items;
+		die($primary);
 	}
+	
+	
 /*
  * Save nested positions of the category menus
  * Can also delete any links removed from the list.
@@ -102,6 +95,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
+			die('category added (test)');
 			$db = new Database;
 			# Get parent
 			$parent	= $db->query("SELECT * FROM showrooms 
@@ -146,75 +140,54 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  * Add Item(s)
  */ 
 	public function add_item($tool_id=NULL)
-	{		
+	{	
 		valid::id_key($tool_id);
 		$db = new Database;	
+		
 		if($_POST)
 		{
 			if( empty($_POST['name']) )
-			{
-				echo 'Name is required'; die(); # error
-			}
+				die('Name is required'); # error
 			
 			# Get highest position
-			$get_highest = $db->query("SELECT MAX(position) as highest 
+			$get_highest = $db->query("
+				SELECT MAX(position) as highest 
 				FROM showroom_items_meta 
-				WHERE cat_id = '{$_POST['category']}'
+				WHERE cat_id = '{$_POST['category_id']}'
 			")->current();
 			
 			# Make URL friendly
 			$url = trim($_POST['url']);
 			$url = ( empty($url) ) ? $_POST['name'] : $url;
-			$url = preg_replace("(\W)", '_', $url);
+			$url = valid::filter_php_url($url);
 			
 			$data = array(			
 				'fk_site'	=> $this->site_id,
 				'url'		=> $url,
-				'cat_id'	=> $_POST['category'],
+				'cat_id'	=> $_POST['category_id'],
 				'name'		=> $_POST['name'],
 				'intro'		=> $_POST['intro'],
 				'body'		=> $_POST['body'],
 				'position'	=> ++$get_highest->highest,				
 			);	
-
-			# Upload image if sent
-			if(! empty($_FILES['image']['name']) )
-				if (! $data['img'] = $this->_upload_image($_FILES, $_POST['category']) )
-					echo 'Image must be jpg, gif, or png.';
-
-
 			$db->insert('showroom_items_meta', $data);
 			
-			echo 'Item added'; #status message
+			# Upload image if sent
+			if(! empty($_FILES['image']['name']) )
+				if (! $data['img'] = $this->_upload_image($_FILES, $_POST['category_id']) )
+					echo 'Image not saved! Must be jpg, gif, or png.';
+
+			die('Item added'); #status message
 		}
-		else
+		elseif($_GET)
 		{
-			# Get list of categories
-			$categories = $db->query("SELECT id, name FROM showroom_items
-				WHERE parent_id = '$tool_id' AND fk_site = '$this->site_id'
-				AND local_parent != '0'
-				ORDER BY lft ASC
-			");
-			
-			# If categories
-			if( count($categories) > 0)
-			{
-				$primary = new View("edit_showroom/new_item");
-				$primary->tool_id = $tool_id;			
-				$this->template->primary = $primary;
-				$primary->categories = $categories;
-				echo $primary;			
-			}
-			else
-			{
-				# add categories screen
-				$primary = new View('edit_showroom/new_category');
-				$primary->tool_id = $tool_id;				
-				$primary->message = 'You will need to add some categories first.';
-				echo $primary;
-			}
+			$category = valid::id_key(@$_GET['category']);
+			$primary = new View("edit_showroom/new_item");
+			$primary->tool_id = $tool_id;
+			$primary->category = $category;
+			die($primary);			
 		}
-		die();		
+		die();
 	}
 	
 	
@@ -425,7 +398,34 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		}
 		else
 			return FALSE;
-	}	
+	}
+
+
+	/*
+	 * Need this to enable nested showroom categories
+	 * Need to add a root child to items list for every other
+	 * child to belong to
+	 * Add root child id to parent for easier access.
+	 */	
+	function _tool_adder($tool_id)
+	{
+		$db = new Database;
+		$data = array(
+			'parent_id'		=> $tool_id,
+			'fk_site'		=> $this->site_id,
+			'name'			=> 'ROOT',
+			'local_parent'	=> '0',
+			'position'		=> '0'
+		);	
+		$root_insert_id = $db->insert('showroom_items', $data)->insert_id(); 	
+		
+		$db->update('showrooms', 
+			array( 'root_id' => $root_insert_id ), 
+			array( 'id' => $tool_id, 'fk_site' => $this->site_id ) 
+		);	
+	
+		return 'add';
+	}
 }
 
 /* -- end of application/controllers/showroom.php -- */

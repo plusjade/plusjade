@@ -29,16 +29,8 @@
 
 			<div class="fieldsets" style="float:left;">	
 				<b>Category</b>
-				<br>
-				<select name="category">
-					<?php
-					foreach($categories as $category)
-					{
-						echo '<option value="'.$category->id.'">'.$category->name.'</option>'."\n";
-					}
-					?>
-				</select>
-				
+				<?php echo $category?>
+				<input type="hidden" name="category_id" value="<?php echo $category?>">
 				<br>
 				<br><b>Image</b>
 				<br><input type="file" name="image">

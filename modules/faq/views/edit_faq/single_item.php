@@ -1,10 +1,10 @@
 
 
-<form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm">	
+<form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm" rel="faq-<?php echo $item->parent_id?>">	
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="save_changes" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Changes
+			<img src="<?php url::image_path('admin/check.png')?>" alt=""/> Save Changes
 		</button>
 		<div id="common_title">Edit FAQ</div>
 	</div>	

@@ -11,8 +11,15 @@
 		<?php
 			foreach($items as $image)
 			{
-				echo '<li id="image_'.$image->id.'"><div><img src="'.url::site().'data/'. $this->site_name .'/assets/images/albums/' . $album->id . '/sm_' . $image->path . '" id="' . $image->id . '" width="120px""></div>';
-				echo '<a href="/get/edit_album/delete_image/' . $image->id .'" class="delete_image" id="'.$image->id.'">[x]</a> <a href="/get/edit_album/edit_item/'.$image->id.'" rel="facebox" class="load_image" id="'.$image->id.'" >edit</a></li>'."\n";
+				?>
+				<li id="image_<?php echo $image->id?>">
+					<div>
+						<img src="<?php echo url::site()?>data/<?php echo $this->site_name?>/assets/images/albums/<?php echo $album->id?>/sm_<?php echo $image->path?>" id="<?php echo $image->id?>" width="120px">
+					</div>
+					<a href="/get/edit_album/delete_image/<?php echo $image->id?>" class="delete_image" id="<?php echo $image->id?>">[x]</a> 
+					<a href="/get/edit_album/edit_item/<?php echo $image->id?>" rel="facebox" class="load_image" id="<?php echo $image->id?>">edit</a>	
+				</li>
+				<?php
 			}				
 		?>
 	</ul>
@@ -22,7 +29,7 @@
 <script type="text/javascript">
 	$("#sortable_images_wrapper").sortable({ handle : "img" });
 	<?php
-		echo tool_ui::js_save_sort_init('album', NULL, 'sortable_images_wrapper');
-		echo tool_ui::js_delete_init('image');
+		echo javascript::save_sort('album', $album->id, NULL, 'sortable_images_wrapper');
+		echo javascript::delete_item('image');
 	?>
 </script>
