@@ -101,14 +101,8 @@ class Tool_Controller extends Controller {
 				yaml::add_value($this->site_name, 'pages_config', $newline);
 			}
 			
-			#$tool = Load_Tool::factory($tool->name);
-			#$tool->_tool_adder($tool_insert_id);
-			# NOTE! call_user_func is supposed to be really slow so optimized later...
-			$goto = call_user_func(
-				array("Edit_{$tool->name}_Controller", '_tool_adder'),
-				$tool_insert_id,
-				$this->site_id
-			);		
+			$edit_tool	= Load_Tool::edit_factory($tool->name);
+			$goto		= $edit_tool->_tool_adder($tool_insert_id, $this->site_id);
 
 			# Pass output to javascript @tool view "add" 
 			# so it can load the next step page
