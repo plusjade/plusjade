@@ -4,7 +4,7 @@ class Load_Tool_Core {
 
 	/*
 	 * Dynamically loads a tool object instance
-	 * Used on /application/controllers/build_page.php
+	 * Used @ /application/controllers/build_page.php
 	 *
 	 */
 	function factory($tool)
@@ -45,72 +45,46 @@ class Load_Tool_Core {
 				$tool = new Blog_Controller(); 			
 				break;						
 			default:
-				$tool = new Text_Controller();
-		}
-		
+				die('<b>error:</b> tool does not exist');
+		}	
 		return $tool;
 	}
 
-	/*
-	 * Execute further commands after a tool is added
-	 * if needed
-	 */
-	function after_add($tool_name, $tool_id)
-	{		
-		switch ($tool_name)
-		{
-			case 'Navigation':
-				/*
-				 * Need to add a root child to items list for every other
-				 * child to belong to
-				 * Add root child id to parent for easier access.
-				 */
-				$db = new Database;
-				$data = array(
-					'parent_id'		=> $tool_id,
-					'fk_site'		=> $this->site_id,
-					'display_name'	=> 'ROOT',
-					'type'			=> 'none',
-					'local_parent'	=> '0',
-					'position'		=> '0'
-				);	
-				$root_insert = $db->insert('navigation_items', $data); 	
-				
-				$db->update('navigations', 
-					array( 'root_id' => $root_insert->insert_id() ), 
-					array( 'id' => $tool_id, 'fk_site' => $this->site_id ) 
-				);
-				
-				return true;
-				
-			break;
-
-			case 'Showroom':
-				/*
-				 * Need this to enable nested showroom categories
-				 * Need to add a root child to items list for every other
-				 * child to belong to
-				 * Add root child id to parent for easier access.
-				 */
-				$db = new Database;
-				$data = array(
-					'parent_id'		=> $tool_id,
-					'fk_site'		=> $this->site_id,
-					'name'			=> 'ROOT',
-					'local_parent'	=> '0',
-					'position'		=> '0'
-				);	
-				$root_insert = $db->insert('showroom_items', $data); 	
-				
-				$db->update('showrooms', 
-					array( 'root_id' => $root_insert->insert_id() ), 
-					array( 'id' => $tool_id, 'fk_site' => $this->site_id ) 
-				);
-				
-				return true;
-				
-			break;
-		}
+/*
+	these functions are useful when going through the add_tool wizard.
+	Wizard Steps:
+		1. tool/add 
+			2. edit_tool_controller::_tool_adder()
+				3. method as defined by _tool_adder (usually add)
 	
+	typically the tool will call "add" in which case the add method
+	must know whether it should update an already existing tool in the dom
+	(this case is when using the add link via the red toolkit)
+	
+	or add the just-added tool parent into the DOM
+	These functions take care of that check.
+	
+	Note: if the tool does not invoke "add" it probably will do "manage"
+	in which case the checks aren't needed.
+*/
+	# this output the guid so we can use it to update the DOM
+	# via ajaxForm success callback	
+	static function die_guid($guid=NULL)
+	{
+		if(NULL != $guid)
+		{
+			valid::id_key($guid);
+			die("$guid");
+		}
+	}
+	
+	static function is_get_guid($guid=NULL)
+	{
+		if(NULL != $guid)
+		{
+			valid::id_key($guid);
+			return '<input type="hidden" name="guid" value="'. $guid .'">';
+		}	
+		return '';
 	}
 }

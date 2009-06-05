@@ -38,13 +38,9 @@ $(document).ready(function()
 		var toolbar = '<div id="toolbar_' + temp[1]  + '" class="jade_toolbar_wrapper">' + toolkit + '</div>';
 		$(this).prepend(toolbar);
 	 });
+
+
 	 
-	// ACTIVATE action Tool toolkit menus	
-	$('.actions_link').click(function(){
-		$(this).next('ul').toggle();
-		return false;
-	});
-	
 	/* ADD blue tool-item toolkits
 	 * selector format: .tool_wrapper .tool_item
 	 * -----------------------------------
@@ -62,20 +58,62 @@ $(document).ready(function()
 		});
 	});
 
-	/* add tool-item toolkits to DOM ajax requests
+	/* add blue tool-item toolkits to DOM ajax requests
 	 * enabled for calendar, showroom, (blog)
 	 * -----------------------------------
 	*/
 	jQuery.fn.add_toolkit_items = function(toolname){
+		toolname = toolname.toLowerCase();
 		$("." + toolname + "_wrapper ." + toolname + "_item").each(function(i){					
 			var id		= $(this).attr("rel");
-			var edit	= '<a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="item_'+id+'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit">' + edit + ' ' + del + '</div>';
+			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit"><span>'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
 			$(this).prepend(toolbar);			
 		});
 	};	
-	
+
+	/*
+	 * updates the tool container <#tool_wrapper_id> 
+	 * with the updated output from that tool.
+	*/
+	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, response){
+		
+		if(!response) response = 'Updating...';
+		
+		if('add' == action) {
+			$('div.container_1').prepend('<div id="new_tool_placeholder" class="ajax_loading">Adding Tool...</div>');
+		} else if('update' == action){
+			$('#'+ toolname +'_wrapper_'+ tool_id).html('<div class="ajax_loading">'+ response +'</div>');
+		}		
+		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){		
+			
+			if('add' == action) {
+				// the response = guid
+				// add tool html to container (just add to 1 for now...)
+				// also need to make sure its sortable and inherents all the admin toolbars etc ..
+				
+				// get the toolkit via ajax
+				$.get('/get/tool/toolkit/'+ response, function(toolkit){
+					toolbar = '<div id="toolbar_'+ response +'" class="jade_toolbar_wrapper">' + toolkit + '</div>';
+					$('div.container_1 #new_tool_placeholder').replaceWith('<span id="guid_'+ response +'" class="common_tool_wrapper" rel="local">' + toolbar + data + '</span>');	
+				});
+			}
+			else if('update' == action){
+				// replace old tool html with new html
+				$('#'+ toolname +'_wrapper_'+ tool_id).replaceWith(data);			
+			}
+			
+			// reapply the blue per-item toolbars
+			$().add_toolkit_items(toolname);
+			
+			// re-initialize tool js...
+			$('#'+ toolname +'_init_'+ tool_id).click();			
+			
+		});
+	};	
+
+
 	/*
 	 * DELEGATE admin link functionality
 	 * -----------------------------------
@@ -83,7 +121,7 @@ $(document).ready(function()
 	$("body").click($.delegate({
 	
 		// facebox links
-		"a[rel*=facebox]": function(e){
+		"a[rel=facebox]": function(e){
 			var pane = "base"; // loads in "base" unless otherwise noted via id
 			if(e.target.id) var pane = "2";			
 			$.facebox(function(){
@@ -93,7 +131,17 @@ $(document).ready(function()
 			}, false, "facebox_"+pane);
 			return false;
 		},
-
+		
+		// facebox load div content
+		"a[rel=facebox_div]": function(e){
+			var pane = "base"; // loads in "base" unless otherwise noted via id
+			if(e.target.id) var pane = "2";
+			var url    = e.target.href.split('#')[0]
+			var target = e.target.href.replace(url,'')				
+			$.facebox($(target).clone().show(), false, "facebox_"+pane);
+			return false;
+		},
+		
 		// DELETE tool or tool item link		
 		"a.js_admin_delete": function(e) {
 			var url = $(e.target).attr("href");
@@ -113,22 +161,78 @@ $(document).ready(function()
 		"a.jade_confirm_delete_common": function(e) {
 			var url	= $(e.target).attr("href");
 			var el	= $(e.target).attr('rel');
+			$.facebox('deleting ...', "status_close", "confirm_dialog");
 			$.get(url, function(data) {
 				$('#' + el).remove();
-				$.facebox(data, "status_close", "confirm_dialog")
-				setTimeout('$.facebox.close()', 1000);				
+				$.facebox.close();			
 			});
 			return false;
+		},
+		
+		"a.update_tool_html": function(e) {
+			values		= e.target.href.split('/');
+			tool_id		= values.pop();
+			toolname	= values.pop();
+			$.facebox.close();
+			$().jade_update_tool_html('update', toolname, tool_id);
+			return false;
+		},
+		
+		// ACTIVATE action Tool toolkit menus	
+		".actions_link": function(e) {
+			$(e.target).next('ul').toggle();
+			return false;
 		}
-
 	}));
+
+
+
 	
-	/*
+	/* AJAX FORMS
 	 * ACTIVATE default ajax forms in all facebox windows
 	 * Can delegate on the submit event but we'll keep it as is for now.
 	 * ---------------------------------------------------------------------
 	 */
-	$(document).bind('reveal.facebox', function(){		
+	$(document).bind('reveal.facebox', function(){				
+		var options = {
+			beforeSubmit: function(){
+				if(! $(".ajaxForm input").jade_validate() )
+					return false;
+			},
+			success: function(data) {
+				var action = $('form.ajaxForm').attr('rel');
+
+				if( 'undefined' == typeof(action) ) {
+					// TODO: find something good to put here
+					// if no rel attribute specified ...
+					$.facebox(data, "status_reload", "facebox_2");
+					alert('this form had no rel attribute');
+					//location.reload();
+				} else {
+					action = action.split('-');
+					//action	= action[0];
+					//toolname	= action[1];
+					//tool_id	= action[2];					
+					if('close' == action[0] ) {
+						$.facebox.close('facebox_'+action[1]); // TODO FIX THIS BY SANITIZING
+					} else {
+						// update/add the tool html output via ajax.
+						$.facebox.close();
+						$().jade_update_tool_html(action[0], action[1], action[2], data);	
+					}
+				}
+				return true;
+			}					
+		};	
+		$(".ajaxForm").ajaxForm(options);
+		
+		$('textarea.render_html').wysiwyg();
+		
+		// Focus for input fields
+		$("form input, form select").focus(function(){
+			$("form input, form select").removeClass("input_focus");
+			$(this).addClass("input_focus");
+		});
 		// Activate wysiwyg editor.
 		/*
 		$('textarea').fck({
@@ -136,26 +240,8 @@ $(document).ready(function()
 			, toolbar:'Plusjade'
 		});
 		*/
-		$('textarea.render_html').wysiwyg();
-		var options = {
-			beforeSubmit: function(){
-				if(! $(".ajaxForm input").jade_validate() )
-					return false;
-			},
-			success: function(data) {
-				$.facebox(data, "status_reload", "facebox_2");
-				location.reload();							
-			}					
-		};
-		$(".ajaxForm").ajaxForm(options);
-		
-		
-		// Focus for input fields
-		$("form input, form select").focus(function(){
-			$("form input, form select").removeClass("input_focus");
-			$(this).addClass("input_focus");
-		});
 	});
+
 
 	
 
