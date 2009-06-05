@@ -1,6 +1,6 @@
 
 
-<div class="calendar_wrapper">
+<div id="calendar_wrapper_<?php echo $tool_id?>" class="calendar_wrapper">
 
 	<div id="load_calender_div" class="phpajaxcalendar_wrapper">
 		<?php echo $calendar?>

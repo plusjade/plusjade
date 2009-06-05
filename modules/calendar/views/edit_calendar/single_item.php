@@ -1,5 +1,5 @@
 
-<?php echo form::open_multipart("edit_calendar/edit/{$item->id}", array('class' => 'ajaxForm', 'id' => $item->id, 'rel' => 'close'))?>
+<?php echo form::open_multipart("edit_calendar/edit/$item->id", array('class' => 'ajaxForm', 'id' => $item->id, 'rel' => "close-base"))?>
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="edit_item" class="jade_positive">

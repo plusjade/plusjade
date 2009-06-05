@@ -177,26 +177,29 @@ a.progressCancel:hover {
 
 <form id="form1" action="/get/edit_album/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" ass="ajaxForm" style="min-height:300px;">	
 	
-<div id="form_wrapper">
+	<div id="form_wrapper">
 
-	<div class="aligncenter">
-		<span id="spanButtonPlaceHolder"></span>
-		<input id="btnCancel" type="button" value="Cancel All Uploads" onclick="swfu.cancelQueue();" disabled="disabled" style="margin-left: 2px; font-size: 8pt; height: 29px;" />
+		<div class="aligncenter">
+			<span id="spanButtonPlaceHolder"></span>
+			<input id="btnCancel" type="button" value="Cancel All Uploads" onclick="swfu.cancelQueue();" disabled="disabled" style="margin-left: 2px; font-size: 8pt; height: 29px;" />
+		</div>
+		
+		<div id="divStatus" class="aligncenter">0 Files Uploaded</div>
+		
+		<div class="fieldset flash" id="fsUploadProgress">
+			<span class="legend">Upload Queue</span>
+		</div>
+		
 	</div>
 	
-	<div id="divStatus" class="aligncenter">0 Files Uploaded</div>
-	
-	<div class="fieldset flash" id="fsUploadProgress">
-		<span class="legend">Upload Queue</span>
-	</div>
-</div>
+	<a href="/get/tool/html/album/<?php echo $tool_id?>" class="update_tool_html">Update Tool</a>
 </form>	
 	
 <script type="text/javascript">
 	swfu = new SWFUpload({
 		flash_url : "/assets/js/swfupload/Flash/swfupload.swf",
 		upload_url: "/get/edit_album/add_image/<?php echo $tool_id?>",
-		post_params: {"PHPSESSID" : "<?php echo session_id(); ?>"},
+		//post_params: {"PHPSESSID" : "<?php echo session_id(); ?>"},
 		file_size_limit : "50 MB",
 		file_types : "*.jpg;*.jpeg;*.gif;*.png",
 		file_types_description : "Image Files",
@@ -206,7 +209,7 @@ a.progressCancel:hover {
 			progressTarget : "fsUploadProgress",
 			cancelButtonId : "btnCancel"
 		},
-		debug: false,
+		debug: true,
 
 		// Button settings
 		button_image_url: "/assets/images/admin/swf_upload.png",

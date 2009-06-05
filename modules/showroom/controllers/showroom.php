@@ -96,6 +96,10 @@ class Showroom_Controller extends Controller {
 			ORDER BY lft ASC 
 		");		
 		
+		function render_node_showroom($item)
+		{
+			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/showroom/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
+		}
 		return Tree::display_tree('showroom', $items);
 	}
 	

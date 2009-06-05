@@ -13,26 +13,8 @@
 		
 		
 	<div class="fieldsets">
-		<b>Category Name</b><br>
-		<input type="text" name="category[]" class="full_width" rel="text_req">
-	</div>
-
-	<div class="fieldsets">
-		<b>Category Name</b><br>
-		<input type="text" name="category[]" class="full_width" rel="text_req">
+		<b>Category Name</b>
+		<br><input type="text" name="category" rel="text_req" style="width:300px">
 	</div>
 	
 </form>
-
-<script type="text/javascript">
-	$("input[name='name']").keyup(function(){
-		input = $(this).val().replace(/\W/g, '_').toLowerCase();
-		$("input[name='url']").val(input);
-	});
-	$("input[name='url']").keyup(function(){
-		input = $(this).val().replace(/\W/g, '_');
-		$(this).val(input);
-	});
-
-
-</script>

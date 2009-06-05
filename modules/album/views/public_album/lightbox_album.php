@@ -1,5 +1,5 @@
 
-<div id="album_lightbox_wrapper_<?php echo $album->id?>" class="album_wrapper album_lightbox_wrapper">
+<div id="album_wrapper_<?php echo $album->id?>" class="album_wrapper album_lightbox_wrapper">
 	<ul>
 		<?php 
 		foreach($images as $image)

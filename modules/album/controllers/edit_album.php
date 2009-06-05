@@ -14,8 +14,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		echo $this->_view_manage_tool_items('album', $tool_id);		
-		die();
+		die( $this->_view_manage_tool_items('album', $tool_id) );
 	}
 
 	public function add($tool_id=NULL)
@@ -44,12 +43,12 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		# validate for file size 5M and type (images)
 		if ( empty($_FILES['Filedata']['type']) OR ( $_FILES['Filedata']['type'] > 50000 ) )
 		{
-			echo 'Invalid File';
-			die();
+			die('Invalid File');
 		}
 		
 		# Get highest position
-		$get_highest = $db->query("SELECT MAX(position) as highest 
+		$get_highest = $db->query("
+			SELECT MAX(position) as highest 
 			FROM album_items 
 			WHERE parent_id = '$tool_id' 
 		")->current()->highest;
@@ -94,8 +93,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$image_sm->save("$image_store/$tool_id/sm_$name");
 		}
 		unlink($filename);
-		echo 'Images added!!<br>Updating...';	
-		die();	
+		die('Images added!!<br>Updating...');	
 	}
 	
 	
@@ -111,13 +109,12 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 				'caption'	=> $_POST['caption'],
 			);
 			$db->update('album_items', $data, array( 'id' => $id, 'fk_site' => $this->site_id) );
-			echo 'Image Updated!';
+			die('Image Updated!');
 		}
 		else
 		{
-			$this->_view_edit_single('album', $id);
+			die($this->_view_edit_single('album', $id));
 		}
-		die();
 	}
 
 /*
@@ -130,7 +127,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	{
 		valid::id_key($tool_id);		
 		$db = new Database;	
-			
+	
 		if($_POST)
 		{
 			$data = array(
@@ -139,13 +136,12 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 				'params'	=> $_POST['params'],
 			);
 			$db->update('albums', $data, " id = '$tool_id' AND fk_site = '$this->site_id' ");
-			echo 'Settings Saved!!<br>Updating ...';
+			die('Settings Saved!!<br>Updating ...');
 		}
 		else
 		{
-			$this->_view_edit_settings('album', $tool_id);
+			die( $this->_view_edit_settings('album', $tool_id) );
 		}
-		die();
 	}
 
 
@@ -179,8 +175,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	public function save_sort()
 	{
-		$this->_save_sort_common($_GET['image'], 'album_items');
-		die();	
+		die( $this->_save_sort_common($_GET['image'], 'album_items') );
 	}
 	
 	

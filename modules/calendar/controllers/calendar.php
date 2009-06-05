@@ -41,7 +41,7 @@ class Calendar_Controller extends Controller {
 				});			
 			');
 		$primary->readyJS('calendar','index');		
-		
+		$primary->tool_id = $tool_id;
 		return $primary;
 	}
 
@@ -55,6 +55,23 @@ class Calendar_Controller extends Controller {
 		$db			= new Database;
 		$date_array = array();
 		$calendar_page_name	= uri::easy_segment('1');
+		
+		#quick hack, optimize later...
+		if('get' == $calendar_page_name)
+		{
+			# get tools_list id of the tool from db ...
+			$tool = 7;
+			$page = $db->query("
+				SELECT pages.page_name
+				FROM pages_tools
+				JOIN pages ON pages_tools.page_id = pages.id
+				WHERE pages_tools.fk_site = '$this->site_id'
+				AND pages_tools.tool = '$tool'
+				AND pages_tools.tool_id = '$tool_id'
+			")->current();			
+			
+			$calendar_page_name = $page->page_name;
+		}
 		
 		# Create array for dates associated with this month
 		$dates = $db->query("

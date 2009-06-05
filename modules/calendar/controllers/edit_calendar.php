@@ -3,7 +3,7 @@
 class Edit_Calendar_Controller extends Edit_Tool_Controller {
 
 /*
- *	Handles all editing logic for Showroom module.
+ *	Handles all editing logic for calendar module.
  *	Extends the module template to build page quickly for ajax rendering.
  *	Only Logged in users should have access
  *
@@ -28,8 +28,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
 		");
-		echo 'blah';
-		die();
+		die('blah');
 	}
 
 /*
@@ -60,13 +59,12 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 					echo 'Image must be jpg, gif, or png.';
 
 			$db->insert('calendar_items', $data);
-			echo 'Event added'; #status message
+			die('Event added'); #status message
 		}
 		else
 		{			
-			echo $this->_view_add_single('calendar', $tool_id);
-		}
-		die();		
+			die( $this->_view_add_single('calendar', $tool_id) );
+		}	
 	}
 	
 /*
@@ -84,20 +82,19 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 				'desc'	=> $_POST['desc'],		
 			);		
 			$db->update('calendar_items', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			echo 'Event Saved<br>Updating...';
-		
+			die('Event Saved<br>Updating...');
 		}
 		else
 		{
 			$primary = new View("edit_calendar/single_item");		
-			$parent = $db->query("SELECT * FROM calendar_items 
+			$parent = $db->query("
+				SELECT * FROM calendar_items 
 				WHERE id = '$id' 
 				AND fk_site = '$this->site_id'
 			")->current();
 			$primary->item = $parent;
-			echo $primary;
-		}
-		die();		
+			die($primary);
+		}	
 	}
 
 /*
@@ -109,19 +106,12 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	public function delete($id=NULL)
 	{
 		valid::id_key($id);				
-		$this->_delete_single_common('calendar', $id);
-		die();
+		die( $this->_delete_single_common('calendar', $id) );
 	}
 
-/*
- * SAVE items sort order
- * Success Response via Facebox_response tier 2
- * [see root JS in this::manage() ]
- */
-	public function save_sort()
+	function settings()
 	{
-		$this->_save_sort_common($_GET['showroom'], 'showroom_items');
-		die();
+		die('Edit Calendar settings...');
 	}
 	
 # Ajax get a list of events for a certain date
@@ -139,7 +129,8 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 		$year	= $pieces['2'];
 		$db = new Database;
 		
-		$events = $db->query("SELECT * FROM calendar_items 
+		$events = $db->query("
+			SELECT * FROM calendar_items 
 			WHERE fk_site = '$this->site_id'
 			AND year = '$year'  
 			AND month = '$month'
@@ -151,12 +142,11 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			$primary = new View('edit_calendar/day');
 			$primary->events = $events;
 			$primary->date = $date;
-			echo $primary;
+			die($primary);
 		}
 		else
-			echo 'no events on this day';
-			
-		die();
+			die('no events on this day');
+
 	}
 	
 /*
@@ -194,5 +184,3 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	}
 	
 }
-
-/* -- end of application/controllers/showroom.php -- */
