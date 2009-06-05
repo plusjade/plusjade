@@ -167,6 +167,20 @@ class Showroom_Controller extends Controller {
 			return 'item does not exist';
 			
 	}
+
+
+	function _ajax($url_array, $tool_id)
+	{
+		$category	= @$url_array['2'];
+		$item		= @$url_array['3'];	
+		
+		if(! empty($category) AND empty($item) )
+			echo $this->_items_category($tool_id, $category);
+		elseif(! empty($category) AND !empty($item) )
+			echo $this->_item($category, $item);
+
+		die();
+	}
 	
 }
 

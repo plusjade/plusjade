@@ -50,6 +50,48 @@ class Load_Tool_Core {
 		return $tool;
 	}
 
+	function edit_factory($tool)
+	{
+		switch ($tool)
+		{
+			case 'Slide_Panel':
+				$tool = new Edit_Slide_Panel_Controller(); 			
+				break;				
+			case 'About':
+				$tool = new Edit_About_Controller(); 			
+				break;					
+			case 'Faq':
+				$tool = new Edit_Faq_Controller(); 
+				break;
+			case 'Contact':
+				$tool = new Edit_Contact_Controller(); 
+				break;
+			case 'Album':
+				$tool = new Edit_Album_Controller(); 			
+				break;
+			case 'Reviews':
+				$tool = new Edit_Reviews_Controller(); 			
+				break;	
+			case 'Showroom':
+				$tool = new Edit_Showroom_Controller(); 			
+				break;
+			case 'Text':
+				$tool = new Edit_Text_Controller(); 			
+				break;
+			case 'Calendar':
+				$tool = new Edit_Calendar_Controller(); 			
+				break;
+			case 'Navigation':
+				$tool = new Edit_Navigation_Controller(); 			
+				break;
+			case 'Blog':
+				$tool = new Edit_Blog_Controller(); 			
+				break;						
+			default:
+				die('<b>error:</b> edit_tool does not exist');
+		}	
+		return $tool;
+	}
 /*
 	these functions are useful when going through the add_tool wizard.
 	Wizard Steps:

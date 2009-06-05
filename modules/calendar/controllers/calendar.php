@@ -151,4 +151,29 @@ class Calendar_Controller extends Controller {
 			echo $view;
 		}
 	}
+	
+/*
+ * page builders frequently use ajax to update their content
+ * common method for handling ajax requests.
+ * param $url_array = (array) an array of url signifiers
+ * param $tool_id 	= (int) the tool id of the tool.
+ */ 	
+	function _ajax($url_array, $tool_id)
+	{
+		$action	= @$url_array['2'];
+		$year	= @$url_array['3'];
+		$month	= @$url_array['4'];
+		$day	= @$url_array['5'];
+
+		if('month' == $action)
+		{
+			die( $this->month($tool_id, $year, $month) );
+		}
+		elseif('day' == $action)
+		{
+			die( $this->day($tool_id, $year, $month, $day) );
+		}
+	}
+	
+	
 }

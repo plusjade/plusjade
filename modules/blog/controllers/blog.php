@@ -309,7 +309,45 @@ class Blog_Controller extends Controller {
 		");
 		return $comments;	
 	}
+
+/*
+ * page builders frequently use ajax to update their content
+ * common method for handling ajax requests.
+ * param $url_array = (array) an array of url signifiers
+ * param $tool_id 	= (int) the tool id of the tool.
+ */ 
+	function _ajax($url_array, $tool_id)
+	{
+		$action	= @$url_array['2'];
+		$value	= @$url_array['3'];	
+		switch($action)
+		{
+			case 'entry':
+				echo $this->_single_post($value);
+				break;
+			
+			case 'tag':
+				break;	
+				
+			case 'archive':
+				break;
+
+			case 'comment':
+				# this is an ajaxForm comment post request
+				# OR ajax request to view comments
+				valid::id_key($value);
+				if($_POST)
+					echo $this->_post_comment($value);
+				else
+					echo $this->_get_comments($value);
+				break;
+				
+			default:
 	
+				break;
+		}
+		die();
+	}
 }
 
 /* -- end of application/controllers/blog.php -- */
