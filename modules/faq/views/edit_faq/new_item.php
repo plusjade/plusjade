@@ -1,7 +1,7 @@
 
 
 <form action="/get/edit_faq/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
-	<?php echo $hidden_guid?>
+
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_images" class="jade_positive">
 			<img src="<?php url::image_path('admin/check.png')?>" alt=""/> Add Question

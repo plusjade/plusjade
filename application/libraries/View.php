@@ -384,6 +384,7 @@ class View_Core {
 			self::$kohana_global_data['javascript'] .= $contents;
 		}
 	}
+	
 /*
  *	Load CSS files in the source page
  */	

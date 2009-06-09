@@ -13,7 +13,7 @@ $image_path		= "/data/$user/themes/$theme/images";
 $static_helpers	= "static_helpers.css";
 
 ob_start();
-
+echo $user_css;
 # Load static_helpers.css first so they can be overwritten
 readfile($static_helpers);
 

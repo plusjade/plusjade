@@ -2,32 +2,11 @@
 <?php 
 $select = array('no' => '', 'yes' => '');
 if( $item->enable == 'no') $select['no'] = 'SELECTED';		
-
-
-
-$formatted_html = '
-<span style="font-style: italic;">Call support</span>
-<br>
-<br>
-<div style="margin-left: 40px;">
-	Monday - Sat: 8am - 8pm
-	<br>Sunday: Closed
-</div>
-
-<span style="font-style: italic;">Email support</span>
-<span style="font-weight: bold;"></span>
-<br>
-<br>
-<div style="margin-left: 40px;">
-	Daily response time: within one hour
-</div>
-';
-echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'id' => $item->id));	
-	?>
-
+echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'id' => $item->id, 'rel' => $js_rel_command));	
+?>
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="update_contact" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Changes
+			<img src="<?php echo url::image_path('admin/check.png')?>" alt=""/> Save Changes
 		</button>
 		<div id="common_title">Edit <?php echo $item->type?></div>
 	</div>	

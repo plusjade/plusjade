@@ -14,7 +14,10 @@ abstract class Edit_Tool_Controller extends Controller {
 		if(! $this->client->logged_in()
 			OR $this->client->get_user()->client_site_id != $this->site_id )
 		{
-			die('Please login');
+			# hack for allowing swfupload to work in authenticated session...
+			# leave this here to minimize this to edit_tools only.
+			if( empty($_POST['PHPSESSID']) )
+				die('Please login');
 		}
 		
 		# Controller variables
@@ -116,6 +119,7 @@ abstract class Edit_Tool_Controller extends Controller {
 			$primary = new View("edit_$toolname/manage_$toolname");
 			$primary->set($toolname, $parent);
 			$primary->items = $items;
+			$primary->tool_id = $parent->id;
 		}
 		else
 		{
@@ -138,7 +142,7 @@ abstract class Edit_Tool_Controller extends Controller {
 	{
 		$primary = new View("edit_$toolname/new_item");
 		$primary->tool_id = $tool_id;
-		$primary->hidden_guid = Load_Tool::is_get_guid(@$_GET['guid']);		
+		$primary->js_rel_command = "update-$toolname-$tool_id";
 		return $primary;
 	}
 
@@ -157,13 +161,12 @@ abstract class Edit_Tool_Controller extends Controller {
 		$table		= $toolname.'s';
 		$item		= $this->_grab_tool_child($toolname, $item_id, $JOIN);
 
-		if( is_object($item) )
-		{
-			$primary->item = $item;
-			return $primary;
-		}
-		else
-			echo 'Bad id';
+		if(! is_object($item) )
+			die('invalid id');
+
+		$primary->item = $item;
+		$primary->js_rel_command = "update-$toolname-$item->parent_id";
+		return $primary;
 	}
 
 	
@@ -175,6 +178,7 @@ abstract class Edit_Tool_Controller extends Controller {
 	{
 		$primary = new View("edit_$toolname/settings");
 		$primary->tool_id = $tool_id;	
+		$primary->js_rel_command = "update-$toolname-$tool_id";
 		$parent = $this->_grab_tool_parent($toolname, $tool_id);
 		
 		if( is_object($parent) )

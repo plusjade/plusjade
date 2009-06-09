@@ -1,40 +1,4 @@
 
-<style type="text/css">
-	#tool_list_wrapper{
-		float:left;
-		width:180px;
-	}
-	#tool_list_wrapper ul{
-		line-height:1.5em;
-	}
-	#tool_view_wrapper{
-		float:right;
-		height:360px;
-		padding:5px;
-		background:#eee;
-		overflow:auto;
-		border:1px solid #ccc;
-		width:600px;
-	}
-	.each_tool{
-		display:none;
-		margin:5px;	
-	}
-	.each_tool button{
-		width:200px;;
-		height:30px;
-		border:0;
-	}
-	.each_tool div.desc{
-		margin-top:10px;
-		padding:10px;
-		background:#fff;
-	}
-	#jade_tool_box label:hover,
-	#jade_tool_box label.selected{	
-		background: #7ebd40 url(/assets/images/admin/light_green_bg.png) repeat-x bottom left;
-	}
-</style>
 
 <?php echo form::open("tool/add/$page_id", array('class' => 'custom_ajaxForm') )?>
 		
@@ -42,7 +6,7 @@
 		<div id="common_title">Add New Tool to Page</div>
 	</div>
 		
-	<div id="tool_list_wrapper">
+	<div id="tool_list_wrapper" class="common_left_panel">
 		<h3>Content Tools</h3>
 		<ul>
 		<?php 
@@ -66,7 +30,7 @@
 		?>		
 	</div>
 	
-	<div id="tool_view_wrapper">		
+	<div id="tool_view_wrapper" class="common_main_panel">		
 		<?php	
 		foreach($tools_list as $key => $tool)
 		{
@@ -100,6 +64,8 @@
 
 </form>
 <script type="text/javascript">
+$(document).ready(function()
+{
 	$('#tool_1').show();
 	$('#tool_list_wrapper a').click(function(){
 		id = $(this).attr('rel');	
@@ -112,23 +78,27 @@
 	// ACTIVATE custom ajax form
 	// tool_data = post output from this method (above)
 	// receives the custom url of where the next 'add' page is for the particular tool
-	var options = {
+	$('.facebox .custom_ajaxForm').ajaxForm({	
+		beforeSubmit: function(){
+			$('.facebox .show_submit').show();
+		},			
 		success: function(tool_data) {
-			/* 
-				the data we get back should be JSON (when i learn it)
-				data format:
-				toolname:next_step:tool_id:tool_guid
-				TODO: clean this up, its too cryptic
-			*/
-			
+			//alert(tool_data); return false;
+			//data format: toolname:step2:tool_id:tool_guid
 			tool_data = tool_data.split(':');
-			// load up the add-item method
+			
+			// add tool to dom
+			$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);
+			
+			// load the step2 tool::method
 			$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
-			{guid : tool_data[3]},
-			function(data){ 
-				$.facebox(data, false, 'facebox_base')				
-			});					
-		}					
-	};
-	$('.facebox .custom_ajaxForm').ajaxForm(options);
+				{guid : tool_data[3]},
+				function(data){
+					$.facebox(data, '', 'facebox_base');
+					$('.facebox .show_submit').hide();					
+				}
+			);					
+		}
+	});
+});
 </script>

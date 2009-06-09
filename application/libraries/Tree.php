@@ -32,9 +32,9 @@ class Tree_Core {
 	}
 		
 	/* 
-	 * Takes an object of list-items from navigation_items
+	 * Takes an object of items with lft/rgt traversed fields
 	 * and displays a neat nested ul/li list.
-	 *    $items are required to have lft/rgt values
+	 * $items are required to have lft/rgt values
 	 * 
 	*/
 	static function display_tree($toolname, $items, $admin=FALSE)

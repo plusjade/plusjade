@@ -1,8 +1,9 @@
 
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="/images/check.png" alt=""/> Save Order
+		<img src="<?php echo url::image_path('admin/check.png')?>" alt="">Save Order
 	</button>
+	<div id="common_title">Arrange Questions</div>
 </div>
 
 <ul id="generic_sortable_list" class="ui-tabs-nav" style="min-height:320px">

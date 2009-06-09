@@ -82,10 +82,9 @@ class Blog_Controller extends Controller {
 				$primary->readyJS('blog', 'multiple_posts', $blog_page_name);		
 				break;
 		}
-		#Javascript
-		$primary->readyJS('blog', 'index');
 		$primary->content = $content;
-		return $primary;
+		
+		return $this->public_template($primary, 'blog', $tool_id);
 	}
 	
 	
@@ -323,7 +322,7 @@ class Blog_Controller extends Controller {
 		switch($action)
 		{
 			case 'entry':
-				echo $this->_single_post($value);
+				die( $this->_single_post($value) );
 				break;
 			
 			case 'tag':
@@ -337,16 +336,15 @@ class Blog_Controller extends Controller {
 				# OR ajax request to view comments
 				valid::id_key($value);
 				if($_POST)
-					echo $this->_post_comment($value);
+					die( $this->_post_comment($value) );
 				else
-					echo $this->_get_comments($value);
+					die( $this->_get_comments($value) );
 				break;
 				
 			default:
-	
+				die('no action');
 				break;
 		}
-		die();
 	}
 }
 

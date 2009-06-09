@@ -30,11 +30,11 @@ $(document).ready(function()
 
 	// ADD redbar Tool toolkit to all tools
 	// -----------------------------------
-	 $(".common_tool_wrapper").each(function(i){
+	 $('.common_tool_wrapper').each(function(i){
 		++i;
 		var temp	= new Array();
 		temp		= $(this).attr('id').split('_');
-		var toolkit = $("#toolkit_" + temp[1]).html();
+		var toolkit = $('#toolkit_' + temp[1]).html();
 		var toolbar = '<div id="toolbar_' + temp[1]  + '" class="jade_toolbar_wrapper">' + toolkit + '</div>';
 		$(this).prepend(toolbar);
 	 });
@@ -64,8 +64,8 @@ $(document).ready(function()
 	*/
 	jQuery.fn.add_toolkit_items = function(toolname){
 		toolname = toolname.toLowerCase();
-		$("." + toolname + "_wrapper ." + toolname + "_item").each(function(i){					
-			var id		= $(this).attr("rel");
+		$('.'+ toolname +'_item', this).each(function(i){		
+			var id		= $(this).attr('rel');
 			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
 			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
 			var toolbar	= '<div class="jade_admin_item_edit"><span>'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
@@ -81,35 +81,40 @@ $(document).ready(function()
 		
 		if(!response) response = 'Updating...';
 		
+		// Set loading status...
 		if('add' == action) {
-			$('div.container_1').prepend('<div id="new_tool_placeholder" class="ajax_loading">Adding Tool...</div>');
+			// default add to container_1
+			$('div.container_1').prepend('<div id="new_tool_placeholder" class="load_tool_html">Adding Tool...</div>');
 		} else if('update' == action){
-			$('#'+ toolname +'_wrapper_'+ tool_id).html('<div class="ajax_loading">'+ response +'</div>');
-		}		
-		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){		
-			
+			$('#'+ toolname +'_wrapper_'+ tool_id).html('<div class="load_tool_html">Updating...</div>');
+		}
+		
+		// Get the tool html output...
+		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){					
+			/* possible actions:
+				1. add
+				2. update
+			 */
 			if('add' == action) {
-				// the response = guid
-				// add tool html to container (just add to 1 for now...)
-				// also need to make sure its sortable and inherents all the admin toolbars etc ..
-				
-				// get the toolkit via ajax
+				// response = guid
+				// get the toolkit to insert red toolbar via ajax
 				$.get('/get/tool/toolkit/'+ response, function(toolkit){
 					toolbar = '<div id="toolbar_'+ response +'" class="jade_toolbar_wrapper">' + toolkit + '</div>';
-					$('div.container_1 #new_tool_placeholder').replaceWith('<span id="guid_'+ response +'" class="common_tool_wrapper" rel="local">' + toolbar + data + '</span>');	
+					
+					// replace the placeholder with toolbar + html output
+					$('div.container_1 #new_tool_placeholder')
+					.replaceWith('<span id="guid_'+ response +'" class="common_tool_wrapper" rel="local">' + toolbar + data + '</span>');	
+				
+					// add blue per-item toolbars
+					$('#'+ toolname +'_wrapper_'+ tool_id).add_toolkit_items(toolname);
 				});
 			}
-			else if('update' == action){
+			else if('update' == action) {
 				// replace old tool html with new html
-				$('#'+ toolname +'_wrapper_'+ tool_id).replaceWith(data);			
+				$('#'+ toolname +'_wrapper_'+ tool_id).replaceWith(data);
+				// reapply blue per-item toolbars
+				$('#'+ toolname +'_wrapper_'+ tool_id).add_toolkit_items(toolname);			
 			}
-			
-			// reapply the blue per-item toolbars
-			$().add_toolkit_items(toolname);
-			
-			// re-initialize tool js...
-			$('#'+ toolname +'_init_'+ tool_id).click();			
-			
 		});
 	};	
 
@@ -147,7 +152,7 @@ $(document).ready(function()
 			var url = $(e.target).attr("href");
 			var rel	= $(e.target).attr('rel');
 			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><p><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a></p><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Item</a></div>';	
-			$.facebox(data, "confirm_facebox", "confirm_dialog");
+			$.facebox(data, 'confirm_facebox', 'facebox_2');
 			return false;		
 		},
 		
@@ -161,10 +166,10 @@ $(document).ready(function()
 		"a.jade_confirm_delete_common": function(e) {
 			var url	= $(e.target).attr("href");
 			var el	= $(e.target).attr('rel');
-			$.facebox('deleting ...', "status_close", "confirm_dialog");
-			$.get(url, function(data) {
-				$('#' + el).remove();
-				$.facebox.close();			
+			$.facebox('deleting ...', "status_close", "facebox_2");
+			$.get(url, function() {
+				$.facebox.close();	
+				$('#' + el).remove();		
 			});
 			return false;
 		},
@@ -193,13 +198,18 @@ $(document).ready(function()
 	 * Can delegate on the submit event but we'll keep it as is for now.
 	 * ---------------------------------------------------------------------
 	 */
-	$(document).bind('reveal.facebox', function(){				
-		var options = {
+	$(document).bind('reveal.facebox', function(){
+		$('body').addClass('disable_body').attr('scroll','no');
+		$('.facebox .show_submit').hide();
+		$(".ajaxForm").ajaxForm({
 			beforeSubmit: function(){
 				if(! $(".ajaxForm input").jade_validate() )
 					return false;
+					
+				$('.facebox .show_submit').show();
 			},
 			success: function(data) {
+				$('.facebox .show_submit').hide();
 				var action = $('form.ajaxForm').attr('rel');
 
 				if( 'undefined' == typeof(action) ) {
@@ -207,32 +217,32 @@ $(document).ready(function()
 					// if no rel attribute specified ...
 					$.facebox(data, "status_reload", "facebox_2");
 					alert('this form had no rel attribute');
-					//location.reload();
 				} else {
 					action = action.split('-');
 					//action	= action[0];
 					//toolname	= action[1];
 					//tool_id	= action[2];					
 					if('close' == action[0] ) {
-						$.facebox.close('facebox_'+action[1]); // TODO FIX THIS BY SANITIZING
+						// TODO: Sanitize this?
+						// useful for facebox_2 requests
+						$.facebox.close('facebox_'+action[1]);
+					} else if('scope' == action[0] ) {
+						$('span#guid_'+ action[2]).removeClass('local global');
+						$('span#guid_'+ action[2]).addClass(data);
+						$.facebox.close();
 					} else {
-						// update/add the tool html output via ajax.
+						// in case of update or add
+						// update tool html output to DOM via ajax
+						
 						$.facebox.close();
 						$().jade_update_tool_html(action[0], action[1], action[2], data);	
 					}
 				}
 				return true;
-			}					
-		};	
-		$(".ajaxForm").ajaxForm(options);
+			}
+		});
 		
 		$('textarea.render_html').wysiwyg();
-		
-		// Focus for input fields
-		$("form input, form select").focus(function(){
-			$("form input, form select").removeClass("input_focus");
-			$(this).addClass("input_focus");
-		});
 		// Activate wysiwyg editor.
 		/*
 		$('textarea').fck({
@@ -242,16 +252,19 @@ $(document).ready(function()
 		*/
 	});
 
+	$(document).bind('close.facebox', function(){
+		$('body').removeClass('disable_body').removeAttr('scroll');
+	});
 
 	
 
 	// ACTIVATE sortable containers
 	// -------------------------------------------------
 	for(i=1;i<=5;i++){
-		$(".container_"+i).addClass("CONTAINER_WRAPPER").attr("rel",i);
+		$('.container_'+i).addClass("CONTAINER_WRAPPER").attr('rel', i);
 	}
 
-	$(".CONTAINER_WRAPPER").sortable({
+	$('.CONTAINER_WRAPPER').sortable({
 		items: 'span.common_tool_wrapper',
 		connectWith: '.CONTAINER_WRAPPER',
 		forcePlaceholderSize: true,
@@ -275,81 +288,24 @@ $(document).ready(function()
 		},
 		update: function(event, ui){			
 			var output = '';
-			page_id = $('#click_hook').attr("rel");
+			page_id = $('#click_hook').attr('rel');
 			
 			$(".CONTAINER_WRAPPER").each(function(){
 				var container = $(this).attr("rel");
 				var kids = $(this).children("span.common_tool_wrapper");
 				
 				$(kids).each(function(i){
-					var scope = $(this).attr("rel");
-					output += scope + "." + this.id + "." + container + "." + i + "#";
+					output += this.id + '|' + container + '|' + i + '#';
 				});
 			});
-			$.facebox(function() {
-					$.post("/get/page/tools/"+page_id, {output: output}, function(data){
-						$.facebox(data, "status_close", "facebox_2");
-						setTimeout('$.facebox.close()', 1000);
-					})
-				}, 
-				'status_close', 
-				'facebox_2'
-			);
-			
+			$.facebox('Saving...', "status_close", "facebox_2");
+			$.post("/get/tool/save_positions/"+page_id, {output: output}, function(data){
+				$.facebox(data, "status_close", "facebox_2");
+				setTimeout('$.facebox.close()', 1000);
+			});
 		}
 		//revert: true
 	});	
-	
-	// ADD local/global toggle to action lists
-	// NOTE: consider doing this on the server.
-	$("span.common_tool_wrapper").each(function(){
-		var scope = $(this).attr("rel");
-		var toggle = 'local';
-		if("local" == scope) toggle = 'global';
-		var scope_toggle = '<li><a href="#" class="toggle_scope" rel="'+ toggle +'"><img src="/assets/images/admin/'+ toggle +'.png" alt=""> Make '+ toggle +'</a></li>';
-		$("ul.toolkit_dropdown", this).append(scope_toggle);
-	});	
-
-	// ACTIVATE local/global scope toggle
-	$("span.common_tool_wrapper").click($.delegate({
-		".toggle_scope": function(e){
-			var new_scope = $(e.target).attr("rel");	
-			var toggle = "local";
-			if("local" == new_scope) toggle = "global";
-			var new_link = '<a href="#" class="toggle_scope" rel="' + toggle + '"><img src="/assets/images/admin/'+ toggle +'.png" alt=""> Make ' + toggle + '</a>';
-			
-			$(e.target).parents("span").removeAttr("rel").attr("rel",new_scope);
-			$(e.target).replaceWith(new_link);
-			return false;				
-		}
-	}));
-	
-	
-	// SAVE container tool-position results
-	var output = '';	
-	$("#get_tool_sort").click(function(){
-		page_id = $(this).attr("rel");
-		
-		$(".CONTAINER_WRAPPER").each(function(){
-			var container = $(this).attr("rel");
-			var kids = $(this).children("span.common_tool_wrapper");
-			
-			$(kids).each(function(i){
-				var scope = $(this).attr("rel");
-				output += scope + '.' + this.id + '.' + container + '.' + i + '#';
-			});
-		});
-		//alert(output); return false;
-		$.facebox(function() {
-				$.post("/get/page/tools/"+page_id, {output: output}, function(data){
-					$.facebox(data, "status_close", "facebox_2");
-					setTimeout('$.facebox.close()', 1000);
-				})
-			}, 
-			"status_close", 
-			"facebox_2"
-		);	
-	});		
 	
 	/*
 	var zIndexNumber = 1000;

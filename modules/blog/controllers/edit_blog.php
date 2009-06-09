@@ -29,17 +29,18 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			ORDER BY created DESC
 		");
 		$primary->items = $items;
-		echo $primary;
-		die();	
+		die($primary);
 	}
-	
+
+/*
+ * add a new blog post
+ */ 
 	function add($tool_id=NULL)
 	{
-		valid::id_key($tool_id);
-		$db = new Database;
-		
+		valid::id_key($tool_id);	
 		if($_POST)
 		{
+			$db = new Database;	
 			$data = array(
 				'fk_site'	=> $this->site_id,
 				'parent_id'	=> $tool_id,
@@ -51,15 +52,14 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			);
 
 			$db->insert('blog_items', $data); 
-			echo 'Post added'; #status
+			die('Post added'); #status
 		}
-		else
-		{
-			echo $this->_view_add_single('blog', $tool_id);
-		}
+		die( $this->_view_add_single('blog', $tool_id) );
 	}
 
-
+/*
+ * edit a blog post
+ */ 
 	function edit($id=NULL)
 	{
 		valid::id_key($id);
@@ -92,42 +92,51 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 					$db->insert('blog_items_tags', $data);
 				}
 			}			
-			echo 'Post Saved!<br>Updating...'; #status				
+			die('Post Saved!<br>Updating...'); #status				
 		}
-		else
-		{
-			$primary = new View("edit_blog/single_item");
-			$item = $db->query("
-				SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
-				GROUP_CONCAT(DISTINCT blog_items_tags.value, CONCAT('_',blog_items_tags.id) ORDER BY blog_items_tags.value  separator ',') as tag_string
-				FROM blog_items 
-				LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
-				WHERE blog_items.id = '$id'
-				AND blog_items.fk_site = '$this->site_id'
-				AND blog_items.status = 'publish'
-			")->current();
-			$primary->item = $item;
-		
-			echo $primary;
-		}
-		die();
+
+		$primary = new View("edit_blog/single_item");
+		$item = $db->query("
+			SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
+			GROUP_CONCAT(DISTINCT blog_items_tags.value, CONCAT('_',blog_items_tags.id) ORDER BY blog_items_tags.value  separator ',') as tag_string
+			FROM blog_items 
+			LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
+			WHERE blog_items.id = '$id'
+			AND blog_items.fk_site = '$this->site_id'
+		")->current();
+		$primary->item = $item;
+		$primary->js_rel_command = "update-blog-$item->parent_id";
+		die($primary);
 	}
 
-	function delete($tool_id=NULL)
+/*
+ * delete a single blog post
+ * should also delete blog post metadata: comments/tags
+ */
+	function delete($id=NULL)
 	{
-		valid::id_key($tool_id);
-		$this->_delete_single_common('blog', $tool_id);
-		echo 'Post deleted!'; #status
-		die();
+		valid::id_key($id);
+		$db = new Database;
+		$db->delete('blog_items', array('id' => "$id", 'fk_site' => $this->site_id));	
+		$db->query("
+			DELETE FROM blog_items_tags
+			WHERE item_id = '$id'
+			AND fk_site = '$this->site_id'
+		");
+		$db->query("
+			DELETE FROM blog_items_comments
+			WHERE item_id = '$id'
+			AND fk_site = '$this->site_id'
+		");
+		die('Post deleted!'); #status
 	}
 
 	function delete_tag($id=NULL)
 	{
-		$db = new Database;
 		valid::id_key($id);
+		$db = new Database;
 		$db->delete('blog_items_tags', array('id' => "$id", 'fk_site' => "$this->site_id") );	
-		echo 'Tag deleted!'; #status
-		die();
+		die('Tag deleted!'); #status
 	}	
 
 	function delete_comment($id=NULL)
@@ -135,8 +144,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		valid::id_key($id);
 		$db = new Database;
 		$db->delete('blog_items_comments', array('id' => "$id", 'fk_site' => $this->site_id) );	
-		echo 'Comment deleted!'; #status
-		die();
+		die('Comment deleted!'); #status
 	}
 	
 	
@@ -145,22 +153,34 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		valid::id_key($tool_id);
 		if($_POST)
 		{
+			die('testing');
 			$db = new Database;
 			$data = array(
 				'title'	=> $_POST['title'],
 			);
-			
 			$db->update('blogs', $data, "id='$tool_id' AND fk_site = '$this->site_id'"); 						
-			
-			echo 'Settings Updated!<br>Updating...'; #success
+			die('Settings Updated!<br>Updating...'); #success
 		}
-		else
-		{
-			echo $this->_view_edit_settings('blog', $tool_id);
-		}
-		die();
+		die( $this->_view_edit_settings('blog', $tool_id) );
+	}
+
+	function _tool_adder($tool_id, $site_id)
+	{
+		return 'add';
 	}
 	
+	function _tool_deleter($tool_id, $site_id)
+	{
+		$db = new Database;
+		$db->query("
+			DELETE FROM blog_items_comments
+			WHERE parent_id = '$tool_id'
+			AND fk_site = '$this->site_id'
+		");
+		$db->query("
+			DELETE FROM blog_items_tags
+			WHERE parent_id = '$tool_id'
+			AND fk_site = '$this->site_id'
+		");
+	}
 }
-
-/* -- end of application/controllers/faq.php -- */

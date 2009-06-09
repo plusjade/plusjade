@@ -34,7 +34,7 @@
 			<div class="close_wrapper"> \
 				<a href="#" class="close"> \
 					<img src="/facebox/closelabel.gif" title="close" class="close_image" /> \
-				</a> \
+				</a> <div class="show_submit" style="display:none"><div>Submitting...</div></div> \
 			</div> \
 			<div class="body"> \
 				<div class="content"></div> \
@@ -68,30 +68,27 @@
 
     reveal: function(data, klass) {
       $(document).trigger('beforeReveal.facebox')
-      if (klass) $('#'+$.facebox.settings.id+' .content').addClass(klass)
+      $('#'+$.facebox.settings.id+' .content').removeClass('loading_msg')
+	  if (klass) $('#'+$.facebox.settings.id+' .content').addClass(klass)
       $('#'+$.facebox.settings.id+' .content').append(data)
       $('#'+$.facebox.settings.id+' .loading').remove()
       $('#'+$.facebox.settings.id+' .body').children().fadeIn('normal')
 	  var zi = 100 + ($(".facebox").length * 2);
-      
-	 // $('#'+$.facebox.settings.id).css('z-index', zi).css('left', $(window).width() / 2 - ($('#'+$.facebox.settings.id+' .body').width() / 2))
-	  $('#'+$.facebox.settings.id).css('z-index', zi)
-            
-	  
+   
 	  $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
-
-	  /*
+	  $('#facebox_base div.body').css('height', getPageHeight());
+	  $('#'+$.facebox.settings.id).css('z-index', zi);
+	  
 	  $(window).resize(function(){
-		$('#'+$.facebox.settings.id).css("left", getPageWidth() / 2 - ($('#'+$.facebox.settings.id+' table').width() / 2));
+		$('#facebox_base div.body').css('height', getPageHeight());
+		//$('#'+$.facebox.settings.id).css("left", getPageWidth() / 2 - ($('#'+$.facebox.settings.id+' table').width() / 2));
 	  });
-	 
-	  $(window).scroll(function(){
-		$('#'+$.facebox.settings.id).css("top", getPageScroll()[1]);
-	  });	
-	   */
+
+/*
  	  $(window).scroll(function(){
 		$('div.facebox').css("top", getPageScroll()[1]);
-	  });	
+	  });
+*/
 	},
 
     close: function(id) {
@@ -182,7 +179,10 @@
     } else if (document.body) { // other Explorers
       windowHeight = document.body.clientHeight;
     }	
-    return windowHeight
+	if(520 < windowHeight)
+		return windowHeight - 70
+		
+    return 520 - 70
   }
 
   // Backwards compatibility

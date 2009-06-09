@@ -1,9 +1,9 @@
 
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="/images/check.png" alt=""/> Save Order
+		<img src="<?php echo url::image_path('admin/check.png')?>" alt=""/> Save Order
 	</button>
-	<strong>Edit <b>Contact</b> Tool.</strong>	
+	<div id="common_title">Re-arrange Contact Order</div>	
 </div>
 	
 <ul id="generic_sortable_list" class="ui-tabs-nav">
@@ -17,8 +17,7 @@
 			<table><tr>
 				<td width="80px" class="drag_box"><img src="<?php echo url::image_path('arrow.png')?>" alt="handle" class="handle"></td>
 				<td width="30px" class="aligncenter"><?php echo $contact->position?>. </td>
-				<td class="page_edit"><a href="/get/edit_contact/edit/<?php echo $contact->id?>" rel="facebox" id="<?php echo $contact->id?>"><span><?php echo $contact->type?></span></a></td>
-				<td width="60px" class="alignright"><a href="/get/edit_contact/delete/<?php echo $contact->id?>" class="delete_contact" id="<?php echo $contact->id?>">Delete!</a></td>
+				<td class="page_edit"><span><?php echo $contact->type?></span></td>
 			</tr></table>
 		</li>		
 		<?php
@@ -29,7 +28,7 @@
 <script type="text/javascript">
 	$("#generic_sortable_list").sortable({ handle : ".handle", axis : "y" });	
 	<?php	
-		echo javascript::save_sort('contact');
+		echo javascript::save_sort('contact', $tool_id);
 		echo javascript::delete_item('contact');
 	?>
 </script>

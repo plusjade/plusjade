@@ -14,35 +14,31 @@ class Css_Core {
 		
 		ob_start();
 		
-		if(! file_exists($file_path) )
-		{
-			if(! is_dir($dir_path) )
-				mkdir("$dir_path");
-			
-			$source = MODPATH . "$tool_name/views/$tool_name/custom.css";
-					
-			if( file_exists($source) )
-				readfile($source);
-			else
-			{
-				return '/* new file */';
-			}
-
-			# Change the values
-			$source_contents = str_replace('++', $tool_id , ob_get_clean() );
-			
-			if( file_put_contents($file_path, $source_contents) )
-				return $source_contents;
-			else
-				return 'could not copy the source file';
-		
-		}
-		else
+		if(file_exists($file_path))
 		{
 			readfile($file_path);
 			return ob_get_clean();
 		}
+			
+		if(! is_dir($dir_path) )
+			mkdir("$dir_path");
+		
+		$source = MODPATH . "$tool_name/views/public_$tool_name/custom.css";
+				
+		if( file_exists($source) )
+			readfile($source);
+		else
+		{
+			return '/* new file */';
+		}
 
+		# Change the values
+		$source_contents = str_replace('++', $tool_id , ob_get_clean() );
+		
+		if( file_put_contents($file_path, $source_contents) )
+			return $source_contents;
+		else
+			return 'could not copy the source file';
 	}
 
 	/*

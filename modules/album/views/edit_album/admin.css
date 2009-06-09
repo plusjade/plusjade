@@ -9,42 +9,219 @@
 	color:blue;
 	font-weight:bold;
 }
+#left_window{
+	width:180px;
+	float:left;
+}
 #sortable_images_wrapper{
-	list-style:none;
+	width:600px;
+	min-height:400px;
+	float:right;
 	margin:0;
-	border:1px solid #ccc;
-	padding:10px;
 	overflow:auto;
+	border:1px solid #ccc;
 	background:#eee;
 }
-#sortable_images_wrapper li{
+#sortable_images_wrapper div{
 	float:left;
-	height:140px;
-	width:122px;
-	margin:5px;
-	padding:5px;
-	border:1px solid #ccc;
+	margin:3px;
 	background:#fff;
-	text-align:center;
 }
-
-#sortable_images_wrapper li a{
-	font-size:0.8em;
-	padding:2px;
-	background:#e2f4ff;
-}
-
-#sortable_images_wrapper li img{
+#sortable_images_wrapper span{
 	display:block;
-	padding-bottom:3px;
+	padding:2px;
+	background:#ffffcc;
+	text-align:center;
 	cursor:move;
+	font-size:0.9em;
 }
-#sortable_images_wrapper li img.selected{
-	border:1px solid red !important;
+#sortable_images_wrapper img{
+	padding:5px;
+	background:#fff;
 }
-#sortable_images_wrapper li a.load_image{
-	float:left;
+
+#sortable_images_wrapper img.ui-selecting {
+	background:#FECA40;
 }
-#sortable_images_wrapper li a.delete_image{
-	float:right;
+#sortable_images_wrapper img.ui-selected{
+	background:orange;
+}	
+.ui-selectable-helper{
+	z-index:9999 !important;
+	border:2px dashed green !important;
 }
+#select-result{
+	padding:5px;
+	text-align:center;
+	background:#dfefff;
+}
+#select-result img{
+	padding:3px;
+	background:#fff;
+}
+	
+	
+	
+/* new_item.php (add new images view) */
+
+/* -- swf uploader styles ------------------------------- */
+#swf_wrapper{
+	width:450px;
+	margin:0 auto;
+}
+
+#swf_wrapper div.fieldset {
+	border:  1px solid #afe14c;
+	margin: 10px 0;
+	padding: 20px 10px;
+}
+#swf_wrapper div.fieldset span.legend {
+	position: relative;
+	background-color: #FFF;
+	padding: 3px;
+	top: -30px;
+	font: 700 14px Arial, Helvetica, sans-serif;
+	color: #73b304;
+}
+
+
+#swf_wrapper div.flash {
+	width: 375px;
+	margin: 10px 5px;
+	border-color: #D9E4FF;
+	-moz-border-radius-topleft : 5px;
+	-webkit-border-top-left-radius : 5px;
+    -moz-border-radius-topright : 5px;
+    -webkit-border-top-right-radius : 5px;
+    -moz-border-radius-bottomleft : 5px;
+    -webkit-border-bottom-left-radius : 5px;
+    -moz-border-radius-bottomright : 5px;
+    -webkit-border-bottom-right-radius : 5px;
+}
+
+#swf_wrapper button,
+#swf_wrapper input,
+#swf_wrapper select,
+#swf_wrapper textarea { 
+	border-width: 1px; 
+	margin-bottom: 10px;
+	padding: 2px 3px;
+}
+
+
+
+#swf_wrapper input[disabled]{ border: 1px solid #ccc } /* FF 2 Fix */
+
+
+#swf_wrapper label { 
+	width: 150px; 
+	text-align: right; 
+	display:block;
+	margin-right: 5px;
+}
+
+#swf_wrapper #btnSubmit { margin: 0 0 0 155px ; }
+
+/* -- Table Styles ------------------------------- */
+#swf_wrapper td {
+	font: 10pt Helvetica, Arial, sans-serif;
+	vertical-align: top;
+}
+
+#swf_wrapper .progressWrapper {
+	width: 357px;
+	overflow: hidden;
+}
+
+#swf_wrapper .progressContainer {
+	margin: 5px;
+	padding: 4px;
+	border: solid 1px #E8E8E8;
+	background-color: #F7F7F7;
+	overflow: hidden;
+}
+/* Message */
+#swf_wrapper .message {
+	margin: 1em 0;
+	padding: 10px 20px;
+	border: solid 1px #FFDD99;
+	background-color: #FFFFCC;
+	overflow: hidden;
+}
+/* Error */
+#swf_wrapper .red {
+	border: solid 1px #B50000;
+	background-color: #FFEBEB;
+}
+
+/* Current */
+#swf_wrapper .green {
+	border: solid 1px #DDF0DD;
+	background-color: #EBFFEB;
+}
+
+/* Complete */
+#swf_wrapper .blue {
+	border: solid 1px #CEE2F2;
+	background-color: #F0F5FF;
+}
+
+#swf_wrapper .progressName {
+	font-size: 8pt;
+	font-weight: 700;
+	color: #555;
+	width: 323px;
+	height: 14px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#swf_wrapper .progressBarInProgress,
+#swf_wrapper .progressBarComplete,
+#swf_wrapper .progressBarError {
+	font-size: 0;
+	width: 0%;
+	height: 2px;
+	background-color: blue;
+	margin-top: 2px;
+}
+
+#swf_wrapper .progressBarComplete {
+	width: 100%;
+	background-color: green;
+	visibility: hidden;
+}
+
+#swf_wrapper .progressBarError {
+	width: 100%;
+	background-color: red;
+	visibility: hidden;
+}
+
+#swf_wrapper .progressBarStatus {
+	margin-top: 2px;
+	width: 337px;
+	font-size: 7pt;
+	font-family: Arial;
+	text-align: left;
+	white-space: nowrap;
+}
+#swf_wrapper a.progressCancel {
+	font-size: 0;
+	display: block;
+	height: 14px;
+	width: 14px;
+	background-image: url(../images/cancelbutton.gif);
+	background-repeat: no-repeat;
+	background-position: -14px 0px;
+	float: right;
+}
+#swf_wrapper a.progressCancel:hover {
+	background-position: 0px 0px;
+}
+/* -- SWFUpload Object Styles ------------------------------- */
+#swf_wrapper .swfupload {
+	vertical-align: top;
+}
+

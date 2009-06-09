@@ -1,6 +1,6 @@
 
 
-<form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm" rel="faq-<?php echo $item->parent_id?>">	
+<form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="save_changes" class="jade_positive">

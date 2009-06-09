@@ -55,19 +55,6 @@ abstract class Controller_Core {
 		$this->input = Input::instance();
 	}
 
-	/**
-	 * Handles methods that do not exist.
-	 *
-	 * @param   string  method name
-	 * @param   array   arguments
-	 * @return  void
-	 */
-	public function __call($method, $args)
-	{
-		# Default to showing a 404 page
-		#Event::run('system.404');
-		die('root controller method not found');
-	}
 
 	/**
 	 * Includes a View within the controller scope.
@@ -103,5 +90,74 @@ abstract class Controller_Core {
 		# Fetch the output and close the buffer
 		return ob_get_clean();
 	}
-
+	
+	
+	function public_template($primary, $toolname, $tool_id)
+	{
+		$template = new View('public_tool_wrapper');		
+		$template->primary = $primary;
+		$template->toolname = $toolname;
+		$template->tool_id = $tool_id;
+		$template->readyJS = '';
+		$template->custom_css = '';
+		
+		# add admin mode stuff to each tool output ( _index() in particular )
+		/*
+		  Each initial tool view is called view <toolname>::_index()
+		  in public view the index displays only html
+		  in admin view each tool_output has to be 100% self_contained.
+			so we inject appropriate CSS, html, and javascript =D
+		 */
+		if( $this->client->logged_in() )
+		{
+			# Custom CSS
+			$css_file = DATAPATH . "$this->site_name/tools_css/$toolname/$tool_id.css";		
+			if( file_exists($css_file) )
+			{
+				$contents = file_get_contents($css_file);							
+				$template->custom_css = "
+					<style type=\"text/css\">
+						$contents
+					</style>
+				";
+			}			
+			
+			# Javascripts
+			# grab the index javascript and insert it inline.
+			$js_file = MODPATH . "$toolname/views/public_$toolname/js/index.js";
+			
+			if( file_exists($js_file) )
+			{
+				$contents = file_get_contents($js_file);			
+				$contents = str_replace('%VAR%', $tool_id , $contents);
+				
+				$template->readyJS = "
+					<script type=\"text/javascript\">
+						$(document).ready(function(){	
+							$contents
+						});
+					</script>
+				";
+			}
+		}
+		else
+			$template->readyJS($toolname, 'index', $tool_id);
+			
+		return $template;
+	}
+	
+	/**
+	 * Handles methods that do not exist.
+	 *
+	 * @param   string  method name
+	 * @param   array   arguments
+	 * @return  void
+	 */
+	public function __call($method, $args)
+	{
+		# Default to showing a 404 page
+		#Event::run('system.404');
+		die('root controller method not found');
+	}
+	
 } # End Controller Class

@@ -8,36 +8,39 @@ class Contact_Controller extends Controller {
 	}
   
 	function _index($tool_id)
-	{	
-		$db = new Database;
-		$primary = new View("public_contact/index");
-		$primary->email_form = new View("public_contact/email_form");
-		
+	{
+		$db = new Database;		
 		# Get contact parent
-		$parent = $db->query("SELECT * FROM contacts 
+		$parent = $db->query("
+			SELECT * FROM contacts 
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();
 		$primary->parent_id = $parent->id;
 		
-		$contacts = $db->query("SELECT * FROM contact_items 
+		$contacts = $db->query("
+			SELECT * FROM contact_items 
 			JOIN contact_types ON contact_types.type_id = contact_items.type 
 			WHERE parent_id = '$parent->id' 
 			AND fk_site = '$this->site_id' 
 			AND enable = 'yes' 
 			ORDER BY position
 		");
+		if('0' == $contacts->count())
+			return $this->public_template('(no contact types)', 'contact', $tool_id);		
+		
+		$primary = new View("public_contact/index");
+		$primary->email_form = new View("public_contact/email_form");		
 		$primary->contacts = $contacts;
 		
 		# contact_types (to switch display styles)
 		$contact_types = $db->query('SELECT * FROM contact_types');
 		$primary->contact_types = $contact_types;
 		
-		# Javascript
-		$primary->add_root_js_files('ajax_form/ajax_form.js');	
-		$primary->readyJS('contact','index');			
+		$primary->add_root_js_files('ajax_form/ajax_form.js');		
+
 		
-		return $primary;
+		return $this->public_template($primary, 'contact', $tool_id);
 	}
   
 	function email_form()
@@ -56,13 +59,11 @@ class Contact_Controller extends Controller {
 				'Reply-To: '.$_POST['email'] . "\r\n" .
 				'X-Mailer: PHP/' . phpversion();
 
-			if(! mail($to, $subject, $message, $headers) )
-				echo '<div class="send_error">There was a problem sending the email.</div>';
-			else
-				echo '<div class="send_success">Email Sent! We will be in touch shortly!</div>';
+			if(mail($to, $subject, $message, $headers) )
+				die('<div class="send_success">Email Sent! We will be in touch shortly!</div>');
+				
+			die('<div class="send_error">There was a problem sending the email.</div>');
 		}
-		
-		die();
 	}
  
 	function gmap($item_id=NULL)
@@ -75,9 +76,6 @@ class Contact_Controller extends Controller {
 			
 		$primary = new View('public_contact/gmap');
 		$primary->link = $item->value;	
-		echo $primary;
-		die();
+		die($primary);
 	}
-
-
-}	/* -- end of application/controllers/contact.php -- */
+}

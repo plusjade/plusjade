@@ -5,21 +5,15 @@ abstract class Template_Controller extends Controller {
 
 	public function __construct()
 	{
-		parent::__construct();
-		
-		#$this->profiler = new Profiler;	
-		
-		# Load Template
+		parent::__construct();	
+		#$this->profiler = new Profiler;		
 		$this->template = new View("shell");	
-		
-
-		# View variables						
+	
 		$data = array(
 			'data_path' => 'http://' . ROOTDOMAIN . "/data/$this->site_name",
 		);	
 		$this->template->set_global($data);
 
-		
 		# Global CSS			
 		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/assets/');
 		
@@ -41,13 +35,12 @@ abstract class Template_Controller extends Controller {
  * Load Assets for Admin edit mode
  *
  */ 
-	function _load_admin()
+	function _load_admin($page_id, $page_name)
 	{	
 		if( $this->client->logged_in() AND ($this->client->get_user()->client_site_id == $this->site_id) )
 		{	
-			$this->template->linkCSS('css/admin_global.css');
-			$this->template->linkCSS('css/smoothness.css');
-
+			$this->template->linkCSS('get/css/admin', url::site() );
+			
 			$js_files = array(
 				'facebox/public_multi.js',
 				'ui/ui_latest_lite.js',
@@ -57,7 +50,26 @@ abstract class Template_Controller extends Controller {
 				'admin/init.js'	
 			);
 			$this->template->add_root_js_files($js_files);
-			$this->template->admin_panel = view::factory('admin/admin_panel');
+			
+			# determine if tool is protected so we can omit scope link
+			$db = new Database;
+			$protected_tools = $db->query("
+				SELECT * FROM tools_list
+				WHERE protected = 'yes'
+			");	
+			$protected_array = array();
+			foreach($protected_tools as $tool)
+				$protected_array[] = $tool->id;
+				
+			$this->template->admin_panel =
+				view::factory(
+					'admin/admin_panel',
+					array(
+						'protected_array'	=> $protected_array,
+						'page_id'			=> $page_id,
+						'page_name'			=> $page_name,
+					)
+				);
 			return TRUE;
 		}	
 		return FALSE;

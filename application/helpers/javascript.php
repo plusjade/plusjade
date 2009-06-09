@@ -20,6 +20,10 @@ class javascript_Core {
 			// Save item sort order
 			$("#save_sort").click(function() {
 				var order = $("#'. $list_id .'").sortable("serialize");
+				if(!order){
+					alert("No items to sort");
+					return false;
+				}
 				$.facebox("Saving Changes...", "status_reload", "facebox_base");
 				$.get("/get/'. $url .'/save_sort?"+order, function(data){
 					$.facebox.close();

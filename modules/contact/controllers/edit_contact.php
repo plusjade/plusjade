@@ -20,8 +20,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 		$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
 		$primary = $this->_view_manage_tool_items('contact', $tool_id, $join);
 		$primary->set_global('contact_types', $contact_types);
-		echo $primary;
-		die();
+		die($primary);
 	}
 
 /*
@@ -36,34 +35,34 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
-			if(! empty($_POST['id']) )
+			if(empty($_POST['id']))
+				die('Please specify a contact');
+
+			# Get highest position
+			$get_highest = $db->query("
+				SELECT MAX(position) as highest FROM contact_items WHERE parent_id = '$tool_id'
+			")->current()->highest;
+
+			foreach($_POST['id'] as $id => $name)
 			{
-				# Get highest position
-				$get_highest = $db->query("SELECT MAX(position) as highest FROM contact_items WHERE parent_id = '$tool_id' ");
-				$highest = $get_highest->current()->highest;
-				
-				foreach($_POST['id'] as $id => $name)
-				{
-					$data = array(
-						'parent_id'		=> $tool_id,
-						'fk_site'		=> $this->site_id,
-						'type'			=> $id,
-						'display_name'	=> $name,
-						'position'		=> ++$highest
-					);
-					$db->insert('contact_items', $data); 
-				}
-				echo 'Contacts added!!<br>Updating...'; #status message
+				$data = array(
+					'parent_id'		=> $tool_id,
+					'fk_site'		=> $this->site_id,
+					'type'			=> $id,
+					'display_name'	=> $name,
+					'position'		=> ++$get_highest
+				);
+				$db->insert('contact_items', $data); 
 			}
-			else
-				echo 'Please specify a contact';	
+			die('Contacts added!!<br>Updating...'); #status message				
 		}
 		else
 		{
 			$primary = new View('edit_contact/new_item');
 			$contact_types = $db->query("SELECT * FROM contact_types");
 			$primary->contact_types = $contact_types;
-			$contacts = $db->query("SELECT * FROM contact_items 
+			$contacts = $db->query("
+				SELECT * FROM contact_items 
 				JOIN contact_types ON contact_types.type_id = contact_items.type
 				WHERE parent_id = '$tool_id' 
 				AND fk_site = '{$this->site_id}' 
@@ -71,9 +70,9 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 			");
 			$primary->contacts = $contacts;
 			$primary->tool_id = $tool_id;
-			echo $primary;	
+			$primary->js_rel_command = "update-contact-$tool_id";
+			die($primary);
 		}
-		die();
 	}
 	
 /*
@@ -84,8 +83,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 	public function edit($id=Null)
 	{
 		valid::id_key($id);
-		
-		if(! empty($_POST['enable']) )
+		if($_POST)
 		{
 			$db = new Database;
 			$data = array(
@@ -94,7 +92,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 				'enable'		=> $_POST['enable'],
 			);
 			$db->update( 'contact_items', $data, array('id' => $id, 'fk_site' => $this->site_id) );
-			echo 'Contact edited!!<br>Updating...'; # success
+			die('Contact edited!!<br>Updating...'); # success
 		}
 		else
 		{
@@ -102,9 +100,9 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 			$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
 			$item = $this->_grab_tool_child('contact', $id, $join);		
 			$primary->item = $item;
-			echo $primary;
+			$primary->js_rel_command = "update-contact-$item->parent_id";
+			die($primary);
 		}
-		die();	
 	}
 	
 /*
@@ -115,8 +113,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
  */
 	public function delete($id=NULL)
 	{
-		$this->_delete_single_common('contact', $id);
-		die();
+		die($this->_delete_single_common('contact', $id));
 	}
 
 /*
@@ -126,9 +123,15 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
  */
 	public function save_sort()
 	{
-		$this->_save_sort_common($_GET['contact'], 'contact_items');
-		die();	
+		if( empty($_GET['contact']) )
+			die('No items to sort');
+			
+		die( $this->_save_sort_common($_GET['contact'], 'contact_items') );
 	}
+	
+	static function _tool_adder($tool_id, $site_id)
+	{
+		return 'add';
+	}
+	
 }
-
-/* -- end of application/controllers/contact.php -- */

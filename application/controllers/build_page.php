@@ -32,6 +32,8 @@ class Build_Page_Controller extends Template_Controller {
 		$primary	= '';
 		$prepend	= '';
 		$append		= '';
+		$all_tools_string = null;
+		
 		
 		$this->template->title 	= $page->title;
 		$this->template->meta_tags('description', $page->meta);
@@ -52,8 +54,9 @@ class Build_Page_Controller extends Template_Controller {
 
 		# Load Admin CSS and Javascript (if logged in)
 		# _load_admin() is in the template_controller
-		$admin_mode = $this->_load_admin();
+		$admin_mode = $this->_load_admin($page->id, $page->page_name);
 		
+
 		if( $tools->count() > 0 )
 		{	
 			foreach ($tools as $tool)
@@ -61,31 +64,29 @@ class Build_Page_Controller extends Template_Controller {
 				# If Logged in wrap classes around tools for Javascript
 				# TODO: consider this with javascript
 				if( $this->client->logged_in() )
-				{		
-					$scope = 'local';
-					if( '5' >= $tool->page_id ) $scope = 'global';
-		
-					$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper" rel="' . $scope . '">';
+				{
+					$scope = ('5' >= $tool->page_id) ? 'global' : 'local';
+					$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper '.$scope.'">';
 					$append		= '</span>';
-				}
-				
-				# Create unique Tool array so we can fetch the css for each tool	
-				$all_tools[] = "$tool->tool.$tool->tool_id";
 
-				# Throw tool into admin panel array
-				$tools_array[$tool->guid] = array(
-					'guid'		=> $tool->guid,
-					'name'		=> strtolower($tool->name),
-					'name_id'	=> $tool->tool,
-					'tool_id'	=> $tool->tool_id,
-				);
-				
-				$js_tool_init = strtolower($tool->name)."_init_$tool->tool_id";
-				
+					# Throw tool into admin panel array
+					$tools_array[$tool->guid] = array(
+						'guid'		=> $tool->guid,
+						'name'		=> strtolower($tool->name),
+						'name_id'	=> $tool->tool,
+						'tool_id'	=> $tool->tool_id,
+						'scope'		=> $scope,
+					);
+				}
+
+				# Create unique Tool array so we can fetch only tool-css needed for this page.	
+				$all_tools[] = "$tool->tool.$tool->tool_id";					
+
+
 				# Create Tool object
 				$tool_object  = $prepend;				
 				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
-				$tool_object .= "$append <span id='$js_tool_init' style='display:none'></span>";
+				$tool_object .= $append;
 				
 				# Add tools to correct container.				
 				$index = $tool->container;
@@ -93,19 +94,32 @@ class Build_Page_Controller extends Template_Controller {
 					$index = $tool->page_id; 
 
 				$containers_array[$index] .= $tool_object;		
-			}
-			
-			# Load Tools Public CSS
-			$all_tools_string = implode('-', $all_tools);
-			
-			$this->template->linkCSS("get/css/tools/$all_tools_string", url::site() );			
+			}		
 		}
+		
+		/*
+		if('0' < count($all_tools))
+		{
+			# Load Tools Public CSS (only when not logged in)
+			$all_tools_string = implode('-', $all_tools);	
+			$this->template->linkCSS("get/css/tools/$all_tools_string", url::site() );
+		}
+		*/
 		
 		
 		# Drop Tool array into admin Panel if logged in
 		if($admin_mode)
-			$this->template->set_global('tools_array', $tools_array);			
-	
+			$this->template->set_global('tools_array', $tools_array);
+		else
+			$this->template->linkCSS("get/css/custom/$page->id", url::site() );
+		
+		/*
+		# load custom tool css for this page. 
+		$custom_css = (($admin_mode)) ? '/admin' : '';
+		$this->template->linkCSS("get/css/custom/$page->id$custom_css", url::site() );
+		*/
+		
+		
 		# Load Javascript files if they exist.
 		if (! empty($_SESSION['js_files']) AND is_array($_SESSION['js_files']) )
 		{

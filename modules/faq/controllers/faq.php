@@ -11,24 +11,25 @@ class Faq_Controller extends Controller {
 		$db = new Database;
 		$primary = new View("public_faq/index");
 		
-		$parent = $db->query("SELECT * FROM faqs 
+		$parent = $db->query("
+			SELECT * FROM faqs 
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();	
 
-		$items = $db->query("SELECT * FROM faq_items 
+		$items = $db->query("
+			SELECT * FROM faq_items 
 			WHERE parent_id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 			ORDER BY position
 		");
+		if('0' == $items->count())
+			return $this->public_template('(no questions)', 'faq', $tool_id);
 		
 		$primary->parent = $parent;	
-		$primary->items = $items;	
-		
-		# Javascript
-		$primary->readyJS('faq','index', $parent->id);
+		$primary->items = $items;
 
-		return $primary;	
+		return $this->public_template($primary, 'faq', $tool_id);
 	}
 }
 
