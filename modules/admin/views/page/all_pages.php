@@ -1,96 +1,28 @@
 
-<style type="text/css">
-#page_browser_wrapper .breadcrumb_wrapper{
-	font-size:1.2em;
-	font-weight:bold;
-}
-#page_browser_wrapper .breadcrumb_wrapper a{
-}
-
-#page_browser_wrapper #legend{
-	float:left;
-	width:200px;
-	padding:5px;
-}
-
-#directory_window{
-	height:350px;
-	width:460px;
-	float:right;
-	padding:10px;
-	overflow:auto;
-	order:1px solid #99ccff;
-	background:#e2effc;
-}
-#directory_window div.asset{
-	margin:3px;
-	overflow:auto;
-}
-.folder_bar, .page_icon, .page_bar{
-	padding:4px;
-}
-#directory_window div.sub_folders{
-	display:none;
-}
-.enabled{
-	background:#fff;
-	border:1px solid #99ccff;
-}
-.hidden{
-	background:#f2f1f1;
-	border:1px solid #ccc;
-}
-.disabled{
-	background:#fbe2e2;
-	border:1px solid pink;
-}
-
-.folder_bar{
-	background:lightgreen;
-	width:25px;
-	float:left;
-}
-.page_bar{
-	float:right;
-}
-.page_bar div{
-	float:left;
-	text-align:right;
-	order:1px solid red;
-	width:25px;
-	min-height:10px;
-	overflow:auto;
-}
-.page_icon{
-	float:left;
-	padding:3px;
-}
-</style>
-
 <div id="page_browser_wrapper">
 
 	<div id="common_tool_header" class="breadcrumb_wrapper">
 		<a href="#" rel="ROOT" class="open_folder"><?php echo url::site()?></a><span id="breadcrumb" rel=""></span>
 	</div>
 	
-	<div id="legend">
+	<div class="common_left_panel">
 		<img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="/get/page/add" class="new_page">New Page</a>
-		
-		<br><br>
-		
+		<br>
+		<br>		
 		<h3>Key</h3>
 		<small>
 			<img src="<?php echo url::image_path('admin/magnifier.png')?>" alt=""> Load page.
 			<br><img src="<?php echo url::image_path('admin/cog_edit.png')?>" alt=""> Edit page settings.
-			<br><img src="<?php echo url::image_path('admin/folder_add.png')?>" alt=""> Create folder from page name
+			<br><img src="<?php echo url::image_path('admin/folder_add.png')?>" alt=""> Create sub-directory
 			<br><img src="<?php echo url::image_path('admin/delete.png')?>" alt=""> Delete page.	
+			<br><img src="<?php echo url::image_path('admin/shield.png')?>" alt=""> Contains Page Builder	
 			<br>
 			<br><b style="color:#ccc">Gray:</b> accessible but not in menu.
 			<br><b style="color:red">Red:</b> not publicly accessible.
 		</small>
 	</div>
 	
-	<div id="directory_window" rel="ROOT">
+	<div id="directory_window" class="common_main_panel" rel="ROOT">
 		<?php echo $files_structure?>
 	</div>
 

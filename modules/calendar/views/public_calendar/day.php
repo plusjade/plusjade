@@ -7,7 +7,7 @@
 	foreach($events as $event)
 	{
 		?>
-		<div class="calendar_item" rel="<?php echo $event->id?>">
+		<div id="calendar_item_<?php echo $event->id?>" class="calendar_item" rel="<?php echo $event->id?>">
 			<h2 class="center"><?php echo $event->title?></h2>
 			<br>
 			Description:

@@ -18,16 +18,30 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	</div>	
 	<input type="hidden" name="old_page_name" value="<?php echo $filename?>">
 	<input type="hidden" name="directory" value="<?php echo $directory?>">
-	
 	<?php
 	if($filename != 'home')
 	{		
 		?>
-		<div style="text-align:center;padding:5px;">
-			Page URL: <?php echo url::site(),$directory?><span></span>
+		<div class="common_left_panel fieldsets">
+			<b>Page Access</b>
+			<br><select name="enable" class="enabled_<?php echo $page->enable?>">
+				<option value="yes" <?php echo $page_enable['yes']?>>Allow Access</option>
+				<option value="no" <?php echo $page_enable['no']?>>No Access</option>
+			</select> <span><img src="<?php echo url::image_path("admin/enabled_$page->enable.png")?>" alt=""></span>
+			<br>
+			<br>
+			<b>Menu Link</b>
+			<br><select name="menu" class="enabled_<?php echo $page->menu?>">
+				<option value="yes" <?php echo $menu_enable['yes']?>>Show in Menu</option>
+				<option value="no" <?php echo $menu_enable['no']?>>Do Not Show</option>
+			</select> <span><img src="<?php echo url::image_path("admin/enabled_$page->menu.png")?>" alt=""></span>
+
 		</div>
 		
-		<div class="fieldsets" style="float:left;width:65%;">
+		<div class="common_main_panel fieldsets">
+			<div style="text-align:center;padding:5px;">
+				Page URL: <?php echo url::site(),$directory?><span></span>
+			</div>
 			<b>Label Name</b><br>
 			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
 			<br><br>
@@ -35,26 +49,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			<?php if($is_protected) echo '<span style="color:red">(protected)</span>'?>
 			<br><input type="text" name="page_name" value="<?php echo $filename?>" size="30" maxlength="50">		
 			
-			<div id="page_exists" class="aligncenter error_msg"></div>
-		
-		</div>
-		
-		<div class="fieldsets" style="float:right;width:30%;">
-			<b>Page Access</b><br>
-			<select name="enable" class="enabled_<?php echo $page->enable?>">
-				<option value="yes" <?php echo $page_enable['yes']?>>Allow Access</option>
-				<option value="no" <?php echo $page_enable['no']?>>No Access</option>
-			</select> <span><img src="<?php echo url::image_path("admin/enabled_$page->enable.png")?>" alt=""></span>
-			<br>
-			<br>
-			<b>Menu Link</b><br>
-			<select name="menu" class="enabled_<?php echo $page->menu?>">
-				<option value="yes" <?php echo $menu_enable['yes']?>>Show in Menu</option>
-				<option value="no" <?php echo $menu_enable['no']?>>Do Not Show</option>
-			</select> <span><img src="<?php echo url::image_path("admin/enabled_$page->menu.png")?>" alt=""></span>
-
-		</div>
-		
+			<div id="page_exists" class="aligncenter error_msg"></div>	
 		<?php
 	}
 	else
@@ -62,16 +57,8 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		?>
 		<input type="hidden" name="page_name" value="home">
 		<input type="hidden" name="enable" value="yes">		
-		
-		<div id="home_require_message">**Home page is required**</div> 
-		<?php echo url::site()?><strong><?php echo $filename?></strong>
 
-		<div class="fieldsets" style="float:left;width:65%">
-			<b>Page Name</b> (in menu)<br>
-			<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
-		</div>
-		
-		<div class="fieldsets" style="float:right;width:30%">
+		<div class="common_left_panel fieldsets">
 			<b>Menu Link</b>
 			<br>
 			<select name="menu" class="enabled_<?php echo $page->menu?>">
@@ -80,20 +67,24 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			</select> 
 			<span><img src="<?php echo url::image_path("admin/enabled_$page->menu.png")?>"></span>
 		</div>
+		
+		<div class="common_main_panel fieldsets">
+		
+			<div id="home_require_message">**Home page is required**</div> 
+			<p><?php echo url::site()?><strong><?php echo $filename?></strong></p>
+			
+			<b>Page Name</b> (in menu)
+			<br><input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
 		<?php
 	}
 	?>
-	
-	<div class="fieldsets clearboth">
-		<b>Page Title</b><br>
-		<input type="text" name="title" value="<?php echo $page->title?>" class="full_width">
-	</div>
-	
-	<div class="fieldsets">
-		<b>Meta description</b><br>
-		<input type="text" name="meta" value="<?php echo $page->meta?>" class="full_width">
-	</div>
-	
+			<p>
+			<b>Page Title</b>
+			<br><input type="text" name="title" value="<?php echo $page->title?>" style="width:500px">
+			</p>
+			<b>Meta description</b>
+			<br><input type="text" name="meta" value="<?php echo $page->meta?>" style="width:500px">
+	</div>	
 </form>
 
 <script type="text/javascript">

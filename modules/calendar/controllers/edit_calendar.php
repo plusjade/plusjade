@@ -19,6 +19,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
  */
 	function manage($tool_id=NULL)
 	{
+		die('blah');
 		valid::id_key($tool_id);
 		$calendar = new Calendar;
 		$db = new Database;
@@ -28,7 +29,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
 		");
-		die('blah');
+		
 	}
 
 /*
@@ -36,8 +37,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
  */ 
 	public function add($tool_id=NULL)
 	{		
-		valid::id_key($tool_id);
-		
+		valid::id_key($tool_id);	
 		if($_POST)
 		{
 			$db = new Database;
@@ -74,8 +74,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	{
 		valid::id_key($id);
 		$db = new Database;
-
-		if(! empty($_POST['title']) )
+		if($_POST)
 		{
 			$data = array(
 				'title'	=> $_POST['title'],
@@ -93,6 +92,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 				AND fk_site = '$this->site_id'
 			")->current();
 			$primary->item = $parent;
+			$primary->js_rel_command = "update-calendar-$parent->parent_id";
 			die($primary);
 		}	
 	}
@@ -183,4 +183,8 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			return FALSE;
 	}
 	
+	static function _tool_adder($tool_id, $site_id)
+	{
+		return 'add';
+	}
 }

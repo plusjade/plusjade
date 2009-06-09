@@ -272,47 +272,6 @@ class Page_Controller extends Admin_Controller {
 		die('Page deleted!!'); # success			
 	}
 
-/*
- * Save the tool positions/containers, and local/global scope on the page
- * the posts happens via ajax in the public/assets/js/admin/init.js file
- * invoked via id="get_tool_sort" link (now as callback for tool sortable js)
- */
-	function tools($page_id=NULL)
-	{
-		valid::id_key($page_id);		
-		
-		if($_POST)
-		{
-			#echo '<PRE>';print_r($_POST);echo '</PRE>'; die();
-			$db = new Database;
-			$output = rtrim($_POST['output'], '#');	
-			$output = explode('#', $output);
-			
-			if( empty($output['0']) )
-				die('There are no tools to sort');
-	
-			# hash format "scope.guid_id.container.position"
-			foreach($output as $hash)
-			{
-				$pieces	= explode('.', $hash);
-				
-				# Update the rows
-				$guid 				= strstr($pieces['1'], '_');
-				$guid 				= ltrim($guid, '_');
-				$data['position']	= $pieces['3'];			
-				$data['page_id']	= $page_id;
-				$data['container']	= $pieces['2'];	
-				if( 'global' == $pieces['0'] )
-				{
-					$data['page_id']	= $pieces['2'];
-					$data['container']	= $pieces['2'];
-				}
-				$db->update('pages_tools', $data, "guid = '$guid' AND fk_site = '$this->site_id'");								
-			}	
-			echo 'Order Updated!';
-		}
-		die();
-	}
 	
 /*
  * Configure page settings	

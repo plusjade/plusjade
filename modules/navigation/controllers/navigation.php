@@ -8,15 +8,12 @@ class Navigation_Controller extends Controller {
 	}
 
 	/*
-	 * Displays a nestable navigation menu
-	 *
+	 * Displays a nestable navigation element menu
 	 */	 
 	function _index($tool_id)
 	{	
 		valid::id_key($tool_id);	
-		
-		$primary	= new View('public_navigation/index');	
-		$db			= new Database;
+		$db = new Database;
 		
 		$parent	= $db->query("
 			SELECT * FROM navigations 
@@ -31,21 +28,21 @@ class Navigation_Controller extends Controller {
 			ORDER BY lft ASC
 		");		
 		
-		# TODO: change this to only logged in view
-		if('0' == $items->count() )
-			return '(no items)';
-			
-			
+		# There will always be a root_holder so no items is actually =1
+		if('1' == $items->count())
+			return $this->public_template('(no items)', 'navigation', $tool_id);
+		
+		$primary = new View('public_navigation/index');	
 		$primary->parent = $parent;
 		
-		# node_generation function is contained in the tree class...
+		# public node_generation function is contained in the tree class...
 		$primary->tree = Tree::display_tree('navigation', $items);
 		
-		# Javascript
+		# admin Javascript
 		if( $this->client->logged_in() )
 			$primary->add_root_js_files('simple_tree/jquery.simple.tree.js');
 		
-		return $primary;
+		return $this->public_template($primary, 'navigation', $tool_id);
 	}
   
 }

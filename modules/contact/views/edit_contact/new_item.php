@@ -1,13 +1,11 @@
 
 
-<?php echo form::open("edit_contact/add/$tool_id", array('class' => 'ajaxForm') )?>
-	<input type="hidden" name="holder" value="holder">
-
+<?php echo form::open("edit_contact/add/$tool_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command) )?>
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_contacts" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Add Contacts
+			<img src="<?php echo url::image_path('admin/check.png')?>" alt=""/> Add Contacts
 		</button>
-		<strong>Add New Contacts</strong>	
+		<div id="common_title">Add New Contacts</div>	
 	</div>
 	
 	<table id="new_contact_table" border="0" width="100%">

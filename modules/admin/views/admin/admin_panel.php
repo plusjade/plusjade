@@ -1,12 +1,3 @@
-<?php 
-if( empty($page_id) ) $page_id = NULL;
-#HACK
-$page_name = uri::easy_segment('1');
-
-if (empty($tools_array))
-	$tools_array = array();
-?>
-
 <!-- START admin elements -->		
 <div id="admin_bar_wrapper">
 	<ul id="admin_bar">				
@@ -22,7 +13,6 @@ if (empty($tools_array))
 				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/change" rel="facebox">New Theme</a></li>
 			</ul>		
 		</li>
-						
 		<li class="root_list dropdown">
 			<div>Pages &#8595;</div>
 			<ul>
@@ -30,30 +20,25 @@ if (empty($tools_array))
 				<li><img src="<?php echo url::image_path('admin/sitemap.png')?>" alt=""> <a href="/get/page/navigation" rel="facebox">Navigation</a></li>
 				
 			</ul>		
-		</li>
-		
+		</li>		
 		<li class="root_list dropdown">
 			<div>Tools &#8595;</div>
 			<ul>
 				<li><img src="<?php echo url::image_path('admin/tools.png')?>" alt=""> <a href="/get/tool" rel="facebox">All Tools</a></li>
 			</ul>
 		</li>
-
 		<li class="root_list dropdown">
 			<div>Files &#8595;</div>
 			<ul>
 				<li><img src="<?php echo url::image_path('admin/tools.png')?>" alt=""> <a href="/get/tool" rel="facebox">(not live)</a></li>
 			</ul>
-		</li>
-		
+		</li>		
 		<li class="root_list floatright">
 			<div><b><a class="toggle_admin_bar" href="#">Hide Admin</a></b></div>
 		</li>
-
 		<li class="root_list floatright">
 			<div><a href="/get/admin/logout">Logout</a></div>
-		</li>	
-		
+		</li>			
 		<li class="root_list floatright">
 			<div><a href="http://<?php echo ROOTDOMAIN ?>/get/auth">+Jade</a></div>
 		</li>
@@ -63,7 +48,6 @@ if (empty($tools_array))
 		<table><tr>
 			<td class="title"><b>ON THIS PAGE: <?php echo $page_name?></b></td>
 			<td><a href="/get/page/settings/<?php echo $page_id?>" rel="facebox">Page Settings</a></td>
-			<td><a href="#" id="get_tool_sort" rel="<?php echo $page_id?>">Save The Page</a></td>
 			<td><a href="/get/tool/add/<?php echo $page_id?>" rel="facebox">ADD CONTENT</a></td>
 		</tr></table>		
 
@@ -80,9 +64,14 @@ if (empty($tools_array))
 				 * name			defines the tool table (plural) ex: album(s)
 				 * name_id		tools_list id of the tool
 				 * tool_id		gets the tool from the tool table
-				 */
+				 * scope		local/global
+				 */	
 				foreach($tools_array as $db_position => $data_array)
 				{
+					$data_array['page_id'] = $page_id;
+					$data_array['protected'] =
+						(in_array($data_array['name_id'], $protected_array)) ?
+							TRUE : FALSE;					
 					echo View::factory('tool/toolkit_html', array('data_array'=> $data_array));
 				}
 			}

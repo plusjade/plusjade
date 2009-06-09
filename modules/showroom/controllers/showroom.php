@@ -82,8 +82,7 @@ class Showroom_Controller extends Controller {
 				});
 			');
 			
-		$primary->readyJS('showroom', 'index', $parent->id);
-		return $primary;		
+		return $this->public_template($primary, 'showroom', $tool_id);	
 	}
 
 	function _categories($parent_id)

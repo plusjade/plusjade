@@ -150,11 +150,6 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		}
 	}
 	
-	public function delete($id=NULL)
-	{
-
-	}
-
 	public function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);		
@@ -165,14 +160,23 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			$data = array(
 				'title'	=> $_POST['title'],
 			);		
-			$db->update('navigations', $data, "id = '$tool_id' AND fk_site = '$this->site_id'");
+			$db->update(
+				'navigations',
+				$data,
+				"id = '$tool_id' AND fk_site = '$this->site_id'
+			");
 			die('Settings Saved!<br>Updating...');	
 		}
 		else
 		{
 			$primary = new View("edit_navigation/settings");
-			$parent = $db->query("SELECT * FROM navigations WHERE id = '$tool_id' AND fk_site = '$this->site_id' ")->current();			
+			$parent = $db->query("
+				SELECT * FROM navigations 
+				WHERE id = '$tool_id' 
+				AND fk_site = '$this->site_id'
+			")->current();		
 			$primary->parent = $parent;
+			$primary->js_rel_command = "update-navigation-$tool_id";
 			die($primary);
 		}			
 	}

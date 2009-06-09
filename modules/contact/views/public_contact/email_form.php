@@ -18,7 +18,7 @@
 				
 				<div class="phone_div">
 					<b>Your Phone #</b><br>
-					<input type="text" name="phone" value="<?php echo 'phone'?>">
+					<input type="text" name="phone">
 				</div>
 			</td>
 
@@ -31,7 +31,7 @@
 		</tr>
 		
 		<tr><td colspan="2" class="buttons">
-			<button type="submit" name="submit"/>Send Email</button>	
+			<button type="submit" name="submit">Send Email</button>	
 		</td></tr>
 		</table>
 

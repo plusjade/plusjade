@@ -1,5 +1,5 @@
 
-<?php echo form::open_multipart("css/edit/$name_id/$tool_id", array('class' => 'ajaxForm'))?>
+<?php echo form::open_multipart("css/edit/$name_id/$tool_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command))?>
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="save_css" class="jade_positive">

@@ -16,13 +16,16 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	{
 		valid::id_key($tool_id);
 		$db = new Database;
-		$primary = new View('edit_faq/manage');
 		$items = $db->query("
 			SELECT * FROM faq_items 
 			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
 			ORDER BY position
 		");
+		if('0' == $items->count())
+			$this->add($tool_id);
+
+		$primary = new View('edit_faq/manage');
 		$primary->items = $items;
 		$primary->tool_id = $tool_id;
 		die($primary);
@@ -30,8 +33,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	
 	function add($tool_id=NULL)
 	{
-		valid::id_key($tool_id);
-		
+		valid::id_key($tool_id);	
 		if($_POST)
 		{
 			$db = new Database;
@@ -52,21 +54,13 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 				
 			);
 			$db->insert('faq_items', $data); 
-			
-			Load_Tool::die_guid(@$_POST['guid']); # if wizard : die($guid)
-			
 			die('Question added'); #success
 		}
 		else
 		{
 			$primary = new View("edit_faq/new_item");
-			$primary->tool_id = $tool_id;
-			
-			# For the javascript tool_html updates
-			$primary->hidden_guid = Load_Tool::is_get_guid(@$_GET['guid']);				
-			$action = ( empty($_GET['guid']) ) ? 'update' : 'add';	
-			$primary->js_rel_command = "$action-faq-$tool_id";
-			
+			$primary->tool_id = $tool_id;	
+			$primary->js_rel_command = "update-faq-$tool_id";
 			die($primary);
 		}
 	}
@@ -74,8 +68,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 
 	function edit($id=NULL)
 	{
-		valid::id_key($id);
-		
+		valid::id_key($id);		
 		if($_POST)
 		{
 			$db = new Database;
@@ -103,13 +96,15 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	 */
 	function save_sort()
 	{
+		if(empty($_GET['faq']))
+			die('No items to sort');
+			
 		die( $this->_save_sort_common($_GET['faq'], 'faq_items') );
 	}
 	
 	function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-
 		if($_POST)
 		{
 			$db = new Database;

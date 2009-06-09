@@ -41,7 +41,7 @@ show title
 next/prev buttons,
 pause on hover
 */
-echo form::open("edit_album/settings/$tool_id", array('id' => "$tool_id", 'class' => 'ajaxForm'));
+echo form::open("edit_album/settings/$tool_id", array('id' => "$tool_id", 'class' => 'ajaxForm', 'rel' => $js_rel_command));
 ?>			
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="edit_album" class="jade_positive">
@@ -108,7 +108,7 @@ $(function() {
 	});
 	
 	var markup = '<div id="slideshow">'
-		+ '<img src="/images/admin/smiley.jpg"><img src="/images/admin/sample2.jpg">'
+		+ '<img src="/assets/images/admin/smiley.jpg"><img src="/assets/images/admin/sample2.jpg">'
 		+ '</div>';
 		
 	function start() {

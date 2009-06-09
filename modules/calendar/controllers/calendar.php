@@ -40,9 +40,8 @@ class Calendar_Controller extends Controller {
 					$().add_toolkit_items("calendar");
 				});			
 			');
-		$primary->readyJS('calendar','index');		
-		$primary->tool_id = $tool_id;
-		return $primary;
+			
+		return $this->public_template($primary, 'calendar', $tool_id);
 	}
 
 	# Ajax query for month (last and next buttons)
@@ -166,13 +165,9 @@ class Calendar_Controller extends Controller {
 		$day	= @$url_array['5'];
 
 		if('month' == $action)
-		{
 			die( $this->month($tool_id, $year, $month) );
-		}
 		elseif('day' == $action)
-		{
 			die( $this->day($tool_id, $year, $month, $day) );
-		}
 	}
 	
 	

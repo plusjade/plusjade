@@ -20,7 +20,7 @@
 	<?php echo $tree?>
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript">	
 	function get_active_node(){
 		active = false;
 		$('li span.active').each(function(){
@@ -31,6 +31,9 @@
 	
 	// initiliaze simpleTree
 	$simpleTreeCollection = $(".facebox .simpleTree").simpleTree();
+
+	//Make root the default active node.
+	$('.facebox .simpleTree li.root > span').addClass('active');
 	
 	$("li.root > span").click(function(){
 		$('span.active').removeClass('active').addClass('text');
@@ -38,10 +41,9 @@
 		
 	});
 	
-	
 	/*
-		delegate element click actions
-	*/
+	 * delegate element click actions
+	 */
 	ROOT = $('.simpleTree > li.root').attr('rel');
 	$('#actions_list').click($.delegate({
 		
@@ -108,12 +110,11 @@
 	}));
 	
 	
-	// Gather and send nest data.
+	// Gather and save nest data.
 	// ------------------------
 	$(".facebox #link_save_sort").click(function() {
-		$.facebox('Saving Tree...', "status_reload", "facebox_2");
-		
-		var output = "";
+		$('.facebox .show_submit').show();	
+		var output = '';
 		var tool_id = $(this).attr("rel");
 		
 		$(".facebox #admin_navigation_wrapper ul").each(function(){
@@ -132,6 +133,7 @@
 			{output: output},
 			function(data){
 				$.facebox.close();
+				$('.facebox .show_submit').hide();			
 				$().jade_update_tool_html('update', 'navigation', tool_id, data);	
 			}
 		)		
