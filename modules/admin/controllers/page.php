@@ -12,7 +12,7 @@ class Page_Controller extends Admin_Controller {
 		$this->client->can_edit($this->site_id);
 	}
 	/*
-	 * show file structure view of all pages
+	 * show file-structure view of all pages
 	 *
 		**KEY: Variable logic used in this class
 		------------------------------------------
@@ -62,61 +62,50 @@ class Page_Controller extends Admin_Controller {
 		ob_start();
 		foreach($folders_array as $directory => $file_array)
 		{
-			$path_for_css = str_replace('/','_',$directory, $count);
+			$path_for_css = str_replace('/', '_', $directory, $count);
 			
-			echo '<div class="' .$path_for_css. ' sub_folders">';
+			echo "<div class=\"$path_for_css sub_folders\">";
 			
 			foreach($file_array as $filename => $data)
 			{
+				# parse filedata for page
 				$file_data	= explode(':', $data);
 				list($id, $menu, $enable) = $file_data;
+				
+				# is page on menu, hidden, or disabled?
 				$visibility = 
 					('no' == $enable) ? 'disabled' :
 						( ('no' == $menu) ? 'hidden' : 'enabled' );					
-
+				
+				# full path to page
 				$full_path = ('ROOT' == $directory)
 					? $filename : "$directory/$filename";
-					
-				$protected_page	= '';
-				$folderize = '<img src="'.url::image_path('admin/folder_add.png').'" alt="" class="folderize" id="'.$id.'" rel="'.$full_path.'">';
+
+				$vars = array(
+					'id'			=> $id,
+					'visibility'	=> $visibility,
+					'is_folder'		=> FALSE,
+					'is_protected'	=> FALSE,
+					'full_path'		=> $full_path,
+					'filename'		=> $filename,
+				);
 				
+				# is page protected?
 				if('ROOT' == $directory AND $builder = yaml::does_key_exist($this->site_name, 'pages_config', $filename) )
 				{
-					$builder = explode(':',$builder);
-					$protected_page = '<img src="'.url::image_path('admin/shield.png').'" title="'.$builder['0'].'" alt="">';
-					$folderize = '';
+					$builder = explode(':', $builder);
+					$vars['is_protected'] = TRUE;
+					$vars['page_builder'] = $builder['0'];
 				}	
-				?>
-				<div id='page_wrapper_<?php echo $id?>' class="<?php echo $visibility?> asset">
-					<?php
-					if(! empty($folders_array[$full_path]) )
-					{
-						$folderize='';
-						?>
-						<div class="folder_bar">
-							<a href="/<?php echo $full_path?>" class="open_folder" rel="<?php echo $full_path?>">
-								<img src="<?php echo url::image_path('admin/folder.png')?>" class="open_folder" rel="<?php echo $full_path?>" alt="" >
-							</a>
-						</div>
-						<?php 
-					}
-					?>
-					<div class="page_bar">
-						<div><?php echo $protected_page?></div>
-						<div><a href="<?php echo url::site($full_path)?>" class="" title="Go to Page: <?php echo url::site($full_path)?>"><img src="<?php echo url::image_path('admin/magnifier.png')?>" alt=""></a></div>
-						<div><a href="/get/page/settings/<?php echo $id?>" title="Page Settings"><img src="<?php echo url::image_path('admin/cog_edit.png')?>" alt="" class="img_facebox"></a></div>
-						<div><?php echo $folderize?></div>
-						<div><a href="/get/page/delete/<?php echo $id?>" id="<?php echo $id?>" title="Delete Page"><img src="<?php echo url::image_path('admin/delete.png')?>" class="delete_page" alt=""></a></div>
-					</div>
-
-					<div class="page_icon">
-						<img src="<?php echo url::image_path('admin/page.png')?>" alt="">
-						<?php echo $filename?>
-					</div>
-					
-				</div>
-				<?php
+				
+				# is page_name a folder? (has children)
+				if(! empty($folders_array[$full_path]) )
+					$vars['is_folder'] = TRUE;
+				
+				# display html
+				echo View::factory('page/page_wrapper_html', array('vars' => $vars));
 			}
+			
 			echo '</div>';
 		}
 		$primary->files_structure = ob_get_clean();
@@ -135,8 +124,9 @@ class Page_Controller extends Admin_Controller {
 			# Validate page_name & duplicate check
 			$full_path = $filename = self::_validate_page_name($_POST['label'], $_POST['page_name'], $directory);
 
-			if(! empty($directory) )
+			if('ROOT' != $directory)
 				$full_path = "$directory/$filename";
+				
 			
 			$db = new Database;			
 			$max = $db->query("
@@ -151,70 +141,72 @@ class Page_Controller extends Admin_Controller {
 				'label'		=> $_POST['label'],
 				'position'	=> ++$max->highest,
 			);
-			if(! empty($_POST['menu']) )
+			if(! empty($_POST['menu']) AND 'yes' == $_POST['menu'])
 				$data['menu'] = 'yes';
 			
+			# setup vars...
 			$page_id = $db->insert('pages', $data)->insert_id();
+			$visibility = ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
+			$vars = array(
+				'id'			=> $page_id,
+				'visibility'	=> $visibility,
+				'is_folder'		=> FALSE,
+				'is_protected'	=> FALSE,
+				'full_path'		=> $full_path,
+				'filename'		=> $filename,
+			);
 
-			# outputing html here is easier to maintain as of now ...
-			$page_access = ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';
-			?>
-			<div id='page_icon_<?php echo $page_id?>' class="<?php echo $page_access?> asset">
-				<div class="page_bar">
-					<a href="<?php echo url::site($full_path)?>" class="" title="Go to Page: <?php echo url::site($full_path)?>"><img src="<?php echo url::image_path('admin/magnifier.png')?>" alt=""></a>
-					<a href="/get/page/settings/<?php echo $page_id?>" title="Page Settings"><img src="<?php echo url::image_path('admin/cog_edit.png')?>" alt="" class="img_facebox"></a>
-					<img src="<?php echo url::image_path('admin/folder_add.png')?>" alt="" class="folderize" rel="<?php echo $full_path?>">
-		
-					<a href="/get/page/delete/<?php echo $page_id?>" id="<?php echo $page_id?>" title="Delete Page"><img src="<?php echo url::image_path('admin/delete.png')?>" class="delete_page" alt=""></a>
-				</div>
-
-				<div class="page_icon">
-					<img src="<?php echo url::image_path('admin/page.png')?>" alt="">
-					<?php echo $filename?>
-				</div>
-				
-			</div>			
-			<?php
-			die();
-		}
-		else
-		{
-			# directory comes from all_pages javascript loader
-			if(! isset($_GET['directory']) )
-				die('no directory selected');
-				
-			$primary		= new View("page/new_page");
-			$db				= new Database;
-			$directory	= $_GET['directory'];
-			$path_array		= explode('/', $directory);
-			$primary->directory = $directory;
-			
-			
-			# if the path is root...
-			if( empty($directory) )
+			/*
+			# i only need this if enabling auto-add page builders to new pages..
+			# is page protected?
+			if('ROOT' == $directory AND $builder = yaml::does_key_exist($this->site_name, 'pages_config', $filename) )
 			{
-				$page_builders = $db->query("
-					SELECT * FROM tools_list WHERE protected = 'yes'
-				");
-				$primary->page_builders = $page_builders;
-				
-				$directory = 'ROOT';
+				$builder = explode(':', $builder);
+				$vars['is_protected'] = TRUE;
+				$vars['page_builder'] = $builder['0'];
 			}
+			*/
 			
-			# Javascript duplicatate_page name filter Validation
-			# -------------------------------
-			# get page_name filter for this path
-			$filter_array = self::_get_filename_filter($directory);
-
-			# convert filter_array to string to use as javascript array
-			$filter_string = implode("','",$filter_array);
-			$filter_string = "'$filter_string'";
-
-			#echo'<pre>';print_r($filter_array);echo'</pre>';die();
-			#echo $filter_string;die();
-			$primary->filter = $filter_string;
-			die($primary);
+			# send html to javascript handler
+			die( View::factory('page/page_wrapper_html', array('vars' => $vars)) );
 		}
+
+		# directory comes from all_pages javascript loader
+		if(! isset($_GET['directory']) )
+			die('no directory selected');
+			
+		$primary		= new View("page/new_page");
+		$db				= new Database;
+		$directory	= $_GET['directory'];
+		$path_array		= explode('/', $directory);
+		$primary->directory = $directory;
+		
+		
+		# if the path is root...
+		if( empty($directory) )
+		{
+			$page_builders = $db->query("
+				SELECT * FROM tools_list WHERE protected = 'yes'
+			");
+			$primary->page_builders = $page_builders;
+			
+			$directory = 'ROOT';
+		}
+		
+		# Javascript duplicatate_page name filter Validation
+		# -------------------------------
+		# get page_name filter for this path
+		$filter_array = self::_get_filename_filter($directory);
+
+		# convert filter_array to string to use as javascript array
+		$filter_string = implode("','",$filter_array);
+		$filter_string = "'$filter_string'";
+
+		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
+		#echo $filter_string;die();
+		$primary->filter = $filter_string;
+		die($primary);
+
 	}
 
 /*
@@ -307,7 +299,7 @@ class Page_Controller extends Admin_Controller {
 				yaml::edit_value($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
 			}
 			
-			die('Changes Saved!<br>Updating...'); # success				
+			die('Page Settings Saved'); # success				
 		}
 		else
 		{
