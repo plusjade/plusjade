@@ -208,4 +208,9 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		# which method to invoke after?
 		return 'manage';
 	}
+	
+	static function _tool_deleter()
+	{
+		return false;
+	}
 }

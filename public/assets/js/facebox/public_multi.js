@@ -179,10 +179,10 @@
     } else if (document.body) { // other Explorers
       windowHeight = document.body.clientHeight;
     }	
-	if(520 < windowHeight)
+	if(555 < windowHeight)
 		return windowHeight - 70
 		
-    return 520 - 70
+    return 485
   }
 
   // Backwards compatibility

@@ -44,9 +44,7 @@ pause on hover
 echo form::open("edit_album/settings/$tool_id", array('id' => "$tool_id", 'class' => 'ajaxForm', 'rel' => $js_rel_command));
 ?>			
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="edit_album" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Settings
-		</button>
+		<button type="submit" name="edit_album" class="jade_positive">Save Settings</button>
 		<div id="common_title">Edit Settings</div>
 	</div>	
 	

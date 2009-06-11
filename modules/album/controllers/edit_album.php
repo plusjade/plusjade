@@ -66,7 +66,9 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		$filename	= upload::save($holder);
 		$image		= new Image($filename);			
 		$ext		= $image->__get('ext');
-		$name		= time()."$tool_id".".$ext";
+		$token		= text::random('alnum', 18);
+		$name		= "$token.$ext";
+		
 
 		if( $image->save("$image_store/$tool_id/$name") )
 		{

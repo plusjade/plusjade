@@ -3,7 +3,7 @@
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="edit_item" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Changes
+			<img src="/images/check.png" alt=""> Save Changes
 		</button>
 		<div id="common_title">Edit Calendar Event</div>
 	</div>	
@@ -18,8 +18,6 @@
 		<textarea name="desc" class="render_html"><?php echo $item->desc?></textarea>
 	</div>	
 	
-	
-
 </form>
 
 
