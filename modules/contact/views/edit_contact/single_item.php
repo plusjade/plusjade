@@ -1,7 +1,8 @@
 
 <?php 
 $select = array('no' => '', 'yes' => '');
-if( $item->enable == 'no') $select['no'] = 'SELECTED';		
+if( $item->enable == 'no') $select['no'] = 'SELECTED';
+	
 echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'id' => $item->id, 'rel' => $js_rel_command));	
 ?>
 	<div id="common_tool_header" class="buttons">
@@ -36,7 +37,7 @@ echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'id'
 		?>
 		<div class="fieldsets">		
 			<b>Value</b><br>		
-			<textarea id="contact_textarea" name="value" class="render_html" style="height:450px"><?php echo $item->value?></textarea>
+			<textarea name="value" class="render_html"><?php echo $item->value?></textarea>
 		</div>
 		<?php
 	}
@@ -44,9 +45,5 @@ echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'id'
 </form>
 
 <script type="text/javascript">
-	$(".facebox #place_address").click(function(){
-		var html = $(".facebox #address_container").html();
-		$(".facebox #contact_textarea").html(html);
-		return false;
-	});
+
 </script>

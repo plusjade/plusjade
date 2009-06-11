@@ -73,6 +73,49 @@ $(document).ready(function()
 		});
 	};	
 
+	/* display server response
+	 * ShowRespose in beta mode?
+	 * -----------------------------------
+	*/
+	$('body').append('<div id="show_response_beta">[Server Response]</div>');
+	$('#show_response_beta').css('top', getPageHeight()- 30 + getPageScroll()[1]);
+	$(window).resize(function(){
+		$('#show_response_beta').css('top', getPageHeight()- 30 + getPageScroll()[1]);
+	});
+	$(window).scroll(function(){
+		$('#show_response_beta').css('top', getPageHeight()- 30 + getPageScroll()[1]);
+	});
+  // getPageScroll() by quirksmode.com
+  function getPageScroll() {
+    var xScroll, yScroll;
+    if (self.pageYOffset) {
+      yScroll = self.pageYOffset;
+      xScroll = self.pageXOffset;
+    } else if (document.documentElement && document.documentElement.scrollTop) {	 // Explorer 6 Strict
+      yScroll = document.documentElement.scrollTop;
+      xScroll = document.documentElement.scrollLeft;
+    } else if (document.body) {// all other Explorers
+      yScroll = document.body.scrollTop;
+      xScroll = document.body.scrollLeft;	
+    }
+    return new Array(xScroll,yScroll) 
+  }
+
+  // Adapted from getPageSize() by quirksmode.com
+  function getPageHeight() {
+    var windowHeight
+    if (self.innerHeight) {	// all except Explorer
+      windowHeight = self.innerHeight;
+    } else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
+      windowHeight = document.documentElement.clientHeight;
+    } else if (document.body) { // other Explorers
+      windowHeight = document.body.clientHeight;
+    }	
+	return windowHeight
+  }
+
+// ---------------------
+  
 	/*
 	 * updates the tool container <#tool_wrapper_id> 
 	 * with the updated output from that tool.
@@ -166,10 +209,12 @@ $(document).ready(function()
 		"a.jade_confirm_delete_common": function(e) {
 			var url	= $(e.target).attr("href");
 			var el	= $(e.target).attr('rel');
-			$.facebox('deleting ...', "status_close", "facebox_2");
-			$.get(url, function() {
-				$.facebox.close();	
-				$('#' + el).remove();		
+			$('.facebox .show_submit').show();
+			$.get(url, function(data) {
+				$.facebox.close();
+				$('#' + el).remove();
+				$('.facebox .show_submit').hide();	
+				$('#show_response_beta').html(data);	
 			});
 			return false;
 		},
@@ -207,6 +252,7 @@ $(document).ready(function()
 					return false;
 					
 				$('.facebox .show_submit').show();
+				$('#show_response_beta').html('waiting for response...');
 			},
 			success: function(data) {
 				$('.facebox .show_submit').hide();
@@ -238,18 +284,25 @@ $(document).ready(function()
 						$().jade_update_tool_html(action[0], action[1], action[2], data);	
 					}
 				}
+				$('#show_response_beta').html(data);
 				return true;
 			}
 		});
 		
 		$('textarea.render_html').wysiwyg();
-		// Activate wysiwyg editor.
-		/*
-		$('textarea').fck({
-			path: '/assets/js/fckeditor/'
-			, toolbar:'Plusjade'
+		//$jw_editor = $('textarea.render_html').wysiwyg();
+		
+		// expand/contract the wysiwg editor
+		// TODO: clean this up later
+		var height = (300 > (getPageHeight()- 240)) ? 200 : getPageHeight()- 240;
+		$('.facebox form div.wysiwyg').css('min-height', height);
+		$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
+		
+		$(window).resize(function(){
+			height = (300 > (getPageHeight()- 240)) ? 200 : getPageHeight()- 240;		
+			$('.facebox form div.wysiwyg').css('min-height', height);
+			$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
 		});
-		*/
 	});
 
 	$(document).bind('close.facebox', function(){

@@ -1,4 +1,40 @@
 
+/* icons */
+span.icon {
+	font-size:14px;
+	background-attachment:fixed;
+	background: url(/assets/images/admin/icons_sprite.png) no-repeat 0px 0px;
+}
+span.rainbow{background-position:0px -293px}
+span.flag{background-position:0px -293px}
+span.page{background-position:0px -135px}
+span.add_page{background-position:0px -116px}
+span.sitemap{background-position:0px -168px}
+span.tools{background-position:0px -187px}
+span.cog{background-position:0px -29px}
+span.css{background-position:0px -81px}
+span.cross{background-position:0px -14px}
+span.edit_page{background-position:0px -65px}
+span.manage{background-position:0px -98px}
+span.plus{background-position:0px -14px}
+span.wrench{background-position:0px -46px}
+span.local{background-position:0px -239px}
+span.global{background-position:0px -219px}
+span.add_folder{background-position:0px -325px}
+span.folder{background-position:0px -311px}
+span.shield{background-position:0px -152px}
+span.shield{background-position:0px -152px}
+span.magnify{background-position:0px -203px}
+#show_response_beta{
+	position:absolute;
+	left:0;
+	height:15px;
+	background:#ffffcc;
+	font-size:10px;
+	color:#777;
+	padding:5px;
+	border:1px solid #777;
+}
 /* ------------ Facebox Reset base styles  ------------*/
 .facebox img {border:0}
 .facebox h1,.facebox h2, .facebox h3,.facebox h4,.facebox h5,.facebox h6{
@@ -35,7 +71,7 @@ body.disable_body{
 }
 .facebox .popup {
 	position: relative;
-	min-width:860px;
+	min-width:850px;
 }
 .facebox div.content{overflow:hidden;}
 
@@ -85,7 +121,7 @@ body.disable_body{
 	margin:0 auto;
 	width:800px;
 	background:#fff;
-	padding:15px;
+	padding-top:15px;
 }
 .facebox .loading {
 	margin:0 auto;
@@ -169,7 +205,8 @@ ul#admin_bar{
 	width:80%;
 	height:30px;
 	text-align:left;
-	background: #fff url(/assets/images/admin/orange_bg.png) repeat-x top left;
+	background-attachment:fixed;
+	background:orange url(/assets/images/admin/gradients.jpg) repeat-x 0px -305px;
 	color:#fff;
 	border:2px solid green;
 	border-top:0;
@@ -178,7 +215,8 @@ ul#admin_bar{
 #admin_bar li.root_list{
 	display:block;
 	float:left;
-	background: orange url(/assets/images/admin/orange_bg.png) repeat-x top left;
+	background-attachment:fixed;
+	background:orange url(/assets/images/admin/gradients.jpg) repeat-x 0px -305px;
 	height:30px;
 	width:100px;
 	padding:0;
@@ -218,7 +256,8 @@ ul#admin_bar{
 #admin_bar div.title_tag{
 	color:#fff;
 	font-weight:bold;
-	background: #7ebd40 url(/assets/images/admin/green_bg.png) repeat-x top left !important;
+	background-attachment:fixed;
+	background:green url(/assets/images/admin/gradients.jpg) repeat-x 0px -150px !important;
 }
 #tool_bar_wrapper{
 
@@ -228,10 +267,12 @@ ul#admin_bar{
 #tool_bar_wrapper table td {
 	padding:8px 0;
 	text-align:center;
-	background: #fff url(/assets/images/admin/sky_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:skyblue url(/assets/images/admin/gradients.jpg) repeat-x 0px -500px;
 }
 #tool_bar_wrapper table td.title {
-	background: #7ebd40 url(/assets/images/admin/green_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:green url(/assets/images/admin/gradients.jpg) repeat-x 0px -150px !important;
 	color:#fff;
 }
 #tool_bar_wrapper table{
@@ -290,7 +331,8 @@ ul#admin_bar{
 	z-index:200 !important;
 }
 .jade_toolbar_wrapper table{
-	background: #d52020 url(/assets/images/admin/red_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:#d52020 url(/assets/images/admin/gradients.jpg) repeat-x 0px -465px;
 	border-collapse:collapse;
 	width:100%;
 	height:30px;
@@ -354,7 +396,8 @@ div.CONTAINER_WRAPPER > span.local > div.jade_toolbar_wrapper > table{
 }
 */
 div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper > table{
-	background: purple url(/assets/images/admin/orange_bg.png) repeat-x bottom left !important;
+	background-attachment:fixed;
+	background:orange url(/assets/images/admin/gradients.jpg) repeat-x 0px -310px;
 	border:1px solid #cc6600 !important;
 }
 	
@@ -364,7 +407,8 @@ div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper > table{
 	text-align:right;
 	height:20px;
 	padding:3px;
-	background:lightblue url('/assets/images/admin/blue_bg.png') repeat-x bottom left;
+	background-attachment:fixed;
+	background:lightblue url(/assets/images/admin/gradients.jpg) repeat-x 0px -70px;
 }
 .jade_admin_item_edit span{
 	color:#fff;
@@ -436,11 +480,9 @@ div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper > table{
 }
 
 /* --- textarea defaults --- */
-textarea.render_html div.wysiwyg iframe{
-	height:370px !important;
+.facebox form div.wysiwyg iframe{
 }
-textarea.render_html div.wysiwyg{
-	height:420px !important;
+.facebox form div.wysiwyg{
 	width:97% !important;
 }
 
@@ -469,7 +511,8 @@ span.msg{
 }
 .buttons a, .buttons button{
     display:block;
-    background: blue url(/assets/images/admin/blue_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:lightblue url(/assets/images/admin/gradients.jpg) repeat-x 0px -110px;
 	border:1px solid #336699;
     color:#fff;	
     font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
@@ -501,9 +544,10 @@ span.msg{
 }
 /* STANDARD */
 button:hover, .buttons a:hover{
-    background: blue url(/assets/images/admin/dark_blue_bg.png) repeat-x bottom left;
+    ackground: blue url(/assets/images/admin/dark_blue_bg.png) repeat-x bottom left;
 	border:1px solid #336699;
-    color:#fff;	
+    color:#fff;
+	background:#ccc;
 }
 .buttons a:active{
     background-color:#6299c5;
@@ -513,26 +557,29 @@ button:hover, .buttons a:hover{
 /* POSITIVE */
 button.jade_positive, .buttons a.jade_positive{
     color:#fff;
-	background: #7ebd40 url(/assets/images/admin/light_green_bg.png) repeat-x bottom left;
-    border:1px solid #7ebd40;
+	background-attachment:fixed;
+	background:lightgreen url(/assets/images/admin/gradients.jpg) repeat-x 0px -205px;
+	
+	border:1px solid #7ebd40;
 }
-.buttons a.jade_positive:hover, button.jade_positive:hover{
-    background: orange url(/assets/images/admin/light_orange_bg.png) repeat-x bottom left;
-	border:1px solid orange; 
-}
+.buttons a.jade_positive:hover,
+button.jade_positive:hover,
 .buttons a.jade_positive:active{
-    background: orange url(/assets/images/admin/light_orange_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:orange url(/assets/images/admin/gradients.jpg) repeat-x 0px -250px;
 	border:1px solid orange; 
 }
 
 /* NEGATIVE */
 .buttons a.jade_negative, button.jade_negative{
-    background: #333 url(/assets/images/admin/black_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:#333 url(/assets/images/admin/gradients.jpg) repeat-x 0px -15px;
 	border:1px solid #000;
     color:#fff;		
 }
 .buttons a.jade_negative:hover, button.jade_negative:hover{
-    background: #fbe3e4 url(/assets/images/admin/red_bg.png) repeat-x bottom left;
+	background-attachment:fixed;
+	background:#d52020 url(/assets/images/admin/gradients.jpg) repeat-x 0px -465px;
 	border:1px solid #cc0000;
     color:#fff;
 }
@@ -698,7 +745,6 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 /* this sets the width for most facebox containers using this header */
 .facebox #common_tool_header{
 	overflow:hidden;
-	ackground: #fff url('/assets/images/admin/bright_blue_bg.png') repeat-x bottom left;
 	margin-bottom:10px;
 	padding-bottom:10px;
 	border-bottom:1px dashed #999;
@@ -744,7 +790,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 .facebox .common_main_panel{
 	width:590px;
-	height:350px;
+	min-height:350px;
 	float:right;
 	padding:5px;
 	overflow:auto;
@@ -772,6 +818,9 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 #directory_window div.asset{
 	margin:3px;
 	overflow:auto;
+}
+#directory_window a{
+	text-decoration:none;
 }
 #page_browser_wrapper .folder_bar,
 #page_browser_wrapper .page_icon,
@@ -804,18 +853,43 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 #page_browser_wrapper .page_bar div{
 	float:left;
-	text-align:right;
-	order:1px solid red;
-	width:25px;
-	min-height:10px;
-	overflow:auto;
+	text-align:center;
+	width:23px;
+	min-height:15px;
 }
 #page_browser_wrapper .page_icon{
 	float:left;
 	padding:3px;
 }
 
+/* add new_page */
 
+#new_page_wrapper .pane_left{
+	width:51%;
+	float:left;	
+}
+.sub_options, .root_options{
+	background:#eee;
+	padding:10px;
+}
+#new_page_wrapper .pane_right{
+	width:42%;
+	float:right
+}
+
+#new_page_url{
+	text-align:center;
+	line-height:1.8em;
+}
+#new_page_url b{
+	color:#333;
+	font-size:1.4em;
+}
+#link_example{
+	color:green;
+}	
+	
+	
 /* tool/add @new_tool view */
 #tool_list_wrapper ul{
 	line-height:1.5em;

@@ -95,9 +95,9 @@ $(document).ready(function()
 				{guid : tool_data[3]},
 				function(data){
 					$.facebox(data, '', 'facebox_base');
-					$('.facebox .show_submit').hide();					
+					$('.facebox .show_submit').hide();	
 				}
-			);					
+			);
 		}
 	});
 });

@@ -1,2 +1,2 @@
-<li><img src="<?php echo url::image_path('admin/manage.png')?>" alt="add"> <a href="/get/edit_navigation/manage/<?php echo $identifer?>" rel="facebox">Manage</a></li>
-<li><img src="<?php echo url::image_path('admin/wrench.png')?>" alt="settings"> <a href="/get/edit_navigation/settings/<?php echo $identifer?>" rel="facebox">Settings</a></li>
+<li><span class="icon manage">&nbsp; &nbsp; </span> <a href="/get/edit_navigation/manage/<?php echo $identifer?>" rel="facebox">Manage</a></li>
+<li><span class="icon wrench">&nbsp; &nbsp; </span> <a href="/get/edit_navigation/settings/<?php echo $identifer?>" rel="facebox">Settings</a></li>

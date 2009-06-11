@@ -1,8 +1,6 @@
 
 <div id="common_tool_header" class="buttons">
-	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="<?php echo url::image_path('admin/check.png')?>" alt=""> Save Image Order
-	</button>
+	<button type="submit" id="save_sort" class="jade_positive">Save Image Order</button>
 	<div id="common_title">Manage Album</div>
 </div>	
 

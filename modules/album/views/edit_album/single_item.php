@@ -4,9 +4,7 @@
 	<input type="hidden" name="path" value="<?php echo $item->path?>">
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="edit_item" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Changes
-		</button>
+		<button type="submit" name="edit_item" class="jade_positive">Save Changes</button>
 		<div id="common_title">Edit Image</div>
 	</div>	
 	

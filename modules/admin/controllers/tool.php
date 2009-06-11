@@ -109,37 +109,35 @@ class Tool_Controller extends Controller {
 			
 			die(strtolower($tool->name).":$step2:$tool_insert_id:$tool_guid");
 		}	
-		else
-		{			
-			$primary = new View('tool/new_tool');
-			$tools = $db->query("
-				SELECT * FROM tools_list WHERE protected = 'no'
-			");
 			
-			# is page protected? if not show page builders.
-			$page = $db->query("
-				SELECT page_name FROM pages WHERE id = '$page_id'
-			")->current();			
+		$primary = new View('tool/new_tool');
+		$tools = $db->query("
+			SELECT * FROM tools_list WHERE protected = 'no'
+		");
+		
+		# is page protected? if not show page builders.
+		$page = $db->query("
+			SELECT page_name FROM pages WHERE id = '$page_id'
+		")->current();			
 
-			# If not a sub page and does not have builder installed already..
+		# If not a sub page and does not have builder installed already..
+		
+		if( FALSE !== strpos($page->page_name, '/') )
+			$protected_tools = 'Page builders cannot be placed on sub pages';
+		elseif( yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
+			$protected_tools = 'A page builder already exists on this page.';
+		else
+		{
+			$protected_tools = $db->query("
+				SELECT * FROM tools_list WHERE protected = 'yes'
+			");		
+		}
+		$primary->protected_tools = $protected_tools;
 			
-			if( FALSE !== strpos($page->page_name, '/') )
-				$protected_tools = 'Page builders cannot be placed on sub pages';
-			elseif( yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
-				$protected_tools = 'A page builder already exists on this page.';
-			else
-			{
-				$protected_tools = $db->query("
-					SELECT * FROM tools_list WHERE protected = 'yes'
-				");		
-			}
-			$primary->protected_tools = $protected_tools;
-			
-			
-			$primary->tools_list = $tools;
-			$primary->page_id = $page_id;
-			die($primary);
-		}		
+		$primary->tools_list = $tools;
+		$primary->page_id = $page_id;
+		die($primary);
+		
 	}
 	
 
@@ -159,7 +157,7 @@ class Tool_Controller extends Controller {
 			SELECT pages_tools.*, tools_list.name, tools_list.protected, pages.page_name
 			FROM pages_tools
 			JOIN tools_list ON pages_tools.tool = tools_list.id
-			JOIN pages ON pages_tools.page_id = pages.id
+			LEFT JOIN pages ON pages_tools.page_id = pages.id
 			WHERE guid = '$tool_guid' 
 			AND pages_tools.fk_site = '$this->site_id'
 		")->current();	
@@ -189,7 +187,7 @@ class Tool_Controller extends Controller {
 		if( is_callable(array($edit_tool,'_tool_deleter')) )
 			$edit_tool->_tool_deleter($tool_data->tool_id, $this->site_id);
 			
-		die('Tool Deleted! Updating...');
+		die('Tool Deleted');
 	}
 
 /*

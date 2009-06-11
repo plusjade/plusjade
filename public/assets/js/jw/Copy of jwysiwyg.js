@@ -77,7 +77,7 @@
             html : '<'+'?xml version="1.0" encoding="UTF-8"?'+'><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">STYLE_SHEET</head><body style="margin:0;padding:0;font-size:80%;line-height:1.3em;font-family:verdana;">INITIAL_CONTENT</body></html>',
             css  : {},
 
-            debug        : true,
+            debug        : false,
 
             autoSave     : true,  // http://code.google.com/p/jwysiwyg/issues/detail?id=11
             rmUnwantedBr : true,  // http://code.google.com/p/jwysiwyg/issues/detail?id=15
@@ -105,7 +105,6 @@
         });
     };
 
-	
     function Wysiwyg( element, options )
     {
         return this instanceof Wysiwyg
@@ -284,19 +283,22 @@
             separator09 : { separator : true },
 
             html : {
-                visible : false,
+                visible : true,
                 exec    : function()
                 {
                     if ( this.viewHTML )
                     {
                         this.setContent( $(this.original).val() );
-                        //$(this.original).hide();
+                        $(this.original).hide();
                     }
                     else
                     {
                         this.saveContent();
 						
-                       // $(this.original).show();
+                        $(this.original).show();
+						//html = '<textarea style="width:400px;height:300px">' + $(this.original).html() + '</textarea>';
+						//$.facebox(html, false, 'facebebox_2');
+						//return false;
                     }
 
                     this.viewHTML = !( this.viewHTML );
@@ -322,8 +324,6 @@
         element  : null,
         editor   : null,
 
-		
-		// load up jw
         init : function( element, options )
         {
             var self = this;
@@ -371,34 +371,21 @@
             var panel = this.panel = $('<ul></ul>').addClass('panel');
 
             this.appendControls();
-            
-			// jw view
-			this.element = $('<div></div>').css({
+            this.element = $('<div></div>').css({
                 width : '98%'
 				//width : ( newX > 0 ) ? ( newX ).toString() + 'px' : '100%'
             }).addClass('wysiwyg')
               .append(panel)
               .append( $('<div><!-- --></div>').css({ clear : 'both' }) )
-              .append(editor)
-			
-			
-			// html view (textarea)
-            $(element)
-			.wrap('<div id="editable_wrapper"></div>')
-			.wrap('<div id="show_html"></div>');
-			
-			$('#editable_wrapper')
-			.prepend(this.element)
-			.before('<ul class="ui-tabs-nav generic_tabs"> \
-					<li><a href="#fragment-1" class="show_edit">Edit</a><li> \
-					<li><a href="#fragment-2" class="show_html">HTML</a><li> \
-					<li><a href="#fragment-3" class="show_files">Files</a><li> \
-				</ul>\
-			');
-			$('div.wysiwyg').wrap('<div id="show_edit"></div>');
+              .append(editor);
 
-			
-			this.viewHTML = false;
+            $(element)
+            // .css('display', 'none')
+            .hide()
+            .before(this.element);
+
+            this.viewHTML = false;
+
             this.initialHeight = newY - 8;
 
             /**
@@ -418,22 +405,7 @@
             {
                 self.setContent( self.initialContent );
                 self.saveContent();
-            });	
-			// update edit view
-            $('.show_edit').bind('click', function()
-            {
-				$('#show_html').hide();
-				content = $('textarea.render_html').val();
-                self.setContent(content);
-				$('#show_edit').show();
-				return false;
             });
-            $('.show_html').bind('click', function()
-            {
-				$('#show_edit').hide();
-				$('#show_html').show();
-				return false;
-            });				
         },
 
         initFrame : function()
@@ -685,3 +657,6 @@
         }
     });
 })(jQuery);
+
+/* text area resizer */
+//(function($){var textarea,staticOffset;var iLastMousePos=0;var iMin=32;var grip;$.fn.TextAreaResizer=function(){return this.each(function(){textarea=$(this).addClass('processed'),staticOffset=null;$(this).parent().append($('<div class="grippie"></div>').bind("mousedown",{el:this},startDrag));var grippie=$('div.grippie',$(this).parent())[0];grippie.style.marginRight=(grippie.offsetWidth-$(this)[0].offsetWidth)+'px'})};function startDrag(e){textarea=$(e.data.el);textarea.blur();iLastMousePos=mousePosition(e).y;staticOffset=textarea.height()-iLastMousePos;textarea.css('opacity',0.25);$(document).mousemove(performDrag).mouseup(endDrag);return false}function performDrag(e){var iThisMousePos=mousePosition(e).y;var iMousePos=staticOffset+iThisMousePos;if(iLastMousePos>=(iThisMousePos)){iMousePos-=5}iLastMousePos=iThisMousePos;iMousePos=Math.max(iMin,iMousePos);textarea.height(iMousePos+'px');if(iMousePos<iMin){endDrag(e)}return false}function endDrag(e){$(document).unbind('mousemove',performDrag).unbind('mouseup',endDrag);textarea.css('opacity',1);textarea.focus();textarea=null;staticOffset=null;iLastMousePos=0}function mousePosition(e){return{x:e.clientX+document.documentElement.scrollLeft,y:e.clientY+document.documentElement.scrollTop}}})(jQuery);

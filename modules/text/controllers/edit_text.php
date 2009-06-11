@@ -26,7 +26,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 			);		
 			$db->update('texts', $data, "id = '$id' AND fk_site = '$this->site_id'");
 			
-			die('Changes Saved!<br>Updating...');
+			die('Changes Saved');
 		}
 		else
 		{
@@ -51,9 +51,14 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 		$this->add($id);
 	}
 	
-	static function _tool_adder()
+	static function _tool_adder($tool_id, $site_id)
 	{
 		return 'add';
+	}
+	
+	static function _tool_deleter($tool_id, $site_id)
+	{
+		return true;
 	}
 }
 

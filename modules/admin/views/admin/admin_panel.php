@@ -8,29 +8,29 @@
 		<li class="root_list dropdown">
 			<div>Theme &#8595;</div>
 			<ul> 
-				<li><img src="<?php echo url::image_path('admin/rainbow.png')?>" alt=""> <a href="/get/theme" rel="facebox">Edit Theme</a></li>
-				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/logo" rel="facebox">Edit Logo</a></li>
-				<li><img src="<?php echo url::image_path('admin/flag_green.png')?>" alt=""> <a href="/get/theme/change" rel="facebox">New Theme</a></li>
+				<li><span class="icon rainbow">&nbsp; &nbsp; </span><a href="/get/theme" rel="facebox" >Edit Theme</a></li>
+				<li><span class="icon flag">&nbsp; &nbsp; </span><a href="/get/theme/logo" rel="facebox">Edit Logo</a></li>
+				<li><span class="icon flag">&nbsp; &nbsp; </span><a href="/get/theme/change" rel="facebox">New Theme</a></li>
 			</ul>		
 		</li>
 		<li class="root_list dropdown">
 			<div>Pages &#8595;</div>
 			<ul>
-				<li><img src="<?php echo url::image_path('admin/page.png')?>" alt=""> <a href="/get/page" rel="facebox">All Pages</a></li>
-				<li><img src="<?php echo url::image_path('admin/sitemap.png')?>" alt=""> <a href="/get/page/navigation" rel="facebox">Navigation</a></li>
+				<li><span class="icon page">&nbsp; &nbsp; </span><a href="/get/page" rel="facebox">All Pages</a></li>
+				<li><span class="icon sitemap">&nbsp; &nbsp; </span><a href="/get/page/navigation" rel="facebox">Navigation</a></li>
 				
 			</ul>		
 		</li>		
 		<li class="root_list dropdown">
 			<div>Tools &#8595;</div>
 			<ul>
-				<li><img src="<?php echo url::image_path('admin/tools.png')?>" alt=""> <a href="/get/tool" rel="facebox">All Tools</a></li>
+				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/tool" rel="facebox">All Tools</a></li>
 			</ul>
 		</li>
 		<li class="root_list dropdown">
 			<div>Files &#8595;</div>
 			<ul>
-				<li><img src="<?php echo url::image_path('admin/tools.png')?>" alt=""> <a href="/get/tool" rel="facebox">(not live)</a></li>
+				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/tool" rel="facebox">(not live)</a></li>
 			</ul>
 		</li>		
 		<li class="root_list floatright">
