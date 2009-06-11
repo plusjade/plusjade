@@ -1,35 +1,8 @@
-<style type="text/css">	
-	#new_page_wrapper .pane_left{
-		width:51%;
-		float:left;	
-	}
-	.sub_options, .root_options{
-		background:#eee;
-		padding:10px;
-	}
-	#new_page_wrapper .pane_right{
-		width:42%;
-		float:right
-	}
 
-	#new_page_url{
-		text-align:center;
-		line-height:1.8em;
-	}
-	#new_page_url b{
-		color:#333;
-		font-size:1.4em;
-	}
-	#link_example{
-		color:green;
-	}	
-</style>
 <?php echo form::open('page/add', array('class' => 'custom_ajaxForm') );?>	
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" id="add_page_submit" name="add_page" class="jade_positive">
-			<img src="<?php echo url::image_path('check.png')?>" alt=""/> Add Page
-		</button>
+		<button type="submit" id="add_page_submit" name="add_page" class="jade_positive">Add Page</button>
 		<div id="common_title">Add New Page</div>
 	</div>	
 
@@ -45,7 +18,7 @@
 		
 			<p style="line-height:1.6em">
 				Add to Main Menu?
-				<br><input type="checkbox" name="menu"> Yes!
+				<br><input type="checkbox" name="menu" value="yes"> Yes!
 			</p>
 		</div>
 		
@@ -112,7 +85,6 @@
 	
 	/* 
 	 * custom validation to check for unique page_names
-	 *
 	 */
 	Array.prototype.in_array = function(p_val) {
 		for(var i = 0, l = this.length; i < l; i++) {
@@ -127,7 +99,6 @@
 		
 	/* 
 	 * custom ajax form, validates inputs and unique page_names
-	 *
 	 */		
 	var options = {
 		beforeSubmit: function(){
@@ -142,14 +113,14 @@
 				$("input[name='page_name']").addClass('input_error');
 				return false;
 			}
+			$('.facebox .show_submit').show();
 		},
 		success: function(data) {
+			$('.facebox .show_submit').hide();
+			$.facebox.close('facebox_2');
 			directory = '<?php echo $directory?>';
 			path_for_css = directory.replace(/\//g,'_');
-
-			$('div.'+path_for_css).append(data);
-			$.facebox('Page added!', "status_reload", "facebox_2");
-			setTimeout('$.facebox.close("facebox_2")', 500);			
+			$('div.'+path_for_css).append(data);	
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);

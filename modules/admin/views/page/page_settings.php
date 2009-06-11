@@ -109,11 +109,15 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 				$('#page_exists').html('Page name already exists');
 				$("input[name='page_name']").addClass('input_error');
 				return false;
-			}	
+			}
+			$('.facebox .show_submit').show();
+			$('#show_response_beta').html('waiting for response...');			
 		},
 		success: function(data) {
-			$.facebox(data, "status_reload", "facebox_2");
-			//window.location = '<?php echo url::site()?>' + sent_page;							
+			// If the page name changes consider a notification or redirect logic?
+			$.facebox.close();
+			$('.facebox .show_submit').hide();
+			$('#show_response_beta').html(data);					
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);

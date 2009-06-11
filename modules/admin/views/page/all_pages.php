@@ -6,16 +6,16 @@
 	</div>
 	
 	<div class="common_left_panel">
-		<img src="<?php echo url::image_path('admin/page_add.png')?>" alt=""> <a href="/get/page/add" class="new_page">New Page</a>
+		<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/page/add" class="new_page">New Page</a>
 		<br>
 		<br>		
 		<h3>Key</h3>
-		<small>
-			<img src="<?php echo url::image_path('admin/magnifier.png')?>" alt=""> Load page.
-			<br><img src="<?php echo url::image_path('admin/cog_edit.png')?>" alt=""> Edit page settings.
-			<br><img src="<?php echo url::image_path('admin/folder_add.png')?>" alt=""> Create sub-directory
-			<br><img src="<?php echo url::image_path('admin/delete.png')?>" alt=""> Delete page.	
-			<br><img src="<?php echo url::image_path('admin/shield.png')?>" alt=""> Contains Page Builder	
+		<small style="line-height:1.7em">
+			<span class="icon magnify">&nbsp; &nbsp; </span> Load page.
+			<br><span class="icon cog">&nbsp; &nbsp; </span> Edit page settings.
+			<br><span class="icon add_folder">&nbsp; &nbsp; </span> Create sub-directory
+			<br><span class="icon cross">&nbsp; &nbsp; </span> Delete page.	
+			<br><span class="icon shield">&nbsp; &nbsp; </span> Contains Page Builder	
 			<br>
 			<br><b style="color:#ccc">Gray:</b> accessible but not in menu.
 			<br><b style="color:red">Red:</b> not publicly accessible.
@@ -97,7 +97,7 @@
 		},
 		
 		// make img click execute as its parent alink
-		'img.delete_page': function(e){
+		'span.delete_page': function(e){
 			if (confirm("This cannot be undone! Delete this page?")) {
 				$.parent = $(e.target).parent('a');
 				id = $.parent.attr('id');
@@ -112,7 +112,7 @@
 			return false;
 		},
 		
-		'img.img_facebox': function(e){
+		'span.icon_facebox': function(e){
 			$.parent = $(e.target).parent('a');
 			url = $.parent.attr('href');
 
@@ -124,11 +124,11 @@
 			return false;
 		},
 		
-		'img.folderize': function(e){
+		'span.folderize': function(e){
 			folder_path = $(e.target).attr('rel');
 			id = $(e.target).attr('id');
 			klass = folder_path.replace(/\//g,'_');
-			html = '<div class="folder_bar"><a href="/'+ folder_path +'" rel="'+ folder_path +'" class="open_folder" ><img src="<?php echo url::image_path('admin/folder.png')?>" rel="'+ folder_path +'" class="open_folder" alt=""></a></div>';
+			html = '<div class="folder_bar"><a href="/'+ folder_path +'" rel="'+ folder_path +'" class="open_folder" ><span class="icon add_folder open_folder" rel="'+ folder_path +'"> &nbsp; &nbsp; </span></a></div>';
 			
 			
 			$('#page_wrapper_'+id).prepend(html);
