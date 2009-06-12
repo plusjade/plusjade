@@ -101,7 +101,6 @@ abstract class Controller_Core {
 		$template->readyJS = '';
 		$template->custom_css = '';
 		
-		# add admin mode stuff to each tool output ( _index() in particular )
 		/*
 		  Each initial tool view is called view <toolname>::_index()
 		  in public view the index displays only html
@@ -110,19 +109,20 @@ abstract class Controller_Core {
 		 */
 		if( $this->client->logged_in() )
 		{
-			# Custom CSS
-			$css_file = DATAPATH . "$this->site_name/tools_css/$toolname/$tool_id.css";		
-			if( file_exists($css_file) )
-			{
-				$contents = file_get_contents($css_file);							
-				$template->custom_css = "
-					<style type=\"text/css\">
-						$contents
-					</style>
-				";
-			}			
+			# Get CSS
+			$custom_css	= DATAPATH . "$this->site_name/tools_css/$toolname/$tool_id.css";
+			$contents =
+				(file_exists($custom_css)) ?
+					file_get_contents($custom_css) :
+						'';
 			
-			# Javascripts
+			$template->custom_css = "
+				<style type=\"text/css\">
+					$contents
+				</style>
+			";			
+			
+			# Get Javascripts
 			# grab the index javascript and insert it inline.
 			$js_file = MODPATH . "$toolname/views/public_$toolname/js/index.js";
 			
@@ -141,8 +141,14 @@ abstract class Controller_Core {
 			}
 		}
 		else
+		{
+			/* # public view:
+			 *	css is handled via /get/css/tools/page_id link
+			 *	js is handled in the same way @ view library
+			 */
 			$template->readyJS($toolname, 'index', $tool_id);
-			
+		}	
+		
 		return $template;
 	}
 	

@@ -9,6 +9,7 @@ class Load_Tool_Core {
 	 */
 	function factory($tool)
 	{
+		$tool = ucwords($tool);
 		switch ($tool)
 		{
 			case 'Slide_Panel':
@@ -45,13 +46,14 @@ class Load_Tool_Core {
 				$tool = new Blog_Controller(); 			
 				break;						
 			default:
-				die('<b>error:</b> tool does not exist');
+				die('<b>error:</b> tool does not exist (Load_Tool::factory)');
 		}	
 		return $tool;
 	}
 
 	function edit_factory($tool)
 	{
+		$tool = ucwords($tool);
 		switch ($tool)
 		{
 			case 'Slide_Panel':
@@ -88,45 +90,11 @@ class Load_Tool_Core {
 				$tool = new Edit_Blog_Controller(); 			
 				break;						
 			default:
-				die('<b>error:</b> edit_tool does not exist');
+				die('<b>error:</b> edit_tool does not exist (Load_Tool::edit_factory)');
 		}	
 		return $tool;
 	}
-/*
-	these functions are useful when going through the add_tool wizard.
-	Wizard Steps:
-		1. tool/add 
-			2. edit_tool_controller::_tool_adder()
-				3. method as defined by _tool_adder (usually add)
-	
-	typically the tool will call "add" in which case the add method
-	must know whether it should update an already existing tool in the dom
-	(this case is when using the add link via the red toolkit)
-	
-	or add the just-added tool parent into the DOM
-	These functions take care of that check.
-	
-	Note: if the tool does not invoke "add" it probably will do "manage"
-	in which case the checks aren't needed.
-*/
-	# this output the guid so we can use it to update the DOM
-	# via ajaxForm success callback	
-	static function die_guid($guid=NULL)
-	{
-		if(NULL != $guid)
-		{
-			valid::id_key($guid);
-			die("$guid");
-		}
-	}
-	
-	static function is_get_guid($guid=NULL)
-	{
-		if(NULL != $guid)
-		{
-			valid::id_key($guid);
-			return '<input type="hidden" name="guid" value="'. $guid .'">';
-		}	
-		return '';
-	}
 }
+
+
+

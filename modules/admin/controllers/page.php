@@ -375,8 +375,8 @@ class Page_Controller extends Admin_Controller {
 	}
 		
 /*
- * build filename filter array to protect current named pages
- * relative to the directory they belong to.
+ * build filename filter array to protect current named pages-
+ * -relative to the directory they belong to.
 		concat "%%" to mark the start of the page_name
 		avoides deeper nested duplicate file_structure matches
 		ex: Match "country/city"
