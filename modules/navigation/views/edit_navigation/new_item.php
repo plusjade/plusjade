@@ -1,23 +1,9 @@
-<style type="text/css">
-	.each_link_wrapper{
-		padding:5px;
-	}
-	.tier{
-		margin:5px auto;
-		width:400px;
-		padding:5px;
-		text-align:right;
-		order:1px solid #ccc;
-	}
-</style>
 
-<form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form" style="min-height:300px;">	
+<form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 	<input type="hidden" name="local_parent" value="<?php echo $local_parent?>">
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" class="jade_positive">
-			<img src="<? echo url::image_path('check.png')?>" alt=""/> Create Element
-		</button>
+		<button type="submit" class="jade_positive">Create Element</button>
 		<div id="common_title">Add element to Navigation</div>
 	</div>	
 	
@@ -53,7 +39,7 @@
 				</select>
 			</span>
 			<span id="url" style="display:none">http://<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
-			<span id="email" style="display:none">mailto:<input type="text" name="data" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="email" style="display:none">mailto:<input type="text" name="data" disabled="disabled" rel="email_req" style="width:250px"></span>
 		</div>
 		
 	</div>
@@ -74,13 +60,11 @@
 		});
 	});
 
-	
-	
 	/* 
 	 * custom ajax form response needs to populate the nested li list.
 	 *
 	 */		
-	var options = {
+	$(".custom_ajaxForm").ajaxForm({
 		beforeSubmit: function(){					
 			if(! $(".custom_ajaxForm input:enabled").jade_validate() )
 				return false;
@@ -92,18 +76,17 @@
 			else
 				text = $("[name='data']:enabled").val();
 			*/
-			
-			text = $("input[name='item']").val();
+			$('.facebox .show_submit').show();
+			text = $("input[name='item']").val();	
 		},
 		success: function(data) {
-		
+			// TODO: This does not work in chrome and safari
 			$simpleTreeCollection.get(0).addNode(data, text);
-			
-			$.facebox('Element added!', "status_reload", "facebox_2");
-			setTimeout('$.facebox.close("facebox_2")', 500);			
-		}					
-	};
-	$(".custom_ajaxForm").ajaxForm(options);
+			$.facebox.close("facebox_2");
+			$('.facebox .show_submit').hide();
+			$('#show_response_beta').html(data);	
+		}
+	});
 	
 
 

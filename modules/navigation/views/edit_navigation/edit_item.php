@@ -11,23 +11,7 @@
 	$data[$item->type] = $item->type;
 ?>
 
-<style type="text/css">
-	.each_link_wrapper{
-		padding:5px;
-	}
-	.tier{
-		margin:5px auto;
-		width:400px;
-		padding:5px;
-		text-align:right;
-		order:1px solid #ccc;
-	}
-	.hide{
-		display:none;
-	}
-</style>
-
-<form action="/get/edit_navigation/edit/<?php echo $item->id?>" method="POST" class="custom_ajaxForm" id="add_links_form" style="min-height:300px;">	
+<form action="/get/edit_navigation/edit/<?php echo $item->id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive">
@@ -35,9 +19,6 @@
 		</button>
 		<div id="common_title">Edit Navigation element</div>
 	</div>	
-	
-	<div id="common_tool_info">
-	</div>
 	
 	<div class="fieldsets">
 		
@@ -76,7 +57,7 @@
 				</select>
 			</span>
 			<span id="url" class="hide">http://<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="text_req" style="width:250px"></span>
-			<span id="email" class="hide">mailto:<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span id="email" class="hide">mailto:<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="email_req" style="width:250px"></span>
 		</div>
 		
 	</div>
@@ -84,7 +65,6 @@
 </form>
 
 <script type="text/javascript">
-
 	$('span#<?php echo $item->type?> > :input').removeAttr("disabled");
 	$('span#<?php echo $item->type?>').show();	
 	
@@ -105,19 +85,20 @@
 	
 	/*
 	 * custom ajax form response needs to populate the nested li list.
-	 *
 	 */
-	var options = {
+	$(".custom_ajaxForm").ajaxForm({
 		beforeSubmit: function(){
 			if(! $(".custom_ajaxForm input:enabled").jade_validate() )
-				return false;			
+				return false;
+			$('.facebox .show_submit').show();
 		},
 		success: function(data) {	
 			text = $("input[name='item']").val();
 			$('li span.active').html(text);
-			$.facebox('Changes Saved!', "status_reload", "facebox_2");
-			setTimeout('$.facebox.close("facebox_2")', 500);			
-		}					
-	};
-	$(".custom_ajaxForm").ajaxForm(options);
+			
+			$.facebox.close("facebox_2");
+			$('.facebox .show_submit').hide();
+			$('#show_response_beta').html(data);			
+		}
+	});
 </script>

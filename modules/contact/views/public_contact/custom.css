@@ -2,12 +2,26 @@
 #contact_wrapper_++{
 
 }
-#contact_wrapper_++ table.contact_table td span.contact_name{
-
+#contact_wrapper_++ div.contact_item{
+	clear:both;
+	overflow:auto;
 }
-#contact_wrapper_++ table.contact_table td .contact_value{
+#contact_wrapper_++ div.contact_wrapper div.contact_icon{
+	float:left;
+	text-align:center;
+	padding:0 10px;
+}
+#contact_wrapper_++ div.contact_wrapper div.contact_view{
+	float:left;
+}
+#contact_wrapper_++ div.contact_wrapper div.contact_name{
+	font-weight:bold;
+}
+
+#contact_wrapper_++ div.contact_wrapper .contact_value{
 
 }	
+
 
 /* --- map  --- */
 

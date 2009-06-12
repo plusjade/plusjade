@@ -50,9 +50,9 @@ $(document).ready(function()
 		var tool = this;
 		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
 			var id		= $(this).attr("rel");
-			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="'+tool+'_item_'+id+'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit"><span>'+ tool +' item</span>'+ edit +' ' + del + '</div>';
+			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="'+tool+'_item_'+id+'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ tool +' item</span>'+ edit +' ' + del + '</div>';
 					
 			$(this).prepend(toolbar);			
 		});
@@ -66,9 +66,9 @@ $(document).ready(function()
 		toolname = toolname.toLowerCase();
 		$('.'+ toolname +'_item', this).each(function(i){		
 			var id		= $(this).attr('rel');
-			var edit	= '<img src="/assets/images/admin/cog_edit.png" alt=""> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<img src="/assets/images/admin/delete.png" alt=""> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit"><span>'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
+			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
 			$(this).prepend(toolbar);			
 		});
 	};	
@@ -194,7 +194,14 @@ $(document).ready(function()
 		"a.js_admin_delete": function(e) {
 			var url = $(e.target).attr("href");
 			var rel	= $(e.target).attr('rel');
-			var data = '<div class="buttons confirm_facebox">This can not be undone.<br><p><a href="#" class="cancel_delete"><img src="/assets/images/admin/asterisk_yellow.png">Cancel</a></p><a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'"><img src="/assets/images/admin/cross.png">Delete Item</a></div>';	
+			var data = '<div class="buttons confirm_facebox">This can not be undone.<br>\
+				<p><a href="#" class="cancel_delete">\
+					<span class="icon asterisk">&#160; &#160; &#160;</span> Cancel\
+				</a></p>\
+				<a href="' + url +'"  class="jade_confirm_delete_common jade_negative" rel="'+ rel +'">\
+					<span class="icon cross">&#160; &#160; &#160;</span> Delete Item\
+				</a>\
+			</div>';	
 			$.facebox(data, 'confirm_facebox', 'facebox_2');
 			return false;		
 		},
@@ -290,17 +297,16 @@ $(document).ready(function()
 		});
 		
 		$('textarea.render_html').wysiwyg();
-		//$jw_editor = $('textarea.render_html').wysiwyg();
 		
 		// expand/contract the wysiwg editor
 		// TODO: clean this up later
-		var height = (300 > (getPageHeight()- 240)) ? 200 : getPageHeight()- 240;
-		$('.facebox form div.wysiwyg').css('min-height', height);
+		var height = (300 > (getPageHeight()- 300)) ? 170 : getPageHeight()- 250;
+		$('.facebox form div.wysiwyg, .facebox form textarea.render_html, .facebox form textarea.render_css').css('min-height', height);
 		$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
 		
 		$(window).resize(function(){
-			height = (300 > (getPageHeight()- 240)) ? 200 : getPageHeight()- 240;		
-			$('.facebox form div.wysiwyg').css('min-height', height);
+			height = (300 > (getPageHeight()- 300)) ? 170 : getPageHeight()- 250;		
+			$('.facebox form div.wysiwyg, .facebox form textarea.render_html, .facebox form textarea.render_css').css('min-height', height);
 			$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
 		});
 	});

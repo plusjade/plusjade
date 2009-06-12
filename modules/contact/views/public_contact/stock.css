@@ -1,23 +1,22 @@
 	/*  --- index.php --- */
-	
-.contact_wrapper table.contact_table {
-	width:100%;
-	border-collapse:collapse;
-}	
-.contact_wrapper table.contact_table td.contact_icon{
-	width:90px;
-	vertical-align:top;
+div.contact_item{
+	clear:both;
+	overflow:auto;
 }
-
-.contact_wrapper table.contact_table td span.contact_name{
-	display:block;
+div.contact_wrapper div.contact_icon{
+	float:left;
+	text-align:center;
+	padding:0 10px;
+}
+div.contact_wrapper div.contact_view{
+	float:left;
+}
+div.contact_wrapper div.contact_name{
 	font-weight:bold;
-	padding:5px 0;
 }
 
-.contact_wrapper table.contact_table td .contact_value{
-	line-height:1.2em;
-	padding:10px;
+div.contact_wrapper .contact_value{
+
 }	
 
 /* --- map view --- */

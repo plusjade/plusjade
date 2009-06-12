@@ -5,26 +5,27 @@ span.icon {
 	background-attachment:fixed;
 	background: url(/assets/images/admin/icons_sprite.png) no-repeat 0px 0px;
 }
-span.rainbow{background-position:0px -293px}
-span.flag{background-position:0px -293px}
-span.page{background-position:0px -135px}
+span.cross{background-position:0px -14px}
+span.cog{background-position:0px -29px}
+span.wrench{background-position:0px -46px}
+span.edit_page{background-position:0px -65px}
+span.css{background-position:0px -81px}
+span.manage{background-position:0px -98px}
 span.add_page{background-position:0px -116px}
+span.page{background-position:0px -135px}
+span.shield{background-position:0px -152px}
 span.sitemap{background-position:0px -168px}
 span.tools{background-position:0px -187px}
-span.cog{background-position:0px -29px}
-span.css{background-position:0px -81px}
-span.cross{background-position:0px -14px}
-span.edit_page{background-position:0px -65px}
-span.manage{background-position:0px -98px}
-span.plus{background-position:0px -14px}
-span.wrench{background-position:0px -46px}
-span.local{background-position:0px -239px}
-span.global{background-position:0px -219px}
-span.add_folder{background-position:0px -325px}
-span.folder{background-position:0px -311px}
-span.shield{background-position:0px -152px}
-span.shield{background-position:0px -152px}
 span.magnify{background-position:0px -203px}
+span.global{background-position:0px -219px}
+span.local{background-position:0px -239px}
+span.plus{background-position:0px -255px}
+span.rainbow{background-position:0px -293px}
+span.flag{background-position:0px -293px}
+span.folder{background-position:0px -311px}
+span.add_folder{background-position:0px -325px}
+
+
 #show_response_beta{
 	position:absolute;
 	left:0;
@@ -410,7 +411,7 @@ div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper > table{
 	background-attachment:fixed;
 	background:lightblue url(/assets/images/admin/gradients.jpg) repeat-x 0px -70px;
 }
-.jade_admin_item_edit span{
+.jade_admin_item_edit span.item_name{
 	color:#fff;
 	float:left;
 }
@@ -482,13 +483,19 @@ div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper > table{
 /* --- textarea defaults --- */
 .facebox form div.wysiwyg iframe{
 }
-.facebox form div.wysiwyg{
-	width:97% !important;
+.facebox form div.wysiwyg,
+textarea{
+	width:98% !important;
 }
 
-textarea.render_html{
+textarea.render_html,
+textarea.render_css{
 	width:99% !important;
-	height:300px !important;
+	height:300px;
+}
+textarea.render_css{
+	font-family: courier new;
+	font-size:1.2em;
 }
 
 /* form validation messages */
@@ -667,7 +674,15 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 .generic_tabs{
 	padding:7px 0 !important;
 }
-
+.generic_tabs div.field_title{
+	float:right;
+	font-size:1.2em;
+	font-weight:bold;
+	color:blue;
+	font-family: 'Lucida Console', Monaco, monospace;
+	text-transform : capitalize;
+	padding-right:10px;
+}
 .generic_tabs li{
 	display:inline;
 	margin-right:2px;

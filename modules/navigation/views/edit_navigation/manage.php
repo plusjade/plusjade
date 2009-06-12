@@ -132,9 +132,9 @@
 		$.post('/get/edit_navigation/save_tree/'+tool_id,
 			{output: output},
 			function(data){
-				$.facebox.close();
-				$('.facebox .show_submit').hide();			
-				$().jade_update_tool_html('update', 'navigation', tool_id, data);	
+				$.facebox.close();		
+				$().jade_update_tool_html('update', 'navigation', tool_id, data);
+				$('.facebox .show_submit').hide();					
 			}
 		)		
 	});		

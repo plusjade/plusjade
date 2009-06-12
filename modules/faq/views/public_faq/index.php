@@ -1,6 +1,6 @@
 
 
-<div class="faq_title"><?php echo $parent->title?></div> 
+<h2 class="faq_header"><?php echo $parent->title?></h2> 
 
 <dl class="faq_list">
 	<?php

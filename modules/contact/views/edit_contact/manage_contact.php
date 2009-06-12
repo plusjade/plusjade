@@ -1,8 +1,6 @@
 
 <div id="common_tool_header" class="buttons">
-	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="<?php echo url::image_path('admin/check.png')?>" alt=""/> Save Order
-	</button>
+	<button type="submit" id="save_sort" class="jade_positive">Save Order</button>
 	<div id="common_title">Re-arrange Contact Order</div>	
 </div>
 	
@@ -27,8 +25,5 @@
 
 <script type="text/javascript">
 	$("#generic_sortable_list").sortable({ handle : ".handle", axis : "y" });	
-	<?php	
-		echo javascript::save_sort('contact', $tool_id);
-		echo javascript::delete_item('contact');
-	?>
+	<?php echo javascript::save_sort('contact', $tool_id)?>
 </script>

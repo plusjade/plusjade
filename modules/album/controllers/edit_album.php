@@ -30,8 +30,6 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	public function add_image($tool_id=NULL)
 	{
-		# TODO: TEST to make sure all names are unique. 
-		# Cant have htem rewrite eachother.
 		valid::id_key($tool_id);
 			
 		# validate for file size 5M and type (images)
@@ -95,7 +93,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$image_sm->save("$image_store/$tool_id/sm_$name");
 		}
 		unlink($filename);
-		die('Images added!!<br>Updating...');	
+		die('Images added');	
 	}
 	
 	
@@ -111,12 +109,10 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 				'caption'	=> $_POST['caption'],
 			);
 			$db->update('album_items', $data, array( 'id' => $id, 'fk_site' => $this->site_id) );
-			die('Image Updated!');
+			die('Image updated');
 		}
-		else
-		{
-			die($this->_view_edit_single('album', $id));
-		}
+		
+		die($this->_view_edit_single('album', $id));
 	}
 
 /*
@@ -127,6 +123,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	public function settings($tool_id=NULL)
 	{
+		die('album settings is temporarily disabled while we update our code. Thanks!');
 		valid::id_key($tool_id);		
 		if($_POST)
 		{
@@ -139,10 +136,8 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$db->update('albums', $data, " id = '$tool_id' AND fk_site = '$this->site_id' ");
 			die('Settings Saved!!<br>Updating ...');
 		}
-		else
-		{
-			die( $this->_view_edit_settings('album', $tool_id) );
-		}
+
+		die( $this->_view_edit_settings('album', $tool_id) );
 	}
 
 

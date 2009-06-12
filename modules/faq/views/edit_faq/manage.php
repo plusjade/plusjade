@@ -1,12 +1,10 @@
 
 <div id="common_tool_header" class="buttons">
-	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="<?php echo url::image_path('admin/check.png')?>" alt="">Save Order
-	</button>
+	<button type="submit" id="save_sort" class="jade_positive">Save Order</button>
 	<div id="common_title">Arrange Questions</div>
 </div>
 
-<ul id="generic_sortable_list" class="ui-tabs-nav" style="min-height:320px">
+<ul id="generic_sortable_list" class="ui-tabs-nav">
 	<?php
 	$counter = 0;
 	foreach($items as $item)
@@ -17,8 +15,7 @@
 			<table id="menu_page_list"><tr>
 				<td width="80px" class="drag_box"><img src="<?php echo url::image_path('arrow.png')?>" alt="handle" class="handle"></td>
 				<td width="30px" class="aligncenter"><?php echo ++$counter?>. </td>
-				<td class="page_edit"><a href="/get/edit_faq/edit/<?php echo $item->id?>" rel="facebox" id="2"><?php echo $item->question?></a></td>
-				<td class="alignright" width="50px"><a href="/get/edit_faq/delete/<?php echo $item->id?>" class="delete_page" id="<?php echo $item->id?>">delete</a></td>
+				<td class="page_edit"><?php echo $item->question?></td>
 			</tr></table>
 		</li>		
 		<?php

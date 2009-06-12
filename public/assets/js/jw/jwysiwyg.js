@@ -367,7 +367,8 @@
                      */
                 }
             }
-
+	
+			$('textarea.render_html').hide();		
             var panel = this.panel = $('<ul></ul>').addClass('panel');
 
             this.appendControls();
@@ -385,17 +386,21 @@
 			// html view (textarea)
             $(element)
 			.wrap('<div id="editable_wrapper"></div>')
-			.wrap('<div id="show_html"></div>');
+			.wrap('<div id="show_html" class="editor_pane"></div>');
+			
+			var name = $('textarea.render_html').attr('name');
 			
 			$('#editable_wrapper')
 			.prepend(this.element)
 			.before('<ul class="ui-tabs-nav generic_tabs"> \
-					<li><a href="#fragment-1" class="show_edit">Edit</a><li> \
-					<li><a href="#fragment-2" class="show_html">HTML</a><li> \
-					<li><a href="#fragment-3" class="show_files">Files</a><li> \
+					<div class="field_title">'+ name +'</div> \
+					<li><a href="#" class="show_edit">Edit</a><li>\
+					<li><a href="#" class="show_html">HTML</a><li>\
+					<li><a href="#" class="show_files">Files</a><li>\
+					<li><a href="#" class="reset">Reset</a><li>\
 				</ul>\
 			');
-			$('div.wysiwyg').wrap('<div id="show_edit"></div>');
+			$('div.wysiwyg').wrap('<div id="show_edit" class="editor_pane"></div>');
 
 			
 			this.viewHTML = false;
@@ -414,26 +419,43 @@
             if ( this.options.autoSave )
                 $('form').submit(function() { self.saveContent(); });
 
-            $('form').bind('reset', function()
+            $('.reset').bind('click', function()
             {
                 self.setContent( self.initialContent );
                 self.saveContent();
-            });	
+				return false;
+            });		
 			// update edit view
             $('.show_edit').bind('click', function()
             {
-				$('#show_html').hide();
+				$('div.editor_pane').hide();
+				$('#show_edit').show();
 				content = $('textarea.render_html').val();
                 self.setContent(content);
-				$('#show_edit').show();
+				self.saveContent();
 				return false;
             });
+			// show html view
             $('.show_html').bind('click', function()
             {
-				$('#show_edit').hide();
+				$('div.editor_pane').hide();
 				$('#show_html').show();
+				$('textarea.render_html').show();
+				self.saveContent();
 				return false;
-            });				
+            });
+			// add custom stuff to the editor
+            $('.insert_html').bind('click', function()
+            {
+				divId = $(this).attr('rel');
+				$('div.editor_pane').hide();
+				$('#show_edit').show();
+				old_content = $('textarea.render_html').val();
+				custom = $('div#'+ divId).html();
+				self.setContent(old_content + custom);
+				self.saveContent();
+				return false;
+            });			
         },
 
         initFrame : function()
