@@ -83,19 +83,15 @@ $(document).ready(function()
 			$('.facebox .show_submit').show();
 		},			
 		success: function(tool_data) {
-			//alert(tool_data); return false;
-			//data format: toolname:step2:tool_id:tool_guid
+			//tool_data format: toolname:load_method:tool_id:tool_guid
 			tool_data = tool_data.split(':');
+			// add tool to DOM
+			$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);	
 			
-			// add tool to dom
-			$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);
-			
-			// load the step2 tool::method
+			// load the 'load_method' tool::method
 			$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
-				{guid : tool_data[3]},
 				function(data){
 					$.facebox(data, '', 'facebox_base');
-					$('.facebox .show_submit').hide();	
 				}
 			);
 		}

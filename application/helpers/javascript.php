@@ -24,7 +24,7 @@ class javascript_Core {
 					alert("No items to sort");
 					return false;
 				}
-				$.facebox("Saving Changes...", "status_reload", "facebox_base");
+				$(".facebox .show_submit").show();
 				$.get("/get/'. $url .'/save_sort?"+order, function(data){
 					$.facebox.close();
 					$().jade_update_tool_html("update", "'.$toolname.'", "'.$tool_id.'", data);	

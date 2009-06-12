@@ -59,11 +59,16 @@ class Tool_Controller extends Controller {
 			
 			# GET tool name
 			$tool = $db->query("
-				SELECT name, protected FROM tools_list WHERE id='$id'
+				SELECT LOWER(name) AS name, protected
+				FROM tools_list
+				WHERE id='$id'
+				AND enabled = 'yes'
 			")->current();
-			$table = strtolower($tool->name).'s';
+			if(! is_object($tool) )
+				die('invalid tool');
+				
+			$table = $tool->name.'s';
 
-			
 			# INSERT row in tool parent table
 			$data = array(
 				'fk_site'	=> $this->site_id
@@ -72,7 +77,8 @@ class Tool_Controller extends Controller {
 
 			# GET MIN position of tools on page			
 			$lowest = $db->query("
-				SELECT MIN(position) as lowest FROM pages_tools 
+				SELECT MIN(position) as lowest
+				FROM pages_tools 
 				WHERE page_id ='$page_id'
 			")->current()->lowest;
 			
@@ -90,12 +96,18 @@ class Tool_Controller extends Controller {
 			if('yes' == $tool->protected)
 			{
 				$page = $db->query("
-					SELECT page_name FROM pages WHERE id = '$page_id'
+					SELECT page_name
+					FROM pages
+					WHERE id = '$page_id'
 				")->current();		
 			
 				$newline = "\n$page->page_name:$tool->name:$tool_insert_id,\n";
 				yaml::add_value($this->site_name, 'pages_config', $newline);
 			}
+			
+			# generate tool_css file
+			//$css = new Css;
+			Css::generate_tool_css($tool->name, $tool_insert_id);
 			
 			# run _tool_adder
 			$step_2 = 'add';
@@ -106,13 +118,14 @@ class Tool_Controller extends Controller {
 			# Pass output to javascript @tool view "add" 
 			# so it can load the next step page
 			# data Format-> toolname:next_step:tool_id:tool_guid
-			
 			die(strtolower($tool->name).":$step2:$tool_insert_id:$tool_guid");
 		}	
 			
 		$primary = new View('tool/new_tool');
 		$tools = $db->query("
-			SELECT * FROM tools_list WHERE protected = 'no'
+			SELECT * FROM tools_list
+			WHERE protected = 'no'
+			AND enabled = 'yes'
 		");
 		
 		# is page protected? if not show page builders.
@@ -154,7 +167,7 @@ class Tool_Controller extends Controller {
 		$db = new Database;	
 	
 		$tool_data = $db->query("
-			SELECT pages_tools.*, tools_list.name, tools_list.protected, pages.page_name
+			SELECT pages_tools.*, LOWER(tools_list.name) as name, tools_list.protected, pages.page_name
 			FROM pages_tools
 			JOIN tools_list ON pages_tools.tool = tools_list.id
 			LEFT JOIN pages ON pages_tools.page_id = pages.id
@@ -164,9 +177,9 @@ class Tool_Controller extends Controller {
 		
 		if(! is_object($tool_data) )
 			die('Tool does not exist');
-			
-		$table_parent	= strtolower($tool_data->name).'s';
-		$table_child	= strtolower($tool_data->name).'_items';
+		
+		$table_parent	= $tool_data->name.'s';
+		$table_child	= $tool_data->name.'_items';
 
 		# DELETE pages_tools row
 		$db->delete('pages_tools', array('guid' => $tool_guid ) );		
@@ -175,12 +188,17 @@ class Tool_Controller extends Controller {
 		$db->delete($table_parent, array('id' => $tool_data->tool_id, 'fk_site' => $this->site_id) );	
 		
 		# DELETE all tool child items
-		if('Text' != $tool_data->name)
+		if('text' != $tool_data->name)
 			$db->delete($table_child, array('parent_id' => $tool_data->tool_id, 'fk_site' => $this->site_id) );	
 
 		# is tool protected?
 		if('yes' == $tool_data->protected)
 			yaml::delete_value($this->site_name, 'pages_config', $tool_data->page_name);
+		
+		# DELETE custom css file
+		$custom_css = DATAPATH . "$this->site_name/tools_css/$tool_data->name/$tool_data->tool_id.css";
+		if(file_exists($custom_css))
+			unlink($custom_css);
 		
 		# run tool_deleter
 		$edit_tool	= Load_Tool::edit_factory($tool_data->name);
@@ -210,7 +228,12 @@ class Tool_Controller extends Controller {
 		}
 
 		$primary	= new View('tool/move');
-		$pages		= $db->query("SELECT id, page_name FROM pages WHERE fk_site = '$this->site_id' ORDER BY page_name");
+		$pages = $db->query("
+			SELECT id, page_name 
+			FROM pages 
+			WHERE fk_site = '$this->site_id' 
+			ORDER BY page_name
+		");
 		$primary->pages = $pages;
 		$primary->tool_guid = $tool_guid;
 		die($primary);	

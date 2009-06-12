@@ -111,15 +111,9 @@ class Build_Page_Controller extends Template_Controller {
 		if($admin_mode)
 			$this->template->set_global('tools_array', $tools_array);
 		else
-			$this->template->linkCSS("get/css/custom/$page->id", url::site() );
+			$this->template->linkCSS("get/css/tools/$page->id", url::site() );
 		
-		/*
-		# load custom tool css for this page. 
-		$custom_css = (($admin_mode)) ? '/admin' : '';
-		$this->template->linkCSS("get/css/custom/$page->id$custom_css", url::site() );
-		*/
-		
-		
+
 		# Load Javascript files if they exist.
 		if (! empty($_SESSION['js_files']) AND is_array($_SESSION['js_files']) )
 		{
