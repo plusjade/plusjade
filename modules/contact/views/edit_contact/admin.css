@@ -3,15 +3,15 @@
 .contact_list{
 	width:40%;
 }
-.gray{
-	color:#ccc;
+tr.gray td,
+tr.gray td b{
+	color:#ccc !important;
 }
 #new_contact_table{
 	border-collapse:collapse;
 }
 #new_contact_table td{
 	padding-bottom:10px;
-	font-size:1.4em;
 }
 #new_contact_table td input{
 	font-size:1.4em;

@@ -123,31 +123,29 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			$db->update( 'navigation_items', $data, array('id' => $id, 'fk_site' => $this->site_id) ); 	
 			die('Changes Saved!');
 		}
-		else
-		{
-			$primary = new View('edit_navigation/edit_item');
+		$primary = new View('edit_navigation/edit_item');
+	
+		$item = $db->query("
+			SELECT * FROM navigation_items 
+			WHERE id = '$id'
+			AND fk_site = '$this->site_id'
+		")->current();
 		
-			$item = $db->query("
-				SELECT * FROM navigation_items 
-				WHERE id = '$id'
-				AND fk_site = '$this->site_id'
-			")->current();
+		if(! is_object($item) )
+			die('element does not exist');
 			
-			if(! is_object($item) )
-				die('element does not exist');
-				
-				
-			$pages = $db->query("
-				SELECT page_name FROM pages 
-				WHERE fk_site = '$this->site_id'
-				ORDER BY page_name
-			");
 			
-			$primary->item = $item;
-			$primary->pages = $pages;
-			
-			die($primary);
-		}
+		$pages = $db->query("
+			SELECT page_name FROM pages 
+			WHERE fk_site = '$this->site_id'
+			ORDER BY page_name
+		");
+		
+		$primary->item = $item;
+		$primary->pages = $pages;
+		
+		die($primary);
+
 	}
 	
 	public function settings($tool_id=NULL)
@@ -165,20 +163,19 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 				$data,
 				"id = '$tool_id' AND fk_site = '$this->site_id'
 			");
-			die('Settings Saved!<br>Updating...');	
+			die('Navigation Settings Saved');	
 		}
-		else
-		{
-			$primary = new View("edit_navigation/settings");
-			$parent = $db->query("
-				SELECT * FROM navigations 
-				WHERE id = '$tool_id' 
-				AND fk_site = '$this->site_id'
-			")->current();		
-			$primary->parent = $parent;
-			$primary->js_rel_command = "update-navigation-$tool_id";
-			die($primary);
-		}			
+
+		$primary = new View("edit_navigation/settings");
+		$parent = $db->query("
+			SELECT * FROM navigations 
+			WHERE id = '$tool_id' 
+			AND fk_site = '$this->site_id'
+		")->current();		
+		$primary->parent = $parent;
+		$primary->js_rel_command = "update-navigation-$tool_id";
+		die($primary);
+			
 	}
 
 

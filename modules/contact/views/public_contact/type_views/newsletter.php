@@ -1,8 +1,5 @@
 
-<span class="contact_name"><?php echo $contact->display_name?></span> 
-
 <div class="contact_value newsletter">
-	
 
 <!-- CHANGE THIS FOR LIVE campaign-monitor -->
 	<form action="http://plusjade.createsend.com/t/r/s/ydkjuy/" id="newsletter_form" method="post">
@@ -10,10 +7,8 @@
 		<label for="name">Name:</label> <input name="cm-name" id="name" type="text" rel="text_req"> 	
 		 <label for="ydkjuy-ydkjuy">Email:</label> <input name="cm-ydkjuy-ydkjuy" id="ydkjuy-ydkjuy" type="text" rel="text_req">
 		
-		<div class="buttons">
-			<button type="submit" name="submit" class="jade_positive">
-				Join Us!
-			</button>
+		<div class="buttons" style="margin:10px auto; width:200px">
+			<button type="submit" name="submit" class="jade_positive">Join Us!</button>
 		</div>
 		
 	</form>

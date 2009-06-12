@@ -39,7 +39,6 @@ class Contact_Controller extends Controller {
 		
 		$primary->add_root_js_files('ajax_form/ajax_form.js');		
 
-		
 		return $this->public_template($primary, 'contact', $tool_id);
 	}
   
@@ -72,7 +71,11 @@ class Contact_Controller extends Controller {
 		$map_link = 'http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=Alhambra,+CA+91803&sll=37.0625,-95.677068&sspn=50.823846,82.089844&ie=UTF8&ll=34.076052,-118.133755&spn=0.052396,0.080166&t=h&z=14&iwloc=addr';
 		
 		$db = new Database;
-		$item = $db->query("SELECT value FROM contact_items WHERE id ='$item_id' AND fk_site = '$this->site_id'")->current();
+		$item = $db->query("
+			SELECT value FROM contact_items
+			WHERE id ='$item_id'
+			AND fk_site = '$this->site_id'
+		")->current();
 			
 		$primary = new View('public_contact/gmap');
 		$primary->link = $item->value;	

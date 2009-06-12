@@ -20,8 +20,25 @@ ul#actions_list{
 	border:1px solid #ccc;
 }
 
+/* edit links page*/
 
+.fieldsets .each_link_wrapper{
+	padding:5px;
+}
+.fieldsets .tier{
+	margin:5px auto;
+	width:400px;
+	padding:5px;
+	text-align:right;
+	order:1px solid #ccc;
+}
+.fieldsets .hide{
+	display:none;
+}
 
+	
+/* simple tree view */
+	
 .simpleTree
 {	
 	margin:0;

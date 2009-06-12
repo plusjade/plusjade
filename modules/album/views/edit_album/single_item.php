@@ -1,5 +1,5 @@
 
-<form action="/get/edit_album/edit_item/<?php echo $item->id?>" method="POST"  class="ajaxForm" rel="close" id="<?php echo $item->id?>"> 
+<form action="/get/edit_album/edit_item/<?php echo $item->id?>" method="POST"  class="ajaxForm" rel="close-2"> 
 	<input type="hidden" name="parent_id" value="<?php echo $item->parent_id?>">
 	<input type="hidden" name="path" value="<?php echo $item->path?>">
 	

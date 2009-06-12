@@ -5,6 +5,10 @@
 </div>	
 
 <div id="left_window">
+	<p>
+		<b>Click</b> or <b>click+drag</b>
+		<br>to select images.
+	</p>
 	<div id="select-result">
 	
 	</div>
@@ -34,18 +38,22 @@
 			var result = $("#select-result").empty();
 			$(".ui-selected:first", this).each(function(){
 				id = $(this).attr('rel');
-				actions ='<p><a href="get/edit_album/edit_item/'+ id +'" class="edit_image" rel="facebox" id="2">Edit this</a><br><br><a href="/get/edit_album/delete_image/'+ id +'" class="delete_image" rel="'+ id +'">Delete this</a></p>';
+				actions ='<p><a href="get/edit_album/edit_item/'+ id +'" class="edit_image" rel="facebox" id="2">Edit this</a></p>';
+				
+				
 				result.append(actions);
 				$(this).clone().prependTo(result);
 				
 			});
 			
 			var id_string = '';
+			var qty_selected = $(".ui-selected", this).size();
 			$(".ui-selected", this).each(function(){
 				id_string += $(this).attr('rel') + '-';
 			});
+			
 			if('' != id_string){
-				delete_all ='<p><a href="/get/edit_album/delete_image/'+ id_string +'" class="delete_image" rel="'+ id_string +'">Delete all selected</a></p>';
+				delete_all ='<a href="/get/edit_album/delete_image/'+ id_string +'" class="delete_image" rel="'+ id_string +'">Delete '+ qty_selected +' selected</a><br>';
 				result.append(delete_all);		
 			}
 			
