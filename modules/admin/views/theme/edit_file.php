@@ -187,29 +187,32 @@
 
 </style>
 
+<?php /*
 <script type="text/javascript" src="/assets/js/syntax/shCore.js" charset="utf-8"></script>
 <script type="text/javascript" src="/assets/js/syntax/shBrushCss.js" charset="utf-8"></script>
 <script type="text/javascript" src="/assets/js/syntax/shBrushXml.js" charset="utf-8"></script>
-
+*/
+?>
 
 <?php echo form::open("theme/edit/$file_name", array('class'=> 'ajaxForm') )?>	
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="update" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Changes
-		</button>
+		<button type="submit" name="update" class="jade_positive">Save Changes</button>
 		<div id="common_title">Edit <?php echo $file_name?></div>
 	</div>	
-
-	<div style="height:400px;overflow:auto">
-		<textarea name="code" class="css" style="height:400px !important; width:99%; overflow:auto;"><?php echo $file_contents?></textarea>
+	
+	<div class="common_left_panel">
+	
+	</div>
+	<div class="common_main_panel">
+		<textarea name="code" class="render_css"><?php echo $file_contents?></textarea>
 	</div>
 </form>
 
 
 <script language="javascript">
 	$(document).ready(function(){				
-		dp.SyntaxHighlighter.ClipboardSwf = '/assets/js/syntax/clipboard.swf';
-		dp.SyntaxHighlighter.HighlightAll('code');			 
+		//dp.SyntaxHighlighter.ClipboardSwf = '/assets/js/syntax/clipboard.swf';
+		//dp.SyntaxHighlighter.HighlightAll('code');			 
 	});	
 </script>
