@@ -22,9 +22,7 @@ class Theme_Controller extends Controller {
 		$theme_data_path	= APPPATH."views/$this->theme";
 		
 		$primary->theme_files = $directory->get_file_list($custom_data_path, 'root', TRUE);
-
-		echo $primary;
-		die();
+		die($primary);
 	}
 
 # Update a file	
@@ -33,19 +31,16 @@ class Theme_Controller extends Controller {
 		# Save a file
 		if($_POST)
 		{
-			echo Site_Data::save_file($file, $_POST['contents']);
+			die(Site_Data::save_file($file, $_POST['contents']));
 		}
-		else
-		{
-			$primary = new View('theme/edit_file');
-			$primary->file_name = $file;
+		
+		$primary = new View('theme/edit_file');
+		$primary->file_name = $file;
+		
+		if( $primary->file_contents = Site_Data::edit_file($file) )
+			die($primary);
 			
-			if( $primary->file_contents = Site_Data::edit_file($file) )
-				echo $primary;
-			else
-				echo 'You cannot edit this file';
-		}
-		die();		
+		die('You cannot edit this file');	
 	}
 
 # Change Sitewide Theme
@@ -64,28 +59,123 @@ class Theme_Controller extends Controller {
 			{					
 				$copy_theme = new Data_Folder;	
 				if(! $copy_theme->dir_copy($source, $dest) )
-				{
-					# Error
-					echo 'Unable to change theme<br>Please try again later.';
-					die();
-				}
+					die('Unable to change theme<br>Please try again later.'); # Error
 			}
 			$db->update('sites', array('theme' => $new_theme), "site_id = '$this->site_id'");			
+
+			if(yaml::edit_site_value($this->site_name, 'site_config', 'theme', $new_theme ))
+				die('Theme Changed');
 			
-			#TODO: Make sure this is handled by facebox auto reload.
-			echo 'Theme Changed!!<br>Updating...';
+			# on success: should clear the cache and reload the page.
+			die('There was a problem changing the theme.');
 		}
-		else
-		{
-			$primary	= new View('theme/change');
-			$themes		= $db->query('SELECT * FROM themes');
-			$primary->themes = $themes;			
-			echo $primary;
-		}
-		
-		die();		
+
+		$primary	= new View('theme/change');
+		$themes		= $db->query('SELECT * FROM themes');
+		$primary->themes = $themes;
+		$primary->js_rel_command = 'reload-home';
+		die($primary);	
 	}
+
+	
+# Edit logo view
+	function logo()
+	{		
+		$primary = new View("theme/logo");
 		
+		# Get all uploaded Logos
+		$upload_path = DOCROOT."/data/$this->site_name/assets/images/banners";		
+		$img_path	= url::site("data/$this->site_name/assets/images/banners");
+		if(is_dir($upload_path))
+		{
+			$saved_banners = array();
+			$dir = opendir("$upload_path");
+			while (TRUE == ($file = readdir($dir))) 
+			{
+				$key = explode('.', $file);
+				$key = $key['0'];
+				if (strpos($file, '.gif', 1)||strpos($file, '.jpg', 1)||strpos($file, '.png', 1) ) 
+					$saved_banners[$key] = $file;
+			}
+			$primary->saved_banners = $saved_banners;
+			$primary->img_path = $img_path;
+			die($primary);
+		}
+		die('Banner directory does not exist.');
+	}
+	
+	function add_logo()
+	{		
+		if(empty($_FILES['image']['name']))
+			die('Please select an image to upload.');  #error
+	
+		$files = new Validation($_FILES);
+		$files->add_rules('image', 'upload::valid','upload::type[gif,jpg,jpeg,png]', 'upload::size[1M]');
+			
+		if (! $files->validate() )
+			die('Unable to upload image');  #error
+			
+		# Temporary file name
+		$filename	= upload::save('image');
+		$image		= new Image($filename);			
+		$ext		= $image->__get('ext');
+		$image_name = basename($filename).'_ban.'.$ext;
+		
+		$image->save(DOCROOT . "data/$this->site_name/assets/images/banners/$image_name");
+	 
+		# Remove the temporary file
+		unlink($filename);
+		
+		#success message	
+		die("$image_name"); 				
+			
+		if(! empty($_POST['enable']) )
+		{
+			$db		= new Database;
+			$data	= array( 'banner' => $image_name );
+			$db->update('sites', $data, "site_id = $this->site_id"); 
+			$_SESSION['banner'] = $image_name;
+			die('Logo Saved'); # success	  		
+		}			
+	}
+	
+	# Change logo
+	function change_logo()
+	{
+		if($_POST)
+		{
+			$db		= new Database;
+			$data	= array('banner' => $_POST['banner']);
+			$db->update('sites', $data, "site_id = $this->site_id"); 
+			$_SESSION['banner'] = $_POST['banner'];
+			
+			if(yaml::edit_site_value($this->site_name, 'site_config', 'banner', $_POST['banner']))
+				die('Banner changed.'); # success message		
+		}
+		die('Nothing sent.');
+	}
+	
+	
+	function delete_logo()
+	{
+		if(empty($_POST['delete_logo']))
+			die('nothing sent');
+
+		$img_path = DOCROOT."data/$this->site_name/assets/images/banners/{$_POST['banner']}";
+		if(file_exists($img_path))
+		{
+			if(unlink($img_path))
+				die('Image deleted!');
+		}
+		die('Unable to delete image'); 
+	}
+
+	
+
+
+	
+	
+/* not using*/
 # Style Theme
 	function css_theme()
 	{
@@ -181,113 +271,5 @@ class Theme_Controller extends Controller {
 		$this->template->primary = $primary; 
 	
 	}
-
-	
-	function add_logo()
-	{
-		if(! empty($_FILES['image']['name']) )
-		{
-			$files = new Validation($_FILES);
-			$files->add_rules('image', 'upload::valid','upload::type[gif,jpg,jpeg,png]', 'upload::size[1M]');
-			
-			if ( $files->validate() )
-			{
-				# Temporary file name
-				$filename	= upload::save('image');
-				$image		= new Image($filename);			
-				$ext		= $image->__get('ext');
-				$image_name = basename($filename).'_ban.'.$ext;
-				
-				$image->save(DOCROOT."data/{$this->site_name}/assets/images/banners/".$image_name);
-			 
-				# Remove the temporary file
-				unlink($filename);
-				
-				#success message	
-				echo 'Image successfully uploaded!'; 				
-				
-				if(! empty($_POST['enable']) )
-				{
-					$db		= new Database;
-					$data	= array( 'banner' => $image_name );
-					$db->update('sites', $data, "site_id = $this->site_id"); 
-					$_SESSION['banner'] = $image_name;
-					
-					#success message	
-					echo '<br>Logo Saved!';  		
-				}	
-		
-
-			}
-			else
-				echo 'Unable to uploda image';  #error message
-		}
-		else
-			echo 'Please select an image to upload.';  #error message					
-
-		die();
-	}
-	
-	
-	function change_logo()
-	{
-		# change logo
-		if($_POST)
-		{
-			$db		= new Database;
-			$data	= array('banner' => $_POST['banner']);
-			$db->update('sites', $data, "site_id = $this->site_id"); 
-			$_SESSION['banner'] = $_POST['banner'];
-			
-			#success message	
-			echo 'Image changed!';  		
-		}
-		die();
-	}
-	
-	
-	function delete_logo()
-	{
-		if(! empty($_POST['delete_logo']) )
-		{
-			$img_path = DOCROOT."data/{$this->site_name}/assets/images/banners/{$_POST['banner']}";
-			if(file_exists($img_path))
-			{
-				if(unlink($img_path))
-					echo 'Image deleted!';
-				else
-					echo 'Unable to delete image'; 
-				
-			}
-		}
-		die();
-	}
-
-	
-# Edit logo
-	function logo()
-	{				
-		$primary = new View("theme/logo");
-		
-		# Get all uploaded Logos
-		$upload_path = DOCROOT."/data/$this->site_name/assets/images/banners";		
-		$saved_banners = array();
-		
-		if(is_dir($upload_path))
-		{
-			$dir = opendir("$upload_path");
-			while (false !== ($file = readdir($dir))) 
-			{
-				if (strpos($file, '.gif',1)||strpos($file, '.jpg',1)||strpos($file, '.png',1) ) 
-					array_push($saved_banners, $file);
-			}
-		}
-		
-		$primary->saved_banners = $saved_banners;	
-		
-		echo $primary;
-		die();
-	}
-
 	
 } /* End of file /modules/admin/theme.php */
