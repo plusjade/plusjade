@@ -19,7 +19,8 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		$primary = new View('edit_blog/manage');
 		
 		# Show drafts
-		$items = $db->query("SELECT blog_items.*, 
+		$items = $db->query("
+			SELECT blog_items.*, 
 			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on 
 			FROM blog_items
 			WHERE blog_items.parent_id = '$tool_id'
@@ -72,7 +73,11 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 				'url'		=> $_POST['url'],
 				'status'	=> $_POST['status'],
 			);
-			$db->update('blog_items', $data, "id = '$id' AND fk_site='$this->site_id'");
+			$db->update(
+				'blog_items',
+				$data,
+				"id = '$id' AND fk_site='$this->site_id'"
+			);
 			
 			$tags = trim($_POST['tags']);
 			if (! empty($tags) )
@@ -92,10 +97,10 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 					$db->insert('blog_items_tags', $data);
 				}
 			}			
-			die('Post Saved!<br>Updating...'); #status				
+			die('Post Saved'); #status				
 		}
 
-		$primary = new View("edit_blog/single_item");
+		$primary = new View("edit_blog/edit_item");
 		$item = $db->query("
 			SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
 			GROUP_CONCAT(DISTINCT blog_items_tags.value, CONCAT('_',blog_items_tags.id) ORDER BY blog_items_tags.value  separator ',') as tag_string
@@ -159,7 +164,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 				'title'	=> $_POST['title'],
 			);
 			$db->update('blogs', $data, "id='$tool_id' AND fk_site = '$this->site_id'"); 						
-			die('Settings Updated!<br>Updating...'); #success
+			die('Blog Settings Updated.'); #success
 		}
 		die( $this->_view_edit_settings('blog', $tool_id) );
 	}

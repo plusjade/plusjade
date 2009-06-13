@@ -27,7 +27,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		")->current();			
 
 		#show category list.
-		$primary = new View("edit_showroom/manage_showroom");
+		$primary = new View("edit_showroom/manage");
 		$items = $db->query("
 			SELECT cat.*, COUNT(items.id) AS item_count
 			FROM showroom_items AS cat
@@ -98,7 +98,8 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			die('category added (test)');
 			$db = new Database;
 			# Get parent
-			$parent	= $db->query("SELECT * FROM showrooms 
+			$parent	= $db->query("
+				SELECT * FROM showrooms 
 				WHERE id = '$tool_id' 
 				AND fk_site = '$this->site_id' 
 			")->current();
@@ -122,17 +123,12 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			}
 			# Update left and right values
 			Tree::rebuild_tree('showroom_items', $parent->root_id, '1');
-			echo 'Categories added<br>Updating...'; #status message
-			die();
-			
+			die('Categories added'); #status message			
 		}
-		else
-		{
-			$primary = new View('edit_showroom/new_category');
-			$primary->tool_id = $tool_id;				
-			echo $primary;
-		}
-		die();		
+
+		$primary = new View('edit_showroom/add_category');
+		$primary->tool_id = $tool_id;				
+		die($primary);	
 	}
 
 
@@ -182,7 +178,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		elseif($_GET)
 		{
 			$category = valid::id_key(@$_GET['category']);
-			$primary = new View("edit_showroom/new_item");
+			$primary = new View("edit_showroom/add_item");
 			$primary->tool_id = $tool_id;
 			$primary->category = $category;
 			die($primary);			
@@ -202,10 +198,8 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			if( empty($_POST['name']) )
-			{
-				echo 'Name is required'; # error
-				die();
-			}
+				die('Name is required'); # error
+				
 			# Make URL friendly
 			$url = trim($_POST['url']);
 			$url = ( empty($url) ) ? $_POST['name'] : $url;
@@ -218,7 +212,6 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				'intro'		=> $_POST['intro'],
 				'body'		=> $_POST['body'],		
 			);
-		
 			$old_image = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['old_category']}/{$_POST['old_image']}";
 		
 			# Upload image if sent
@@ -245,42 +238,45 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			
 			}			
 
-			$db->update('showroom_items_meta', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			
-			echo 'Item saved!!<br>Updating...';
-
+			$db->update(
+				'showroom_items_meta',
+				$data,
+				"id = '$id' AND fk_site = '$this->site_id'"
+			);	
+			die('Item saved');
 		}
-		else
-		{
-			$primary = new View("edit_showroom/single_item");
 
-			# Grab single item
-			$item = $db->query("SELECT * FROM showroom_items_meta
-				WHERE id = '$id' AND fk_site = '$this->site_id'
-			")->current();
+		# Grab single item
+		$item = $db->query("
+			SELECT * FROM showroom_items_meta
+			WHERE id = '$id' 
+			AND fk_site = '$this->site_id'
+		")->current();
+		
+		# If item exists & belongs to this site:
+		if(empty($item) )
+			die('item does not exist');
 			
-			# If item exists & belongs to this site:
-			if(! empty($item) )
-			{
-				# Get list of categories
-				$category = $db->query("SELECT id, name, parent_id FROM showroom_items
-					WHERE id = '$item->cat_id' AND fk_site = '$this->site_id'
-				")->current();
-				
-				$categories = $db->query("SELECT id, name FROM showroom_items
-					WHERE parent_id = '$category->parent_id' AND fk_site = '$this->site_id'
-					AND local_parent != '0'
-					ORDER BY lft ASC
-				");
-				
-				$primary->categories = $categories;	
-				$primary->item = $item;
-				echo $primary;			
-			}
-			else
-				echo 'Bad id';
-		}
-		die();		
+		# Get list of categories 
+		# TODO: could probably join these no?
+		$category = $db->query("
+			SELECT id, name, parent_id 
+			FROM showroom_items
+			WHERE id = '$item->cat_id' 
+			AND fk_site = '$this->site_id'
+		")->current();
+		
+		$categories = $db->query("
+			SELECT id, name FROM showroom_items
+			WHERE parent_id = '$category->parent_id' 
+			AND fk_site = '$this->site_id'
+			AND local_parent != '0'
+			ORDER BY lft ASC
+		");
+		$primary = new View("edit_showroom/edit_item");
+		$primary->categories = $categories;	
+		$primary->item = $item;
+		die($primary);	
 	}
 
 /*
@@ -292,7 +288,6 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	public function delete($id=NULL)
 	{
 		valid::id_key($id);				
-		# Get image object
 		$image = $this->_grab_tool_child('showroom', $id);
 
 		# Image File delete		
@@ -303,9 +298,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			
 		# db delete
 		$this->_delete_single_common('showroom', $id);
-		
-		echo 'Item Deleted!<br>Updating...';
-		die();
+		die('Showroom item Deleted');
 	}
 
 /*
@@ -315,8 +308,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	public function save_sort()
 	{
-		$this->_save_sort_common($_GET['showroom'], 'showroom_items');
-		die();
+		die( $this->_save_sort_common($_GET['showroom'], 'showroom_items') );
 	}
 	
 /*
@@ -336,14 +328,15 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				'view'		=> $_POST['view'],
 				'params'	=> $_POST['params'],
 			);
-			$db->update('showrooms', $data, " id = '$tool_id' AND fk_site = '{$this->site_id}' ");
-			echo 'Showroom updated!!';		
+			$db->update(
+				'showrooms',
+				$data,
+				"id = '$tool_id' AND fk_site = '$this->site_id'"
+			);
+			die('Showroom updated');		
 		}
-		else
-		{
-			$this->_view_edit_settings('showroom', $tool_id);	
-		}
-		die();
+		
+		die( $this->_view_edit_settings('showroom', $tool_id) );
 	}
 	
 /*

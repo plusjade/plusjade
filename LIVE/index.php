@@ -1,5 +1,7 @@
 <?php
 # ROOT/Parent +Jade domain name
+define('ROOTNAME', 'plusjade');
+define('ROOTACCOUNT', 'jade');
 define('ROOTDOMAIN', 'plusjade.com');
 /**
  * This file acts as the "front controller" to your application. You can

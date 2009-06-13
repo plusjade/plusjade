@@ -24,8 +24,8 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	}
 	
 /*
- * ADD images into album (multiple) 
- * Loads into tier 1 Facebox
+ * ADD images into album.
+ * this gets called by the swfloader, once per image uploader.
  * @PARM (INT) $page_id = page id (table pages) album is installed
  */
 	public function add_image($tool_id=NULL)
@@ -67,7 +67,6 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		$token		= text::random('alnum', 18);
 		$name		= "$token.$ext";
 		
-
 		if( $image->save("$image_store/$tool_id/$name") )
 		{
 			# add to database
@@ -93,7 +92,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$image_sm->save("$image_store/$tool_id/sm_$name");
 		}
 		unlink($filename);
-		die('Images added');	
+		die('Image added');	
 	}
 	
 	
@@ -134,7 +133,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 				'params'	=> $_POST['params'],
 			);
 			$db->update('albums', $data, " id = '$tool_id' AND fk_site = '$this->site_id' ");
-			die('Settings Saved!!<br>Updating ...');
+			die('Album Settings Saved.');
 		}
 
 		die( $this->_view_edit_settings('album', $tool_id) );

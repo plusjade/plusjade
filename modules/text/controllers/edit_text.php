@@ -20,31 +20,26 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 
 		if($_POST)
 		{
-			#echo'<pre>';print_r($_POST);echo'</pre>';die();
-			$data = array(
-				'body'	=> $_POST['body'],		
-			);		
-			$db->update('texts', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			
+			$db->update(
+				'texts',
+				array('body' => $_POST['body']),
+				"id = '$id' AND fk_site = '$this->site_id'"
+			);
 			die('Changes Saved');
 		}
-		else
-		{
-			$primary = new View("edit_text/single_item");
-			$parent = $db->query("
-				SELECT * FROM texts 
-				WHERE id = '$id' 
-				AND fk_site = '$this->site_id'
-			")->current();			
-			$primary->item = $parent;
-			
-			$primary->js_rel_command = "update-text-$parent->id";
-			
-			die($primary);
-		}	
+		
+		$primary = new View("edit_text/add_item");
+		$parent = $db->query("
+			SELECT * FROM texts 
+			WHERE id = '$id' 
+			AND fk_site = '$this->site_id'
+		")->current();			
+		$primary->item = $parent;
+		$primary->js_rel_command = "update-text-$parent->id";
+		die($primary);
 	}
 /*
- * edit a single item
+ * edit a single item, uses the same logic as add so we're all good.
  */
 	public function edit($id=NULL)
 	{

@@ -1,5 +1,5 @@
 <?php
-class Page_Controller extends Admin_Controller {
+class Page_Controller extends Controller {
 
 	/**
 	 *	Provides CRUD for pages 

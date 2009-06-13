@@ -10,7 +10,7 @@ if( empty($this->banner) )
 else
 {
 	?>	
-	<a href="<?php echo url::site()?>">
+	<a href="<?php echo url::site()?>" id="jade_banner_link">
 		<img src="<?php echo $data_path?>/assets/images/banners/<?php echo $this->banner?>" id="header_banner">
 	</a>
 	<?php

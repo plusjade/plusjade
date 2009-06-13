@@ -1,6 +1,9 @@
 <?php
 # ROOT/Parent +Jade domain name
+define('ROOTNAME', 'localhost');
+define('ROOTACCOUNT', 'jade');
 define('ROOTDOMAIN', 'localhost.com');
+
 /**
  * This file acts as the "front controller" to your application. You can
  * configure your application, modules, and system directories here.

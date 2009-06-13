@@ -21,23 +21,13 @@ abstract class Controller_Core {
 	 * @return  void
 	 */
 	public function __construct()
-	{	
+	{
 		$session	= Session::instance();
-		$site_name	= $_SESSION['site_name'];
-		
-		$site_config = file_get_contents(DATAPATH . "$site_name/protected/site_config.yaml");
-		$site_config = explode(',',$site_config);
-		$keys = array();
-		foreach($site_config as $string)
-		{
-			$value	= strstr($string ,':');
-			$keys[]	= ltrim($value, ':');
-		}
-		$this->site_id 		= $keys['0'];
-		$this->site_name 	= $keys['1'];
-		$this->theme 		= $keys['2'];
-		$this->banner 		= $keys['3'];
-		
+		$site_config = yaml::parse_basic($_SESSION['site_name'], 'site_config');
+		$this->site_id 		= $site_config['site_id'];
+		$this->site_name 	= $site_config['site_name'];
+		$this->theme 		= $site_config['theme'];
+		$this->banner 		= $site_config['banner'];
 		
 		# Auth Instance
 		$this->client = new Auth;	

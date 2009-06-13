@@ -37,7 +37,7 @@
 			?>
 			<div id="tool_<?php echo $tool->id?>" class="each_tool">
 				<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
-					<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
+					<?php echo $tool->name?>
 				</button>
 				<div class="desc"><?php echo $tool->desc?></div>
 			</div>

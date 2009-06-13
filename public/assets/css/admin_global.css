@@ -307,6 +307,7 @@ ul#admin_bar{
 	left:80%;
 	width:100px;
 	text-align:center;
+	z-index: 9999;
 }
 #hide_link a {
 	background:orange;

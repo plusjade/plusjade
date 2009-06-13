@@ -1,13 +1,4 @@
 
-div.wysiwyg iframe{
-	height:330px !important;
-}
-div.wysiwyg{
-	height:380px !important;
-	width:97% !important;
-}
-
-
 /* --- edit_showroom.php --- */
 #edit_showroom_textarea{
 	width:460px; 
