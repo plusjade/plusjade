@@ -56,13 +56,11 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 			$db->insert('faq_items', $data); 
 			die('Question added'); #success
 		}
-		else
-		{
-			$primary = new View("edit_faq/new_item");
-			$primary->tool_id = $tool_id;	
-			$primary->js_rel_command = "update-faq-$tool_id";
-			die($primary);
-		}
+		
+		$primary = new View("edit_faq/add_item");
+		$primary->tool_id = $tool_id;	
+		$primary->js_rel_command = "update-faq-$tool_id";
+		die($primary);
 	}
 
 
@@ -76,11 +74,15 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 			   'question'	=> $_POST['question'],
 			   'answer'		=> $_POST['answer']
 			);
-			$db->update('faq_items', $data, "id = '$id' AND fk_site='$this->site_id'");		
+			$db->update(
+				'faq_items',
+				$data,
+				"id = '$id' AND fk_site='$this->site_id'"
+			);		
 			die('Faq updated!<br>Updating...'); # success			
 		}
-		else
-			die( $this->_view_edit_single('faq', $id) );
+
+		die( $this->_view_edit_single('faq', $id) );
 	}
 
 	function delete($tool_id=NULL)
@@ -111,16 +113,25 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 			$data = array(
 				'title'	=> $_POST['title'],
 			);
-			$db->update('faqs', $data, "id='$tool_id' AND fk_site = '$this->site_id'"); 						
+			$db->update(
+				'faqs',
+				$data,
+				"id='$tool_id' AND fk_site = '$this->site_id'"
+			); 						
 			die( 'Settings Updated!<br>Updating...'); # success
 		}
-		else
-			die( $this->_view_edit_settings('faq', $tool_id) );
+		
+		die( $this->_view_edit_settings('faq', $tool_id) );
 	}
 	
 	static function _tool_adder($tool_id, $site_id)
 	{
 		return 'add';
+	}
+	
+	static function _tool_deleter($tool_id, $site_id)
+	{
+		return FALSE;
 	}
 }
 

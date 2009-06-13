@@ -116,7 +116,7 @@ abstract class Edit_Tool_Controller extends Controller {
 
 		if($items->count() > 0)
 		{
-			$primary = new View("edit_$toolname/manage_$toolname");
+			$primary = new View("edit_$toolname/manage");
 			$primary->set($toolname, $parent);
 			$primary->items = $items;
 			$primary->tool_id = $parent->id;
@@ -176,18 +176,15 @@ abstract class Edit_Tool_Controller extends Controller {
  */	
 	public function _view_edit_settings($toolname, $tool_id)
 	{
-		$primary = new View("edit_$toolname/settings");
-		$primary->tool_id = $tool_id;	
-		$primary->js_rel_command = "update-$toolname-$tool_id";
 		$parent = $this->_grab_tool_parent($toolname, $tool_id);
 		
-		if( is_object($parent) )
-		{
-			$primary->set($toolname, $parent);		
-			return $primary;
-		}
-		else
+		if(!is_object($parent) )
 			return FALSE;
+
+		$primary = new View("edit_$toolname/settings");
+		$primary->tool = $parent;
+		$primary->js_rel_command = "update-$toolname-$tool_id";			
+		return $primary;
 	}
 	
 

@@ -61,10 +61,8 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			$db->insert('calendar_items', $data);
 			die('Event added'); #status message
 		}
-		else
-		{			
-			die( $this->_view_add_single('calendar', $tool_id) );
-		}	
+		
+		die( $this->_view_add_single('calendar', $tool_id) );	
 	}
 	
 /*
@@ -80,21 +78,23 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 				'title'	=> $_POST['title'],
 				'desc'	=> $_POST['desc'],		
 			);		
-			$db->update('calendar_items', $data, "id = '$id' AND fk_site = '$this->site_id'");
-			die('Event Saved<br>Updating...');
+			$db->update(
+				'calendar_items',
+				$data,
+				"id = '$id' AND fk_site = '$this->site_id'"
+			);
+			die('Event Saved');
 		}
-		else
-		{
-			$primary = new View("edit_calendar/single_item");		
-			$parent = $db->query("
-				SELECT * FROM calendar_items 
-				WHERE id = '$id' 
-				AND fk_site = '$this->site_id'
-			")->current();
-			$primary->item = $parent;
-			$primary->js_rel_command = "update-calendar-$parent->parent_id";
-			die($primary);
-		}	
+
+		$primary = new View("edit_calendar/edit_item");		
+		$parent = $db->query("
+			SELECT * FROM calendar_items 
+			WHERE id = '$id' 
+			AND fk_site = '$this->site_id'
+		")->current();
+		$primary->item = $parent;
+		$primary->js_rel_command = "update-calendar-$parent->parent_id";
+		die($primary);
 	}
 
 /*
@@ -186,5 +186,10 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	static function _tool_adder($tool_id, $site_id)
 	{
 		return 'add';
+	}
+	
+	static function _tool_deleter($tool_id, $site_id)
+	{
+		return FALSE;
 	}
 }

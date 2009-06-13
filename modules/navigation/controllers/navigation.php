@@ -11,7 +11,7 @@ class Navigation_Controller extends Controller {
 	 * Displays a nestable navigation element menu
 	 */	 
 	function _index($tool_id)
-	{	
+	{
 		valid::id_key($tool_id);	
 		$db = new Database;
 		

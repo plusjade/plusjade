@@ -97,16 +97,6 @@ class Build_Page_Controller extends Template_Controller {
 			}		
 		}
 		
-		/*
-		if('0' < count($all_tools))
-		{
-			# Load Tools Public CSS (only when not logged in)
-			$all_tools_string = implode('-', $all_tools);	
-			$this->template->linkCSS("get/css/tools/$all_tools_string", url::site() );
-		}
-		*/
-		
-		
 		# Drop Tool array into admin Panel if logged in
 		if($admin_mode)
 			$this->template->set_global('tools_array', $tools_array);

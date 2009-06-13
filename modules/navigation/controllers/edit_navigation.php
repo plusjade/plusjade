@@ -77,7 +77,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			# GET must come from ajax request @ view(edit_navigation/manage)
 			$local_parent = valid::id_key($_GET['local_parent']);
 	
-			$primary = new View('edit_navigation/new_item');
+			$primary = new View('edit_navigation/add_item');
 			$db = new Database;
 			$pages = $db->query("
 				SELECT page_name FROM pages 
@@ -87,7 +87,6 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			$primary->pages = $pages;
 			$primary->tool_id = $tool_id;
 			$primary->local_parent = $local_parent;	
-
 			die($primary);
 		}	
 	}
@@ -120,7 +119,11 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 				'type'			=> $_POST['type'],
 				'data'			=> @$_POST['data'],
 			);	
-			$db->update( 'navigation_items', $data, array('id' => $id, 'fk_site' => $this->site_id) ); 	
+			$db->update(
+				'navigation_items',
+				$data,
+				array('id' => $id, 'fk_site' => $this->site_id)
+			); 	
 			die('Changes Saved!');
 		}
 		$primary = new View('edit_navigation/edit_item');
@@ -134,7 +137,6 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		if(! is_object($item) )
 			die('element does not exist');
 			
-			
 		$pages = $db->query("
 			SELECT page_name FROM pages 
 			WHERE fk_site = '$this->site_id'
@@ -143,9 +145,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		
 		$primary->item = $item;
 		$primary->pages = $pages;
-		
 		die($primary);
-
 	}
 	
 	public function settings($tool_id=NULL)
@@ -154,15 +154,12 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		$db = new Database;
 
 		if($_POST)
-		{
-			$data = array(
-				'title'	=> $_POST['title'],
-			);		
+		{	
 			$db->update(
 				'navigations',
-				$data,
-				"id = '$tool_id' AND fk_site = '$this->site_id'
-			");
+				array('title' => $_POST['title']),
+				"id = '$tool_id' AND fk_site = '$this->site_id'"
+			);
 			die('Navigation Settings Saved');	
 		}
 
@@ -172,7 +169,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();		
-		$primary->parent = $parent;
+		$primary->tool = $parent;
 		$primary->js_rel_command = "update-navigation-$tool_id";
 		die($primary);
 			

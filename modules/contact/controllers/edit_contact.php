@@ -57,11 +57,10 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 				$db->insert('contact_items', $data); 
 			}
 			$count = count($_POST['id']);
-			
 			die("$count Contact(s) added."); #status message				
 		}
 
-		$primary = new View('edit_contact/new_item');
+		$primary = new View('edit_contact/add_item');
 		$contact_types = $db->query("SELECT * FROM contact_types");
 		$primary->contact_types = $contact_types;
 		$contacts = $db->query("
@@ -98,7 +97,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 			die('Contact edited'); # success
 		}
 
-		$primary = new View("edit_contact/single_item");
+		$primary = new View("edit_contact/edit_item");
 		$join = 'JOIN contact_types ON contact_types.type_id = contact_items.type';
 		$item = $this->_grab_tool_child('contact', $id, $join);		
 		$primary->item = $item;
@@ -138,7 +137,7 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 
 	static function _tool_deleter($tool_id, $site_id)
 	{
-		return false;
+		return FALSE;
 	}
 	
 }

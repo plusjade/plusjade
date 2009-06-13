@@ -268,7 +268,7 @@ $(document).ready(function()
 				if( 'undefined' == typeof(action) ) {
 					// TODO: find something good to put here
 					// if no rel attribute specified ...
-					$.facebox(data, "status_reload", "facebox_2");
+					$('#show_response_beta').html(data);
 					alert('this form had no rel attribute');
 				} else {
 					action = action.split('-');
@@ -282,7 +282,10 @@ $(document).ready(function()
 					} else if('scope' == action[0] ) {
 						$('span#guid_'+ action[2]).removeClass('local global');
 						$('span#guid_'+ action[2]).addClass(data);
-						$.facebox.close();
+						$.facebox.close();	
+					} else if('reload' == action[0] ) {
+						$.facebox(data, 'loading_msg', 'facebox_2');
+						location.reload();
 					} else {
 						// in case of update or add
 						// update tool html output to DOM via ajax
