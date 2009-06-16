@@ -3,7 +3,7 @@
 
 	<ul id="vertical_tabs" class="ui-tabs-nav">	
 		<li><a href="#fragment-1" class="ui-tabs-selected"><span>Dashboard</span></a></li>
-		<li><a href="#fragment-2"><span>Website</span></a></li>
+		<li><a href="#fragment-2"><span>Add a Website</span></a></li>
 		<li><a href="#fragment-3"><span>Marketing</span></a></li>
 		<li><a href="#fragment-4"><span>Analytics</span></a></li>
 		<li><a href="#fragment-5"><span>Account</span></a></li>
@@ -14,15 +14,23 @@
 		<div id="fragment-1">
 
 			<div id="common_tool_header" class="buttons">
-		
-				<a href="/get/auth/manage" class="jade_positive floatright">Edit Website</a>
-
-				<div id="common_title">Hello there, <?php echo ucwords($user->username)?>!</div>
+				<div id="common_title">Hello there, <?php echo ucfirst($user->username)?>!</div>
+				
+				Glad you are back, we have work to do: 
 			</div>
 		
-		
-				Glad you are back, we have work to do: 
-				
+				Sites you own:
+				<div id="site_button_wrapper">
+					<?php
+					foreach($sites_array as $name => $site_id)
+						echo "<p><a href=\"/get/auth/manage?site=$site_id\">$name</a></p>";
+					
+					#quick hack - remove later
+					if($this->client->logged_in(2))
+						echo '<p><a href="/get/utada">Admin: Go to Master</a></p>';
+					?>	
+				</div>
+			
 				<ol>
 					<li>
 						<span class="main_header">Website - Create essential pages.</span>
@@ -61,7 +69,14 @@
 		</div>
 
 		<div id="fragment-2">
-			hello jello
+			<h3>Add New Website</h3>
+			
+			<form action="/get/auth/new_website" method="POST">
+				<input type="text" name="site_name" style="width:300px">
+				<br>
+				<br>
+				<button type="submit">Create Website</button>
+			</form>
 		</div>
 		
 		<div id="fragment-3">
@@ -73,18 +88,6 @@
 		
 		<div id="fragment-5">		
 			<a href="/get/auth/change_password">Change Password</a>
-
-			<?php 
-			#quick hack - remove later
-			if($this->client->logged_in(2))
-			{
-				?>
-				<p><a href="/get/auth/create">Create New Site account</a></p>
-				<p><a href="/get/auth/destroy">Destroy Site account</a></p>	
-				<p><a href="/get/auth/clean_db">Clean Database</a></p>
-				<?php
-			}
-			?>
 		</div>
 		
 		

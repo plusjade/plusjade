@@ -812,6 +812,126 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	overflow:auto;
 	
 }
+
+
+
+/* auth form views */
+
+/* auth create */
+#auth_form{
+	width:400px;
+	margin:10px auto;
+	padding:10px;
+}
+#auth_form div.fieldsets{
+	background:#fff;
+	padding:10px;
+	margin-bottom:10px;
+}
+#tagline{
+	padding:10px;
+	background:#fff;
+	text-align:center;
+	font-size:2em;
+}
+#auth_form input{
+	font-size:1.8em;
+	background-attachment:fixed;
+	background:skyblue url(/assets/images/admin/gradients.jpg) repeat-x 0px -500px;
+	border:1px solid #dedede;
+	width:99%;
+}
+#auth_form button{
+	width:100%;
+}
+#auth_form .buttons{
+	margin:0 auto;
+	width:300px;
+}
+
+
+/* login prompt */
+
+#auth_form div.error{
+	text-align:center;
+	background:#fff;
+	color:red;
+	font-size:1.2em;
+}
+
+.login_help_toggle{
+	text-align:center;
+	padding:15px;
+}
+	/*  --- dashboard.php --- */ 
+.indent{
+	line-height:2em;
+}
+#jade_welcome {
+
+}	
+#jade_welcome span{
+	float:right;
+}
+#jade_welcome b{
+	font-size:1.4em;
+	color:blue;
+}
+
+#edit_website_link{
+	clear:both;
+	margin:20px auto;
+	width:220px;
+}
+#edit_website_link a{
+	font-size:2em;
+}
+
+	/* --- ui tabs --- */	
+.ui-tabs-hide { 
+	display: none; 
+}
+.ui-tabs-nav{
+	list-style:none;
+	margin:0;
+	padding:0;	
+}
+
+
+	/* Vertical Tab Navigation */
+#vertical_tabs{
+	margin:0;
+	padding:0;
+	width:15%;
+	float:left;
+	overflow:hidden;
+}
+#vertical_tabs li{
+	margin-bottom:10px;
+}
+#vertical_tabs li a{
+	display:block;
+	padding:8px 10px;
+	color:#333;
+}
+#vertical_tabs li a:hover, #vertical_tabs .ui-tabs-selected a{
+	color:red;
+}
+#vertical_content{
+	width:80%;
+	float:right;
+	line-height:2em;
+}
+.main_header{
+	color:#7ebd40;
+	font-size:1.2em;
+	font-weight:bold;
+}
+
+
+
+
+
 /* ----------------------- admin views ----------------------- */
 .enabled_yes{
 	border:2px solid green;

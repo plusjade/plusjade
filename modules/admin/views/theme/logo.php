@@ -38,7 +38,7 @@
 <?php
 	foreach($saved_banners as $key => $image)
 	{
-		if($image == $_SESSION['banner'])
+		if($image == $this->banner)
 			$current_banner = $image;
 		?>
 		<img src="<?php echo "$img_path/$image"?>" id="selected_banner" rel="<?php echo $image?>" alt="">

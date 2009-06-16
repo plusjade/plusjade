@@ -37,7 +37,7 @@ abstract class Template_Controller extends Controller {
  */ 
 	function _load_admin($page_id, $page_name)
 	{	
-		if( $this->client->logged_in() AND ($this->client->get_user()->client_site_id == $this->site_id) )
+		if( $this->client->can_edit($this->site_id) )
 		{	
 			$this->template->linkCSS('get/css/admin', url::site() );
 			
@@ -45,8 +45,9 @@ abstract class Template_Controller extends Controller {
 				'facebox/public_multi.js',
 				'ui/ui_latest_lite.js',
 				'ajax_form/ajax_form.js',
-				'jw/jwysiwyg.js',		#'fckeditor/fckeditor.js',
+				'jw/jwysiwyg.js',
 				'swfupload/swfupload.js',
+				'simple_tree/jquery.simple.tree.js',
 				'admin/init.js'	
 			);
 			$this->template->add_root_js_files($js_files);
