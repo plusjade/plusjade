@@ -205,7 +205,7 @@
 	
 	</div>
 	<div class="common_main_panel">
-		<textarea name="code" class="render_css"><?php echo $file_contents?></textarea>
+		<textarea name="contents" class="render_css"><?php echo $file_contents?></textarea>
 	</div>
 </form>
 

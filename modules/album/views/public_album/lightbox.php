@@ -1,7 +1,7 @@
 
 
 
-<ul>
+<ul class="album_lightbox">
 	<?php 
 	foreach($images as $image)
 	{

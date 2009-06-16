@@ -16,38 +16,30 @@ class Auth_Controller extends Template_Controller {
 	{
 		parent::__construct();
 		$this->template->linkCSS('css/admin_global.css');
-		$this->template->linkCSS('css/auth.css');
 		$this->template->linkJS('ui/ui_latest_lite.js');	
 	}
-	
-	/*
-	 * User login screen for logged out users.
-	 * User dashboard for logged in users.
-	 */	 
+
+/*
+ * User login screen for logged out users.
+ * User dashboard for logged in users.
+ */	 
 	public function index()
 	{
-		if('jade' != $this->site_name) url::redirect();	
+		if(ROOTACCOUNT != $this->site_name)
+			url::redirect();	
 		
 		if( Auth::instance()->logged_in() )
 		{
-			$this->template->title = 'My dashboard';	
-			$primary = new View("auth/dashboard");
-			$primary->user = Auth::instance()->get_user();	
+			$primary = $this->display_dashboard();
 		}
-		elseif(! $_POST)
-		{
-			$this->template->title = 'User Login';
-			$primary = new View('auth/login');
-		}
-		else
+		elseif($_POST)
 		{
 			$user = ORM::factory('user', $_POST['username']);
+			
 			# TRUE means to save token for auto login
 			if (Auth::instance()->login($user, $_POST['password'], TRUE))
-			{			
-				$primary = new View("auth/dashboard");
-				$primary->user = Auth::instance()->get_user();
-				$this->template->title = 'My dashboard';
+			{
+				$primary = $this->display_dashboard();
 			}
 			else
 			{
@@ -55,15 +47,48 @@ class Auth_Controller extends Template_Controller {
 				$primary->errors = 'Invalid username or password';
 			}
 		}
+		else
+		{
+			$this->template->title = 'User Login';
+			$primary = new View('auth/login');
+		}
+		
 		$this->template->primary = $primary; 
 	}
+	
+/*
+ * Internal function used to setup the dashboard view.
+ */	
+	private function display_dashboard()
+	{
+		$this->template->title = 'My dashboard';	
+		$primary = new View("auth/dashboard");
+		$primary->user = Auth::instance()->get_user();	
+		
+		$user_id = Auth::instance()->get_user()->id;
+		
+		$db = new Database;
+		$sites = $db->query("
+			SELECT sites_users.*, sites.subdomain, sites.site_id 
+			FROM sites_users 
+			JOIN sites ON sites_users.fk_site = sites.site_id
+			WHERE sites_users.fk_users = '$user_id'
+		");		
+		foreach($sites as $site)
+		{
+			$first	= text::random('numeric', 5);
+			$last	= text::random('numeric', 6);
+			$sites_array[$site->subdomain] = "$first$site->site_id$last";
+		}
+		$primary->sites_array = $sites_array;
+		
+		return $primary;
+	}
 
-
-	/*
-	 * Externally authenticate a user to edit their website
-	 * Uses token to validate user
-	 * no view
-	 */ 
+/*
+ * Externally authenticate a user to edit their website
+ * Uses token to validate user, then passes to appropriate website.
+ */ 
 	public function manage()
 	{
 		if(! empty($_GET['tKn']) )
@@ -79,63 +104,64 @@ class Auth_Controller extends Template_Controller {
 			$user	= ORM::factory('user')->where('token', $token)->find();
 			
 			# if token does not match any user...
-			if( empty($user->username) ) url::redirect();
+			if( empty($user->username) )
+				url::redirect();
 			
 			# Log user in ONLY IF site ids match (user is attached to this site)
-			if($user->client_site_id == $this->site_id)
+			if(Auth::instance()->can_edit($this->site_id, $user->id))
 				Auth::instance()->force_login($user->username);
 
 			url::redirect();
 		}
-		else
+		elseif(! empty($_GET['site']) )
 		{
 			/*
 			 * Execute "Edit Website" link on client dashboard (auth/index).
 			 * This is pretty safe since the link will only
 			 * build the auth token link to the website owned by the logged in user
 			 */
+			valid::id_key($_GET['site']);
+			if(! $this->client->logged_in() )
+				die('Please login');
 			
-			if(! $this->client->logged_in() ) die();
+			# get the real site_id using the correct offsets
+			$site_id		= (string) $_GET['site'];
+			$site_id		= substr($site_id, 5);
+			$length			= strlen($site_id) - 6;
+			(int)$site_id	= substr($site_id, 0, $length);	
+			$token			= $this->client->get_user()->token;	
 			
-			$user	= $this->client->get_user()->username;	
-			$token	= $this->client->get_user()->token;	
+			$db = new Database;
+			$site = $db->query("
+				SELECT subdomain 
+				FROM sites 
+				WHERE site_id = '$site_id'
+			")->current();
 			
-			$user_site = "http://$user.".ROOTDOMAIN."/get/auth/manage?tKn=$token";
+			if(! is_object($site) )
+				die('invalid input');
+				
+			$user_site = "http://$site->subdomain.". ROOTDOMAIN ."/get/auth/manage?tKn=$token";
 			url::redirect($user_site);
 		}
-	
+		die();
 	}
 	
-	/*
-	 * Create a new user account (creates website as well)
-	 */	 
+	
+/*
+ * Create a new user account + website. Website has username as sitename
+ */	 
 	public function create()
 	{
-		if('jade' != $this->site_name) url::redirect();
+		if(ROOTACCOUNT != $this->site_name)
+			url::redirect();
 	
-		$this->template->title = 'Create Account';		
-		$primary = new View("auth/create_user");
-
-		# setup and initialize your form field names
-		$form = array(
-			'beta'		=> '',
-			'email'		=> '',
-			'username'	=> '',
-			'password'	=> '',
-			'password2'	=> '',
-		);	
-		#  copy the form as errors, so the errors will be stored with keys corresponding to the form field names
-		$errors = $form;
-		
-		if($_POST AND 'DOTHEDEW' != $_POST['beta'])
+		if($_POST)
 		{
-			$primary->error = 'The beta code is not valid';	
-		}
-		elseif ($_POST)
-		{			 
-			# Create new user
-			$user = ORM::factory('user');			
-			
+			# validate
+			if('DOTHEDEW' != $_POST['beta'])
+				$this->display_create('The beta code is not valid');
+
 			$post = new Validation($_POST);
 			$post->pre_filter('trim');
 			$post->add_rules('beta', 'required', 'valid::alpha_numeric'); 
@@ -143,105 +169,83 @@ class Auth_Controller extends Template_Controller {
 			$post->add_rules('username', 'required', 'valid::alpha_numeric');
 			$post->add_rules('password', 'required', 'matches[password2]', 'valid::alpha_dash');
 			
-			if ($post->validate())
+			if(! $post->validate() )
 			{
-				if ( ! $user->username_exists($_POST['username']))
-				{
-					# HACK function for creating token for users.
-					# GET THIS OUT OF HERE
-					function quick_token()
-					{
-						$db = new Database;
-						while (TRUE)
-						{
-							# Create a random token
-							$token = text::random('alnum', 32);
-
-							# Make sure the token does not already exist
-							if ($db->select('id')->where('token', $token)->get('users')->count() === 0)
-							{
-								# A unique token has been found
-								return $token;
-							}
-						}
-					}	
-					$_POST['token'] = quick_token();
-
-					# load vars to user table
-					foreach ($_POST as $key => $val)
-					{
-						# Set user data
-						if($key != 'password2' AND 'beta' != $key)
-							$user->$key = $val;
-					}
-					
-					# save user and save login role data
-					# this condition physically sets up the site
-					if ($user->save() AND $user->add(ORM::factory('role', 'login')))
-					{
-						# create data folder structure for site
-						$copy_data	= new Data_Folder;	
-						$source		= DOCROOT.'/data/_stock';
-						$dest		= DOCROOT."/data/{$_POST['username']}";			
-						
-						if($copy_data->dir_copy($source, $dest))
-						{
-							$db = new Database;
-							
-							# create db sites record
-							$data = array(
-								'subdomain'	=> $_POST['username'],
-								'theme'		=> 'base',		
-							);
-							$query = $db->insert('sites', $data);
-							$sites_insert_id = $query->insert_id();
-
-							# update users table to reflect new site id
-							$db->update('users', array('client_site_id' => "$sites_insert_id"), array('username' => "{$_POST['username']}"));
-
-							# create pages home record
-							$data = array(
-								'fk_site'	=> $sites_insert_id,
-								'page_name'	=> 'home',
-								'label'		=> 'Home',
-								'position'	=> '0',								
-							);
-							$query = $db->insert('pages', $data);
-
-							$data = array(
-								'fk_site'	=> $sites_insert_id,
-								'page_name'	=> 'about',
-								'label'		=> 'About',
-								'position'	=> '1',								
-							);
-							$query = $db->insert('pages', $data);
-							
-							# Log user in
-							Auth::instance()->login($user, $_POST['password']);
-								
-							# Take to user dashboard
-							url::redirect('get/auth');							
-						}
-						else
-							echo 'Unable to make data folder!'; #status message	
-
-					}
-				}
-				else
-					$primary->error = 'domain already exists';
-
-			}
-			else
-			{
-				# Errors				
+				$form = array(
+					'beta'		=> '',
+					'email'		=> '',
+					'username'	=> '',
+					'password'	=> '',
+					'password2'	=> '',
+				);	
+				# copy the form as errors, so the errors will be stored 
+				# with keys corresponding to the form field names
+				$errors = $form;
+				# send errors to display_create		
 				$errors	= arr::overwrite($errors, $post->errors('form_error_messages'));
-				$primary->error = $errors;			
-			}	
-		
-			$form	= arr::overwrite($form, $post->as_array()); 
-			$primary->values = $form;		
-		}
+				$primary->error = $errors;
+				$form	= arr::overwrite($form, $post->as_array()); 
+				$primary->values = $form;
+				
+				$this->display_create($errors);
+				die('im dead');
+			}
+			
+			# Create new user
+			$user = ORM::factory('user');	
+			$site_name = $_POST['username'];
+			
+			if($user->username_exists($site_name))
+				die('domain already exists');
+				
+			#TODO: EMAIL MUST ALSO BE UNIQUE so we pw_reset can work.
 
+			
+			# HACK function for creating token for users.
+			# GET THIS OUT OF HERE
+			function quick_token()
+			{
+				$db = new Database;
+				while (TRUE)
+				{
+					$token = text::random('alnum', 32);
+
+					# Make sure the token does not already exist
+					if ($db->select('id')->where('token', $token)->get('users')->count() === 0)
+						return $token;
+				}
+			}	
+			$_POST['token'] = quick_token();
+
+			# load vars to user table
+			foreach ($_POST as $key => $val)
+				if($key != 'password2' AND 'beta' != $key)
+					$user->$key = $val;
+		
+			# create new user with appropriate roles
+			if(!$user->save() OR !$user->add(ORM::factory('role', 'login')))
+				die('There was a problem creating a new user.');
+			
+			# create the website.
+			self::create_website($user->id, $site_name);
+			# Log user in
+			Auth::instance()->login($user, $_POST['password']);
+			# Take to user dashboard
+			url::redirect('get/auth');
+		}
+		
+		$this->display_create();
+	}
+
+/*
+ * Internal function used to setup the create view.
+ */	
+	private function display_create($errors=NULL)
+	{
+		$this->template->title = 'Create Account';		
+		$primary = new View("auth/create_user");
+		
+		$primary->errors = $errors;
 		#Javascript
 		$this->template->global_readyJS('
 			$("form input, form select").focus(function(){
@@ -249,149 +253,109 @@ class Auth_Controller extends Template_Controller {
 				$(this).addClass("input_focus");
 			});	
 		');
-		$this->template->primary = $primary;		
-			
-	}
-	
-	/*
-	 * destroy a complete site (only jade can access)
-	 * IMPORTANT: this should work with every database entry relating to the site. 
-	 * For now we specify only what we want to delete
-	 * enable user destory too (might remove later)	
-	 */
-	 
-	public function destroy($site_id = NULL, $site_name = NULL, $confirm = NULL)
-	{
-		if($this->site_name != 'jade') url::redirect();
-		if(!$this->client->logged_in(2)) url::redirect();	
-		
-		$db = new Database;	
-		$primary = new View('auth/destroy');
-		
-		if(!empty($site_id) AND empty($confirm))
-			$primary->confirm_link = '<a href="/get/auth/destroy/' . $site_id . '/' . $site_name . '/true">Are you sure??</a>';
-		
-		if(!empty($site_id) AND !empty($site_name) AND !empty($confirm))
-		{
-			# DELETE ALL DATABASE ENTRIES
-			$db->delete('users', array('client_site_id' => $site_id));		
-			$db->delete('pages', array('fk_site' => $site_id));
-			$db->delete('sites', array('site_id' => $site_id));
-			# do this for all db tables?
-			# NOTE (see the clean_db method in this class)
-		
-			# DELETE DATA FOLDER
-			$data_path = DATAPATH ."$site_name";
-			$directory = new Data_Folder;
-			
-			if($directory->rmdir_recurse($data_path))
-				echo 'Site destroyed! =('; #success message	 			
-			else
-				echo 'Unable to destory data folder'; #error message
-		
-		}		
-		$result = $db->query("SELECT site_id, url FROM sites");
-		$primary->sites = $result;
-		
 		$this->template->primary = $primary;
+		die($this->template);
 	}
 
 /*
- * Searches all tables for fk_site ids that no longer exist.
- * In order to work, all tables must have fk_site fields
- * And must have id field named "id"
- * Only one exception @ pages_tools where id = guid
- */
-	function clean_db()
+ * View enabling the creation of another website for the currently logged in user.
+ */	
+	public function new_website()
 	{
-		$db = new Database;
-		$primary = new View('auth/clean_db');
-		$site_ids = array();
-		$table_names = array();
-		$protected_tables = array(
-			'contact_types',
-			'roles',
-			'roles_users',
-			'sites',
-			'themes',
-			'tools_list',
-			'users',
-			'user_tokens',
-		);
-		
-		# Get all tables from database
-		$all_tables = $db->query("SHOW TABLES from plusjade");
-		$all_tables->result(FALSE);		
-		foreach($all_tables as $table)
+		if($_POST)
 		{
-			$name = $table['Tables_in_plusjade'];
-			$table_names[$name] = $name;
-		}
+			$site_name = trim($_POST['site_name']);
+			$site_name = valid::filter_php_url($_POST['site_name']);	
 		
-		# Remove protected Tables
-		foreach ($protected_tables as $table)
-		{
-			if(! empty($table_names[$table]) )
-				unset($table_names[$table]);
-		}	
-		
-		#troubleshoot
-		#echo'<pre>'; print_r($table_names);echo '</pre>'; die();
-		
-		# Get all site ids
-		$sites = $db->query("SELECT site_id FROM sites");	
-		foreach($sites as $site)
-		{
-			$site_ids[] = $site->site_id;
-		}
-		$id_string = implode(',', $site_ids);
-		
-		# Id string to view for convenience
-		$primary->site_count = count($site_ids);
-		$primary->id_string = $id_string;
-
-		$results = array();
-		# Find all orphaned assets based on fk_site
-		foreach($table_names as $table)
-		{
-			$results[$table] ='';
-			$id = 'id';
-			if( 'pages_tools' == $table )
-				$id = 'guid';
-
-			$table_object = $db->query("SELECT fk_site 
-				FROM $table WHERE fk_site 
-				NOT IN ($id_string)
-			");		
+			# make sure this sitename does not exist
+			$db = new Database;
+			$site = $db->query("
+				SELECT subdomain
+				FROM sites 
+				WHERE subdomain = '$site_name'
+			")->current();
 			
-			if( $table_object->count() > 0 )
-			{
-				foreach($table_object as $row)
-				{
-					$results[$table] .= $row->$id . '<br>';
-				}
-				/*
-				 * If orphans exists,
-				 * run delete query on all rows having fk_site...
-				*/
-				$db->delete($table, array("fk_site" => "$row->fk_site") );
-				
-			}
-			else
-			{
-				$results[$table] = 'clean';
-			}
+			if(is_object($site))
+				die('sitename already exists');
+			
+			# Create the website
+			self::create_website($this->client->get_user()->id, $site_name);
+			# Display the dashboard
+			$primary = $this->display_dashboard();
+			$this->template->primary = $primary;
 		}
+		else
+			die();
+		
+	}
+
 	
-		$primary->results = $results;
-		$this->template->primary = $primary;
+/*
+ * Creates a new website instance for a particular user.
+ * user must already exist
+ * param $user_id = the user this site will belong to
+ * param $site_name = the name of the new website.	
+ */
+	private static function create_website($user_id, $site_name)
+	{
+		# make sure we always know the site_name does not exist.
+		
+		# create data folder structure for site
+		$copy_data	= new Data_Folder;	
+		$source		= DATAPATH . '_stock';
+		$dest		= DATAPATH . $site_name;			
+		
+		if(! $copy_data->dir_copy($source, $dest) )
+			die('Unable to make data folder!'); #status message	
+
+		$db = new Database;
+
+		# create db sites record
+		$data = array(
+			'subdomain'	=> $site_name,
+			'theme'		=> 'base',		
+		);
+		$site_id = $db->insert('sites', $data)->insert_id();
+	
+		# create sites_users record so this user can edit this site.
+		$data = array(
+			'fk_users' => "$user_id",
+			'fk_site' => "$site_id"
+		);
+		$db->insert('sites_users', $data);
+			
+		# create home page
+		$data = array(
+			'fk_site'	=> $site_id,
+			'page_name'	=> 'home',
+			'label'		=> 'Home',
+			'position'	=> '0',
+			'menu'		=> 'yes',									
+		);
+		$query = $db->insert('pages', $data);
+		
+		# create about page
+		$data = array(
+			'fk_site'	=> $site_id,
+			'page_name'	=> 'about',
+			'label'		=> 'About',
+			'position'	=> '1',
+			'menu'		=> 'yes',								
+		);
+		$query = $db->insert('pages', $data);
+		
+		return TRUE;
 	}
 	
-
-
+/*
+ * Change the password of the current logged in user
+ */
 	function change_password()
 	{
 		$this->template->title = 'Change Password';
+		$primary = new View('auth/change_password');
+		$primary->success = FALSE;
+		$primary->error = '';
 		
 		if($_POST)
 		{
@@ -404,35 +368,55 @@ class Auth_Controller extends Template_Controller {
 			if($old_password == $auth->get_user()->password)
 			{
 				if( $auth->get_user()->change_password($_POST, $save = TRUE) )
-				{
-					$primary = new View('auth/change_success');
-				}
+					$primary->success = TRUE;
 				else
-				{
-					$primary = new View('auth/change_password');
-					$primary->status = 'New Password Error';
-				}
+					$primary->error = 'New Password Error';
 			}
 			else
-			{
-				$primary = new View('auth/change_password');
-				$primary->status =  'Old password is incorrect';
-			}
-		}
-		else
-		{
-			$primary = new View('auth/change_password');			
+				$primary->error = 'Old password is incorrect';
 		}
 
 		$this->template->primary = $primary;
 	}
-
 	
+/*
+ * Reset the password and send email instructions to a given user.
+ */
+	public function reset_password()
+	{
+		if($_POST)
+		{
+			$email = $_POST['email']; 
+			if(!valid::email($email))
+				die('email is not valid');
+				
+			$db = new Database;
+			$user_db = $db->query("
+				SELECT id, username
+				FROM users 
+				WHERE email = '$email'
+			")->current();
+			
+			if(! is_object($user_db))
+				die('This email does not exist in our records.');
+				
+			# Load the user model	
+			$user = ORM::factory('user', $user_db->id);
+			
+			$new_password = text::random('alnum', 10);
+			$user->password = $new_password;
+			
+			if($user->save())
+				die("new password has been generated: $user->username: $new_password");
+		
+			# Remember to send the email!!!
+		}
+		die();
+	}
 	
-	/**
-	 * log user out by destroying the session
-	 */
-	 
+/**
+ * log user out by destroying the session
+ */ 
 	function logout()
 	{
 		Auth::instance()->logout();

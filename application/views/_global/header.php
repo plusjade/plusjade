@@ -3,7 +3,7 @@ if( empty($this->banner) )
 {
 	?>
 	<div id="text_logo">
-		<a href="<?php echo url::site()?>"><?php echo $site_name?></a>
+		<a href="<?php echo url::site()?>"><?php echo $this->site_name?></a>
 	</div>
 	<?php
 }

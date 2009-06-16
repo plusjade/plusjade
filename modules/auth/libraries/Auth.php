@@ -93,14 +93,31 @@ class Auth_Core {
 	 * can edit this site.
 	 *
 	 * @param   string   role name
+	   user = user object
 	 * @return  boolean
+	 
+	  the user_id is useful for passing an id of someone not currently logged in
+	  but need to make sure he has access to a site.
 	 */
-	public function can_edit($site_id, $role = NULL)
+	public function can_edit($site_id, $user_id=NULL, $role = NULL)
 	{
-		if(! $this->driver->logged_in($role)
-			OR $this->get_user()->client_site_id != $site_id )
-				die('You do not have permission to edit this site.');
+		if(NULL == $user_id AND !$this->driver->logged_in($role) )
+			return FALSE;
 		
+		$user_id = (NULL == $user_id) ? $this->get_user()->id : $user_id;
+			
+		#HACK- fix this later. check if user can edit this site.
+		$db = new Database; 
+		$sites = $db->query("
+			SELECT * 
+			FROM sites_users 
+			WHERE fk_users = '$user_id'
+			AND fk_site = '$site_id'
+		")->current();
+
+		if(empty($sites->fk_users))
+			return FALSE;
+			
 		return TRUE;
 	}	
 	

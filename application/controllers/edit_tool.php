@@ -11,8 +11,7 @@ abstract class Edit_Tool_Controller extends Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		if(! $this->client->logged_in()
-			OR $this->client->get_user()->client_site_id != $this->site_id )
+		if(! $this->client->can_edit($this->site_id) )
 		{
 			# hack for allowing swfupload to work in authenticated session...
 			# leave this here to minimize this to edit_tools only.
@@ -126,7 +125,7 @@ abstract class Edit_Tool_Controller extends Controller {
 			if( !is_object($parent) )
 				die();
 
-			$primary = new View("edit_$toolname/new_item");			
+			$primary = new View("edit_$toolname/add_item");			
 			$primary->tool_id = $parent->id;
 		}
 		return $primary;		
@@ -140,7 +139,7 @@ abstract class Edit_Tool_Controller extends Controller {
  */
 	function _view_add_single($toolname, $tool_id)
 	{
-		$primary = new View("edit_$toolname/new_item");
+		$primary = new View("edit_$toolname/add_item");
 		$primary->tool_id = $tool_id;
 		$primary->js_rel_command = "update-$toolname-$tool_id";
 		return $primary;

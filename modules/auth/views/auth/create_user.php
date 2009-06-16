@@ -1,14 +1,5 @@
 
-<?php
-$errors = '';
-	
-if(! empty($error) )
-	if( is_array($error) )
-		foreach($error as $error)
-			$errors .= $error.'<br>';
-	else
-		$errors .= $error;
-	
+<?php	
 	if (empty($values['beta'])) $values['beta'] = '';
 	if (empty($values['username'])) $values['username'] = '';
 	if (empty($values['email'])) $values['email'] = '';
@@ -20,8 +11,15 @@ if(! empty($error) )
 
 <form action="" method="POST">	
 	<div id="auth_form" class="create_form">
-		<b><?php echo $errors?></b>
-		
+		<?php
+			
+			if(is_array($errors))
+				foreach($errors as $error)
+					echo "<p>$error</p>";
+			else
+				echo "<b>$errors</b>";
+		?>
+
 		<div class="fieldsets">
 			<b>Beta Code</b><br>
 			<input type="text" name="beta" value="<?php echo $values['beta']?>" class="full" maxlength="50">
