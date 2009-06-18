@@ -52,7 +52,8 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		")->current()->highest;
 
 		# Setup image store directory
-		$image_store = DOCROOT . "data/$this->site_name/assets/images/albums";			
+		
+		$image_store = Assets::dir_path('tools/albums');			
 		if(!is_dir($image_store))
 			mkdir($image_store);
 

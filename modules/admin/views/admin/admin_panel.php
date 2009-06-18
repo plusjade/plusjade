@@ -30,7 +30,7 @@
 		<li class="root_list dropdown">
 			<div>Files &#8595;</div>
 			<ul>
-				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/tool" rel="facebox">(not live)</a></li>
+				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/files" rel="facebox">Manage</a></li>
 			</ul>
 		</li>		
 		<li class="root_list floatright">

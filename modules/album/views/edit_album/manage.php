@@ -13,7 +13,10 @@
 	
 	</div>
 </div>
-
+<?php
+	#hack, take this out later
+	$url_path = Assets::url_path_direct("tools/albums/$album->id");
+?>
 <div id="sortable_images_wrapper">
 	<?php
 		foreach($items as $image)
@@ -21,7 +24,7 @@
 			?>
 			<div id="image_<?php echo $image->id?>">
 				<span>drag</span>
-				<img src="<?php echo url::site()?>data/<?php echo $this->site_name?>/assets/images/albums/<?php echo $album->id?>/sm_<?php echo $image->path?>" rel="<?php echo $image->id?>" height="100px" width="100px">	
+				<img src="<?php echo "$url_path/sm_$image->path"?>" rel="<?php echo $image->id?>" height="100px" width="100px">	
 			</div>
 			<?php
 		}				

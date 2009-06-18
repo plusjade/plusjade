@@ -64,6 +64,7 @@
 			$('#directory_window').attr('rel',klass);		
 			$('div.'+klass).show();
 			
+			// add the breadcrumb
 			if('ROOT' == path){
 				folder_string = '';
 				path = '';

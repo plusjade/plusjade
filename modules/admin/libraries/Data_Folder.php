@@ -2,6 +2,10 @@
  
 class Data_Folder_Core {
 
+
+/*
+ * Copies all files and folders in a directory to another directory
+ */
 	public function dir_copy($srcdir, $dstdir, $offset = '', $verbose = false)
 	{
 		//http://us2.php.net/manual/en/function.copy.php#86738
@@ -43,8 +47,11 @@ class Data_Folder_Core {
 		return TRUE;
 	}
 
-	# http://us2.php.net/manual/en/function.rmdir.php#88723
-	# remove a filled directory recursively
+	
+/*
+ * Remove a filled directory recursively
+ * DOCS: http://us2.php.net/manual/en/function.rmdir.php#88723
+ */
 	function rmdir_recurse($path)
 	{
 		$path = rtrim($path, '/').'/';
@@ -58,7 +65,7 @@ class Data_Folder_Core {
 			{
 				$fullpath = $path.$file;
 				if(is_dir($fullpath))
-					$this->rmdir_recurse($fullpath);
+					self::rmdir_recurse($fullpath);
 				else
 					unlink($fullpath);
 			}
@@ -71,16 +78,17 @@ class Data_Folder_Core {
 		else
 			return FALSE;
 	}
+	
+/*
+ * Original PHP code by Chirp Internet: www.chirp.com.au 
+ * Please acknowledge use of this code by including this header. 
+ * DOCS: http://www.the-art-of-web.com/php/dirlist/
 
-	 # Original PHP code by Chirp Internet: www.chirp.com.au 
-	 # Please acknowledge use of this code by including this header. 
-	 # DOCS: http://www.the-art-of-web.com/php/dirlist/
-	 /*
-	 $dir 		= full directory path to parse
-	 $parent	= the parent directory (set to root on first instance) 	
-	 $recurse	= true to recurse all subdirectories
-	 $omit 		= any directory name you wish to omit
-	 */
+ $dir 		= full directory path to parse
+ $parent	= the parent directory (set to root on first instance) 	
+ $recurse	= true to recurse all subdirectories
+ $omit 		= any directory name you wish to omit
+ */
 	 static function get_file_list($dir, $parent = 'root', $recurse=false, $omit = null) 
 	 { 
 		$retval = array(); 	
@@ -108,6 +116,40 @@ class Data_Folder_Core {
 		 return $retval; 
 	}
 
+	
+	 function show_dir_contents($full_dir, $omit = null) 
+	 { 
+		$retval = array(); 	
+		# add trailing slash if missing 	
+		if(substr($full_dir, -1) != "/") $full_dir .= "/"; 	
+		# open pointer to directory and read list of files 
+		$d = @dir($full_dir) or die("get_file_list: Failed opening directory $full_dir for reading");
+		
+		$stock_dir = Assets::dir_path();
+		$short_dir = str_replace("$stock_dir/", '', $full_dir);
+		$short_dir = str_replace('/', ':', $short_dir);
+		
+		while(false !== ($entry = $d->read())) 
+		{ 
+			# skip hidden files and any omissions
+			if($entry[0] == ".") continue;
+			if(!empty($omit))
+				if($entry == "$omit") continue;
+				
+			if(is_dir("$full_dir$entry")) 
+			{
+				$retval["$short_dir$entry"] = "folder|$entry"; 
+			} 
+			elseif( is_readable("$full_dir$entry") && $entry != 'Thumbs.db' ) 
+				$retval["$short_dir$entry"] = "file|$entry";	 
+		 } 
+		 $d->close(); 
+		 #ksort($retval, SORT_STRING);
+		 asort($retval);
+		 return $retval; 
+	}
+	
+
 	 function get_files_flat($dir, $recurse=false) 
 	 { 
 		$retval = array(); 	
@@ -132,6 +174,8 @@ class Data_Folder_Core {
 		 return $retval; 
 	}
 
+	
+	
 	 static function get_dir_only($dir, $recurse=false) 
 	 { 
 		$retval = array(); 	
@@ -151,6 +195,8 @@ class Data_Folder_Core {
 		 return $retval; 
 	}
 
+	
+	
 	/*
 	$array			array 	main array to be made into a tree
 	$css_class			string	classname appended to each filename

@@ -1,14 +1,3 @@
-<style type="text/css">
-#editable_wrapper{
-	border:1px solid red;
-}
-#show_edit{
-
-}
-#show_html{
-	display:none;
-}
-</style>
 
 <?php echo form::open_multipart("edit_text/add/$item->id", array('class' => 'ajaxForm', 'rel'=>"$js_rel_command"))?>
 
