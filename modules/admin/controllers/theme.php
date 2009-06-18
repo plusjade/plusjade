@@ -84,12 +84,13 @@ class Theme_Controller extends Controller {
 		$primary = new View("theme/logo");
 		
 		# Get all uploaded Logos
-		$upload_path = DOCROOT."/data/$this->site_name/assets/images/banners";		
-		$img_path	= url::site("data/$this->site_name/assets/images/banners");
-		if(is_dir($upload_path))
+		$dir_path	= Assets::dir_path('banners');
+		$url_path	= Assets::url_path('banners');	
+		
+		if(is_dir($dir_path))
 		{
 			$saved_banners = array();
-			$dir = opendir("$upload_path");
+			$dir = opendir($dir_path);
 			while (TRUE == ($file = readdir($dir))) 
 			{
 				$key = explode('.', $file);
@@ -98,7 +99,7 @@ class Theme_Controller extends Controller {
 					$saved_banners[$key] = $file;
 			}
 			$primary->saved_banners = $saved_banners;
-			$primary->img_path = $img_path;
+			$primary->img_path = $url_path;
 			die($primary);
 		}
 		die('Banner directory does not exist.');
@@ -121,7 +122,7 @@ class Theme_Controller extends Controller {
 		$ext		= $image->__get('ext');
 		$image_name = basename($filename).'_ban.'.$ext;
 		
-		$image->save(DOCROOT . "data/$this->site_name/assets/images/banners/$image_name");
+		$image->save(DOCROOT . "data/$this->site_name/assets/banners/$image_name");
 	 
 		# Remove the temporary file
 		unlink($filename);
@@ -161,7 +162,7 @@ class Theme_Controller extends Controller {
 		if(empty($_POST['delete_logo']))
 			die('nothing sent');
 
-		$img_path = DOCROOT."data/$this->site_name/assets/images/banners/{$_POST['banner']}";
+		$img_path = DOCROOT."data/$this->site_name/assets/banners/{$_POST['banner']}";
 		if(file_exists($img_path))
 		{
 			if(unlink($img_path))

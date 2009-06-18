@@ -246,6 +246,7 @@
                 visible : true,
                 exec    : function()
                 {
+					//alert('working'); return false;
                     if ( $.browser.msie )
                         this.editorDoc.execCommand('insertImage', true, null);
                     else
@@ -368,7 +369,16 @@
                 }
             }
 	
-			$('textarea.render_html').hide();		
+	
+			/*
+				Setup all the html stuff.
+				Change the render_html class name so subsequent calls to
+				this method do not duplicate the html.
+			
+			
+			*/
+			$('textarea.render_html').removeClass('render_html').addClass('initiliazed');
+			$('textarea.initiliazed').hide();					
             var panel = this.panel = $('<ul></ul>').addClass('panel');
 
             this.appendControls();
@@ -388,10 +398,11 @@
 			.wrap('<div id="editable_wrapper"></div>')
 			.wrap('<div id="show_html" class="editor_pane"></div>');
 			
-			var name = $('textarea.render_html').attr('name');
+			var name = $('textarea.initiliazed').attr('name');
 			
 			$('#editable_wrapper')
 			.prepend(this.element)
+			.append('<div id="show_files" class="editor_pane"></div>')
 			.before('<ul class="ui-tabs-nav generic_tabs"> \
 					<div class="field_title">'+ name +'</div> \
 					<li><a href="#" class="show_edit">Edit</a><li>\
@@ -418,44 +429,79 @@
 
             if ( this.options.autoSave )
                 $('form').submit(function() { self.saveContent(); });
-
+			
+			
+			
+			
+			/* additional functionality ... */
+			
             $('.reset').bind('click', function()
             {
                 self.setContent( self.initialContent );
                 self.saveContent();
 				return false;
-            });		
+            });	
+			
 			// update edit view
             $('.show_edit').bind('click', function()
             {
 				$('div.editor_pane').hide();
 				$('#show_edit').show();
-				content = $('textarea.render_html').val();
+				content = $('textarea.initiliazed').val();
                 self.setContent(content);
 				self.saveContent();
 				return false;
             });
+			
 			// show html view
             $('.show_html').bind('click', function()
             {
 				$('div.editor_pane').hide();
 				$('#show_html').show();
-				$('textarea.render_html').show();
+				$('textarea.initiliazed').show();
 				self.saveContent();
 				return false;
             });
+			
+			// show FILES browser
+            $('.show_files').bind('click', function()
+            {
+				$('div.editor_pane').hide();
+				$('#show_files').show();
+				self.saveContent();
+				return false;
+            });	
+			
 			// add custom stuff to the editor
             $('.insert_html').bind('click', function()
             {
 				divId = $(this).attr('rel');
 				$('div.editor_pane').hide();
 				$('#show_edit').show();
-				old_content = $('textarea.render_html').val();
+				old_content = $('textarea.initiliazed').val();
 				custom = $('div#'+ divId).html();
 				self.setContent(old_content + custom);
 				self.saveContent();
 				return false;
-            });			
+            });
+			
+
+			// Load the files browser.
+			$('#show_files').load('/get/files').hide();
+	
+
+			// Activate "place_file" command in files browser.
+			$('#show_files').click($.delegate({
+				'a.place_file':function(e){
+					$('div.editor_pane').hide();
+					$('#show_edit').show('fast',function(){
+						self.editorDoc.execCommand('insertImage', false, e.target.href);
+						self.saveContent();
+					});
+					return false;
+				}
+			
+			}));
         },
 
         initFrame : function()

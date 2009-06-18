@@ -14,10 +14,11 @@ class Blog_Controller extends Controller {
    */
 	function _index($tool_id)
 	{
-		$blog_page_name = uri::easy_segment('1');
-		$action	= uri::easy_segment('2');
-		$value	= uri::easy_segment('3');
-		$value2	= uri::easy_segment('4');
+		$url_array		= uri::url_array();
+		$blog_page_name = $this->get_page_name(@$url_array['0'], $tool_id);
+		$action			= @$url_array['1'];
+		$value			= @$url_array['2'];
+		$value2			= @$url_array['3'];
 		
 		/*
 		 * need the parent to setup appropriate views and user-specific settings
@@ -95,13 +96,15 @@ class Blog_Controller extends Controller {
 	function _single_post($url=NULL, $id=NULL)
 	{
 		$content = new View("public_blog/single");
-		
+		$page_name = uri::easy_segment('1');
 		$field = 'url';
+		
 		if(NULL !== $id)
 		{
 			$field	= 'id';
 			$url	= $id;
-		}	
+		}
+		
 		$item = $this->db->query("
 			SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
 			GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string
@@ -117,8 +120,7 @@ class Blog_Controller extends Controller {
 		
 		$content->item = $item;	
 		$content->comments = $this->_get_comments($item->id, $item->parent_id);
-		$content->blog_page_name = uri::easy_segment('1');
-		
+		$content->blog_page_name = $this->get_page_name($page_name, $item->parent_id);
 		return $content;
 	}
 
@@ -195,6 +197,7 @@ class Blog_Controller extends Controller {
 	function _get_comments($post_id=NULL, $tool_id = NULL)
 	{
 		$content = new View('public_blog/comments');
+		$page_name = uri::easy_segment('1');
 		
 		if(NULL == $tool_id)
 		{
@@ -216,7 +219,7 @@ class Blog_Controller extends Controller {
 		$content->comments = $comments;
 		$content->item_id = $post_id;
 		$content->tool_id = $tool_id;
-		$content->blog_page_name = uri::easy_segment('1');
+		$content->blog_page_name = $this->get_page_name($page_name, $tool_id);
 		
 		# Javascript 
 		# TODO: this is being duplicated on all posts,
@@ -309,6 +312,32 @@ class Blog_Controller extends Controller {
 		return $comments;	
 	}
 
+/*
+ * protected pages must maintain their page_name path
+ * especially in cases of ajax requests
+ # quick hack, optimize later...
+ # we can probably do this using pages_config.yaml
+ */
+	private function get_page_name($page_name, $tool_id)
+	{
+		if('get' != $page_name)
+			return $page_name;
+			
+		# get tools_list id of the tool from db ...
+		$tool = 9; #id of tools_list
+		$db = new Database;
+		$page = $db->query("
+			SELECT pages.page_name
+			FROM pages_tools
+			JOIN pages ON pages_tools.page_id = pages.id
+			WHERE pages_tools.fk_site = '$this->site_id'
+			AND pages_tools.tool = '$tool'
+			AND pages_tools.tool_id = '$tool_id'
+		")->current();			
+		
+		return $page->page_name;
+	}
+	
 /*
  * page builders frequently use ajax to update their content
  * common method for handling ajax requests.

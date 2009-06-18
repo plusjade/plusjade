@@ -32,20 +32,21 @@ class Album_Controller extends Controller {
 			return $this->public_template('(no images)', 'album', $tool_id);
 
 		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
-		$img_path = 'http://' . ROOTDOMAIN . "/data/$this->site_name/assets/images/albums/$album->id";  
-
+		
+		$url_path = Assets::url_path_direct("tools/albums/$album->id");	
+		
 		$primary = new View('public_album/index');
-		$primary->display_view = $this->$display_view($images, $img_path);
+		$primary->display_view = $this->$display_view($images, $url_path);
 		$primary->view_name = $display_view;
 
 		return $this->public_template($primary, 'album', $tool_id);
 	}
 
-	private function lightbox($images, $img_path)
+	private function lightbox($images, $url_path)
 	{
 		$primary = new View('public_album/lightbox');
 		$primary->images = $images;
-		$primary->img_path = $img_path;
+		$primary->img_path = $url_path;
 		$primary->add_root_js_files('lightbox/lightbox.js');
 		return $primary;
 	}

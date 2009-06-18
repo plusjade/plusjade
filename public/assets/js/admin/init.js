@@ -267,7 +267,6 @@ $(document).ready(function()
 
 				if( 'undefined' == typeof(action) ) {
 					// TODO: find something good to put here
-					// if no rel attribute specified ...
 					$('#show_response_beta').html(data);
 					alert('this form had no rel attribute');
 				} else {
@@ -304,12 +303,12 @@ $(document).ready(function()
 		// expand/contract the wysiwg editor
 		// TODO: clean this up later
 		var height = (300 > (getPageHeight()- 300)) ? 170 : getPageHeight()- 250;
-		$('.facebox form div.wysiwyg, .facebox form textarea.render_html, .facebox form textarea.render_css').css('min-height', height);
+		$('.facebox form div.wysiwyg, .facebox form textarea.initiliazed, .facebox form textarea.render_css').css('min-height', height);
 		$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
 		
 		$(window).resize(function(){
 			height = (300 > (getPageHeight()- 300)) ? 170 : getPageHeight()- 250;		
-			$('.facebox form div.wysiwyg, .facebox form textarea.render_html, .facebox form textarea.render_css').css('min-height', height);
+			$('.facebox form div.wysiwyg, .facebox form textarea.initiliazed, .facebox form textarea.render_css').css('min-height', height);
 			$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
 		});
 	});
