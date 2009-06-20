@@ -5,51 +5,52 @@
 		<button type="submit" id="add_page_submit" name="add_page" class="jade_positive">Add Page</button>
 		<div id="common_title">Add New Page</div>
 	</div>	
-
-	<div id="new_page_wrapper" class="fieldsets big">
-
-		<div class="pane_left">
-			<b>Page Label</b>
-			<br><input id="" type="text" name="label" value="" rel="text_req" maxlength="50" style="width:330px">
-			<br><br>
-			<b>Page Link</b>
-			<br><input type="text" name="page_name" maxlength="50" style="width:330px">
-			<div id="page_exists" class="aligncenter error_msg"></div>
-		
-			<p style="line-height:1.6em">
-				Add to Main Menu?
-				<br><input type="checkbox" name="menu" value="yes"> Yes!
-			</p>
-		</div>
-		
-		<div class="pane_right">		
-			<?php
-			$slash = '/'; # add slash if not a root page.
-			if(! empty($page_builders) )
-			{
-				$slash = '';
-				?>
-				<div class="root_options">
-					Install Page Builder?<br><br>
-					<select name="page_builder">
-						<option value="0">none - (blank page)</option>
-						<?php 
-						foreach($page_builders as $tool)
-							echo "<option value='$tool->id'>$tool->name</option>";
-						?>
-					</select>	
-				</div>
-				<?php
-			}
+		<?php
+		$slash = '/'; # add slash if not a root page.
+		if(! empty($page_builders) )
+		{
+			$slash = '';
+			/*
 			?>
-		</div>
-		
-	</div>
-	
+			<div class="root_options">
+				Install Page Builder?<br><br>
+				<select name="page_builder">
+					<option value="0">none - (blank page)</option>
+					<?php 
+					foreach($page_builders as $tool)
+						echo "<option value='$tool->id'>$tool->name</option>";
+					?>
+				</select>	
+			</div>
+			<?php
+			*/
+		}
+		?>
 	<div id="new_page_url">
 		Your new page URL:
 		<br><b><?php echo url::site()."$directory$slash"?><span id="link_example">...</span></b>
 	</div>	
+	
+	<div class="common_left_panel">		
+
+	</div>
+	
+	<div class="common_main_panel fieldsets big">
+
+		<b>Page Label</b>
+		<br><input id="" type="text" name="label" value="" rel="text_req" maxlength="50" style="width:330px">
+		<br><br>
+		<b>Page Link</b>
+		<br><input type="text" name="page_name" maxlength="50" style="width:330px">
+		<div id="page_exists" class="aligncenter error_msg"></div>
+	
+		<p style="line-height:1.6em">
+			<b>Add to Main Menu?</b>
+			<br><input type="checkbox" name="menu" value="yes"> Yes!
+		</p>
+		
+	</div>
+	
 	<input type="hidden" name="directory" value="<?php echo $directory?>">
 </form>	
 

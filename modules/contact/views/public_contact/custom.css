@@ -4,21 +4,21 @@
 }
 #contact_wrapper_++ div.contact_item{
 	clear:both;
-	overflow:auto;
+	overflow:hidden;
 }
-#contact_wrapper_++ div.contact_wrapper div.contact_icon{
+#contact_wrapper_++ div.contact_item div.contact_icon{
 	float:left;
 	text-align:center;
 	padding:0 10px;
 }
-#contact_wrapper_++ div.contact_wrapper div.contact_view{
+#contact_wrapper_++ div.contact_item div.contact_view{
 	float:left;
 }
-#contact_wrapper_++ div.contact_wrapper div.contact_name{
+#contact_wrapper_++ div.contact_item div.contact_name{
 	font-weight:bold;
 }
 
-#contact_wrapper_++ div.contact_wrapper .contact_value{
+#contact_wrapper_++ div.contact_item .contact_value{
 
 }	
 

@@ -105,7 +105,11 @@ class Edit_Contact_Controller extends Edit_Tool_Controller {
 		die($primary);
 
 	}
-	
+
+	public function settings()
+	{
+		die('Contact settings is currently disabled.');
+	}
 /*
  * DELETE single contact
  * Success Response via JGrowl

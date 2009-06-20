@@ -54,12 +54,13 @@ class Css_Controller extends Controller {
 	}
 	
 /*
- * load admin_globa.css & all admin css from all tools. 
+ * load admin_global.css & all admin css from all tools. 
  * and load it as one file. useful when in admin mode
  */
 	function admin()
 	{
-		$this->client->can_edit($this->site_id);
+		if(!$this->client->can_edit($this->site_id))
+			die('Please login');
 		
 		header("Content-type: text/css");
 		header("Pragma: public");
@@ -98,11 +99,12 @@ class Css_Controller extends Controller {
  */
 	function edit($name_id=NULL, $tool_id=NULL)
 	{
-		$this->client->can_edit($this->site_id);
+		if(!$this->client->can_edit($this->site_id))
+			die('Please login');
 		valid::id_key($name_id);	
 		valid::id_key($tool_id);		
 		
-		$css_file_path = DOCROOT."data/$this->site_name/tools_css";
+		$css_file_path = DATAPATH . "$this->site_name/tools_css";
 		$db = new Database;
 		$tool = $db->query("
 			SELECT LOWER(name) AS name 
@@ -124,7 +126,7 @@ class Css_Controller extends Controller {
 			die( Css::save_custom_css($tool->name, $tool_id, $_POST['contents'] ) );
 		}
 
-		$primary = new View('css/edit_single');			
+		$primary = new View('css/edit_file');			
 		$primary->contents	= Css::get_tool_css($tool->name, $tool_id);
 		$primary->stock		= Css::get_tool_css($tool->name, $tool_id, TRUE);
 		$primary->tool_id	= $tool_id;

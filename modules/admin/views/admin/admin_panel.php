@@ -37,7 +37,7 @@
 			<div><b><a class="toggle_admin_bar" href="#">Hide Admin</a></b></div>
 		</li>
 		<li class="root_list floatright">
-			<div><a href="/get/admin/logout">Logout</a></div>
+			<div><a href="/get/auth/logout">Logout</a></div>
 		</li>			
 		<li class="root_list floatright">
 			<div><a href="http://<?php echo ROOTDOMAIN ?>/get/auth">+Jade</a></div>

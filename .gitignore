@@ -9,12 +9,9 @@
 
 
 application/logs/*
-application/hooks/*
 application/config/database.php
-extend/*
 public/index.php
 public/.htaccess
-public/blog/*
 public/data/*
 public/assets/images/_upload*
 

@@ -8,6 +8,13 @@ class Files_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
+		if(! $this->client->can_edit($this->site_id) )
+		{
+			# hack for allowing swfupload to work in authenticated session...
+			# leave this here to minimize this to edit_tools only.
+			if( empty($_POST['PHPSESSID']) )
+				die('Please login');
+		}
 	}
 
 /*
@@ -17,38 +24,46 @@ class Files_Controller extends Controller {
 	public function index()
 	{
 		$dir	= Assets::dir_path();
-		$files	= Data_Folder::show_dir_contents($dir, $parent = 'root', FALSE);
+		$files	= self::folder_contents($dir);
 		
 		$primary = new View('files/index');
 		$primary->files = $files;
 		die($primary);
 	}
 /*
- * Show contents of a particular folder
- * Used for ajax calls.
- * $folder comes in data format: one.two.three
+ * Show contents of a particular folder. Used for ajax calls.
+ * $folder comes in data format: folder:sub-folder:sub-sub-folder
  */
 	public function contents($folder=NULL)
 	{
 		$folder	= str_replace(':', '/', $folder);
 		$dir	= Assets::dir_path($folder);		
-		$files	= Data_Folder::show_dir_contents($dir);
-		die( View::factory('files/folder', array('files'=>$files)) );
+		$files	= self::folder_contents($dir);
+		
+		$primary = new View('files/folder');
+		$primary->files = $files;
+		die($primary);
 	}
 
-	
+/*
+ * Add files to a specified folder in website asset repo.
+ * This outputs the view. self::upload handles the processing.
+ */	
 	public function add_files($directory=NULL)
 	{
-		$real_dir = str_replace(':', '/', $directory);
-		$full_path = Assets::dir_path($real_dir);
+		$real_dir	= str_replace(':', '/', $directory);
+		$full_path	= Assets::dir_path($real_dir);
 		if(!is_dir($full_path))
 			die('invalid directory');
-				
+
 		$primary = new View('files/add_files');
 		$primary->directory = $directory;
 		die($primary);
 	}
 
+/*
+ * Upload files to specified folder. Swf uploader uses this.
+ */	
 	public function upload($directory=NULL)
 	{
 		$directory = str_replace(':', '/', $directory);
@@ -56,8 +71,7 @@ class Files_Controller extends Controller {
 		if(!is_dir($full_path))
 			die('invalid directory');
 
-		
-		# validate for file size 5M and type (images)
+		# Do we have a file and is it > 9mb
 		if( empty($_FILES['Filedata']['type']) OR ( $_FILES['Filedata']['type'] > 90000 ) )
 			die('Invalid File');
 
@@ -66,10 +80,8 @@ class Files_Controller extends Controller {
 		if(isset($_POST["PHPSESSID"]))
 			session_id($_POST["PHPSESSID"]);
 
-		
-		$new_path = "$full_path/".$_FILES['Filedata']['name'];
-		
 		# place the file.
+		$new_path = "$full_path/".$_FILES['Filedata']['name'];
 		if(move_uploaded_file($_FILES['Filedata']['tmp_name'], $new_path))
 			die('File uploaded');
 		
@@ -121,7 +133,10 @@ class Files_Controller extends Controller {
 		
 		if(is_dir($full_path))
 		{
-			if(Data_Folder::rmdir_recurse($full_path))
+			if('tools' == $path)
+				die('Tools folder is required');
+				
+			if(Jdirectory::remove($full_path))
 				die('Folder deleted');
 				
 			die('Could not delete the folder.');
@@ -156,20 +171,19 @@ class Files_Controller extends Controller {
 	{
 		$filename = array_pop($url_array);
 		if(empty($filename) OR 'files' == $filename)
-			die('remember to do 404 not found');
+			die('remember to 404 not found');
 
 		$parsed_url = $url_array;
 		foreach($url_array as $key => $segment)
 			if(empty($segment) OR 'files' == $segment)
 				unset($parsed_url[$key]);
 	
-		$dir_string = '';
+		$dir_path = '';
 		if (0 < count($parsed_url))
-			$dir_string = implode('/', $parsed_url) . '/';
+			$dir_path = implode('/', $parsed_url) . '/';
 		
-		$dir_path = Assets::dir_path("$dir_string$filename");
-
-		
+		$dir_path = Assets::dir_path("$dir_path$filename");
+	
 		if(!file_exists($dir_path))
 			die('remember to do 404 not found');
 			
@@ -195,6 +209,40 @@ class Files_Controller extends Controller {
 			header("Content-Disposition: attachment; filename=$filename");
 			readfile($dir_path);				
 		}
+	}
+
+
+/*
+ * Similar to Jdirectory::contents but only gets contents of one folder/directory at a time.
+ * Builds the array differently for "file browser" specific data handling.
+ */ 
+	 private function folder_contents($full_dir, $omit = null) 
+	 { 
+		$retval = array(); 	
+		# add trailing slash if missing 	
+		if(substr($full_dir, -1) != "/")
+			$full_dir .= "/"; 	
+		# open pointer to directory and read list of files 
+		$d = @dir($full_dir) or die("show_dir_contents: Failed opening directory $full_dir");
+		
+		$stock_dir = Assets::dir_path();
+		$short_dir = str_replace("$stock_dir/", '', $full_dir);
+		$short_dir = str_replace('/', ':', $short_dir);
+		
+		while(false !== ($entry = $d->read())) 
+		{
+			# skip hidden files and any omissions
+			if( ($entry[0] == "." ) OR (! empty($omit) AND $entry == "$omit" ) )
+				continue;
+				
+			if(is_dir("$full_dir$entry")) 
+				$retval["$short_dir$entry"] = "folder|$entry"; 
+			else if( is_readable("$full_dir$entry") && $entry != 'Thumbs.db' ) 
+				$retval["$short_dir$entry"] = "file|$entry";	 
+		 } 
+		 $d->close(); 
+		 asort($retval);
+		 return $retval; 
 	}
 	
 } /* End of file /modules/admin/files.php */

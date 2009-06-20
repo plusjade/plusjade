@@ -1,34 +1,35 @@
 <?php
 class Page_Controller extends Controller {
 
-	/**
-	 *	Provides CRUD for pages 
-	 *	
-	 */
+/**
+ *	Provides CRUD for pages 
+ *	
+ */
 	
 	function __construct()
 	{
 		parent::__construct();
-		$this->client->can_edit($this->site_id);
+		if(!$this->client->can_edit($this->site_id))
+			die('Please login');
 	}
-	/*
-	 * show file-structure view of all pages
-	 *
-		**KEY: Variable logic used in this class
-		------------------------------------------
-		sample page_name : about/jade/skills
-			full_path	= about/jade/skills
-			directory	= about/jade
-			filename	= skills
-			
-			! note directory contains no trailing slash
-	 */
+/*
+ * show file-structure view of all pages
+ *
+	**KEY: Variable logic used in this class
+	------------------------------------------
+	sample page_name : about/jade/skills
+		full_path	= about/jade/skills
+		directory	= about/jade
+		filename	= skills
+		
+		! note directory contains no trailing slash
+ */
 	function index()
 	{
 		$db			= new Database;				
 		$primary	= new View("page/all_pages");		
 		$pages_data = $db->query("
-			SELECT id,page_name, menu, enable
+			SELECT id, page_name, menu, enable
 			FROM pages
 			WHERE fk_site = '$this->site_id'
 			ORDER BY page_name
@@ -54,9 +55,7 @@ class Page_Controller extends Controller {
 		}	
 		# troubleshooting...
 			#echo'<pre>';print_r($page_name_array);echo'</pre>';
-			#echo'<pre>';print_r($files_array);echo'</pre>';die();
-		
-			#---- 
+			#echo'<pre>';print_r($folders_array);echo'</pre>';die();
 		
 		# emulate file browsing interface
 		ob_start();
@@ -122,7 +121,7 @@ class Page_Controller extends Controller {
 			$directory = ( empty($_POST['directory']) ) ? 'ROOT' : $_POST['directory']; 
 			
 			# Validate page_name & duplicate check
-			$full_path = $filename = self::_validate_page_name($_POST['label'], $_POST['page_name'], $directory);
+			$full_path = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory);
 
 			if('ROOT' != $directory)
 				$full_path = "$directory/$filename";
@@ -196,7 +195,7 @@ class Page_Controller extends Controller {
 		# Javascript duplicatate_page name filter Validation
 		# -------------------------------
 		# get page_name filter for this path
-		$filter_array = self::_get_filename_filter($directory);
+		$filter_array = self::get_filename_filter($directory);
 
 		# convert filter_array to string to use as javascript array
 		$filter_string = implode("','",$filter_array);
@@ -234,11 +233,19 @@ class Page_Controller extends Controller {
 	{
 		$db = new Database;
 		foreach($_GET['page'] as $position => $id)
-			$db->update('pages', array('position' => "$position"), "id = '$id'"); 	
+			$db->update('pages', array('position' => "$position"), "id = '$id' AND fk_site = '$this->site_id'"); 	
 			
-		die('Sort Order Saved!'); # status response	
+		die('Page Sort Order Saved'); # success
 	}
 	
+/*
+ * Save the Main menu order to db
+ */		
+	public function load_menu()
+	{
+		die( View::factory('_global/menu') );
+	}
+
 	
 /*
  * DELETE single page from pages table
@@ -248,20 +255,62 @@ class Page_Controller extends Controller {
 	{
 		valid::id_key($page_id);
 		$db = new Database;		
+		# the page to be deleted.
 		$page = $db->query("
-			SELECT page_name FROM pages WHERE id='$page_id'
+			SELECT page_name
+			FROM pages
+			WHERE id='$page_id'
 		")->current();
+		
+		if(! is_object($page))
+			die('invalid page');
+		
+		$id_set = $page_id;
+		
 
+		# Get all pages to look for children.
+		$pages_data = $db->query("
+			SELECT id, page_name
+			FROM pages
+			WHERE fk_site = '$this->site_id'
+			ORDER BY page_name
+		");
+		$page_name_array = array();
+		$folders_array = array();
+		
+		# build page array
+		foreach($pages_data as $each_page)
+			$page_name_array[$each_page->page_name] = $each_page->id;
+	
+		# create array of all sub_directories	
+		foreach($page_name_array as $full_path => $data)
+		{
+			$node_array	= explode('/',$full_path);
+			$filename	= array_pop($node_array);
+			$directory	= implode('/', $node_array);
+
+			if( empty($directory) )
+				$directory = 'ROOT';
+			
+			$folders_array[$directory][$filename] = $data;
+		}	
+
+		# if this page contains children, we can delete them all.
+		# OR just not allow pages with children to be deleted.
+		if(array_key_exists($page->page_name, $folders_array))
+			die('A page must have no sub-pages before it can be deleted.');
+			#$id_set .= ','. implode(',', $folders_array[$page->page_name]);
+
+		
 		# if deleting a protected page
 		yaml::delete_value($this->site_name, 'pages_config', $page->page_name);
-		
-		$data = array(
-			'id'		=> $page_id,
-			'fk_site'	=> $this->site_id,		
-		);
-		$db->delete('pages', $data);
-		
-		die('Page deleted!!'); # success			
+
+		$db->query("
+			DELETE FROM pages
+			WHERE id IN ($id_set)
+			AND fk_site = '$this->site_id'
+		");
+		die('Page deleted.'); # success			
 	}
 
 	
@@ -277,7 +326,7 @@ class Page_Controller extends Controller {
 		{
 			# Validate page_name & duplicate check
 			$directory = ( empty($_POST['directory']) ) ? NULL : $_POST['directory']; 
-			$full_path = $filename = self::_validate_page_name($_POST['label'], $_POST['page_name'], $directory, $_POST['page_name']);
+			$full_path = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory, $_POST['page_name']);
 
 			if(! empty($directory) )
 				$full_path = "$directory/$filename";
@@ -291,58 +340,67 @@ class Page_Controller extends Controller {
 				'menu'		=> $_POST['menu'],
 				'enable'	=> $_POST['enable'],
 			);
-			$db->update('pages', $data, "id = '$page_id' AND fk_site = '$this->site_id' "); 			
+			$db->update(
+				'pages',
+				$data,
+				"id = '$page_id' AND fk_site = '$this->site_id'
+			"); 			
 
 			# if new page name & page is protected update the page_config file.
 			if($filename != $_POST['old_page_name'])
-			{
 				yaml::edit_value($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
+
+			# if this page was the homepage, update homepage value
+			if($this->homepage == $_POST['old_page_name'])
+			{
+				$db->update('sites', array('homepage' => $filename), "site_id = '$this->site_id'");
+				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $filename );
 			}
+
 			
 			die('Page Settings Saved'); # success				
 		}
-		else
+
+		$page = $db->query("
+			SELECT *
+			FROM pages
+			WHERE id = '$page_id' 
+			AND fk_site = '$this->site_id'
+		")->current();
+
+		if(! is_object($page) )
+			die('Page not found'); # error
+
+		$primary = new View("page/page_settings");	
+		$primary->page = $page;	
+		
+		# Is this a subpage?
+		$filename	= $page->page_name;
+		$directory	= '';
+		$directory_array = explode('/',$filename);
+		
+		if( 1 < count($directory_array) )
 		{
-			$page = $db->query("
-				SELECT * FROM pages
-				WHERE id = '$page_id' 
-				AND fk_site = '$this->site_id'
-			")->current();
-
-			if(! is_object($page) )
-				die('Page not found'); # error
-
-			$primary = new View("page/page_settings");	
-			$primary->page = $page;	
-			
-			# Is this a subpage?
-			$filename	= $page->page_name;
-			$directory	= '';
-			$directory_array = explode('/',$filename);
-			
-			if( 1 < count($directory_array) )
-			{
-				$filename	=  array_pop($directory_array);
-				$directory	= implode('/', $directory_array);
-			}
-			$primary->filename	= $filename;	
-			$primary->directory	= $directory;				
-			
-			# Javascript dup page_name filter Validation
-			$filter_array = self::_get_filename_filter($directory, $filename);
-
-			# convert filter_array to string to use as javascript array
-			$filter_string = implode("','",$filter_array);			
-			$primary->page_filter_js = "'$filter_string'";
-			
-			
-			# is page protected?
-			$primary->is_protected = FALSE;
-			if(yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
-				$primary->is_protected = TRUE;
-			
-			die($primary);
+			$filename	=  array_pop($directory_array);
+			$directory	= implode('/', $directory_array);
 		}
+		$primary->filename	= $filename;	
+		$primary->directory	= $directory;				
+		
+		# Javascript duplicate page_name filter Validation
+		$filter_array = self::get_filename_filter($directory, $filename);
+
+		# convert filter_array to string to use as javascript array
+		$filter_string = implode("','",$filter_array);			
+		$primary->page_filter_js = "'$filter_string'";
+		
+		
+		# is page protected?
+		$primary->is_protected = FALSE;
+		if(yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+			$primary->is_protected = TRUE;
+		
+		die($primary);
 	}
 
 
@@ -353,7 +411,7 @@ class Page_Controller extends Controller {
 	sanitizes characters
 	name is unique
  */	
-	function _validate_page_name($label, $page_name, $directory='ROOT', $omit=NULL)
+	private function validate_page_name($label, $page_name, $directory='ROOT', $omit=NULL)
 	{
 		$label = trim($label);
 		if( empty($label) )
@@ -367,13 +425,13 @@ class Page_Controller extends Controller {
 		$page_name = valid::filter_php_url($page_name);
 
 		# Validate Unique Page_name relative to page directory		
-		$filter_array = self::_get_filename_filter($directory, $omit);	
+		$filter_array = self::get_filename_filter($directory, $omit);	
 		if( in_array($page_name, $filter_array) )
 			die('Page name already exists');
 
 		return $page_name;
 	}
-		
+	
 /*
  * build filename filter array to protect current named pages-
  * -relative to the directory they belong to.
@@ -384,7 +442,7 @@ class Page_Controller extends Controller {
 				2. users/location/country/city/state		
 		without "%%" #2 will match.
 */
-	function _get_filename_filter($directory='ROOT', $omit=NULL)
+	private function get_filename_filter($directory='ROOT', $omit=NULL)
 	{
 		$db = new Database;
 		$directory = ( empty($directory) ) ? 'ROOT' : $directory;
@@ -426,35 +484,6 @@ class Page_Controller extends Controller {
 		return $filter_array;			
 		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
 	}
-		
-	
-/*
-	NOT USING
-	but still some good logic to refer to maybe?
-*/
-	function get_sub_filter($main_array, $full_path, $pointer=0)
-	{
-		$path_array		= explode('/', $full_path);
-		$count			= (count($path_array)-1);
-		$node			= $path_array[$pointer];
-		$current_path	= substr("$full_path",0,strpos($full_path,$node)+strlen($node));
-		
-		if( $count == $pointer )
-		{
-			$filter = '';
-			foreach($main_array[$full_path] as $name)
-				if(! is_array($name) )
-					$filter .= "'$name',";
-	
-			$filter = trim($filter, ',');
-			return $filter;
-			
-		}
-		else
-			get_sub_filter($main_array[$current_path], $full_path, ++$pointer);
-	}
-
-
 	
 }
 /* End of file page.php */

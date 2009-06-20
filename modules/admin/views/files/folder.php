@@ -24,11 +24,12 @@ foreach ($files as $path => $data)
 		
 		$display_name = ('10' < strlen($name)) ? substr($name, 0, 10).'...' : $name;
 		
-		$ext = substr(strrchr($name, "."), 1);
+		$ext = strtolower(substr(strrchr($name, "."), 1));
 		
 		$img = ((array_key_exists($ext, $image_types))) ?
 			"<img src=\"$url\" width=\"75\" height=\"75\" alt=\"\">"
 			: "<img src=\"/assets/images/admin/file.jpg\" width=\"75\" height=\"75\" alt=\"\">";
+		
 		?>
 		<div id="<?php echo $id?>" class="file_asset" rel="<?php echo $name?>">
 			<span class="icon cross">&nbsp; &nbsp; </span> 
@@ -40,9 +41,10 @@ foreach ($files as $path => $data)
 	}
 	else
 	{
+		$delete = ('tools' == $name AND 'tools' == $path) ? '' : '<span class="icon cross">&nbsp; &nbsp; </span> ';
 		?>
 		<div id="<?php echo $name?>" class="folder_asset" rel="<?php echo $path?>">
-			<span class="icon cross">&nbsp; &nbsp; </span> 
+			<?php echo $delete?>
 			<br><img src="/assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
 			<br><a href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
 		</div>

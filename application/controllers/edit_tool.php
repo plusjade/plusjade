@@ -18,9 +18,6 @@ abstract class Edit_Tool_Controller extends Controller {
 			if( empty($_POST['PHPSESSID']) )
 				die('Please login');
 		}
-		
-		# Controller variables
-		$this->site_data_dir = DATAPATH . "$this->site_name";
 	}
 	
 # ---------- GRABS
@@ -156,7 +153,7 @@ abstract class Edit_Tool_Controller extends Controller {
 	
 	function _view_edit_single($toolname, $item_id, $JOIN = '' )
 	{	
-		$primary	= new View("edit_$toolname/single_item");
+		$primary	= new View("edit_$toolname/edit_item");
 		$table		= $toolname.'s';
 		$item		= $this->_grab_tool_child($toolname, $item_id, $JOIN);
 
@@ -203,7 +200,7 @@ abstract class Edit_Tool_Controller extends Controller {
 		foreach($item_array as $position => $id)
 			$db->update($table, array('position' => "$position"), "id = '$id'"); 	
 		
-		return 'Sort Order Saved!!<br>Updating...'; # status response	
+		return 'Item sort order saved'; # success
 	}
 
 /*
@@ -220,7 +217,7 @@ abstract class Edit_Tool_Controller extends Controller {
 
 	public function __call($method, $id)
     {
-		die('non existent method');
+		die('non existent method for an edit_tool controller');
 	}
 	
-} # End Template_Controller
+} # End edit_tool_Controller

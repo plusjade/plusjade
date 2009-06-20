@@ -9,23 +9,23 @@ class yaml_Core {
 
 /* simple key = value functions for site_config */
 	
-	/*
-	 * Add or edit a key/value pair from a yaml file.
-	 */
+/*
+ * Add or edit a key/value pair from a yaml file.
+ */
 	public static function edit_site_value($site_name, $filename, $key, $new_value)
 	{
-		$config_path		= DATAPATH . "$site_name/protected/$filename.yaml";
+		$config_path		= DATAPATH . "$site_name/protected/$filename.yml";
 		$config_array		= self::parse_basic($site_name, $filename);		
 		$config_array[$key]	= $new_value;
 		return self::build_yaml_file($config_array, $config_path);
 	}
 
-	/*
-		parse the yaml file and return the key/value array
-	*/
+/*
+ * parse the yaml file and return the key/value array
+*/
 	public static function parse_basic($site_name, $filename)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		if( file_exists($config_path) )
 		{
 			$yaml_array		= array();
@@ -34,7 +34,7 @@ class yaml_Core {
 			
 			foreach($pages_config as $entry)
 			{
-				$pieces = explode('=', $entry);
+				$pieces = explode(':', $entry);
 				$key	= trim(@$pieces['0']);
 				$value	= trim(@$pieces['1']);		
 				$yaml_array[$key] = $value;
@@ -44,16 +44,16 @@ class yaml_Core {
 		return FALSE;	
 	}
 
-	/* regenerate and save edited yaml file
-	 * from an edited key/value array of values
-	 * should only be used internally
-	 */
+/* regenerate and save edited yaml file
+ * from an edited key/value array of values
+ * should only be used internally
+ */
 	private static function build_yaml_file($config_array, $config_path)
 	{
 		$contents = '';
 		foreach($config_array as $key => $value)
 			if(! empty($key) )
-				$contents .= "$key = $value ,\n";
+				$contents .= "$key : $value ,\n";
 
 		if(file_put_contents($config_path, $contents))
 			return TRUE;
@@ -68,12 +68,12 @@ class yaml_Core {
 	
 	
 
-	/*
-		parse the yaml file and return the key/value array
-	*/
+/*
+	parse the yaml file and return the key/value array
+*/
 	public static function parse($site_name, $filename)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		$yaml_array = array();
 		if( file_exists($config_path) )
 		{
@@ -96,7 +96,7 @@ class yaml_Core {
 
 	public static function parse_name($site_name, $filename)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		$yaml_array = array();
 		if( file_exists($config_path) )
 		{
@@ -115,7 +115,7 @@ class yaml_Core {
 	
 	public static function does_key_exist($site_name, $filename, $key)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		$protected_pages = self::parse($site_name, $filename);
 		
 		if( array_key_exists($key, $protected_pages) )
@@ -127,7 +127,7 @@ class yaml_Core {
 	
 	public static function add_value($site_name, $filename, $newline)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";	
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";	
 		if( file_exists($config_path) )
 		{
 			$fh = fopen($config_path, 'a') or die('cannot open file');
@@ -143,7 +143,7 @@ class yaml_Core {
 	
 	public static function edit_value($site_name, $filename, $old_value, $new_value )
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		
 		if(self::does_key_exist($site_name, $filename, $old_value))
 		{
@@ -157,7 +157,7 @@ class yaml_Core {
 	
 	public static function delete_value($site_name, $filename, $key)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yaml";	
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";	
 		if( file_exists($config_path) )
 		{
 			$config_array = self::parse($site_name, $filename);

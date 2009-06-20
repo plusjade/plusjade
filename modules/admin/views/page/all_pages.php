@@ -7,8 +7,7 @@
 	
 	<div class="common_left_panel">
 		<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/page/add" class="new_page">New Page</a>
-		<br>
-		<br>		
+		<br><br>		
 		<h3>Key</h3>
 		<small style="line-height:1.7em">
 			<span class="icon magnify">&nbsp; &nbsp; </span> Load page.
@@ -30,28 +29,6 @@
 
 <script type="text/javascript">
 	$('div.ROOT').show();
-
-	function strstr( haystack, needle, bool ) {
-		// http://kevin.vanzonneveld.net
-		// +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// +   bugfixed by: Onno Marsman
-		// *     example 1: strstr('Kevin van Zonneveld', 'van');
-		// *     returns 1: 'van Zonneveld'
-		// *     example 2: strstr('Kevin van Zonneveld', 'van', true);
-		// *     returns 2: 'Kevin '
-		var pos = 0;
-		haystack += '';
-		pos = haystack.indexOf( needle );
-		if( pos == -1 ){
-			return false;
-		} else{
-			if( bool ){
-				return haystack.substr( 0, pos );
-			} else{
-				return haystack.slice( pos );
-			}
-		}
-	}
 	
 	// assign click delegation
 	$('#page_browser_wrapper').click($.delegate({
@@ -74,7 +51,7 @@
 				el_count = folder_array.length;
 				var folder_string = '';				
 				for (i=0; i < el_count; i++){
-					result_string = strstr(path, folder_array[i], true) + folder_array[i];
+					result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
 					folder_string += ' &#8594 <a href="/'+ result_string +'" rel="'+ result_string +'" class="open_folder">'+ folder_array[i] +'</a>';
 				}
 			}
@@ -99,15 +76,21 @@
 		
 		// make img click execute as its parent alink
 		'span.delete_page': function(e){
+			if('folder' == $(e.target).attr('rel'))
+			{
+				alert('A page must have no sub-pages before it can be deleted.');
+				return false;
+			}
 			if (confirm("This cannot be undone! Delete this page?")) {
 				$.parent = $(e.target).parent('a');
 				id = $.parent.attr('id');
 				url = $.parent.attr('href');
 				
-				$.get(url, function(){
+				$.get(url, function(data){
 					klass = $('#page_wrapper_'+id).parent().attr('rel');
 					// remove from container
 					$('#page_wrapper_'+ id).remove();
+					$('#show_response_beta').html(data);	
 				});
 			}
 			return false;
@@ -130,7 +113,6 @@
 			id = $(e.target).attr('id');
 			klass = folder_path.replace(/\//g,'_');
 			html = '<div class="folder_bar"><a href="/'+ folder_path +'" rel="'+ folder_path +'" class="open_folder" ><span class="icon add_folder open_folder" rel="'+ folder_path +'"> &nbsp; &nbsp; </span></a></div>';
-			
 			
 			$('#page_wrapper_'+id).prepend(html);
 			

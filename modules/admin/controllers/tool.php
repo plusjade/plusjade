@@ -11,7 +11,8 @@ class Tool_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->client->can_edit($this->site_id);
+		if(!$this->client->can_edit($this->site_id))
+			die('Please login');
 	}
 	
 # List ALL TOOLS for this site.
@@ -101,12 +102,11 @@ class Tool_Controller extends Controller {
 					WHERE id = '$page_id'
 				")->current();		
 			
-				$newline = "\n$page->page_name:$tool->name:$tool_insert_id,\n";
+				$newline = "\n$page->page_name:$tool->name:$tool_insert_id,";
 				yaml::add_value($this->site_name, 'pages_config', $newline);
 			}
 			
 			# generate tool_css file
-			//$css = new Css;
 			Css::generate_tool_css($tool->name, $tool_insert_id);
 			
 			# run _tool_adder
@@ -123,14 +123,17 @@ class Tool_Controller extends Controller {
 			
 		$primary = new View('tool/new_tool');
 		$tools = $db->query("
-			SELECT * FROM tools_list
+			SELECT * 
+			FROM tools_list
 			WHERE protected = 'no'
 			AND enabled = 'yes'
 		");
 		
 		# is page protected? if not show page builders.
 		$page = $db->query("
-			SELECT page_name FROM pages WHERE id = '$page_id'
+			SELECT page_name
+			FROM pages
+			WHERE id = '$page_id'
 		")->current();			
 
 		# If not a sub page and does not have builder installed already..
@@ -142,7 +145,9 @@ class Tool_Controller extends Controller {
 		else
 		{
 			$protected_tools = $db->query("
-				SELECT * FROM tools_list WHERE protected = 'yes'
+				SELECT *
+				FROM tools_list
+				WHERE protected = 'yes'
 			");		
 		}
 		$primary->protected_tools = $protected_tools;

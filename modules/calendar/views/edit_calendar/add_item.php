@@ -15,10 +15,8 @@
 	
 	
 	<div class="common_main_panel fieldsets">
-		<b>Event Title</b>
-		<br><input type="text" name="title" rel="text_req" style="width:60%">
+		<b>Event Title</b><input type="text" name="title" rel="text_req" style="width:350px">
 		<br>
-		<br><b>Description</b>
 		<br><textarea name="desc" class="render_html"></textarea>		
 	</div>
 	

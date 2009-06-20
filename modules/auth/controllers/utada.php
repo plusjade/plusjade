@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * 
- * Functions exclusive to plusjade.com only
- *
+ * The Utada Master Controller contains functions only the master account holder
+ * can use. Only available at rootsite
  */
 class Utada_Controller extends Template_Controller {
 
@@ -134,7 +134,6 @@ class Utada_Controller extends Template_Controller {
 			$site_id = valid::id_key($_POST['site_id']);
 			
 			# Create a sites_users access row for the master account
-			# REMEMBER to delete it when finished..
 			$db = new Database;
 			$data = array(
 				'fk_site'	=> $site_id,
@@ -199,9 +198,8 @@ class Utada_Controller extends Template_Controller {
 		
 		# DELETE DATA FOLDER
 		$data_path = DATAPATH ."$site_name";
-		$directory = new Data_Folder;
 		
-		if($directory->rmdir_recurse($data_path))
+		if( Jdirectory::remove($data_path) )
 			die('Site destroyed! =(');			
 		
 		die('Unable to destory data folder'); # error
@@ -242,10 +240,8 @@ class Utada_Controller extends Template_Controller {
 		
 		# Remove protected Tables
 		foreach ($protected_tables as $table)
-		{
 			if(! empty($table_names[$table]) )
-				unset($table_names[$table]);
-		}	
+				unset($table_names[$table]);	
 		
 		#troubleshoot
 		#echo'<pre>'; print_r($table_names);echo '</pre>'; die();
@@ -255,9 +251,8 @@ class Utada_Controller extends Template_Controller {
 			SELECT site_id FROM sites
 		");	
 		foreach($sites as $site)
-		{
 			$site_ids[] = $site->site_id;
-		}
+
 		$id_string = implode(',', $site_ids);
 		
 		# Id string to view for convenience
@@ -269,10 +264,8 @@ class Utada_Controller extends Template_Controller {
 		$results = array();
 		foreach($table_names as $table)
 		{
-			$results[$table] ='';
-			$id = 'id';
-			if( 'pages_tools' == $table )
-				$id = 'guid';
+			$results[$table] = '';
+			$id = (('pages_tools' == $table)) ? $id = 'guid' : 'id';
 
 			$table_object = $db->query("
 				SELECT fk_site 
@@ -283,19 +276,13 @@ class Utada_Controller extends Template_Controller {
 			if( $table_object->count() > 0 )
 			{
 				foreach($table_object as $row)
-				{
 					$results[$table] .= "$row->$id<br>";
-				}
 				
-				# If orphans exists,
-				# run delete query on all rows having fk_site...
+				# If orphans exists, delete all rows having fk_site...
 				$db->delete($table, array("fk_site" => "$row->fk_site") );
-				
 			}
 			else
-			{
 				$results[$table] = 'clean';
-			}
 		}
 	
 		$primary->results = $results;

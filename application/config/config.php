@@ -96,6 +96,8 @@ $config['extension_prefix'] = 'MY_';
  */
 $config['modules'] = array
 (
+	MODPATH.'auth',
+	MODPATH.'admin',
 	MODPATH.'text',
 	MODPATH.'navigation',	
 	MODPATH.'showroom',
@@ -106,7 +108,5 @@ $config['modules'] = array
 	MODPATH.'about',
 	MODPATH.'faq',
 	MODPATH.'album',
-	MODPATH.'blog',
-	MODPATH.'admin',
-	MODPATH.'auth'
+	MODPATH.'blog'
 );

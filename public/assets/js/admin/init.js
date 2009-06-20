@@ -1,8 +1,10 @@
 ﻿
 $(document).ready(function()
-{	
-	// TOGGLE ADMIN BAR
-	// -----------------------------------	
+{
+
+/*
+ * TOGGLE ADMIN BAR	
+ */
 	$(".toggle_admin_bar").click(function(){
 		$("#admin_bar_wrapper").slideToggle("slow", function(){
 			$(".jade_toolbar_wrapper").slideToggle("slow");
@@ -11,8 +13,9 @@ $(document).ready(function()
 		});
 	});
 
-	// ACTIVATE Sitewide admin bar dropdowns
-	// -----------------------------------
+/*
+ * ACTIVATE Sitewide admin bar dropdowns
+ */
 	$('#admin_bar li.dropdown ul').hide();
 	
 	$('#admin_bar li.dropdown div').click(function(){
@@ -21,15 +24,17 @@ $(document).ready(function()
 		return false;		
 	});
 
-	// Click away hides open toolbars
+/*
+ * Click away hides open toolbars
+ */
 	$('body:not(.jade_toolbar_wrapper)').click(function(){
 		$('li.dropdown ul').hide();
 		$('.actions_wrapper ul').hide();
 	});
 
-
-	// ADD redbar Tool toolkit to all tools
-	// -----------------------------------
+/*
+ * ADD redbar Tool toolkit to all tools
+ */
 	 $('.common_tool_wrapper').each(function(i){
 		++i;
 		var temp	= new Array();
@@ -40,11 +45,9 @@ $(document).ready(function()
 	 });
 
 
-	 
-	/* ADD blue tool-item toolkits
-	 * selector format: .tool_wrapper .tool_item
-	 * -----------------------------------
-	 */
+/* ADD blue tool-item toolkits
+ * selector format: .tool_wrapper .tool_item
+ */
 	var tools = ['contact', 'showroom', 'slide_panel', 'faq', 'blog'];
 	$.each(tools, function(){	
 		var tool = this;
@@ -53,15 +56,13 @@ $(document).ready(function()
 			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
 			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="'+tool+'_item_'+id+'">delete</a>';
 			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ tool +' item</span>'+ edit +' ' + del + '</div>';
-					
 			$(this).prepend(toolbar);			
 		});
 	});
 
-	/* add blue tool-item toolkits to DOM ajax requests
-	 * enabled for calendar, showroom, (blog)
-	 * -----------------------------------
-	*/
+/* add blue tool-item toolkits to DOM ajax requests
+ * enabled for calendar, showroom, (blog)
+*/
 	jQuery.fn.add_toolkit_items = function(toolname){
 		toolname = toolname.toLowerCase();
 		$('.'+ toolname +'_item', this).each(function(i){		
@@ -73,53 +74,25 @@ $(document).ready(function()
 		});
 	};	
 
-	/* display server response
-	 * ShowRespose in beta mode?
-	 * -----------------------------------
-	*/
+
+/* display server response
+ * ShowRespose in beta mode only.
+ * -----------------------------------
+*/
 	$('body').append('<div id="show_response_beta">[Server Response]</div>');
-	$('#show_response_beta').css('top', getPageHeight()- 30 + getPageScroll()[1]);
+	$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
 	$(window).resize(function(){
-		$('#show_response_beta').css('top', getPageHeight()- 30 + getPageScroll()[1]);
+		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
 	});
 	$(window).scroll(function(){
-		$('#show_response_beta').css('top', getPageHeight()- 30 + getPageScroll()[1]);
+		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
 	});
-  // getPageScroll() by quirksmode.com
-  function getPageScroll() {
-    var xScroll, yScroll;
-    if (self.pageYOffset) {
-      yScroll = self.pageYOffset;
-      xScroll = self.pageXOffset;
-    } else if (document.documentElement && document.documentElement.scrollTop) {	 // Explorer 6 Strict
-      yScroll = document.documentElement.scrollTop;
-      xScroll = document.documentElement.scrollLeft;
-    } else if (document.body) {// all other Explorers
-      yScroll = document.body.scrollTop;
-      xScroll = document.body.scrollLeft;	
-    }
-    return new Array(xScroll,yScroll) 
-  }
 
-  // Adapted from getPageSize() by quirksmode.com
-  function getPageHeight() {
-    var windowHeight
-    if (self.innerHeight) {	// all except Explorer
-      windowHeight = self.innerHeight;
-    } else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
-      windowHeight = document.documentElement.clientHeight;
-    } else if (document.body) { // other Explorers
-      windowHeight = document.body.clientHeight;
-    }	
-	return windowHeight
-  }
 
-// ---------------------
-  
-	/*
-	 * updates the tool container <#tool_wrapper_id> 
-	 * with the updated output from that tool.
-	*/
+/*
+ * updates the tool container #tool_wrapper_<id> 
+ * with the updated output from that tool.
+*/
 	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, response){
 		
 		if(!response) response = 'Updating...';
@@ -162,13 +135,12 @@ $(document).ready(function()
 	};	
 
 
-	/*
-	 * DELEGATE admin link functionality
-	 * -----------------------------------
-	 */
+/*
+ * DELEGATE admin link functionality
+ */
 	$("body").click($.delegate({
 	
-		// facebox links
+		// facebox load ajax
 		"a[rel=facebox]": function(e){
 			var pane = "base"; // loads in "base" unless otherwise noted via id
 			if(e.target.id) var pane = "2";			
@@ -190,7 +162,7 @@ $(document).ready(function()
 			return false;
 		},
 		
-		// DELETE tool or tool item link		
+		// DELETE tool or tool item		
 		"a.js_admin_delete": function(e) {
 			var url = $(e.target).attr("href");
 			var rel	= $(e.target).attr('rel');
@@ -226,6 +198,7 @@ $(document).ready(function()
 			return false;
 		},
 		
+		// currently not using...
 		"a.update_tool_html": function(e) {
 			values		= e.target.href.split('/');
 			tool_id		= values.pop();
@@ -243,16 +216,15 @@ $(document).ready(function()
 	}));
 
 
-
-	
-	/* AJAX FORMS
-	 * ACTIVATE default ajax forms in all facebox windows
-	 * Can delegate on the submit event but we'll keep it as is for now.
-	 * ---------------------------------------------------------------------
-	 */
+/* 
+ * Bind functions to after facebox is revealed event.
+ * 1. Activate AJAX FORMS default ajax forms in all facebox windows
+ * 2. Activate rich text editor (jwysiwyg)
+ */
 	$(document).bind('reveal.facebox', function(){
 		$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
+		
 		$(".ajaxForm").ajaxForm({
 			beforeSubmit: function(){
 				if(! $(".ajaxForm input").jade_validate() )
@@ -271,12 +243,10 @@ $(document).ready(function()
 					alert('this form had no rel attribute');
 				} else {
 					action = action.split('-');
-					//action	= action[0];
-					//toolname	= action[1];
-					//tool_id	= action[2];					
+					//**action = array(action, toolname, tool_id);
+					
+					// useful for facebox_2 requests TODO: Sanitize this?
 					if('close' == action[0] ) {
-						// TODO: Sanitize this?
-						// useful for facebox_2 requests
 						$.facebox.close('facebox_'+action[1]);
 					} else if('scope' == action[0] ) {
 						$('span#guid_'+ action[2]).removeClass('local global');
@@ -288,7 +258,6 @@ $(document).ready(function()
 					} else {
 						// in case of update or add
 						// update tool html output to DOM via ajax
-						
 						$.facebox.close();
 						$().jade_update_tool_html(action[0], action[1], action[2], data);	
 					}
@@ -300,27 +269,34 @@ $(document).ready(function()
 		
 		$('textarea.render_html').wysiwyg();
 		
-		// expand/contract the wysiwg editor
-		// TODO: clean this up later
-		var height = (300 > (getPageHeight()- 300)) ? 170 : getPageHeight()- 250;
-		$('.facebox form div.wysiwyg, .facebox form textarea.initiliazed, .facebox form textarea.render_css').css('min-height', height);
-		$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
+		// Expand/contract box-element to fill up full-available facebox view.
+		// Mainly for text editor and asset browsers windows.
+		var height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;
+		$('.facebox div.wysiwyg, .facebox textarea.initiliazed')
+		.css('min-height', height);
+		$('.facebox div.wysiwyg iframe')
+		.css('min-height', height-30);
 		
 		$(window).resize(function(){
-			height = (300 > (getPageHeight()- 300)) ? 170 : getPageHeight()- 250;		
-			$('.facebox form div.wysiwyg, .facebox form textarea.initiliazed, .facebox form textarea.render_css').css('min-height', height);
-			$('.facebox form div.wysiwyg iframe').css('min-height', height-30);
+			height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;	
+			$('.facebox div.wysiwyg, .facebox textarea.initiliazed')
+			.css('min-height', height);
+			$('.facebox div.wysiwyg iframe')
+			.css('min-height', height-30);
 		});
 	});
 
+/*
+ * Bind functions to the close facebox event.
+ */	
 	$(document).bind('close.facebox', function(){
 		$('body').removeClass('disable_body').removeAttr('scroll');
 	});
 
 	
-
-	// ACTIVATE sortable containers
-	// -------------------------------------------------
+/*
+ * ACTIVATE sortable containers
+ */
 	for(i=1;i<=5;i++){
 		$('.container_'+i).addClass("CONTAINER_WRAPPER").attr('rel', i);
 	}
@@ -351,6 +327,7 @@ $(document).ready(function()
 			var output = '';
 			page_id = $('#click_hook').attr('rel');
 			
+			$.facebox('Saving...', 'loading_msg', 'facebox_2');
 			$(".CONTAINER_WRAPPER").each(function(){
 				var container = $(this).attr("rel");
 				var kids = $(this).children("span.common_tool_wrapper");
@@ -359,10 +336,9 @@ $(document).ready(function()
 					output += this.id + '|' + container + '|' + i + '#';
 				});
 			});
-			$.facebox('Saving...', "status_close", "facebox_2");
 			$.post("/get/tool/save_positions/"+page_id, {output: output}, function(data){
-				$.facebox(data, "status_close", "facebox_2");
-				setTimeout('$.facebox.close()', 1000);
+				$.facebox.close()
+				$('#show_response_beta').html(data);
 			});
 		}
 		//revert: true
@@ -376,8 +352,6 @@ $(document).ready(function()
 		//alert('blah');
 	});
 	*/
-
-
-
-	
 });
+// end of init.js
+

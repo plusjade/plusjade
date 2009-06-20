@@ -7,7 +7,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 body {
 	margin: 0;
 	padding: 0;
-	background: #FFFFFF url(%PATH%/img01.gif) repeat-x;
+	background: #FFFFFF url('%PATH%/img01.gif') repeat-x;
 	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 	color: #8E959B;
 }
@@ -67,25 +67,25 @@ a:hover {
 	color: #990000;
 }
 
-/* Menu */
+/* MAIN_MENU */
 
-#menu {
+#MAIN_MENU {
 	float: left;
 	padding: 0 0 0 0;
 }
 
-#menu ul {
+#MAIN_MENU ul {
 	height: 55px;
 	margin: 0;
 	padding: 23px 0;
 	list-style: none;
 }
 
-#menu li {
+#MAIN_MENU li {
 	display: inline;
 }
 
-#menu a {
+#MAIN_MENU a {
 	display: block;
 	float: left;
 	width: 120px;
@@ -99,7 +99,7 @@ a:hover {
 	font-size: 26px;
 }
 
-#menu a:hover, #menu a.selected {
+#MAIN_MENU a:hover, #MAIN_MENU a.selected {
 	background-image: url(%PATH%/img04.jpg);
 	color: #FFFFFF;
 }

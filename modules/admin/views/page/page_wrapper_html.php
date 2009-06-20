@@ -1,10 +1,11 @@
 
 <?php extract($vars)?>
-
-<div id='page_wrapper_<?php echo $id?>' class="<?php echo $visibility?> asset">
+<?php $type = ''?>
+<div id="page_wrapper_<?php echo $id?>" class="<?php echo $visibility?> asset">
 	<?php
 	if(TRUE == $is_folder)
 	{
+		$type = 'folder';
 		?>
 		<div class="folder_bar">
 			<a href="/<?php echo $full_path?>" class="open_folder" rel="<?php echo $full_path?>">
@@ -52,7 +53,7 @@
 		
 		<div>
 			<a href="/get/page/delete/<?php echo $id?>" id="<?php echo $id?>" title="Delete Page">
-				<span class="icon cross delete_page">&#160; &#160; </span>
+				<span class="icon cross delete_page" rel="<?php echo $type?>">&#160; &#160; </span>
 			</a>
 		</div>
 		
