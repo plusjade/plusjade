@@ -51,7 +51,9 @@ echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'rel
 			<div style="margin-left: 40px;">Daily response time: within one hour </div>
 		</div>
 		<div id="address_html" style="display:none">
-			This is a nice formatted address
+			<i>+Jade Super Web Services</i>
+			<br>123 W. Sample Blvd.
+			<br>Alhambra, Ca 91803
 		</div>		
 		
 	</div>

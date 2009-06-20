@@ -38,9 +38,7 @@ class Auth_Controller extends Template_Controller {
 			
 			# TRUE means to save token for auto login
 			if (Auth::instance()->login($user, $_POST['password'], TRUE))
-			{
 				$primary = $this->display_dashboard();
-			}
 			else
 			{
 				$primary = new View('auth/login');
@@ -262,6 +260,9 @@ class Auth_Controller extends Template_Controller {
  */	
 	public function new_website()
 	{
+		if(ROOTACCOUNT != $this->site_name OR !$this->client->logged_in())
+			url::redirect();
+
 		if($_POST)
 		{
 			$site_name = trim($_POST['site_name']);
@@ -301,11 +302,10 @@ class Auth_Controller extends Template_Controller {
 		# make sure we always know the site_name does not exist.
 		
 		# create data folder structure for site
-		$copy_data	= new Data_Folder;	
-		$source		= DATAPATH . '_stock';
-		$dest		= DATAPATH . $site_name;			
+		$source	= DATAPATH . '_stock';
+		$dest	= DATAPATH . $site_name;			
 		
-		if(! $copy_data->dir_copy($source, $dest) )
+		if(! Jdirectory::copy($source, $dest) )
 			die('Unable to make data folder!'); #status message	
 
 		$db = new Database;
@@ -352,6 +352,9 @@ class Auth_Controller extends Template_Controller {
  */
 	function change_password()
 	{
+		if(ROOTACCOUNT != $this->site_name OR !$this->client->logged_in())
+			url::redirect();	
+			
 		$this->template->title = 'Change Password';
 		$primary = new View('auth/change_password');
 		$primary->success = FALSE;
@@ -384,6 +387,9 @@ class Auth_Controller extends Template_Controller {
  */
 	public function reset_password()
 	{
+		if(ROOTACCOUNT != $this->site_name OR !$this->client->logged_in())
+			url::redirect();	
+		
 		if($_POST)
 		{
 			$email = $_POST['email']; 

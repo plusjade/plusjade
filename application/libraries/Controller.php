@@ -22,12 +22,13 @@ abstract class Controller_Core {
 	 */
 	public function __construct()
 	{
-		$session	= Session::instance();
-		$site_config = yaml::parse_basic($_SESSION['site_name'], 'site_config');
+		$session			= Session::instance();
+		$site_config		= yaml::parse_basic($_SESSION['site_name'], 'site_config');
 		$this->site_id 		= $site_config['site_id'];
 		$this->site_name 	= $site_config['site_name'];
 		$this->theme 		= $site_config['theme'];
 		$this->banner 		= $site_config['banner'];
+		$this->homepage 	= $site_config['homepage'];
 		
 		# Auth Instance
 		$this->client = new Auth;	

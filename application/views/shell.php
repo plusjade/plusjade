@@ -51,7 +51,7 @@
 	}
 	
 	# Add login to +Jade
-	if('jade' == $this->site_name )
+	if(ROOTACCOUNT == $this->site_name )
 	{
 		array_push($keys, "%LOGIN%");
 		array_push($replacements, View::factory("_global/login"));

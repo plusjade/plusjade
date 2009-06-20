@@ -9,30 +9,31 @@
 */
 
 $db		= new Database;	
-$menus	= $db->query("
-	SELECT page_name, label FROM pages 
+$pages	= $db->query("
+	SELECT id, page_name, label
+	FROM pages 
 	WHERE fk_site = '$this->site_id' 
 	AND menu = 'yes' 
 	AND enable = 'yes'
 	ORDER BY position
 ");
 
-$pieces		= explode('/', $_SERVER['REQUEST_URI']);
-$selected	= 'home';
+# pages not built via build_page controller will not have $this_page_id set.
+$this_page_id = (empty($this_page_id)) ? '' : $this_page_id;
+?>
 
-if(! empty($pieces['1']) ) 
-	$selected = $pieces['1'];
-		
-echo '<ul id="primary_menu">';
-	foreach( $menus as $menu )
-	{
-		$name = ( $menu->label == '' ) ? $menu->page_name : $menu->label;
-		
-		if( $menu->page_name == $selected )
-			echo '<li><a href="' , url::site("$menu->page_name") , '" class="selected">' , $name , "</a></li>\n";
-		else
-			echo '<li><a href="' , url::site("$menu->page_name") , '">' , $name , "</a></li>\n";
-	}
-echo '</ul>';
+<ul id="primary_menu">
+	<?php
+		foreach($pages as $page)
+		{
+			$name	= ('' == $page->label) ? $page->page_name : $page->label;
+			$class	= ($page->id == $this_page_id) ? 'class="selected"' : '';
+			?>
+			<li><a href="<?php echo url::site("$page->page_name")?>" <?php echo $class?>> <?php echo $name?></a></li>
+			<?php
+		}
+	?>
+</ul>
 
-/* end of menu.php */
+
+

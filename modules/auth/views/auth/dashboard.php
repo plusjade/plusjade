@@ -23,15 +23,15 @@
 				<div id="site_button_wrapper">
 					<?php
 					foreach($sites_array as $name => $site_id)
-						echo "<p><a href=\"/get/auth/manage?site=$site_id\">$name</a></p>";
+						echo "<p><b>$name</b> &#8594; <a href=\"/get/auth/manage?site=$site_id\">Edit Website</a></p>";
 					
 					#quick hack - remove later
 					if($this->client->logged_in(2))
-						echo '<p><a href="/get/utada">Admin: Go to Master</a></p>';
+						echo '<p><b>Admin</b> &#8594; <a href="/get/utada">Go to Master</a></p>';
 					?>	
 				</div>
 			
-				<ol>
+				<ol style="display:none">
 					<li>
 						<span class="main_header">Website - Create essential pages.</span>
 					</li>

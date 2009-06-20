@@ -14,8 +14,6 @@ class View_Core {
 
 	public $js_array = array();
 	
-	#protected $js_array = array();
- 
 	# The view file name and type
 	protected $kohana_filename = FALSE;
 	protected $kohana_filetype = FALSE;
@@ -24,28 +22,28 @@ class View_Core {
 	protected $kohana_local_data = array();
 	protected static $kohana_global_data = array();
 
-	/**
-	 * Creates a new View using the given parameters.
-	 *
-	 * @param   string  view name
-	 * @param   array   pre-load data
-	 * @param   string  type of file: html, css, js, etc.
-	 * @return  object
-	 */
+/**
+ * Creates a new View using the given parameters.
+ *
+ * @param   string  view name
+ * @param   array   pre-load data
+ * @param   string  type of file: html, css, js, etc.
+ * @return  object
+ */
 	public static function factory($name = NULL, $data = NULL, $type = NULL)
 	{
 		return new View($name, $data, $type);
 	}
 
-	/**
-	 * Attempts to load a view and pre-load view data.
-	 *
-	 * @throws  Kohana_Exception  if the requested view cannot be found
-	 * @param   string  view name
-	 * @param   array   pre-load data
-	 * @param   string  type of file: html, css, js, etc.
-	 * @return  void
-	 */
+/**
+ * Attempts to load a view and pre-load view data.
+ *
+ * @throws  Kohana_Exception  if the requested view cannot be found
+ * @param   string  view name
+ * @param   array   pre-load data
+ * @param   string  type of file: html, css, js, etc.
+ * @return  void
+ */
 	public function __construct($name = NULL, $data = NULL, $type = NULL)
 	{		
 		if (is_string($name) AND $name !== '')
@@ -61,12 +59,12 @@ class View_Core {
 		}
 	}
 	
-	/**
-	 * Magic method access to test for view property
-	 *
-	 * @param   string   View property to test for
-	 * @return  boolean
-	 */
+/**
+ * Magic method access to test for view property
+ *
+ * @param   string   View property to test for
+ * @return  boolean
+ */
 	public function __isset($key = NULL)
 	{
 		return $this->is_set($key);
@@ -105,13 +103,13 @@ class View_Core {
 		return $this;
 	}
 
-	/**
-	 * Sets a view variable.
-	 *
-	 * @param   string|array  name of variable or an array of variables
-	 * @param   mixed         value when using a named variable
-	 * @return  object
-	 */
+/**
+ * Sets a view variable.
+ *
+ * @param   string|array  name of variable or an array of variables
+ * @param   mixed         value when using a named variable
+ * @return  object
+ */
 	public function set($name, $value = NULL)
 	{
 		if (is_array($name))
@@ -123,15 +121,15 @@ class View_Core {
 		return $this;
 	}
 
-	/**
-	 * Checks for a property existence in the view locally or globally. Unlike the built in __isset(), 
-	 * this method can take an array of properties to test simultaneously.
-	 *
-	 * @param string $key property name to test for
-	 * @param array $key array of property names to test for
-	 * @return boolean property test result
-	 * @return array associative array of keys and boolean test result
-	 */
+/**
+ * Checks for a property existence in the view locally or globally. Unlike the built in __isset(), 
+ * this method can take an array of properties to test simultaneously.
+ *
+ * @param string $key property name to test for
+ * @param array $key array of property names to test for
+ * @return boolean property test result
+ * @return array associative array of keys and boolean test result
+ */
 	public function is_set( $key = FALSE )
 	{
 		# Setup result;
@@ -160,13 +158,13 @@ class View_Core {
 		return $result;
 	}
 
-	/**
-	 * Sets a bound variable by reference.
-	 *
-	 * @param   string   name of variable
-	 * @param   mixed    variable to assign by reference
-	 * @return  object
-	 */
+/**
+ * Sets a bound variable by reference.
+ *
+ * @param   string   name of variable
+ * @param   mixed    variable to assign by reference
+ * @return  object
+ */
 	public function bind($name, & $var)
 	{
 		$this->kohana_local_data[$name] =& $var;
@@ -174,13 +172,13 @@ class View_Core {
 		return $this;
 	}
 
-	/**
-	 * Sets a view global variable.
-	 *
-	 * @param   string|array  name of variable or an array of variables
-	 * @param   mixed         value when using a named variable
-	 * @return  object
-	 */
+/**
+ * Sets a view global variable.
+ *
+ * @param   string|array  name of variable or an array of variables
+ * @param   mixed         value when using a named variable
+ * @return  object
+ */
 	public function set_global($name, $value = NULL)
 	{
 		if (is_array($name))
@@ -192,25 +190,25 @@ class View_Core {
 		return $this;
 	}
 
-	/**
-	 * Magically sets a view variable.
-	 *
-	 * @param   string   variable key
-	 * @param   string   variable value
-	 * @return  void
-	 */
+/**
+ * Magically sets a view variable.
+ *
+ * @param   string   variable key
+ * @param   string   variable value
+ * @return  void
+ */
 	public function __set($key, $value)
 	{
 		$this->kohana_local_data[$key] = $value;
 	}
 
-	/**
-	 * Magically gets a view variable.
-	 *
-	 * @param  string  variable key
-	 * @return mixed   variable value if the key is found
-	 * @return void    if the key is not found
-	 */
+/**
+ * Magically gets a view variable.
+ *
+ * @param  string  variable key
+ * @return mixed   variable value if the key is found
+ * @return void    if the key is not found
+ */
 	public function __get($key)
 	{
 		if (isset($this->kohana_local_data[$key]))
@@ -223,24 +221,24 @@ class View_Core {
 			return $this->$key;
 	}
 
-	/**
-	 * Magically converts view object to string.
-	 *
-	 * @return  string
-	 */
+/**
+ * Magically converts view object to string.
+ *
+ * @return  string
+ */
 	public function __toString()
 	{
 		return $this->render();
 	}
 
-	/**
-	 * Renders a view.
-	 *
-	 * @param   boolean   set to TRUE to echo the output instead of returning it
-	 * @param   callback  special renderer to pass the output through
-	 * @return  string    if print is FALSE
-	 * @return  void      if print is TRUE
-	 */
+/**
+ * Renders a view.
+ *
+ * @param   boolean   set to TRUE to echo the output instead of returning it
+ * @param   callback  special renderer to pass the output through
+ * @return  string    if print is FALSE
+ * @return  void      if print is TRUE
+ */
 	public function render($print = FALSE, $renderer = FALSE)
 	{
 		if (empty($this->kohana_filename))
@@ -363,9 +361,11 @@ class View_Core {
 			
 		self::$kohana_global_data[$var] .= $script;
 	}
-	/*
-	 * strings only
-	 */
+
+
+/*
+ * strings only
+ */
 	public function readyJS($toolname, $filename, $variable=NULL, $edit=FALSE)
 	{
 		if (! isset(self::$kohana_global_data['javascript']) )  

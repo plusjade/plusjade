@@ -33,7 +33,59 @@ jQuery.delegate = function(rules) {
   }
 }
 
+// Adapted from getPageSize() by quirksmode.com
+jQuery.getPageHeight = function() {
+	var windowHeight
+	if (self.innerHeight) {	// all except Explorer
+	  windowHeight = self.innerHeight;
+	} else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
+	  windowHeight = document.documentElement.clientHeight;
+	} else if (document.body) { // other Explorers
+	  windowHeight = document.body.clientHeight;
+	}	
+	return windowHeight
+}
 
+// getPageScroll() by quirksmode.com
+jQuery.getPageScroll = function() {
+	var xScroll, yScroll;
+	if (self.pageYOffset) {
+	  yScroll = self.pageYOffset;
+	  xScroll = self.pageXOffset;
+	} else if (document.documentElement && document.documentElement.scrollTop) {	 // Explorer 6 Strict
+	  yScroll = document.documentElement.scrollTop;
+	  xScroll = document.documentElement.scrollLeft;
+	} else if (document.body) {// all other Explorers
+	  yScroll = document.body.scrollTop;
+	  xScroll = document.body.scrollLeft;	
+	}
+	return new Array(xScroll,yScroll) 
+}
+
+/*
+ * http://kevin.vanzonneveld.net
+ * original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+ * bugfixed by: Onno Marsman
+ *	example 1: strstr('Kevin van Zonneveld', 'van');
+ *	returns 1: 'van Zonneveld'
+ *	example 2: strstr('Kevin van Zonneveld', 'van', true);
+ *	returns 2: 'Kevin '
+ */
+jQuery.strstr = function( haystack, needle, bool ) {
+	var pos = 0;
+	haystack += '';
+	pos = haystack.indexOf( needle );
+	if( pos == -1 ){
+		return false;
+	} else{
+		if( bool ){
+			return haystack.substr( 0, pos );
+		} else{
+			return haystack.slice( pos );
+		}
+	}
+}
+	
 /*
  * Public Form Validation
  *

@@ -136,26 +136,26 @@ color: #E5CCD0;
 font-size: 1.0em;
 }
 
-/* Menu */
+/* MAIN_MENU */
 
-#menu
+#MAIN_MENU
 {
 position: absolute;
 right: 0em;
 bottom: 0em;
 }
 
-#menu ul
+#MAIN_MENU ul
 {
 list-style: none;
 }
 
-#menu li
+#MAIN_MENU li
 {
 float: left;
 }
 
-#menu li a
+#MAIN_MENU li a
 {
 margin-left: 0.5em;
 display: block;
@@ -169,7 +169,7 @@ text-transform: lowercase;
 text-decoration: none;
 }
 
-#menu li a.selected
+#MAIN_MENU li a.selected
 {
 background: #CA2F2F url('%PATH%/n3.gif') repeat-x;
 color: #fff;

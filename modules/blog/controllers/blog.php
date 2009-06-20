@@ -229,7 +229,7 @@ class Blog_Controller extends Controller {
 				$("#post_comments_'.$post_id.' .comment_item").each(function(i){
 					var toolname = "blog";
 					var id		= $(this).attr("rel");
-					var del		= "<img src=\"'.url::image_path('admin/delete.png').'\" alt=\"\"> <a href=\"/get/edit_" + toolname + "/delete_comment/" + id + "\" class=\"js_admin_delete\" rel=\"comment_"+id+"\">delete</a>";
+					var del		= "<span class=\"icon cross\">&#160; &#160; </span> <a href=\"/get/edit_" + toolname + "/delete_comment/" + id + "\" class=\"js_admin_delete\" rel=\"comment_"+id+"\">delete</a>";
 					var toolbar	= "<div class=\"jade_admin_item_edit\">" + del + "</div>";
 					$(this).prepend(toolbar);
 				});

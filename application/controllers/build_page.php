@@ -1,19 +1,18 @@
 <?php
 class Build_Page_Controller extends Template_Controller {
 
-	/*
-	 * Case B: is page_name.
-	 * Renders live client pages. Queries on page_name
-	 * Grabs all tools associated with this page, places them correctly.
-	 * and  outputs the view "shell" via template controller.
-	 *
-	 */
 	function __construct()
 	{
 		parent::__construct();
 	}
-  
-	# $page = (object) pages table row
+ 
+/*
+ * Case B: is page_name.
+ * Renders live client pages.
+ * Grabs all tools associated with this page, places them correctly.
+ * Outputs the view "shell" via template controller.
+ * $page = (object) pages table row
+ */
 	function _index($page)
 	{
 		# deny access to disabled pages if not logged in
@@ -29,21 +28,18 @@ class Build_Page_Controller extends Template_Controller {
 		$_SESSION['js_files']	= array();
 		$tools_array			= array();
 		$all_tools				= array();		
-		$primary	= '';
-		$prepend	= '';
-		$append		= '';
-		$all_tools_string = null;
+		$primary				= '';
+		$prepend				= '';
+		$append					= '';
+		$all_tools_string		= null;
 		
 		
 		$this->template->title 	= $page->title;
 		$this->template->meta_tags('description', $page->meta);
-		$this->template->set_global('selected', $page->page_name);	
-		$this->template->set_global('page_id', $page->id);
+		$this->template->set_global('this_page_id', $page->id);	
 		
-		/*
-		 * Grab tools for this page in pages_tools table
-		 * 0-10 are reserved for global tools. we only use 1-5
-		 */		 
+		# Grab tools for this page in pages_tools table
+		# 0-10 are reserved for global tools. we only use 1-5 
 		$tools = $db->query("
 			SELECT * FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
@@ -56,7 +52,7 @@ class Build_Page_Controller extends Template_Controller {
 		# _load_admin() is in the template_controller
 		$admin_mode = $this->_load_admin($page->id, $page->page_name);
 		
-
+		
 		if( $tools->count() > 0 )
 		{	
 			foreach ($tools as $tool)
@@ -110,7 +106,8 @@ class Build_Page_Controller extends Template_Controller {
 			# Load Javascript
 			$this->template->linkJS($_SESSION['js_files']);
 
-			# Load PUBLIC CSS required for Javascript associated with Tools		
+			# Load PUBLIC CSS required for Javascript associated with Tools
+		# TODO:: I probably dont need this anymore - look into it.
 			foreach($_SESSION['js_files'] as $file => $javascript)
 			{
 				$path = DOCROOT . "assets/js/$file/style.css";

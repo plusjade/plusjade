@@ -33,8 +33,6 @@ else
 
 $global	= ob_get_clean();
 
-echo str_replace('%PATH%', $image_path , $global);
-	
-die();
+die( str_replace('%PATH%', $image_path , $global) );
 
 /* end of css/global.php */	

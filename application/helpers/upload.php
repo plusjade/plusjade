@@ -29,7 +29,7 @@ class upload_Core {
 		if ($filename === NULL)
 		{
 			// Use the default filename, with a timestamp pre-pended
-			$filename = time();
+			$filename = text::random('alnum', 10);
 			#$filename = time().$file['name'];
 		}
 

@@ -57,8 +57,8 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		if(!is_dir($image_store))
 			mkdir($image_store);
 
-		if(! is_dir($image_store.'/'.$tool_id) )
-			mkdir($image_store.'/'.$tool_id);		
+		if(! is_dir("$image_store/$tool_id") )
+			mkdir("$image_store/$tool_id");		
 
 		$tmp_name	= $_FILES['Filedata']['tmp_name'];			
 		$holder		= array ('tmp_name' => $tmp_name);

@@ -1,14 +1,16 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-	/* 
-	 * Tree traversal to build nested lists
-	 * used to build navigation lists for navigation tool
-	 * used to build nested categories in showroom tool
-	 * 
-	*/
+/* 
+ * Tree traversal to build nested lists
+ * used to build navigation lists for navigation tool
+ * used to build nested categories in showroom tool
+ * 
+*/
 class Tree_Core {
 
-	# display node data for public navigation tool since
-	# more multiple navigations can be on same page.
+/*
+ * display node data for public navigation tool since
+ * more multiple navigations can be on same page.
+ */
 	static function render_node_navigation($item)
 	{
 		$type = ( empty($item->type) ) ? 'none' : $item->type;
@@ -31,12 +33,10 @@ class Tree_Core {
 		return '<li id="item_' . $item->id . '"><span>'. $entry .'</span>';
 	}
 		
-	/* 
-	 * Takes an object of items with lft/rgt traversed fields
-	 * and displays a neat nested ul/li list.
-	 * $items are required to have lft/rgt values
-	 * 
-	*/
+/* 
+ * Uses Tree traversal method to display neat nested ul/li list.
+ * $items (object) are required to have lft/rgt values
+*/
 	static function display_tree($toolname, $items, $admin=FALSE)
 	{	  
 		# start with an empty $right stack
@@ -214,17 +214,17 @@ class Tree_Core {
 		# Update Left and right values of whole tree
 		Tree::rebuild_tree($item_table, $parent_object->root_id, '1');
 		
-		return 'Changes Saved!!<br>Updating...'; # status response	
+		return 'Tree Saved'; # status response	
 	}
 
 
 	
-	/*
-	 * Rebuilds the tree any time updates are made.
-	 * Needed to renew the left and right values.
-	 * $local_parent starts with root_id,
-	 * $left starts with 1
-	 */
+/*
+ * Rebuilds the tree anytime updates are made.
+ * Needed to renew the left and right values.
+ * $local_parent starts with root_id,
+ * $left starts with 1
+ */
 	public function rebuild_tree($table, $local_parent, $left)
 	{
 	   # the right value of this node is the left value + 1

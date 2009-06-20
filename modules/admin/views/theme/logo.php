@@ -41,7 +41,7 @@
 		if($image == $this->banner)
 			$current_banner = $image;
 		?>
-		<img src="<?php echo "$img_path/$image"?>" id="selected_banner" rel="<?php echo $image?>" alt="">
+		<img src="<?php echo "$img_path/$image"?>" class="selected_banner" rel="<?php echo $image?>" alt="">
 		<?php
 	}
 		?>
@@ -55,7 +55,6 @@
 			$('.common_main_panel img').removeClass('selected');
 			$(e.target).addClass('selected');
 		}
-	
 	}));
 
 	$('.facebox .custom_ajaxForm1').ajaxForm({	
@@ -74,10 +73,9 @@
 	});
 	
 
-	/*
-		forget the ajaxForm , just post this using $.post()
-	*/
-	
+/*
+ * Change logo functionality
+*/
 	$('button[name="change_logo"]').click(function(){
 		image = $('.common_main_panel img.selected').attr('rel');
 		if(!image)
@@ -89,7 +87,7 @@
 		$('.facebox .show_submit').show();
 		$.post('/get/theme/change_logo', {banner: image}, function(data){
 			// the images are already loaded via this facebox so we dont need to load them again?
-			$('#jade_banner_link').html('<img src="<?php echo $img_path?>/' + image +'" alt="">');
+			$('#jade_banner_link').html('<img src="<?php echo $img_path?>/' + image +'" id="header_banner" alt="">');
 			$.facebox.close();
 			$('#show_response_beta').html(data);	
 		});

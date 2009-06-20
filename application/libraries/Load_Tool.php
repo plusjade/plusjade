@@ -2,11 +2,11 @@
  
 class Load_Tool_Core {
 
-	/*
-	 * Dynamically loads a tool object instance
-	 * Used @ /application/controllers/build_page.php
-	 *
-	 */
+/*
+ * Dynamically loads a tool object instance
+ * Used @ /application/controllers/build_page.php
+ *
+ */
 	function factory($tool)
 	{
 		$tool = ucwords($tool);
@@ -51,6 +51,9 @@ class Load_Tool_Core {
 		return $tool;
 	}
 
+/* 
+ * Loads a tool instance, but for admin/edit controllers.
+*/
 	function edit_factory($tool)
 	{
 		$tool = ucwords($tool);
@@ -94,7 +97,7 @@ class Load_Tool_Core {
 		}	
 		return $tool;
 	}
-}
+} # end
 
 
 

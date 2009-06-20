@@ -53,9 +53,9 @@ a img {
 	right:0px; 
 }
 
-	/* --- main_menu_wrapper --- */
+	/* --- MAIN_MENU --- */
 
-#main_menu_wrapper ul{
+#MAIN_MENU ul{
 	width:729px; 
 	height:44px; 
 	background:url(%PATH%/topmenubg.jpg) 0 0 no-repeat;
@@ -64,11 +64,11 @@ a img {
 	top:0px; 
 	left:0px;
 }
-#main_menu_wrapper ul li{
+#MAIN_MENU ul li{
 	width:114px; 
 	float:left;
 }
-#main_menu_wrapper ul li.leftpadding{
+#MAIN_MENU ul li.leftpadding{
 	padding:0 0 0 59px; 
 	width:86px; 
 	background: url(%PATH%/homebg.gif) 100% 0 no-repeat #fff; 
@@ -77,7 +77,7 @@ a img {
 	text-align:center; 
 	line-height:44px;
 }
-#main_menu_wrapper ul li a{
+#MAIN_MENU ul li a{
 	width:114px; 
 	height:44px; 
 	display:block; 
@@ -87,8 +87,8 @@ a img {
 	text-align:center; 
 	line-height:44px;
 }
-#main_menu_wrapper ul li a:hover,
-#main_menu_wrapper ul li a.selected{
+#MAIN_MENU ul li a:hover,
+#MAIN_MENU ul li a.selected{
 	width:114px; 
 	background:#fff; 
 	color:#674E00; 

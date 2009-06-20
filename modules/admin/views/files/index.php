@@ -40,29 +40,6 @@
 
 <script type="text/javascript">
 
-	// Remember to centralize this, its also in pages/all_pages view
-	function strstr( haystack, needle, bool ) {
-		// http://kevin.vanzonneveld.net
-		// +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-		// +   bugfixed by: Onno Marsman
-		// *     example 1: strstr('Kevin van Zonneveld', 'van');
-		// *     returns 1: 'van Zonneveld'
-		// *     example 2: strstr('Kevin van Zonneveld', 'van', true);
-		// *     returns 2: 'Kevin '
-		var pos = 0;
-		haystack += '';
-		pos = haystack.indexOf( needle );
-		if( pos == -1 ){
-			return false;
-		} else{
-			if( bool ){
-				return haystack.substr( 0, pos );
-			} else{
-				return haystack.slice( pos );
-			}
-		}
-	}
-
 	$('#files_browser_wrapper').click($.delegate({
 		'a.get_folder, img.get_folder':function(e){
 			$('#directory_window').html('<div lass="ajax_loading">Loading...</div>');
@@ -84,7 +61,7 @@
 				// and outputs all combinations of the nest.
 				// ex: one, one/two, one/two/three.
 				for (i=0; i < folder_count; i++){
-					result_string = strstr(path, folder_array[i], true) + folder_array[i];
+					result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
 					folder_string += ' &#8594 <a href="/get/files/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
 				}
 			}
@@ -104,11 +81,18 @@
 			return false;
 		},
 		'div.folder_asset span.cross': function(e){
+			
+			$parent	= $(e.target).parent('div');
+			path	= $parent.attr('rel');
+			folder	= $parent.attr('id');
+			
+			if('tools' == path)
+			{
+				alert('Tools folder is required.');
+				return false;
+			}
 			if(confirm('This cannot be undone. Delete folder and all inner contents?'))
 			{
-				$parent	= $(e.target).parent('div');
-				path	= $parent.attr('rel');
-				folder	= $parent.attr('id');
 				$.get('/get/files/delete/'+ path,
 					function(data){
 						$('#directory_window #' + folder).remove();
