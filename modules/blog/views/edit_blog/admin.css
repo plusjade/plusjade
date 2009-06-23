@@ -1,0 +1,14 @@
+/* add item */
+/* edit item */
+div.inputs{
+	width:500px;
+	margin:0 auto;
+	text-align:right;
+	margin-bottom:5px;
+}
+div.inputs input{
+	width:400px;
+}
+div.inputs b{
+	float:left;
+}

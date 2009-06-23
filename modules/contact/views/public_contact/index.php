@@ -6,8 +6,8 @@ foreach($contacts as $contact)
 	?>
 	<div id="contact_item_<?php echo $contact->id?>" class="contact_item" rel="<?php echo $contact->id?>">	
 		
-		<div class="contact_icon">
-			<img src="/assets/images/contact/<?php echo $contact->type; ?>_icon.png" alt="icon">
+		<div class="contact_icon <?php echo $contact->type?>">
+			&#160;
 		</div>	
 		
 		<div class="contact_view">

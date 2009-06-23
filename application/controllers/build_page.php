@@ -23,16 +23,11 @@ class Build_Page_Controller extends Template_Controller {
 		}
 	
 		$db	= new Database;
-		$containers_array		= array();
-		$containers_array		= array_pad($containers_array, 5, ' ');
+		$containers_array		= array(' ',' ',' ',' ',' ',' ');
 		$_SESSION['js_files']	= array();
-		$tools_array			= array();
-		$all_tools				= array();		
 		$primary				= '';
 		$prepend				= '';
 		$append					= '';
-		$all_tools_string		= null;
-		
 		
 		$this->template->title 	= $page->title;
 		$this->template->meta_tags('description', $page->meta);
@@ -41,7 +36,8 @@ class Build_Page_Controller extends Template_Controller {
 		# Grab tools for this page in pages_tools table
 		# 0-10 are reserved for global tools. we only use 1-5 
 		$tools = $db->query("
-			SELECT * FROM pages_tools 
+			SELECT *, LOWER(tools_list.name) AS name
+			FROM pages_tools 
 			JOIN tools_list ON tools_list.id = pages_tools.tool
 			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page->id')
 			AND fk_site = '$this->site_id'
@@ -59,36 +55,30 @@ class Build_Page_Controller extends Template_Controller {
 			{
 				# If Logged in wrap classes around tools for Javascript
 				# TODO: consider this with javascript
-				if( $this->client->logged_in() )
+				if($this->client->logged_in())
 				{
-					$scope = ('5' >= $tool->page_id) ? 'global' : 'local';
+					$scope		= ('5' >= $tool->page_id) ? 'global' : 'local';
 					$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper '.$scope.'">';
 					$append		= '</span>';
 
 					# Throw tool into admin panel array
 					$tools_array[$tool->guid] = array(
 						'guid'		=> $tool->guid,
-						'name'		=> strtolower($tool->name),
+						'name'		=> $tool->name,
 						'name_id'	=> $tool->tool,
 						'tool_id'	=> $tool->tool_id,
 						'scope'		=> $scope,
 					);
 				}
 
-				# Create unique Tool array so we can fetch only tool-css needed for this page.	
-				$all_tools[] = "$tool->tool.$tool->tool_id";					
-
-
 				# Create Tool object
 				$tool_object  = $prepend;				
 				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
 				$tool_object .= $append;
 				
-				# Add tools to correct container.				
-				$index = $tool->container;
-				if('5' >= $tool->page_id ) #...if global
-					$index = $tool->page_id; 
-
+				# Add tools to correct container.
+				# if page_id <= 5, its not a real page_id = global container.
+				(int) $index = (5 <= $tool->page_id ) ? $tool->container : $tool->page_id ;
 				$containers_array[$index] .= $tool_object;		
 			}		
 		}
@@ -97,42 +87,29 @@ class Build_Page_Controller extends Template_Controller {
 		if($admin_mode)
 			$this->template->set_global('tools_array', $tools_array);
 		else
-			$this->template->linkCSS("get/css/tools/$page->id", url::site() );
-		
-
-		# Load Javascript files if they exist.
-		if (! empty($_SESSION['js_files']) AND is_array($_SESSION['js_files']) )
 		{
-			# Load Javascript
-			$this->template->linkJS($_SESSION['js_files']);
-
-			# Load PUBLIC CSS required for Javascript associated with Tools
-		# TODO:: I probably dont need this anymore - look into it.
-			foreach($_SESSION['js_files'] as $file => $javascript)
+			$this->template->linkCSS("get/css/tools/$page->id", url::site() );
+			$this->template->linkJS('jquery_latest.js');
+			# Load Javascript files if they exist.
+			if (! empty($_SESSION['js_files']) )
 			{
-				$path = DOCROOT . "assets/js/$file/style.css";
-				if( file_exists($path) )
-				{
-					# avoid duplicates for assets Admin uses
-					if('facebox' != $file)
-						$this->template->linkCSS("js/$file/style.css");
-					elseif(! $this->client->logged_in() )
-						$this->template->linkCSS("js/$file/style.css");
-				}
+				# Load Javascript
+				$this->template->linkJS($_SESSION['js_files']);
+				# Troubleshoot
+				# echo '<pre>';print_r($_SESSION['js_files']); echo'</pre>'; die();		
 			}
-			
-			# Troubleshoot
-			# echo '<pre>';print_r($_SESSION['js_files']); echo'</pre>'; die();		
 		}
 		# Renew Javascript file requests
-		unset($_SESSION['js_files']);		
-			
-		# Send the containers to the view (shell)
-		$this->template->containers = $containers_array;			
+		unset($_SESSION['js_files']);	
 		
+		/*
+		 * Build the output and send to view
+		 */
+		parent::build_output($containers_array, $page->template);
+
+
 		# needed to hide 404 not found on controller name (its really a page_name)
 		Event::clear('system.404');
-		
 		# needed to enable auto rendering of controllers
 		Event::run('system.post_controller');		
 	}

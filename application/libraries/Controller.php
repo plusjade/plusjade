@@ -23,7 +23,7 @@ abstract class Controller_Core {
 	public function __construct()
 	{
 		$session			= Session::instance();
-		$site_config		= yaml::parse_basic($_SESSION['site_name'], 'site_config');
+		$site_config		= yaml::parse($_SESSION['site_name'], 'site_config');
 		$this->site_id 		= $site_config['site_id'];
 		$this->site_name 	= $site_config['site_name'];
 		$this->theme 		= $site_config['theme'];
@@ -98,7 +98,7 @@ abstract class Controller_Core {
 		  in admin view each tool_output has to be 100% self_contained.
 			so we inject appropriate CSS, html, and javascript =D
 		 */
-		if( $this->client->logged_in() )
+		if( $this->client->can_edit($this->site_id) )
 		{
 			# Get CSS
 			$custom_css	= DATAPATH . "$this->site_name/tools_css/$toolname/$tool_id.css";
@@ -124,12 +124,13 @@ abstract class Controller_Core {
 				
 				$template->readyJS = "
 					<script type=\"text/javascript\">
-						$(document).ready(function(){	
+						$(document).ready(function(){
 							$contents
 						});
 					</script>
 				";
 			}
+			
 		}
 		else
 		{
@@ -142,6 +143,24 @@ abstract class Controller_Core {
 		
 		return $template;
 	}
+
+/*
+ * protected pages must maintain their page_name path
+ * especially in cases of ajax requests or when on homepage
+ # quick hack, optimize later...
+ # we can probably do this using pages_config.yaml
+ */
+	public function get_page_name($page_name, $toolname, $tool_id)
+	{
+		if(empty($page_name))
+			return $this->homepage;
+			
+		if('get' != $page_name)
+			return $page_name;
+		
+		return yaml::does_value_exist($this->site_name, 'pages_config', "$toolname-$tool_id");
+	}
+	
 	
 	/**
 	 * Handles methods that do not exist.

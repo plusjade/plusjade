@@ -324,6 +324,19 @@ class View_Core {
  * should only be called after add_root_js_files() filters requests
  * strings or array
  */	
+	public function admin_linkJS($href, $var = 'load_js') 
+	{
+		if (! isset($this->$var) )  
+			$this->$var = '';
+		
+		$this->$var .= '<script type="text/javascript" src="http://' . ROOTDOMAIN .'/'. $href . '" charset="utf-8"></script>'."\n\t";
+	}
+	
+/*
+ * actually adds javascript files to the root document
+ * should only be called after add_root_js_files() filters requests
+ * strings or array
+ */	
 	public function linkJS($href, $var = 'load_js') 
 	{
 		if (! isset($this->$var) )  
@@ -334,12 +347,12 @@ class View_Core {
 			foreach ($href as $value)
 			{
 				if(!in_array($value, $this->js_array))
-					$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/assets/js/'.$value.'" charset="utf-8"></script>'."\n\t";
+					$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/_assets/js/'.$value.'" charset="utf-8"></script>'."\n\t";
 			}
 		}
 		else
 			if(!in_array($href, $this->js_array))
-				$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/assets/js/'.$href.'" charset="utf-8"></script>'."\n\t";
+				$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/_assets/js/'.$href.'" charset="utf-8"></script>'."\n\t";
 
 
 		if (is_array($href)) 
@@ -393,7 +406,7 @@ class View_Core {
 		if (!isset($this->$var))  
 			$this->$var = '';
 		
-		$url = 'http://' . ROOTDOMAIN . '/assets/';
+		$url = 'http://' . ROOTDOMAIN;
 		
 		if ( FALSE !== $path )
 			$url = $path;

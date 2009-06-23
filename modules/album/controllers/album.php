@@ -38,16 +38,17 @@ class Album_Controller extends Controller {
 		$primary = new View('public_album/index');
 		$primary->display_view = $this->$display_view($images, $url_path);
 		$primary->view_name = $display_view;
-
+		
+		$primary->add_root_js_files("$display_view/$display_view.js");
+		
 		return $this->public_template($primary, 'album', $tool_id);
 	}
 
 	private function lightbox($images, $url_path)
 	{
 		$primary = new View('public_album/lightbox');
-		$primary->images = $images;
-		$primary->img_path = $url_path;
-		$primary->add_root_js_files('lightbox/lightbox.js');
+		$primary->images	= $images;
+		$primary->img_path	= $url_path;
 		return $primary;
 	}
 

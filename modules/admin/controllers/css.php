@@ -14,6 +14,8 @@ class Css_Controller extends Controller {
 	
 /*
  * get user custom css for all tools on a page
+ * these files should be 100% ready for output.
+ * That is any tokens should have been parsed before saved.
  */
 	function tools($page_id=NULL, $admin=FALSE)
 	{
@@ -36,21 +38,29 @@ class Css_Controller extends Controller {
 		
 		# load custom tool css files
 		ob_start();
+		
+		$static_helpers = DOCROOT . '_assets/css/static_helpers.css';
+		if (file_exists($static_helpers))
+			readfile($static_helpers);
+
+		$tool_types = array();
 		foreach($tool_data as $tool)
 		{
 			$custom_file = DATAPATH . "$this->site_name/tools_css/$tool->name/$tool->tool_id.css";
 			if(file_exists($custom_file))
 				readfile($custom_file);
+				
+			$tool_types[$tool->name] = $tool->name;
 		}
 		
-		# This is wrong FIX IT
-		$image_path = "THIS_IS_WRONG/application/views/$this->theme/global/images";
-		
-		$contents		=  ob_get_clean();
-		$keys			= '%PATH%';
-		$replacements	= $image_path;
-	
-		die( str_replace($keys, $replacements , $contents) );
+		# Load any tool-css needed for javascript functionality.
+		foreach($tool_types as $key => $toolname)
+		{
+			$js_css = MODPATH . "$key/views/public_$key/js/js.css";
+			if(file_exists($js_css))
+				readfile($js_css);
+		}
+		die();
 	}
 	
 /*
@@ -68,9 +78,13 @@ class Css_Controller extends Controller {
 		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");		
 		
 		ob_start();	
-		
+
+		$static_helpers = DOCROOT . '_assets/css/static_helpers.css';
+		if (file_exists($static_helpers))
+			readfile($static_helpers);
+			
 		# get the admin_global.css content
-		$admin_global = DOCROOT . 'assets/css/admin_global.css';
+		$admin_global = DOCROOT . '_assets/css/admin_global.css';
 		if(file_exists($admin_global))
 			readfile($admin_global);
 		
@@ -84,9 +98,13 @@ class Css_Controller extends Controller {
 		foreach($tools_list as $tool)
 		{
 			$admin_css	= MODPATH . "$tool->name/views/edit_$tool->name/admin.css";
+			$js_css		= MODPATH . "$tool->name/views/public_$tool->name/js/js.css";
 			
 			if(file_exists($admin_css))
 				readfile($admin_css);
+
+			if(file_exists($js_css))
+				readfile($js_css);
 		}				
 		die( ob_get_clean() );
 	}

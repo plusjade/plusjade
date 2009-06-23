@@ -90,7 +90,7 @@ is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
 define('APPPATH', str_replace('\\', '/', realpath($kohana_application)).'/');
 define('MODPATH', str_replace('\\', '/', realpath($kohana_modules)).'/');
 define('SYSPATH', str_replace('\\', '/', realpath($kohana_system)).'/');
-define('DATAPATH', str_replace('\\', '/', realpath('data')).'/');
+define('DATAPATH', str_replace('\\', '/', realpath('_data')).'/');
 
 // Clean up
 unset($kohana_application, $kohana_modules, $kohana_system);

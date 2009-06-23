@@ -56,4 +56,4 @@
 	<?php if(! empty($response) ) echo '<div class="blog_response">'.$response.'</div>'?>
 	<?php if (! empty($content) ) echo $content?>
 </div>
-	
+<div class="clearboth"></div>

@@ -1,7 +1,6 @@
 
 
 <?php
-
 $url_path = Assets::url_path_direct();
 $image_types = array(
 	'jpg'	=> 'jpeg',
@@ -28,7 +27,7 @@ foreach ($files as $path => $data)
 		
 		$img = ((array_key_exists($ext, $image_types))) ?
 			"<img src=\"$url\" width=\"75\" height=\"75\" alt=\"\">"
-			: "<img src=\"/assets/images/admin/file.jpg\" width=\"75\" height=\"75\" alt=\"\">";
+			: "<img src=\"/_assets/images/admin/file.jpg\" width=\"75\" height=\"75\" alt=\"\">";
 		
 		?>
 		<div id="<?php echo $id?>" class="file_asset" rel="<?php echo $name?>">
@@ -45,7 +44,7 @@ foreach ($files as $path => $data)
 		?>
 		<div id="<?php echo $name?>" class="folder_asset" rel="<?php echo $path?>">
 			<?php echo $delete?>
-			<br><img src="/assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
+			<br><img src="/_assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
 			<br><a href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
 		</div>
 		<?php

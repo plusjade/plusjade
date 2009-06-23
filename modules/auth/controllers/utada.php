@@ -11,8 +11,9 @@ class Utada_Controller extends Template_Controller {
 		parent::__construct();
 		if(ROOTACCOUNT != $this->site_name OR !$this->client->logged_in(2) )
 			die('invalid credentials');
-			
-		$this->template->linkCSS('css/admin_global.css');
+		
+		$this->template->linkCSS('/_assets/css/admin_global.css');
+		$this->template->linkJS('jquery_latest.js');
 	}
 
 /*
@@ -31,7 +32,7 @@ class Utada_Controller extends Template_Controller {
 			WHERE sites_users.fk_users = '$user_id'
 		");
 		$primary->sites = $sites;
-		$this->template->primary = $primary;
+		parent::build_output($primary);
 	}
 	
 /*

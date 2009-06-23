@@ -121,7 +121,8 @@
 			$.facebox.close('facebox_2');
 			directory = '<?php echo $directory?>';
 			path_for_css = directory.replace(/\//g,'_');
-			$('div.'+path_for_css).append(data);	
+			$('div.'+path_for_css).append(data);
+			$('#show_response_beta').html(data);				
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);

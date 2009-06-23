@@ -15,7 +15,7 @@ class Assets_Core {
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
-		return  DOCROOT . "data/$this->site_name/assets$directory";	
+		return  DATAPATH . "$this->site_name/assets$directory";	
 	}
 
 /*
@@ -37,7 +37,18 @@ class Assets_Core {
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
-		return url::site("data/$this->site_name/assets$directory");
+		return url::site("_data/$this->site_name/assets$directory");
+	}
+
+/*
+ * returns DIRECT full url path to asset folder
+ * Its longer but faster.
+ */
+	function url_path_theme($directory=NULL)
+	{
+		$directory = ((NULL === $directory)) ? '' : "/$directory";
+		
+		return "/_data/$this->site_name/themes/$this->theme$directory";
 	}
 	
 } # end

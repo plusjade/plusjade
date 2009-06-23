@@ -37,11 +37,7 @@ class Navigation_Controller extends Controller {
 		
 		# public node_generation function is contained in the tree class...
 		$primary->tree = Tree::display_tree('navigation', $items);
-		
-		# admin Javascript
-		if( $this->client->logged_in() )
-			$primary->add_root_js_files('simple_tree/jquery.simple.tree.js');
-		
+	
 		return $this->public_template($primary, 'navigation', $tool_id);
 	}
   

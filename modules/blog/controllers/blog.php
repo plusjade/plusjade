@@ -8,17 +8,17 @@ class Blog_Controller extends Controller {
 		$this->db = new Database;
 	}
 	
-  /*
-   * The _index controller is only called when building full pages.
-   * This therefore assumes no ajax calls.
-   */
+/*
+* The _index controller is only called when building full pages.
+* This therefore assumes no ajax calls.
+*/
 	function _index($tool_id)
 	{
-		$url_array		= uri::url_array();
-		$blog_page_name = $this->get_page_name(@$url_array['0'], $tool_id);
-		$action			= @$url_array['1'];
-		$value			= @$url_array['2'];
-		$value2			= @$url_array['3'];
+		$url_array	= uri::url_array();
+		$page_name	= $this->get_page_name(@$url_array['0'], 'blog', $tool_id);
+		$action		= @$url_array['1'];
+		$value		= @$url_array['2'];
+		$value2		= @$url_array['3'];
 		
 		/*
 		 * need the parent to setup appropriate views and user-specific settings
@@ -26,38 +26,39 @@ class Blog_Controller extends Controller {
 		# get parent 
 		$parent = $this->db->query("
 			SELECT * FROM blogs 
-			WHERE id = '$tool_id' AND fk_site = '$this->site_id'
+			WHERE id = '$tool_id'
+			AND fk_site = '$this->site_id'
 		")->current();	
 
 		
 		$primary = new View("public_blog/index");
 		$primary->tool_id = $tool_id;
-		$primary->set_global('blog_page_name', $blog_page_name);
+		$primary->set_global('blog_page_name', $page_name);
 		$primary->tags = $this->_get_tags($tool_id);
-		$primary->sticky_posts = $this->_get_sticky_posts($parent->sticky_posts);
-		$primary->recent_comments = $this->_get_recent_comments($tool_id);
+		$primary->sticky_posts = $this->get_sticky_posts($parent->sticky_posts);
+		$primary->recent_comments = $this->get_recent_comments($tool_id);
 		$primary->add_root_js_files('ajax_form/ajax_form.js');
 
 		switch($action)
 		{
 			case 'entry':
-				$content = $this->_single_post($value);
+				$content = $this->single_post($page_name, $value);
 				break;
 			
 			case 'tag':
-				$content = $this->_tag_search($tool_id, $value);
+				$content = $this->tag_search($tool_id, $value);
 				break;
 				
 			case 'archive':
-				$content = $this->_show_archive($tool_id, $value, $value2);
+				$content = $this->show_archive($tool_id, $value, $value2);
 				break;
 
 			case 'comment':
 				valid::id_key($value);
 				if($_POST)
-					$primary->response = $this->_post_comment($value);
+					$primary->response = $this->post_comment($value);
 				
-				$content = $this->_single_post(NULL, $value);
+				$content = $this->single_post($page_name, NULL, $value);
 				break;
 				
 			default:
@@ -75,12 +76,13 @@ class Blog_Controller extends Controller {
 					AND blog_items.status = 'publish'
 					GROUP BY blog_items.id 
 					ORDER BY created DESC
+					# add custom limit here
 				");
 				$content = new View('public_blog/multiple_posts');	
 				$content->items = $items;
 				
-				$primary->add_root_js_files('expander/expander.js');
-				$primary->readyJS('blog', 'multiple_posts', $blog_page_name);		
+				#$primary->add_root_js_files('expander/expander.js');
+				#$primary->readyJS('blog', 'multiple_posts', $blog_page_name);		
 				break;
 		}
 		$primary->content = $content;
@@ -89,14 +91,13 @@ class Blog_Controller extends Controller {
 	}
 	
 	
-	/*
-	 * return single post view
-	 * get by url, or id if sent from comment form
-	 */
-	function _single_post($url=NULL, $id=NULL)
+/*
+ * return single post view
+ * get by url, or id if sent from comment form
+ */
+	private function single_post($page_name, $url=NULL, $id=NULL)
 	{
 		$content = new View("public_blog/single");
-		$page_name = uri::easy_segment('1');
 		$field = 'url';
 		
 		if(NULL !== $id)
@@ -119,13 +120,16 @@ class Blog_Controller extends Controller {
 			return 'This post does not exist';
 		
 		$content->item = $item;	
-		$content->comments = $this->_get_comments($item->id, $item->parent_id);
-		$content->blog_page_name = $this->get_page_name($page_name, $item->parent_id);
+		$content->comments = $this->get_comments($page_name, $item->id, $item->parent_id);
+		$content->blog_page_name = $page_name;
 		return $content;
 	}
 
-
-	function _tag_search($tool_id, $tag)
+/*
+ * get and display a view of all posts having a specific tag.
+ * does not use ajax.
+ */
+	private function tag_search($tool_id, $tag)
 	{
 		$content = new View('public_blog/multiple_posts');
 		$items = $this->db->query("
@@ -145,13 +149,15 @@ class Blog_Controller extends Controller {
 		");
 		$content->items = $items;
 		#Javascript
-		$content->add_root_js_files('expander/expander.js');
-		$content->readyJS('blog', 'multiple_posts', uri::easy_segment('1'));		
+		$content->add_root_js_files('expander/expander.js');		
 		return $content;		
 	}
 	
-	
-	function _show_archive($tool_id, $value, $value2)
+/*
+ * get and display a view of all posts in archive format.
+ * does not use ajax.
+ */	
+	private function show_archive($tool_id, $value, $value2)
 	{
 		$content = new View("public_blog/archive");
 		$date_search = false;
@@ -178,7 +184,8 @@ class Blog_Controller extends Controller {
 			$date_search = "AND created >= '$start' AND created < '$end'";				
 		}
 
-		$items = $this->db->query("SELECT blog_items.*, 
+		$items = $this->db->query("
+			SELECT blog_items.*, 
 			DATE_FORMAT(created, '%Y') as year,
 			DATE_FORMAT(created, '%M') as month,
 			DATE_FORMAT(created, '%e') as day
@@ -193,11 +200,13 @@ class Blog_Controller extends Controller {
 		return $content;
 	}
 	
-	
-	function _get_comments($post_id=NULL, $tool_id = NULL)
+/*
+ * get and display a view of all comments from a specific post.
+ * uses ajax
+ */		
+	private function get_comments($page_name, $post_id=NULL, $tool_id = NULL)
 	{
 		$content = new View('public_blog/comments');
-		$page_name = uri::easy_segment('1');
 		
 		if(NULL == $tool_id)
 		{
@@ -219,7 +228,7 @@ class Blog_Controller extends Controller {
 		$content->comments = $comments;
 		$content->item_id = $post_id;
 		$content->tool_id = $tool_id;
-		$content->blog_page_name = $this->get_page_name($page_name, $tool_id);
+		$content->blog_page_name = $page_name;
 		
 		# Javascript 
 		# TODO: this is being duplicated on all posts,
@@ -238,7 +247,11 @@ class Blog_Controller extends Controller {
 
 	}
 
-	function _post_comment($post_id=NULL)
+/*
+ * function for handling post request on the post-comment form.
+ * uses ajax.
+ */	
+	private function post_comment($post_id=NULL)
 	{
 		if($_POST)
 		{
@@ -268,7 +281,9 @@ class Blog_Controller extends Controller {
 
 /* Sidebar functions */
 	
-	# get all tags
+/*
+ * get all tags from this blog.
+ */	
 	function _get_tags($tool_id)
 	{
 		$tags = $this->db->query("
@@ -283,8 +298,10 @@ class Blog_Controller extends Controller {
 		return $tags;		
 	}
 
-	
-	function _get_sticky_posts($id_string=Null)
+/*
+ * get all sticky posts from this blog.
+ */		
+	private function get_sticky_posts($id_string=Null)
 	{
 		if( empty($id_string) )
 			return false;
@@ -298,8 +315,11 @@ class Blog_Controller extends Controller {
 		");
 		return $item;	
 	}
-	
-	function _get_recent_comments($tool_id=Null)
+
+/*
+ * get all recent comments from this blog.
+ */		
+	private function get_recent_comments($tool_id=Null)
 	{
 		$comments =  $this->db->query("
 			SELECT comments.name, blog_items.title, blog_items.url
@@ -312,31 +332,8 @@ class Blog_Controller extends Controller {
 		return $comments;	
 	}
 
-/*
- * protected pages must maintain their page_name path
- * especially in cases of ajax requests
- # quick hack, optimize later...
- # we can probably do this using pages_config.yaml
- */
-	private function get_page_name($page_name, $tool_id)
-	{
-		if('get' != $page_name)
-			return $page_name;
-			
-		# get tools_list id of the tool from db ...
-		$tool = 9; #id of tools_list
-		$db = new Database;
-		$page = $db->query("
-			SELECT pages.page_name
-			FROM pages_tools
-			JOIN pages ON pages_tools.page_id = pages.id
-			WHERE pages_tools.fk_site = '$this->site_id'
-			AND pages_tools.tool = '$tool'
-			AND pages_tools.tool_id = '$tool_id'
-		")->current();			
-		
-		return $page->page_name;
-	}
+
+
 	
 /*
  * page builders frequently use ajax to update their content
@@ -346,12 +343,12 @@ class Blog_Controller extends Controller {
  */ 
 	function _ajax($url_array, $tool_id)
 	{
-		$action	= @$url_array['2'];
-		$value	= @$url_array['3'];	
+		@list( , $page_name, $action, $value) = $url_array;
+		
 		switch($action)
 		{
 			case 'entry':
-				die( $this->_single_post($value) );
+				die( $this->single_post($page_name, $value) );
 				break;
 			
 			case 'tag':
@@ -365,9 +362,9 @@ class Blog_Controller extends Controller {
 				# OR ajax request to view comments
 				valid::id_key($value);
 				if($_POST)
-					die( $this->_post_comment($value) );
+					die( $this->post_comment($value) );
 				else
-					die( $this->_get_comments($value) );
+					die( $this->get_comments($page_name, $value) );
 				break;
 				
 			default:

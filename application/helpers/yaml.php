@@ -1,29 +1,27 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /**
- * 	Functions to work with parsing, creating, updating, and deleting values in  
- *  site yaml files
- *  yaml files exist in site data directory under "protected" folder
- *
+ * 	THIS IS NOT A REAL/STANDARD YAML PARSER - 
+ *  its a dead simple implementation for our dead-simple requirements.
+ *  Create, read, update, delete values in our yaml files.
+ *  yaml files exist in site data directory in "protected" folder
+	site_config:
+		makes it easier to load up site data rather than querying the db every time.
+ 
+	pages_config: 
+		is needed to determine how to load a page.
+		if page is protected, only the first directory is used.
+		if not we look at the full url. ex: mysite.com/blog/team/jade
+		if the name "blog" is in the pages config, it knows which tool to load and how.
+		In this way extensions to the url can act as commands as opposed to being 
+		treated as a page_name. ex: mysite.com/blog/entry/a-title-to-a-blog-entry
+		if its not, the page_name = "blog/team/jade" & and passed to build_page.php
  */
 class yaml_Core {
-
-/* simple key = value functions for site_config */
-	
-/*
- * Add or edit a key/value pair from a yaml file.
- */
-	public static function edit_site_value($site_name, $filename, $key, $new_value)
-	{
-		$config_path		= DATAPATH . "$site_name/protected/$filename.yml";
-		$config_array		= self::parse_basic($site_name, $filename);		
-		$config_array[$key]	= $new_value;
-		return self::build_yaml_file($config_array, $config_path);
-	}
 
 /*
  * parse the yaml file and return the key/value array
 */
-	public static function parse_basic($site_name, $filename)
+	public static function parse($site_name, $filename)
 	{
 		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		if( file_exists($config_path) )
@@ -44,6 +42,20 @@ class yaml_Core {
 		return FALSE;	
 	}
 
+
+/* ------------------- simple key = value functions for site_config ------------------- */
+	
+/*
+ * Add or edit a key/value pair from a yaml file.
+ */
+	public static function edit_site_value($site_name, $filename, $key, $new_value)
+	{
+		$config_path		= DATAPATH . "$site_name/protected/$filename.yml";
+		$config_array		= self::parse($site_name, $filename);		
+		$config_array[$key]	= $new_value;
+		return self::build_yaml_file($config_array, $config_path);
+	}
+
 /* regenerate and save edited yaml file
  * from an edited key/value array of values
  * should only be used internally
@@ -60,59 +72,13 @@ class yaml_Core {
 		
 		return FALSE;
 	}
-/* END: simple key = value functions for site_config */
 	
-	
-	
-	
-	
+/* ------------------- END: simple key = value functions for site_config ------------------- */
 	
 
 /*
-	parse the yaml file and return the key/value array
-*/
-	public static function parse($site_name, $filename)
-	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
-		$yaml_array = array();
-		if( file_exists($config_path) )
-		{
-			$pages_config = file_get_contents($config_path);
-			$pages_config = explode(',',$pages_config);
-			
-			foreach($pages_config as $entry)
-			{
-				$pieces = explode(':', $entry);
-				$key	= trim(@$pieces['0']);
-				$value	= trim(@$pieces['1']);
-				$id		= trim(@$pieces['2']);				
-				$yaml_array[$key] = "$value:$id";
-			}
-		}			
-		
-		return $yaml_array;
-	}
-
-
-	public static function parse_name($site_name, $filename)
-	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
-		$yaml_array = array();
-		if( file_exists($config_path) )
-		{
-			$pages_config = file_get_contents($config_path);
-			$pages_config = explode(',',$pages_config);
-			
-			foreach($pages_config as $entry)
-			{
-				$pieces = explode(':', $entry);
-				$yaml_array[] = trim(@$pieces['0']);
-			}
-		}			
-		
-		return $yaml_array;
-	}
-	
+ * Searches for a key and returns the value if found.
+ */	
 	public static function does_key_exist($site_name, $filename, $key)
 	{
 		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
@@ -120,11 +86,27 @@ class yaml_Core {
 		
 		if( array_key_exists($key, $protected_pages) )
 			return  $protected_pages[$key];
-		else
-			return FALSE;
+		
+		return FALSE;
 	}
-	
-	
+
+/*
+ * Searches for a value and returns the key if found.
+ */
+	public static function does_value_exist($site_name, $filename, $value)
+	{
+		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
+		$protected_pages = self::parse($site_name, $filename);
+		
+		if( $key = array_search($value, $protected_pages) )
+			return  $key;
+
+		return FALSE;
+	}
+
+/*
+ * add a value to the yaml file.
+ */	
 	public static function add_value($site_name, $filename, $newline)
 	{
 		$config_path = DATAPATH . "$site_name/protected/$filename.yml";	
@@ -140,21 +122,25 @@ class yaml_Core {
 		return true;
 	}
 
-	
-	public static function edit_value($site_name, $filename, $old_value, $new_value )
+/*
+ * edit a key from the yaml file (mostly for pages config where keys are page_names).
+ */		
+	public static function edit_key($site_name, $filename, $old_key, $new_key )
 	{
 		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		
-		if(self::does_key_exist($site_name, $filename, $old_value))
+		if(self::does_key_exist($site_name, $filename, $old_key))
 		{
 			$config_contents = file_get_contents($config_path);
-			$new_content =  str_replace("$old_value:", "$new_value:" , $config_contents);
+			$new_content =  str_replace("$old_key:", "$new_key:" , $config_contents);
 			file_put_contents($config_path, $new_content);
 		}
 		return TRUE;
 	}
 	
-	
+/*
+ * delete a value from the yaml file.
+ */	
 	public static function delete_value($site_name, $filename, $key)
 	{
 		$config_path = DATAPATH . "$site_name/protected/$filename.yml";	
@@ -164,18 +150,11 @@ class yaml_Core {
 			
 			if( array_key_exists($key, $config_array) )
 			{
-				unset($config_array[$key]);
-				$contents = '';
-				
-				foreach($config_array as $key => $value)
-				{
-					if(! empty($key) )
-						$contents .= "$key:$value,\n";
-				}
-				file_put_contents($config_path, $contents);
+				unset($config_array[$key]);				
+				self::build_yaml_file($config_array, $config_path);
 			}
 		}		
-		return true;
+		return TRUE;
 	}
 	
 } // End yaml_core

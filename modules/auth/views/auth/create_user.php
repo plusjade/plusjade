@@ -1,10 +1,4 @@
 
-<?php	
-	if (empty($values['beta'])) $values['beta'] = '';
-	if (empty($values['username'])) $values['username'] = '';
-	if (empty($values['email'])) $values['email'] = '';
-	
-?>
 <div id="tagline">
 	Join <span class="text_logo"><b>+</b>Jade</span> &#8594; Create your website in minutes.
 </div>

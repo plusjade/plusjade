@@ -1,0 +1,1 @@
+ALTER TABLE `pages` ADD `template` VARCHAR( 40 ) NOT NULL AFTER `label`;

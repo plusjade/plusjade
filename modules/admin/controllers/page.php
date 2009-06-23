@@ -348,7 +348,7 @@ class Page_Controller extends Controller {
 
 			# if new page name & page is protected update the page_config file.
 			if($filename != $_POST['old_page_name'])
-				yaml::edit_value($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
+				yaml::edit_key($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
 
 			# if this page was the homepage, update homepage value
 			if($this->homepage == $_POST['old_page_name'])
@@ -461,11 +461,13 @@ class Page_Controller extends Controller {
 				if('0' == $count)
 					$filter_array[] = ltrim($page->page_name, '%');
 			}
+			# Reserved page_names: add _assets, _data, index.php
+			$filter_array[] = '_assets';
+			$filter_array[] = '_data';
+			$filter_array[] = 'index.php';
 		}
 		else
-		{
 			foreach($pages as $page)
-			{
 				if( preg_match("[%%$directory]", $page->page_name) )
 				{
 					$value = str_replace("%%$directory", '', $page->page_name);
@@ -473,8 +475,6 @@ class Page_Controller extends Controller {
 					if('1' == $count)
 						$filter_array[] = ltrim($value, '/');
 				}
-			}
-		}
 		
 		if($omit)
 			foreach($filter_array as $key => $page_name)

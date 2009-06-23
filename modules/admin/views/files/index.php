@@ -1,21 +1,4 @@
 
-<style type="text/css">
-.file_asset, .folder_asset{
-	height:110px;
-	width:110px;
-	float:left;
-	margin:3px;
-	background:#fff;
-	border:1px solid #eee;
-	font-size:0.9em;
-	text-align:center;
-	
-}
-.folder_asset img{
-	cursor:pointer;
-	cursor:cursor;
-}
-</style>
 
 <div id="files_browser_wrapper">
 

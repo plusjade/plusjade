@@ -37,6 +37,7 @@ class Contact_Controller extends Controller {
 		$contact_types = $db->query('SELECT * FROM contact_types');
 		$primary->contact_types = $contact_types;
 		
+		
 		$primary->add_root_js_files('ajax_form/ajax_form.js');		
 
 		return $this->public_template($primary, 'contact', $tool_id);

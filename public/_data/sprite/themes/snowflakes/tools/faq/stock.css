@@ -1,0 +1,24 @@
+
+#faq_wrapper_++{
+
+}
+#faq_wrapper_++ h2.faq_header{
+
+}
+#faq_wrapper_++ dl.faq_list{
+	
+}
+#faq_wrapper_++ dt.faq_item{
+
+}
+#faq_wrapper_++  dt.minus{
+	padding-left:20px;
+	background:transparent url('%MY_THEME%/faq/images/minus.ico') no-repeat 0% 50%;
+}
+#faq_wrapper_++ dt.plus{
+	padding-left:20px;
+	background:transparent url('%MY_THEME%/faq/images/plus.ico') no-repeat 0% 50%;
+}
+#faq_wrapper_++ dd.faq_answer{
+
+}

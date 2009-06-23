@@ -8,17 +8,9 @@ abstract class Template_Controller extends Controller {
 		parent::__construct();	
 		#$this->profiler = new Profiler;		
 		$this->template = new View("shell");	
-	
-		$data = array(
-			'data_path' => 'http://' . ROOTDOMAIN . "/data/$this->site_name",
-		);	
-		$this->template->set_global($data);
 
 		# Global CSS			
-		$this->template->linkCSS("css/global.php?u=$this->site_name&t=$this->theme", '/assets/');
-		
-		# Global Javascript (Theme specific)	
-		$this->template->linkJS('jquery_latest.js');
+		$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/global.css");
 		
 		/*
 		$theme_js_path = APPPATH."/views/$this->theme/js/js.php";
@@ -40,18 +32,9 @@ abstract class Template_Controller extends Controller {
 		if( $this->client->can_edit($this->site_id) )
 		{	
 			$this->template->linkCSS('get/css/admin', url::site() );
-			
-			$js_files = array(
-				'facebox/public_multi.js',
-				'ui/ui_latest_lite.js',
-				'ajax_form/ajax_form.js',
-				'jw/jwysiwyg.js',
-				'swfupload/swfupload.js',
-				'simple_tree/jquery.simple.tree.js',
-				'admin/init.js'	
-			);
-			$this->template->add_root_js_files($js_files);
-			
+			$this->template->admin_linkJS('get/js/admin?v=1.0');
+			$this->template->admin_linkJS('get/js/tools');
+
 			# determine if tool is protected so we can omit scope link
 			$db = new Database;
 			$protected_tools = $db->query("
@@ -74,6 +57,79 @@ abstract class Template_Controller extends Controller {
 			return TRUE;
 		}	
 		return FALSE;
+	}
+
+	/*
+	 * Build the output and send to view
+	 */	
+	public function build_output($containers_array, $template=NULL)
+	{
+		$header		= View::factory('_global/header');
+		$menu		= View::factory('_global/menu');
+		$theme_path	= DATAPATH . "$this->site_name/themes/$this->theme";
+		$template 	= ((NULL == $template)) ? 'master' : $template;
+		
+		ob_start();	
+		if (file_exists("$theme_path/$template.html"))
+			readfile("$theme_path/$template.html");	
+		else if (file_exists("$theme_path/master.html"))
+			readfile("$theme_path/master.html");
+		else
+			die("Could not find template for theme: $this->theme");
+		
+		$master = ob_get_clean();
+
+		function get_string_between($string, $start, $end)
+		{
+			$string = " ".$string;
+			$ini = strpos($string, $start);
+			if ($ini == 0) return "";
+			$ini += strlen($start);   
+			$len = strpos($string, $end, $ini) - $ini;
+			return substr($string, $ini, $len);
+		}
+		$master = get_string_between($master, '<body>', '</body>');
+		
+		$keys = array(
+			'%HEADER%',
+			'%MENU%',
+		);
+		$replacements = array(
+			$header,
+			$menu,
+		);
+		if(! is_array($containers_array) )
+		{
+			$containers_array = array(
+				' ', $containers_array,
+				' ', ' ', ' ', ' '
+			);
+		}
+		
+		# 5 containers
+		foreach($containers_array as $key => $content)
+		{
+			array_push($keys, "%CONTAINER_$key%");
+			array_push($replacements, $content);
+		}
+		
+		# Add login to +Jade
+		if(ROOTACCOUNT == $this->site_name )
+		{
+			array_push($keys, "%LOGIN%");
+			array_push($replacements, View::factory("_global/login"));
+		}
+		
+		# TODO: Look into compression for this ...
+		$this->template->output = str_replace($keys, $replacements , $master);
+
+		# build the end_body contents
+		# It is bad to open 2 buffers, fix this
+		$tracker_path = DATAPATH."$this->site_name/tracker.html";	
+		#ob_start();
+		if ( file_exists("$tracker_path") )
+			readfile("$tracker_path");	
+		$this->template->end_body = ob_get_clean();	
 	}
 	
 	

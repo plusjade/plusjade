@@ -53,24 +53,9 @@ class Calendar_Controller extends Controller {
 		$calendar	= new Calendar;
 		$db			= new Database;
 		$date_array = array();
-		$calendar_page_name	= uri::easy_segment('1');
 		
-		#quick hack, optimize later...
-		if('get' == $calendar_page_name)
-		{
-			# get tools_list id of the tool from db ...
-			$tool = 7;
-			$page = $db->query("
-				SELECT pages.page_name
-				FROM pages_tools
-				JOIN pages ON pages_tools.page_id = pages.id
-				WHERE pages_tools.fk_site = '$this->site_id'
-				AND pages_tools.tool = '$tool'
-				AND pages_tools.tool_id = '$tool_id'
-			")->current();			
-			
-			$calendar_page_name = $page->page_name;
-		}
+		$calendar_page_name	= uri::easy_segment('1');
+		$calendar_page_name = $this->get_page_name($calendar_page_name, 'calendar', $tool_id);
 		
 		# Create array for dates associated with this month
 		$dates = $db->query("
@@ -159,11 +144,13 @@ class Calendar_Controller extends Controller {
  */ 	
 	function _ajax($url_array, $tool_id)
 	{
+		list(, , $action, $year, $month, $day) = $url_array;
+		/*
 		$action	= @$url_array['2'];
 		$year	= @$url_array['3'];
 		$month	= @$url_array['4'];
 		$day	= @$url_array['5'];
-
+		*/
 		if('month' == $action)
 			die( $this->month($tool_id, $year, $month) );
 		elseif('day' == $action)

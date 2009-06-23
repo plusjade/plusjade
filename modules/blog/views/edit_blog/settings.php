@@ -1,13 +1,17 @@
 
 
-<form action="/get/edit_blog/settings/<?php echo $tool_id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
+<form action="/get/edit_blog/settings/<?php echo $tool->id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="save_settings" class="jade_positive" accesskey="enter">Save Settings</button>
 		<div id="common_title">Edit Blog Settings</div>
 	</div>	
 	
-	<div class="fieldsets">
+	<div class="common_left_panel fieldsets">
+	
+	</div>
+	
+	<div class="common_main_panel fieldsets">
 		<b>Ajax</b> 
 		<select>
 			<option>Enable Ajax</option>
@@ -31,6 +35,7 @@
 			<option>10</option>
 		</select>		
 		
+		<p>Stick Posts</p>
 	</div>
 
 </form>
