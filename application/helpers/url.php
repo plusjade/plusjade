@@ -253,7 +253,7 @@ class url_Core {
 	 
 	public static function image_path($image_file)
 	{
-		return "/assets/images/$image_file";
+		return url::site("_assets/images/$image_file");
 	}
 
 } // End url

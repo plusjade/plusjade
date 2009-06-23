@@ -6,6 +6,8 @@ class Showroom_Controller extends Controller {
 	{
 		parent::__construct();
 	}
+
+#TODO: query appropriate page_name when in ajax and homepage mode.
 	
 	function _index($tool_id)
 	{
@@ -121,7 +123,7 @@ class Showroom_Controller extends Controller {
 		
 		if(is_object($parent))
 		{
-			$item_view->img_path = Assets::url_path("tools/showroom/$parent->id");
+			$item_view->img_path = Assets::url_path_direct("tools/showroom/$parent->id");
 		
 			#display items in this cat
 			$items = $db->query("
@@ -161,7 +163,7 @@ class Showroom_Controller extends Controller {
 		{
 			$primary->item = $item_object;
 			$primary->category = $category;
-			$primary->img_path = Assets::url_path("tools/showroom/$item_object->cat_id");
+			$primary->img_path = Assets::url_path_direct("tools/showroom/$item_object->cat_id");
 			
 			return $primary;
 		}

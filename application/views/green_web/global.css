@@ -12,24 +12,24 @@ ul{
 	list-style:none;
 }
 
-/* -- main_menu_wrapper -- */
-#main_menu_wrapper{
+/* -- MAIN_MENU -- */
+#MAIN_MENU{
 	width:683px; 
 	margin:0 auto; 
 	height:37px;
 }
-#main_menu_wrapper ul{
+#MAIN_MENU ul{
 	width:540px; 
 	margin:0 auto;
 	}
-#main_menu_wrapper ul li{
+#MAIN_MENU ul li{
 	height:37px; 
 	float:left;
 	background:url(%PATH%/bg.gif) repeat-x 0 0 #292929; 
 	color:#C1C1C1;
 	font:bold 12px/37px Arial, Helvetica, sans-serif;
 }
-#main_menu_wrapper ul li a{
+#MAIN_MENU ul li a{
 	padding:0 18px; 
 	height:37px; 
 	float:left; 
@@ -39,10 +39,10 @@ ul{
 	color:#C1C1C1;
 	font:bold 12px/37px Arial, Helvetica, sans-serif;
 }
-#main_menu_wrapper ul li a:hover{
+#MAIN_MENU ul li a:hover{
 	background:url(%PATH%/top_btn_h.gif) no-repeat center bottom;
 }
-#main_menu_wrapper ul li a.selected{
+#MAIN_MENU ul li a.selected{
 	padding:0 18px; 
 	height:37px; 
 	float:left; 

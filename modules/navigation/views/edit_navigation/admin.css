@@ -76,7 +76,7 @@ ul#actions_list{
 .simpleTree .root
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/root.gif) no-repeat 16px 0 #ffffff;
+	background: url(/_assets/images/navigation/root.gif) no-repeat 16px 0 #ffffff;
 }
 .simpleTree .line,
 .simpleTree .line-last,
@@ -96,10 +96,9 @@ ul#actions_list{
 }
 
 .simpleTree .line{
-	background: #ffffcc url(/assets/images/navigation/line_bg.gif) 0 0 no-repeat transparent;
+	background: #ffffcc url(/_assets/images/navigation/line_bg.gif) 0 0 no-repeat transparent;
 }
 .simpleTree .line-last{
-	background: #ffffcc url(/assets/images/navigation/spacer.gif) 0 0 no-repeat transparent;
 }
 .simpleTree .line-over{
 	background:orange !important;
@@ -113,36 +112,36 @@ ul#actions_list{
 .simpleTree .folder-open
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/collapsable.gif) 0 -2px no-repeat #fff;
+	background: url(/_assets/images/navigation/collapsable.gif) 0 -2px no-repeat #fff;
 }
 .simpleTree .folder-open-last
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/collapsable-last.gif) 0 -2px no-repeat #fff;
+	background: url(/_assets/images/navigation/collapsable-last.gif) 0 -2px no-repeat #fff;
 }
 .simpleTree .folder-close
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/expandable.gif) 0 -2px no-repeat #fff;
+	background: url(/_assets/images/navigation/expandable.gif) 0 -2px no-repeat #fff;
 }
 .simpleTree .folder-close-last
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/expandable-last.gif) 0 -2px no-repeat #fff;
+	background: url(/_assets/images/navigation/expandable-last.gif) 0 -2px no-repeat #fff;
 }
 .simpleTree .doc
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/leaf.gif) 0 -1px no-repeat #fff;
+	background: url(/_assets/images/navigation/leaf.gif) 0 -1px no-repeat #fff;
 }
 .simpleTree .doc-last
 {
 	margin-left:-16px;
-	background: url(/assets/images/navigation/leaf-last.gif) 0 -1px no-repeat #fff;
+	background: url(/_assets/images/navigation/leaf-last.gif) 0 -1px no-repeat #fff;
 }
 .simpleTree .ajax
 {
-	background: url(/assets/images/navigation/spinner.gif) no-repeat 0 0 #ffffff;
+	background: url(/_assets/images/navigation/spinner.gif) no-repeat 0 0 #ffffff;
 	height: 16px;
 	display:none;
 }
@@ -203,16 +202,16 @@ ul#actions_list{
 
 #drag_container li.doc, #drag_container li.doc-last
 {
-	background: url(/assets/images/navigation/leaf.gif) no-repeat -17px 0 #ffffff;
+	background: url(/_assets/images/navigation/leaf.gif) no-repeat -17px 0 #ffffff;
 }
 #drag_container .folder-close, #drag_container .folder-close-last
 {
-	background: url(/assets/images/navigation/expandable.gif) no-repeat -17px 0 #ffffff;
+	background: url(/_assets/images/navigation/expandable.gif) no-repeat -17px 0 #ffffff;
 }
 
 #drag_container .folder-open, #drag_container .folder-open-last
 {
-	background: url(/assets/images/navigation/collapsable.gif) no-repeat -17px 0 #ffffff;
+	background: url(/_assets/images/navigation/collapsable.gif) no-repeat -17px 0 #ffffff;
 }
 .contextMenu
 {

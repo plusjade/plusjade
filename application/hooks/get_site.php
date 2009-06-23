@@ -104,12 +104,13 @@ function get_site()
 		# Only builder tools should use ajax so we get info from pages_config.yaml
 		if($page_config_value AND 'XMLHttpRequest' == @$_SERVER['HTTP_X_REQUESTED_WITH'])
 		{
-			# extract toolname and tool_id pages_config.yaml
-			$pieces = explode(':',$page_config_value);
-			list($toolname, $tool_id) = $pieces;
-			$toolname = ucwords($toolname);
+			# extract toolname and tool_id from pages_config.yaml
+			$page_data = explode('-', $page_config_value);
+			list($toolname, $tool_id) = $page_data;
 			
 			$tool = Load_Tool::factory($toolname);
+			
+			$url_array['1'] = $page_name; # make sure the page_name is correct.
 			die( $tool->_ajax($url_array, $tool_id) );
 		}
 		else
@@ -135,11 +136,8 @@ function get_site()
 				$page = new Build_Page_Controller;
 				die( $page->_index($page_object) );
 			}
-			else
-			{
-				Event::run('system.404');
-				die('Page Not Found');
-			}
+			Event::run('system.404');
+			die('Page Not Found');
 		}
 	}
 	/*

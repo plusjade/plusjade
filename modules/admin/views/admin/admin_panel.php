@@ -59,19 +59,15 @@
 			{
 				/*
 				 * THIS IS HIDDEN: Exists so JS can grab html.
-				 * $tool_array = guid|tool_name|tool_id
-				 * guid			is for pages_tools table
-				 * name			defines the tool table (plural) ex: album(s)
-				 * name_id		tools_list id of the tool
-				 * tool_id		gets the tool from the tool table
-				 * scope		local/global
+				 * $tool_array = array(guid, name, name_id, tool_id, scope);
 				 */	
-				foreach($tools_array as $db_position => $data_array)
+				foreach($tools_array as $guid => $data_array)
 				{
-					$data_array['page_id'] = $page_id;
-					$data_array['protected'] =
-						(in_array($data_array['name_id'], $protected_array)) ?
-							TRUE : FALSE;					
+					$data_array['page_id']		= $page_id;
+					$data_array['protected']	=
+						(in_array($data_array['name_id'], $protected_array))
+						? TRUE : FALSE;					
+					
 					echo View::factory('tool/toolkit_html', array('data_array'=> $data_array));
 				}
 			}

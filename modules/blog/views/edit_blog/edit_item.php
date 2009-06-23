@@ -1,26 +1,4 @@
-<style type="text/css">
-#left_panel{
-	width:180px;
-	float:left;
-}
-#main_panel{
-	width:600px;
-	float:right;
-	
-}
-#main_panel div.inputs{
-	width:500px;
-	margin:0 auto;
-	text-align:right;
-	margin-bottom:5px;
-}
-#main_panel div.inputs input{
-	width:400px;
-}
-#main_panel div.inputs b{
-	float:left;
-}
-</style>
+
 <?php
 	$status = array('draft'=>'','publish'=>'');
 	$status[$item->status] = 'selected="selected"';
@@ -29,13 +7,11 @@
 	<input type="hidden" name="parent_id" value="<?php echo $item->parent_id?>">
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="add_images" class="jade_positive">
-			<img src="/images/check.png" alt=""/> Save Changes
-		</button>
+		<button type="submit" name="add_images" class="jade_positive">Save Changes</button>
 		<div id="common_title">Update Blog Post</div>
 	</div>	
 
-	<div id="left_panel" class="fieldsets">		
+	<div class="common_left_panel fieldsets">		
 		<b>Status</b>
 		<br><select name="status">
 			<option <?php echo $status['draft']?>>draft</option>
@@ -61,7 +37,7 @@
 		</ul>
 	</div>
 	
-	<div id="main_panel" class="fieldsets">
+	<div class="common_main_panel fieldsets">
 		<div class="inputs">
 			<b>Title</b> <input type="text" name="title" value="<?php echo $item->title?>" rel="text_req">
 		</div>

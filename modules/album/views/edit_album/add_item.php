@@ -22,7 +22,7 @@
 
 <script type="text/javascript">
 	swfu = new SWFUpload({
-		flash_url : "/assets/js/swfupload/Flash/swfupload.swf",
+		flash_url : "/_assets/js/swfupload/Flash/swfupload.swf",
 		upload_url: "<?php echo url::site("get/edit_album/add_image/$tool_id")?>",
 		post_params: {"PHPSESSID" : "<?php echo session_id()?>"},
 		file_size_limit : "50 MB",
@@ -37,7 +37,7 @@
 		debug: false,
 
 		// Button settings
-		button_image_url: "/assets/images/admin/swf_upload.png",
+		button_image_url: "/_assets/images/admin/swf_upload.png",
 		button_width: "100",
 		button_height: "30",
 		button_placeholder_id: "spanButtonPlaceHolder",

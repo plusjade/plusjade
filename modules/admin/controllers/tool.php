@@ -102,7 +102,7 @@ class Tool_Controller extends Controller {
 					WHERE id = '$page_id'
 				")->current();		
 			
-				$newline = "\n$page->page_name:$tool->name:$tool_insert_id,";
+				$newline = "\n$page->page_name:$tool->name-$tool_insert_id,";
 				yaml::add_value($this->site_name, 'pages_config', $newline);
 			}
 			

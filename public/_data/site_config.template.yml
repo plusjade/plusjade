@@ -1,0 +1,5 @@
+site_id:%SITE_ID%,
+site_name:%SITE_NAME%,
+theme:%THEME%,
+banner:%BANNER%,
+homepage:%HOMEPAGE%

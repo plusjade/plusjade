@@ -25,7 +25,7 @@ dt{font-weight:bold;}
 	/* ------------ header_wrapper  ------------*/
 	
 #header_wrapper{
-	background:url('%PATH%/header_bg.png') repeat left 1px;
+	background:url('images/header_bg.png') repeat left 1px;
 	padding:0 15px;
 	text-align:center;
 }
@@ -107,7 +107,7 @@ dt{font-weight:bold;}
 }
 #MAIN_MENU li a {
 	padding:8px 13px; 
-	background: #7ebd40 url('%PATH%/green_bg.png') repeat-x bottom left;
+	background: #7ebd40 url('images/green_bg.png') repeat-x bottom left;
 	color:#fff;
 	font-size:1.2em;
 	text-decoration:none;

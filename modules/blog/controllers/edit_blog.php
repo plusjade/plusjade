@@ -12,6 +12,9 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		parent::__construct();
 	}
 
+/*
+ * show all drafts, TODO:comment moderation.
+ */ 
 	function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
@@ -51,9 +54,10 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 				'body'		=> $_POST['body'],
 				'created'	=> date("Y-m-d H:m:s")
 			);
-
-			$db->insert('blog_items', $data); 
-			die('Post added'); #status
+			$item_id = $db->insert('blog_items', $data)->insert_id();
+			
+			self::save_tags($_POST['tags'], $item_id, $tool_id);
+			die('Post added'); # success
 		}
 		die( $this->_view_add_single('blog', $tool_id) );
 	}
@@ -78,25 +82,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 				$data,
 				"id = '$id' AND fk_site='$this->site_id'"
 			);
-			
-			$tags = trim($_POST['tags']);
-			if (! empty($tags) )
-			{
-				$tags = explode(',', $_POST['tags']);
-			
-				foreach($tags as $tag)
-				{
-					$tag = trim($tag);
-					$tag = preg_replace("(/W)", '_', $tag);
-					$data = array(
-					   'fk_site'	=> $this->site_id,
-					   'item_id'	=> $id,
-					   'parent_id'	=> $_POST['parent_id'],
-					   'value'		=> $tag,					
-					);
-					$db->insert('blog_items_tags', $data);
-				}
-			}			
+			self::save_tags($_POST['tags'], $id, $_POST['parent_id']);
 			die('Post Saved'); #status				
 		}
 
@@ -115,6 +101,33 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	}
 
 /*
+ * Save tags to database.
+ * (string) $tags (comma dilemenated)
+ */
+	private function save_tags($tags, $item_id, $parent_id)
+	{
+		$tags = trim($tags);
+		if (empty($tags))
+			return FALSE;
+			
+		$db = new Database;
+		$tags = explode(',', $tags);
+		
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			$tag = preg_replace("(/W)", '_', $tag);
+			$data = array(
+			   'fk_site'	=> $this->site_id,
+			   'item_id'	=> $item_id,
+			   'parent_id'	=> $parent_id,
+			   'value'		=> $tag,					
+			);
+			$db->insert('blog_items_tags', $data);
+		}
+		return TRUE;
+	}
+/*
  * delete a single blog post
  * should also delete blog post metadata: comments/tags
  */
@@ -122,7 +135,10 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	{
 		valid::id_key($id);
 		$db = new Database;
-		$db->delete('blog_items', array('id' => "$id", 'fk_site' => $this->site_id));	
+		$db->delete(
+			'blog_items',
+			array('id' => $id, 'fk_site' => $this->site_id)
+		);	
 		$db->query("
 			DELETE FROM blog_items_tags
 			WHERE item_id = '$id'
@@ -136,6 +152,9 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		die('Post deleted!'); #status
 	}
 
+/*
+ * delete a single tag
+ */
 	function delete_tag($id=NULL)
 	{
 		valid::id_key($id);
@@ -144,6 +163,9 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		die('Tag deleted!'); #status
 	}	
 
+/*
+ * delete a single comment
+ */
 	function delete_comment($id=NULL)
 	{
 		valid::id_key($id);
@@ -152,7 +174,9 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		die('Comment deleted!'); #status
 	}
 	
-	
+/*
+ * show settings view
+ */	
 	function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
@@ -163,17 +187,27 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			$data = array(
 				'title'	=> $_POST['title'],
 			);
-			$db->update('blogs', $data, "id='$tool_id' AND fk_site = '$this->site_id'"); 						
+			$db->update(
+				'blogs',
+				$data,
+				"id='$tool_id' AND fk_site = '$this->site_id'"
+			); 						
 			die('Blog Settings Updated.'); #success
 		}
 		die( $this->_view_edit_settings('blog', $tool_id) );
 	}
 
+/*
+ * logic executed after this blog tool is added to site.
+ */
 	function _tool_adder($tool_id, $site_id)
 	{
 		return 'add';
 	}
-	
+
+/*
+ * logic executed after this blog tool is deleted from site.
+ */	
 	function _tool_deleter($tool_id, $site_id)
 	{
 		$db = new Database;
@@ -187,5 +221,6 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
 		");
+		return TRUE;
 	}
 }

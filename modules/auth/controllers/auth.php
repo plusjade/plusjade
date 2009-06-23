@@ -15,7 +15,8 @@ class Auth_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->template->linkCSS('css/admin_global.css');
+		$this->template->linkCSS('/_assets/css/admin_global.css');
+		$this->template->linkJS('jquery_latest.js');
 		$this->template->linkJS('ui/ui_latest_lite.js');	
 	}
 
@@ -51,7 +52,7 @@ class Auth_Controller extends Template_Controller {
 			$primary = new View('auth/login');
 		}
 		
-		$this->template->primary = $primary; 
+		parent::build_output($primary);
 	}
 	
 /*
@@ -158,34 +159,27 @@ class Auth_Controller extends Template_Controller {
 		{
 			# validate
 			if('DOTHEDEW' != $_POST['beta'])
-				$this->display_create('The beta code is not valid');
+				$this->display_create('The beta code is not valid', $_POST); # this dies
 
 			$post = new Validation($_POST);
 			$post->pre_filter('trim');
-			$post->add_rules('beta', 'required', 'valid::alpha_numeric'); 
 			$post->add_rules('email', 'required', 'valid::email'); 
 			$post->add_rules('username', 'required', 'valid::alpha_numeric');
 			$post->add_rules('password', 'required', 'matches[password2]', 'valid::alpha_dash');
 			
 			if(! $post->validate() )
 			{
-				$form = array(
+				$values = array(
 					'beta'		=> '',
 					'email'		=> '',
 					'username'	=> '',
 					'password'	=> '',
 					'password2'	=> '',
 				);	
-				# copy the form as errors, so the errors will be stored 
-				# with keys corresponding to the form field names
-				$errors = $form;
-				# send errors to display_create		
+				$errors = $values;
 				$errors	= arr::overwrite($errors, $post->errors('form_error_messages'));
-				$primary->error = $errors;
-				$form	= arr::overwrite($form, $post->as_array()); 
-				$primary->values = $form;
-				
-				$this->display_create($errors);
+				$values	= arr::overwrite($values, $post->as_array()); 
+				$this->display_create($errors, $values);
 				die('im dead');
 			}
 			
@@ -195,9 +189,10 @@ class Auth_Controller extends Template_Controller {
 			
 			if($user->username_exists($site_name))
 				die('domain already exists');
-				
-			#TODO: EMAIL MUST ALSO BE UNIQUE so we pw_reset can work.
 
+			if($user->username_exists($_POST['email']))
+				die('email already exists');
+				
 			
 			# HACK function for creating token for users.
 			# GET THIS OUT OF HERE
@@ -225,7 +220,7 @@ class Auth_Controller extends Template_Controller {
 				die('There was a problem creating a new user.');
 			
 			# create the website.
-			self::create_website($user->id, $site_name);
+			#self::create_website($user->id, $site_name);
 			# Log user in
 			Auth::instance()->login($user, $_POST['password']);
 			# Take to user dashboard
@@ -238,12 +233,15 @@ class Auth_Controller extends Template_Controller {
 /*
  * Internal function used to setup the create view.
  */	
-	private function display_create($errors=NULL)
+	private function display_create($errors=NULL, $values=NULL)
 	{
 		$this->template->title = 'Create Account';		
 		$primary = new View("auth/create_user");
 		
 		$primary->errors = $errors;
+		$primary->values = $values;
+		
+		/*
 		#Javascript
 		$this->template->global_readyJS('
 			$("form input, form select").focus(function(){
@@ -251,8 +249,8 @@ class Auth_Controller extends Template_Controller {
 				$(this).addClass("input_focus");
 			});	
 		');
-		$this->template->primary = $primary;
-		die($this->template);
+		*/
+		parent::build_output($primary);
 	}
 
 /*
@@ -282,8 +280,7 @@ class Auth_Controller extends Template_Controller {
 			# Create the website
 			self::create_website($this->client->get_user()->id, $site_name);
 			# Display the dashboard
-			$primary = $this->display_dashboard();
-			$this->template->primary = $primary;
+			parent::build_output($this->display_dashboard());
 		}
 		else
 			die();
@@ -379,7 +376,7 @@ class Auth_Controller extends Template_Controller {
 				$primary->error = 'Old password is incorrect';
 		}
 
-		$this->template->primary = $primary;
+		parent::build_output($primary);
 	}
 	
 /*
