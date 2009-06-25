@@ -1,31 +1,12 @@
 
 <?php echo form::open('page/add', array('class' => 'custom_ajaxForm') );?>	
+<?php $slash = (empty($directory)) ? '' : '/'; # add slash if not a root page.?>
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" id="add_page_submit" name="add_page" class="jade_positive">Add Page</button>
 		<div id="common_title">Add New Page</div>
 	</div>	
-		<?php
-		$slash = '/'; # add slash if not a root page.
-		if(! empty($page_builders) )
-		{
-			$slash = '';
-			/*
-			?>
-			<div class="root_options">
-				Install Page Builder?<br><br>
-				<select name="page_builder">
-					<option value="0">none - (blank page)</option>
-					<?php 
-					foreach($page_builders as $tool)
-						echo "<option value='$tool->id'>$tool->name</option>";
-					?>
-				</select>	
-			</div>
-			<?php
-			*/
-		}
-		?>
+		
 	<div id="new_page_url">
 		Your new page URL:
 		<br><b><?php echo url::site()."$directory$slash"?><span id="link_example">...</span></b>
@@ -49,6 +30,22 @@
 			<br><input type="checkbox" name="menu" value="yes"> Yes!
 		</p>
 		
+		
+		<select name="template">
+			<?php
+			foreach($templates as $name => $desc)
+				if('master' == $name)
+					echo "<option selected=\"selected\">$name</option>";
+				else
+					echo "<option>$name</option>";
+			?>
+		</select>
+		<div id="template_desc">
+			<?php
+			foreach($templates as $name => $desc)
+				echo "<div class=\"$name\">$desc</div>";
+			?>
+		</div>
 	</div>
 	
 	<input type="hidden" name="directory" value="<?php echo $directory?>">
@@ -127,5 +124,14 @@
 	};
 	$(".custom_ajaxForm").ajaxForm(options);
 	
+	// template select dropdown
+	selected = $("select[name='template'] option:selected").text();
+	$('#template_desc div').hide();
+	$('#template_desc div.'+selected).show();
 	
+	$("select[name='template']").change(function(){
+		$('#template_desc div').hide();
+		value = $('option:selected',this).text();
+		$('#template_desc div.'+value).show();
+	});	
 </script>

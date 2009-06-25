@@ -1,14 +1,14 @@
 <!-- START admin elements -->		
-<div id="admin_bar_wrapper">
+<div id="admin_bar_wrapper" class="admin_reset">
 	<ul id="admin_bar">				
-		<li class="root_list">
+		<li class="root_list header">
 			<div class="title_tag">SITEWIDE:</div>
 		</li>
 		
 		<li class="root_list dropdown">
 			<div>Theme &#8595;</div>
 			<ul> 
-				<li><span class="icon rainbow">&nbsp; &nbsp; </span><a href="/get/theme" rel="facebox" >Edit Theme</a></li>
+				<li><span class="icon rainbow">&nbsp; &nbsp; </span><a href="/get/theme" rel="no_facebox" class="css_styler">Edit Theme</a></li>
 				<li><span class="icon flag">&nbsp; &nbsp; </span><a href="/get/theme/logo" rel="facebox">Edit Logo</a></li>
 				<li><span class="icon flag">&nbsp; &nbsp; </span><a href="/get/theme/change" rel="facebox">New Theme</a></li>
 			</ul>		
@@ -25,6 +25,7 @@
 			<div>Tools &#8595;</div>
 			<ul>
 				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/tool" rel="facebox">All Tools</a></li>
+				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/tool/styler/blog" rel="facebox">Style Tool</a></li>
 			</ul>
 		</li>
 		<li class="root_list dropdown">
@@ -33,7 +34,7 @@
 				<li><span class="icon tools">&nbsp; &nbsp; </span> <a href="/get/files" rel="facebox">Manage</a></li>
 			</ul>
 		</li>		
-		<li class="root_list floatright">
+		<li id="hider" class="root_list floatright">
 			<div><b><a class="toggle_admin_bar" href="#">Hide Admin</a></b></div>
 		</li>
 		<li class="root_list floatright">

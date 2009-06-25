@@ -15,6 +15,8 @@ class Auth_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		
+		$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-");
 		$this->template->linkCSS('/_assets/css/admin_global.css');
 		$this->template->linkJS('jquery_latest.js');
 		$this->template->linkJS('ui/ui_latest_lite.js');	

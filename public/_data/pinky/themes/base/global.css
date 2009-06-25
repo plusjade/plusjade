@@ -25,7 +25,7 @@ dt{font-weight:bold;}
 	/* ------------ header_wrapper  ------------*/
 	
 #header_wrapper{
-	background:url('%PATH%/header_bg.png') repeat left 1px;
+	background:url('images/header_bg.png') repeat left 1px;
 	padding:0 15px;
 	text-align:center;
 }
@@ -86,14 +86,14 @@ dt{font-weight:bold;}
   padding:0;
 }	
 
-	/* -----------  main_menu_wrapper ------------ */
+	/* -----------  MAIN_MENU ------------ */
 
-#main_menu_wrapper{
+#MAIN_MENU{
 	clear:both;
 	margin-top:40px;
 	min-width:850px;
 }
-#main_menu_wrapper ul {
+#MAIN_MENU ul {
 	text-align:center;
 	width:850px;
 	list-style:none;
@@ -101,24 +101,24 @@ dt{font-weight:bold;}
 	padding:8px 0; 
 	overflow:hidden;
 }
-#main_menu_wrapper ul li {
+#MAIN_MENU ul li {
 	display:inline;
 	margin-left:10px;
 }
-#main_menu_wrapper li a {
+#MAIN_MENU li a {
 	padding:8px 13px; 
-	background: #7ebd40 url(/images/admin/green_bg.png) repeat-x bottom left;
+	background: #7ebd40 url('images/green_bg.png') repeat-x bottom left;
 	color:#fff;
 	font-size:1.2em;
 	text-decoration:none;
 	font-family:verdana;
 }
-#main_menu_wrapper li a:hover {
+#MAIN_MENU li a:hover {
 	background:#fff;
 	text-decoration:underline;
 	color:#000;	
 }
-#main_menu_wrapper li a.selected {
+#MAIN_MENU li a.selected {
 	background:#d52020 !important;
 	color:#fff;
 	text-decoration: underline;
@@ -132,47 +132,10 @@ dt{font-weight:bold;}
 	padding:20px;
 	min-height:300px;
 }
-#primary_tagline{
-	_font-weight:bold;
-	_color:#0c7ced;
-	_font-size:1.6em;
-	_text-align:center;
-}
-#primary_left_panel{
-	padding:0 10px;
-	width:46%;
-	blah_border:1px solid red;
-}
-#primary_right_panel{
-  float:right;
-  width:50%;
-  blah_border:1px solid red;
-  text-align:center;
-}
-#primary_full_panel{
-	padding:0 10px;
-	_border:1px solid green;
-}
-#primary_right_panel img{
-  padding:6px;
-  background:#fff;
-  border:1px solid #fff;
-}
 
 /* --- footer wrapper --- */
 
 #footer_wrapper{
-	order-top:3px solid #d4e4f7;
 	min-height:200px;
-	ackground:url('/data/jade/themes/redcross/images/custom_blue.gif') repeat left 1px;
-}
-	/*  ---------------- extras ---------------- */
-	
-
-.image_placeholder{
-margin:10px 15px;
-height:300px;
-background:#e4f3f6;
-border:1px solid #ccc;
 }
 

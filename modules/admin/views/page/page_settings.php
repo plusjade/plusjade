@@ -51,6 +51,26 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		</p>
 		<b>Meta description</b>
 		<br><input type="text" name="meta" value="<?php echo $page->meta?>" style="width:500px">
+	
+	
+		<p></p>
+		<b>Page Template</b>
+		<br><select name="template">
+			<?php
+			foreach($templates as $name => $desc)
+				if($name == $page->template)
+					echo "<option selected=\"selected\">$name</option>";
+				else
+					echo "<option>$name</option>";
+			?>
+		</select>
+		<div id="template_desc">
+			<?php
+			foreach($templates as $name => $desc)
+				echo "<div class=\"$name\">$desc</div>";
+			?>
+		</div>
+		
 	</div>
 	
 	<input type="hidden" name="old_page_name" value="<?php echo $filename?>">
@@ -111,5 +131,16 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			$(this).removeClass().addClass('enabled_yes');
 		else
 			$(this).removeClass().addClass('enabled_no');
+	});
+	
+	// template select dropdown
+	selected = $("select[name='template'] option:selected").text();
+	$('#template_desc div').hide();
+	$('#template_desc div.'+selected).show();
+	
+	$("select[name='template']").change(function(){
+		$('#template_desc div').hide();
+		value = $('option:selected',this).text();
+		$('#template_desc div.'+value).show();
 	});
 </script>

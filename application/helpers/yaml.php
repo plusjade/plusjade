@@ -18,30 +18,35 @@
  */
 class yaml_Core {
 
+
 /*
  * parse the yaml file and return the key/value array
 */
-	public static function parse($site_name, $filename)
+	public static function parse($site_name, $filename, $full_path=NULL)
 	{
-		$config_path = DATAPATH . "$site_name/protected/$filename.yml";
+		if(NULL == $full_path)
+			$config_path = DATAPATH . "$site_name/protected/$filename.yml";
+		else
+			$config_path = DATAPATH . "$site_name/$full_path.yml";
+		
+		$yaml_array = array();
 		if( file_exists($config_path) )
 		{
-			$yaml_array		= array();
-			$pages_config	= file_get_contents($config_path);
-			$pages_config	= explode(',', $pages_config);
-			
-			foreach($pages_config as $entry)
-			{
-				$pieces = explode(':', $entry);
-				$key	= trim(@$pieces['0']);
-				$value	= trim(@$pieces['1']);		
-				$yaml_array[$key] = $value;
-			}
-			return $yaml_array;
-		}			
-		return FALSE;	
-	}
+			$yaml_array	= array();
+			$lines		= file($config_path, FILE_SKIP_EMPTY_LINES);
 
+			foreach($lines as $line)
+			{
+				$pieces = explode(':', $line);
+				$key	= trim(@$pieces['0']);
+				$value	= trim(@$pieces['1']);
+				if(! empty($value))
+					$yaml_array[$key] = $value;
+			}
+			
+		}			
+		return $yaml_array;
+	}
 
 /* ------------------- simple key = value functions for site_config ------------------- */
 	
@@ -65,7 +70,7 @@ class yaml_Core {
 		$contents = '';
 		foreach($config_array as $key => $value)
 			if(! empty($key) )
-				$contents .= "$key : $value ,\n";
+				$contents .= "$key : $value\n";
 
 		if(file_put_contents($config_path, $contents))
 			return TRUE;

@@ -50,6 +50,13 @@ class Assets_Core {
 		
 		return "/_data/$this->site_name/themes/$this->theme$directory";
 	}
+
+	function data_path_theme($directory=NULL)
+	{
+		$directory = ((NULL === $directory)) ? '' : "/$directory";
+		
+		return DATAPATH ."$this->site_name/themes/$this->theme$directory";
+	}
 	
 } # end
 

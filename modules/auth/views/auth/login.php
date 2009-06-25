@@ -52,8 +52,6 @@
 
 <script type="text/javascript">
 	$('#login_help').hide();
-	
-	
 	$('.login_help_toggle a').click(function(){
 		$('#login_help').slideToggle('fast');
 		return false;

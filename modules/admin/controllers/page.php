@@ -138,6 +138,7 @@ class Page_Controller extends Controller {
 				'fk_site'	=> $this->site_id,
 				'page_name'	=> $full_path,
 				'label'		=> $_POST['label'],
+				'template'	=> $_POST['template'],
 				'position'	=> ++$max->highest,
 			);
 			if(! empty($_POST['menu']) AND 'yes' == $_POST['menu'])
@@ -176,24 +177,18 @@ class Page_Controller extends Controller {
 			
 		$primary		= new View("page/new_page");
 		$db				= new Database;
-		$directory	= $_GET['directory'];
+		$directory		= $_GET['directory'];
 		$path_array		= explode('/', $directory);
 		$primary->directory = $directory;
 		
-		
-		# if the path is root...
-		if( empty($directory) )
-		{
-			$page_builders = $db->query("
-				SELECT * FROM tools_list WHERE protected = 'yes'
-			");
-			$primary->page_builders = $page_builders;
-			
-			$directory = 'ROOT';
-		}
+		# get available templates from theme.
+		if($templates = yaml::parse($this->site_name, NULL, "themes/$this->theme/config"))
+			$primary->templates = $templates;
+		else
+			$primary->templates = array('master' => 'default layout');
+
 		
 		# Javascript duplicatate_page name filter Validation
-		# -------------------------------
 		# get page_name filter for this path
 		$filter_array = self::get_filename_filter($directory);
 
@@ -337,6 +332,7 @@ class Page_Controller extends Controller {
 				'title'		=> $_POST['title'],
 				'meta'		=> $_POST['meta'],
 				'label'		=> $_POST['label'],
+				'template'	=> $_POST['template'],
 				'menu'		=> $_POST['menu'],
 				'enable'	=> $_POST['enable'],
 			);
@@ -386,7 +382,14 @@ class Page_Controller extends Controller {
 		}
 		$primary->filename	= $filename;	
 		$primary->directory	= $directory;				
-		
+
+
+		# get available templates from theme.
+		if($templates = yaml::parse($this->site_name, NULL, "themes/$this->theme/config"))
+			$primary->templates = $templates;
+		else
+			$primary->templates = array('master' => 'default layout');
+			
 		# Javascript duplicate page_name filter Validation
 		$filter_array = self::get_filename_filter($directory, $filename);
 

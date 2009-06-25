@@ -149,7 +149,7 @@ class Css_Controller extends Controller {
 		$primary->stock		= Css::get_tool_css($tool->name, $tool_id, TRUE);
 		$primary->tool_id	= $tool_id;
 		$primary->name_id	= $name_id;
-		$primary->tool_name	= $tool->name;
+		$primary->toolname	= $tool->name;
 		$primary->js_rel_command = "update-$tool->name-$tool_id";
 		
 		# get attributes for this tool.

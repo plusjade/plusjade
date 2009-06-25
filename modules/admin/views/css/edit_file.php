@@ -1,24 +1,28 @@
 
 <?php echo form::open_multipart("css/edit/$name_id/$tool_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command))?>
 
-	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="save_css" class="jade_positive">Save Changes</button>
-		<div id="common_title">Edit <?php echo $tool_name?>(<?php echo $tool_id?>) CSS.</div>	
-	</div>
+
 
 	<div class="common_left_panel fieldsets">
+		
+		<p>Edit <?php echo $toolname?>(<?php echo $tool_id?>) CSS.</p>
 		<b>Add container class:</b>
 		<br><input type="text" name="attributes" value="<?php echo $attributes?>">
 	
-		<ul style="line-height:1.6em">
-			<li><a href="#" class="show_orig">Reset</a></li>
-			<li><a href="#" class="show_stock">Show Stock</a></li>
-		</ul>
+		<button type="submit" name="save_css" class="jade_positive">Save Changes</button>
+		
+		<br><br>
+		<button type="submit" name="save_css" class="jade_positive">Save to theme</button>
 	</div>
 	
 
 	<div class="common_main_panel">
-		<textarea id="edit_css" name="contents" class="render_css"><?php echo $contents?></textarea>
+		<ul class="generic_tabs ui-tabs_nav" style="margin-bottom:0">
+			<li><a href="#" class="update">Update</a></li>
+			<li><a href="#" class="show_orig">Reset</a></li>
+			<li><a href="#" class="show_stock">Show Stock</a></li>
+		</ul>
+		<textarea id="edit_css" name="contents" class="blah" style="height:275px"><?php echo $contents?></textarea>
 	</div>
 	
 	<div id="stock_contents" style="display:none"><?php echo $stock?></div>
@@ -38,6 +42,14 @@
 		$('textarea#edit_css').val(original);
 		return false;
 	});
+	
+	$('a.update').click(function(){
+		value	= $('textarea#edit_css').val();
+		css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
+		$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
+		return false;
+	});	
+	
 </script>
 
 

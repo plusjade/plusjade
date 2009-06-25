@@ -1,4 +1,57 @@
 
+
+/* ------------ Overide theme styles for admin views  ------------*/
+.admin_reset img{border:0}
+.admin_reset h1,.admin_reset h2, .admin_reset h3,.admin_reset h4,.admin_reset h5,.admin_reset h6{
+	font-size:1em !important; padding:0 !important; margin:0 !important; margin-bottom:10px !important; background:none !important;
+}
+.admin_reset h1{font-size:1.6em !important; color:#0c7ced !important;}
+.admin_reset h2{font-size:1.4em !important; color:#7c78d3 !important;}
+.admin_reset h3{font-size:1.2em !important; color:#7c78d3 !important;}
+.admin_reset h4{font-size:1.1em !important; color:#7c78d3 !important;}
+.admin_reset h5{font-size:1em !important; color:#7c78d3 !important;}
+.admin_reset dt{font-weight:bold !important; color:#7c78d3 !important;}
+
+.admin_reset a,
+.jade_toolbar_wrapper a,
+.admin_reset .content a{
+	color:blue;
+}
+.admin_reset a:hover,
+.jade_toolbar_wrapper a:hover,
+.admin_reset .content a:hover{
+	color:purple;
+}
+#admin_bar_wrapper a:visited,
+.jade_toolbar_wrapper a:visited,
+.facebox .content a:visited{
+	color:purple;
+}
+.admin_reset ul,
+.jade_toolbar_wrapper ul,
+.admin_reset .content ul{
+	margin:0;
+	padding:0;
+	list-style:none;
+	line-height:24px ;
+	background:transparent;
+}
+.admin_reset ul li,
+ul.toolkit_dropdown li,
+.admin_reset .content ul li{
+	margin:0 !important;
+	padding:0 !important;
+	list-style:none !important;
+	line-height:24px !important;
+	background:transparent !important;
+}
+body.disable_body{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+}
+
 /* icons */
 span.icon {
 	font-size:14px;
@@ -37,24 +90,6 @@ span.move{background-position:0px -363px}
 	padding:5px;
 	border:1px solid #777;
 }
-/* ------------ Facebox Reset base styles  ------------*/
-.facebox img {border:0}
-.facebox h1,.facebox h2, .facebox h3,.facebox h4,.facebox h5,.facebox h6{
-	font-size:1em !important; padding:0 !important; margin:0 !important; margin-bottom:10px !important;
-}
-.facebox h1{font-size:1.6em !important; color:#0c7ced !important;}
-.facebox h2{font-size:1.4em !important; color:#7c78d3 !important;}
-.facebox h3{font-size:1.2em !important;}
-.facebox h4{font-size:1.1em !important;}
-.facebox h5{font-size:1em !important;}
-.facebox dt{font-weight:bold !important;}
-
-body.disable_body{
-    margin: 0;
-    padding: 0;
-    border: 0;
-    overflow: hidden;
-}
 
 /* --------------- facebox ---------------*/
 #facebox_base{z-index: 99}
@@ -75,7 +110,6 @@ body.disable_body{
 	position: relative;
 	min-width:850px;
 }
-.facebox div.content{overflow:hidden;}
 .facebox .close_wrapper {
 	position:relative;
 	margin:0 10px;
@@ -119,15 +153,17 @@ body.disable_body{
 	margin:0 auto;
 	width:800px;
 	background:#fff;
+	overflow:hidden;
 	padding-top:15px;
+	color:#333 !important;
 }
-.facebox .loading {
+.loading {
 	margin:0 auto;
 	text-align: center;
 	width:500px;
 	height:200px;
 	padding-top:30px;
-	background: #fff url('/_assets/images/admin/load.gif') no-repeat 50% 50%;
+	background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%;
 }
 .facebox .image {
   text-align: center;
@@ -175,6 +211,52 @@ body.disable_body{
 	overflow:hidden;
 	text-align:center;
 }
+
+
+div.styler_wrapper{
+	position:fixed;
+	top:0;
+	width:100%;
+	background:transparent;
+	z-index:9999999;
+	font-size: 12px !important;
+	font-family:verdana, arial, "sans serif" !important;
+	color:#333 !important;
+	text-align:left !important;
+}
+div.styler_wrapper .actions{
+	position:relative;
+	overflow:hidden;
+	top:2px;
+}
+div.styler_wrapper a.toggle,
+div.styler_wrapper a.close{
+	display:block;
+	height:28px;
+	width:70px;
+	float:right;
+	padding:5px 5px 0 5px;
+	border:2px solid #a3d7f9;
+	margin-left:7px;
+	border-bottom:0;
+	background:#def1fe;
+	text-align:center;
+	color:#000;
+}
+div.dialog_wrapper{
+	background:#def1fe;
+	border:2px solid #a3d7f9;
+	border-bottom:0;
+}
+div.styler_dialog{
+	height:400px;
+	margin:0 auto;
+	min-width:800px;
+	width:80%;
+	background:#def1fe;
+	overflow:hidden;
+	padding:0;
+}
 /* --------------- Top Admin Panel --------------- */
 
 #admin_bar_wrapper a{
@@ -201,10 +283,10 @@ ul#admin_bar{
 	padding:0;
 	min-width:800px;
 	width:80%;
-	height:30px;
+	height:28px;
 	text-align:left;
 	background-attachment:fixed;
-	background:orange url(/_assets/images/admin/gradients.jpg) repeat-x 0px -305px;
+	background:orange url('/_assets/images/admin/gradients.jpg') repeat-x 0px -305px;
 	color:#fff;
 	border:2px solid green;
 	border-top:0;
@@ -214,15 +296,28 @@ ul#admin_bar{
 	display:block;
 	float:left;
 	background-attachment:fixed;
-	background:orange url(/_assets/images/admin/gradients.jpg) repeat-x 0px -305px;
-	height:30px;
+	background:orange url('/_assets/images/admin/gradients.jpg') repeat-x 0px -305px;
+	height:28px;
 	width:100px;
 	padding:0;
 	margin:0;
 }
+#admin_bar li.root_list.header{
+	background-attachment:fixed;
+	background:green url('/_assets/images/admin/gradients.jpg') repeat-x 0px -150px !important;
+}
+
 #admin_bar li.root_list div{
 	width:100px;
-	padding:8px;
+	margin-top:3px;
+	text-align:center;
+}
+#admin_bar li.root_list.floatright,
+#admin_bar li.root_list.floatright div{
+	width:75px;	
+}
+#hider{
+	width:95px !important;
 }
 #admin_bar li.dropdown div{
 	font-weight:bold;
@@ -254,14 +349,12 @@ ul#admin_bar{
 #admin_bar div.title_tag{
 	color:#fff;
 	font-weight:bold;
-	background-attachment:fixed;
-	background:green url(/_assets/images/admin/gradients.jpg) repeat-x 0px -150px !important;
 }
-#tool_bar_wrapper{
 
-}
 
 /* --- second admin bar: "on this page" toolbar wrapper --- */
+#tool_bar_wrapper{
+}
 #tool_bar_wrapper table td {
 	padding:8px 0;
 	text-align:center;
@@ -307,13 +400,13 @@ ul#admin_bar{
 	z-index: 9999;
 }
 #hide_link a {
-	background:orange;
-	color:#fff;
-	display:block;
 	width:70px;
-	padding:7px 0;
+	display:block;
+	padding:3px;
+	background:#d52020 url(/_assets/images/admin/gradients.jpg) repeat-x 0px -465px;
+	color:#fff;
 	text-decoration:none;
-	border:1px solid green;
+	border:1px solid #333;
 	border-top:0;
 }
 #hide_link a:hover {
@@ -351,19 +444,19 @@ ul#admin_bar{
 }
 .jade_toolbar_wrapper ul.toolkit_dropdown{
 	display:none;
-	clear:both;
-	position:absolute;
-	width:100px;
-	border:1px solid #333;
-	list-style:none;
-	margin:0;
-	padding:5px;
-	background:#fff;
-	line-height:2em;
-	z-index:200;
+	clear:both !important;
+	position:absolute !important;
+	width:100px !important;
+	border:1px solid #333 !important;
+	list-style:none !important;
+	margin:0 !important;
+	padding:5px !important;
+	background:#fff !important;
+	line-height:2em !important;
+	z-index:200 !important;
 }
 .jade_toolbar_wrapper ul.toolkit_dropdown li{
-	display:block;	
+	display:block;
 }
 .jade_toolbar_wrapper ul.toolkit_dropdown:hover{
 	display:block;
@@ -762,16 +855,16 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 /* --------------- common tool elements --------------- */
 
 /* this sets the width for most facebox containers using this header */
-.facebox #common_tool_header{
+#common_tool_header{
 	overflow:hidden;
 	margin-bottom:10px;
 	padding-bottom:10px;
 	border-bottom:1px dashed #999;
 }
-.facebox #common_tool_header button{
+#common_tool_header button{
 	float:right;
 }
-.facebox #common_title{
+#common_title{
 	font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 	padding-top:9px;
 	font-weight:bold;
@@ -779,8 +872,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	font-size:1.5em;
 	color:#000;
 }
-
-.facebox #common_tool_info{
+#common_tool_info{
 	margin-bottom:10px;
 	text-align:center;
 }
@@ -796,18 +888,12 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	background:#ccc;
 	margin-bottom:10px;
 }
-.facebox #home_require_message{
-	text-align:center;
-	font-weight:bold;
-	color:red;
-	font-size:1.2em;
-}
-.facebox .common_left_panel{
+.common_left_panel{
 	width:180px;
 	float:left;
 	padding:5px;
 }
-.facebox .common_main_panel{
+.common_main_panel{
 	width:590px;
 	min-height:350px;
 	float:right;

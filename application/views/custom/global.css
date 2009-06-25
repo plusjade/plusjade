@@ -29,7 +29,7 @@ dt{font-weight:bold;}
 }
 	#header{
 		width:100%;
-		_background: url(%PATH%/line_down.png) repeat-x 17px 40px;
+		_background: url('images/line_down.png') repeat-x 17px 40px;
 	}
 #header_banner{
 	float:right;

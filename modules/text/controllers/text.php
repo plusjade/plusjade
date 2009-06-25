@@ -25,7 +25,7 @@ class Text_Controller extends Controller {
 		$primary->item = $parent;
 		
 		
-		return $this->public_template($primary, 'text', $tool_id);
+		return $this->public_template($primary, 'text', $tool_id, $parent->attributes);
 	}
 	
 }

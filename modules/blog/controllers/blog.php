@@ -29,7 +29,8 @@ class Blog_Controller extends Controller {
 			WHERE id = '$tool_id'
 			AND fk_site = '$this->site_id'
 		")->current();	
-
+		if(!is_object($parent))
+			die('invalid tool');
 		
 		$primary = new View("public_blog/index");
 		$primary->tool_id = $tool_id;
@@ -79,10 +80,7 @@ class Blog_Controller extends Controller {
 					# add custom limit here
 				");
 				$content = new View('public_blog/multiple_posts');	
-				$content->items = $items;
-				
-				#$primary->add_root_js_files('expander/expander.js');
-				#$primary->readyJS('blog', 'multiple_posts', $blog_page_name);		
+				$content->items = $items;	
 				break;
 		}
 		$primary->content = $content;
