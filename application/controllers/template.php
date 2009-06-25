@@ -9,8 +9,10 @@ abstract class Template_Controller extends Controller {
 		#$this->profiler = new Profiler;		
 		$this->template = new View("shell");	
 
+		
 		# Global CSS			
-		$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/global.css");
+		if(! $this->client->can_edit($this->site_id) )
+			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-");
 		
 		/*
 		$theme_js_path = APPPATH."/views/$this->theme/js/js.php";
@@ -30,7 +32,20 @@ abstract class Template_Controller extends Controller {
 	function _load_admin($page_id, $page_name)
 	{	
 		if( $this->client->can_edit($this->site_id) )
-		{	
+		{
+			#inline modular global css
+			$css_path = Assets::data_path_theme('css/global.css');
+			$css = '';
+			if(file_exists($css_path))
+			{
+				$theme_url = Assets::url_path_theme('images');
+				$css = str_replace('../images', $theme_url , file_get_contents($css_path));	
+			}
+			else
+				die("this file does not exist: $css_path"); # for development only
+			
+			$this->template->inline_global_css = "<style type=\"text/css\" id=\"global-style\">\n$css\n</style>\n";
+				
 			$this->template->linkCSS('get/css/admin', url::site() );
 			$this->template->admin_linkJS('get/js/admin?v=1.0');
 			$this->template->admin_linkJS('get/js/tools');
@@ -55,7 +70,7 @@ abstract class Template_Controller extends Controller {
 					)
 				);
 			return TRUE;
-		}	
+		}
 		return FALSE;
 	}
 
@@ -72,10 +87,8 @@ abstract class Template_Controller extends Controller {
 		ob_start();	
 		if (file_exists("$theme_path/$template.html"))
 			readfile("$theme_path/$template.html");	
-		else if (file_exists("$theme_path/master.html"))
-			readfile("$theme_path/master.html");
 		else
-			die("Could not find template for theme: $this->theme");
+			die("Could not find '$template.html' for theme: $this->theme");
 		
 		$master = ob_get_clean();
 

@@ -29,7 +29,7 @@
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
 	  id		   : 'facebox_base',
       faceboxHtml  : '\
-	<div class="facebox" style="display:none;"> \
+	<div class="facebox admin_reset" style="display:none;"> \
 		<div class="popup">\
 			<div class="close_wrapper"> \
 				<a href="#" class="close"> \

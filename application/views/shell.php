@@ -1,10 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <html>
 <head>
 	<?php
 	#$this->profiler = new Profiler;
 	if(! empty($title) ) echo "<title>$title</title>\n\t";
 	if(! empty($meta_tags) ) echo $meta_tags;
+	if(! empty($inline_global_css) ) echo $inline_global_css;
 	if(! empty($load_css) ) echo $load_css;
 	if(! empty($load_js) ) echo $load_js;
 	?>

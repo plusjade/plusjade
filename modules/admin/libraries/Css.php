@@ -117,4 +117,14 @@ class Css_Core {
 		
 		return str_replace($keys, $replacements , $contents);		
 	}
-}
+	
+	public function replace_custom()
+	{
+	
+	
+	}
+	
+} # end
+
+
+

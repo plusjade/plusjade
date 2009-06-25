@@ -38,7 +38,7 @@ class Navigation_Controller extends Controller {
 		# public node_generation function is contained in the tree class...
 		$primary->tree = Tree::display_tree('navigation', $items);
 	
-		return $this->public_template($primary, 'navigation', $tool_id);
+		return $this->public_template($primary, 'navigation', $tool_id, $parent->attributes);
 	}
   
 }

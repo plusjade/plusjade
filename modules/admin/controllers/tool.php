@@ -336,16 +336,37 @@ class Tool_Controller extends Controller {
  * get the rendered html of a single tool 
  * used to insert updated tool data into the DOM via ajax
  */	
-	function html($toolname=NULL, $tool_id=NULL)
+	function html($toolname=NULL, $tool_id=NULL, $full=FALSE)
 	{
 		valid::id_key($tool_id);
-		
 		# probably should query this in the db...
-		$toolname= ucwords($toolname);
-		$tool_object = Load_Tool::factory($toolname);	
-		die( $tool_object->_index($tool_id) );
+		$tool_object = Load_Tool::factory($toolname);			
+		if(!$full)
+			die( $tool_object->_index($tool_id) );
+			
+			
+		# this builds an entire page, used for css builder.
+		$primary = new View('tool/iframe');
+		$primary->global_css = url::site("/_data/$this->site_name/themes/$this->theme/global.css?v=23094823");
+		$primary->html = $tool_object->_index($tool_id);		
+		die($primary);
 	}
 
+/*
+ * TESTING...
+ * editing environment for tool css for theme creation.
+ */	
+	function styler($toolname=NULL)
+	{
+		$tool_id = 68;
+		$primary = new View('tool/styler');
+		$primary->stock_css = Css::get_tool_css($toolname, $tool_id, TRUE);
+		
+		$primary->style_id = "$toolname-$tool_id-style";
+		#change this because it wont work , as this checks for can_edit creds
+		$primary->iframe_url = url::site("get/tool/html/$toolname/$tool_id/TRUE");
+		die($primary);
+	}
 
 /*
  * output red tool toolkit html

@@ -1,0 +1,1 @@
+INSERT INTO `plusjade`.`themes` (`id`, `name`) VALUES (NULL, 'decorative');

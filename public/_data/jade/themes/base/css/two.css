@@ -6,6 +6,7 @@ html, body {
 	margin:0;
 	padding:0;
 	font-family:verdana, arial;
+	background:orange;
 
 }
 
@@ -25,7 +26,7 @@ dt{font-weight:bold;}
 	/* ------------ header_wrapper  ------------*/
 	
 #header_wrapper{
-	background:lightblue url('images/header_bg.png') repeat left 1px;
+	background:lightblue url('../images/header_bg.png') repeat left 1px;
 	padding:0 15px;
 	text-align:center;
 }

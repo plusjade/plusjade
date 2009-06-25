@@ -212,17 +212,61 @@ $(document).ready(function()
 		".actions_link": function(e) {
 			$(e.target).next('ul').toggle();
 			return false;
+		},
+		
+		
+		/* testing ----- */
+		
+		"a.css_styler": function(e) {
+			$('div.styler_wrapper').show();
+			$('div.styler_wrapper .styler_dialog')
+			.html('<div class="loading">Loading...</div>')
+			.load(e.target.href, function(){
+				//this works pretty well!
+				$(document).trigger('reveal.facebox');
+				});
+			return false;
+		},
+		
+		"div.styler_wrapper a.toggle": function(e) {
+			$('div.dialog_wrapper').toggle('fast');
+			
+			value = $(e.target).html();
+			
+			if('hide'== value){
+				$(e.target).html('show');
+				$('div.styler_wrapper').css('top', $.getPageHeight()- 32);
+			}
+			else{
+				$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
+				$(e.target).html('hide')
+			}
+			return false;
+		},
+		"div.styler_wrapper a.close": function(e) {
+			$('div.styler_wrapper').hide();
+			return false;
 		}
 	}));
-
-
+	
+	// testing...
+	$('body').append('<div class="styler_wrapper admin_reset" style="display:none"> \
+			<div class="actions"> \
+				<a href="#" class="toggle">hide</a> \
+				<a href="#" class="close">close</a> \
+			</div> \
+			<div class="dialog_wrapper"> \
+				<div class="styler_dialog">&#160;</div> \
+			</div>\
+		</div>');
+	$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
 /* 
  * Bind functions to after facebox is revealed event.
  * 1. Activate AJAX FORMS default ajax forms in all facebox windows
  * 2. Activate rich text editor (jwysiwyg)
  */
 	$(document).bind('reveal.facebox', function(){
-		$('body').addClass('disable_body').attr('scroll','no');
+		//$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
 		
 		$(".ajaxForm").ajaxForm({
@@ -283,6 +327,12 @@ $(document).ready(function()
 			.css('min-height', height);
 			$('.facebox div.wysiwyg iframe')
 			.css('min-height', height-30);
+			
+			// resize for css_styler
+			state = $('div.styler_wrapper a.toggle').html();
+			height = 435;
+			if('show' == state) height = 32; 
+			$('div.styler_wrapper').css('top', $.getPageHeight()- height);
 		});
 	});
 

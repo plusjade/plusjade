@@ -24,6 +24,7 @@ class Build_Page_Controller extends Template_Controller {
 	
 		$db	= new Database;
 		$containers_array		= array(' ',' ',' ',' ',' ',' ');
+		$tools_array			= array();
 		$_SESSION['js_files']	= array();
 		$primary				= '';
 		$prepend				= '';

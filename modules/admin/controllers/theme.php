@@ -1,10 +1,10 @@
 <?php
 class Theme_Controller extends Controller {
 
-	/**
-	 *	Provides CRUD for theme and theme assets 
-	 *	
-	 */	 
+/**
+ *	Provides CRUD for theme and theme assets 
+ *	
+ */	 
 	function __construct()
 	{
 		parent::__construct();
@@ -20,9 +20,16 @@ class Theme_Controller extends Controller {
 		$primary	= new View('theme/manage');
 		$db			= new Database;
 		
-		$custom_data_path	= DATAPATH . "$this->site_name/themes/$this->theme";		
-		$theme_data_path	= APPPATH . "views/$this->theme";
+		$custom_data_path	= Assets::data_path_theme();		
+		$theme_url			= Assets::url_path_theme('images');
+		$contents = '';
+		if(file_exists("$custom_data_path/css/global.css"))
+			$contents = str_replace('../images', $theme_url , file_get_contents("$custom_data_path/css/global.css"));
 		
+		
+		
+		$primary->css_files = Jdirectory::contents("$custom_data_path/css");
+		$primary->contents	= $contents;
 		$primary->theme_files = Jdirectory::contents($custom_data_path, 'root', TRUE);
 		die($primary);
 	}
@@ -30,23 +37,26 @@ class Theme_Controller extends Controller {
 /*
  * Edit a file from the theme repo
  */
-	function edit($file=NULL, $dir=NULL)
+	function edit($file=NULL)
 	{
-		$current_file = DATAPATH . "$this->site_name/themes/$this->theme/$file";
-		if(! file_exists($current_file) )
+		# CAUTION TODO: these names need to be filtered !!!
+		$file= str_replace(':', '/', $file);
+		$theme_path = Assets::data_path_theme();
+		
+		if(! file_exists("$theme_path/$file") AND empty($_POST['contents']) )
 			die('Invalid File');	
 
 		if($_POST)
-		{
-			if( file_put_contents($current_file, $_POST['contents']) )
-				die('Page updated'); # Success	
+		{	
+			if( file_put_contents("$theme_path/$file", $_POST['contents']) )
+				die('File updated.'); # Success	
 			
 			die('Unable to save changes'); # Error
 		}
 
 		$primary = new View('theme/edit_file');
 		$primary->file_name = $file;	
-		$primary->file_contents = file_get_contents($current_file);
+		$primary->file_contents = file_get_contents("$theme_path/$file");
 		die($primary);
 	}
 
@@ -64,11 +74,10 @@ class Theme_Controller extends Controller {
 			$dest		= DATAPATH . "$this->site_name/themes/$new_theme";				
 	
 			# If theme directory does not yet exist, create it.
-			if(! is_dir($dest) )
-			{					
+			if(! is_dir($dest) )				
 				if(! Jdirectory::copy($source, $dest) )
-					die('Unable to change theme<br>Please try again later.'); # Error
-			}
+					die('Unable to change theme.'); # Error
+
 			$db->update(
 				'sites',
 				array('theme' => $new_theme),
@@ -184,10 +193,9 @@ class Theme_Controller extends Controller {
 
 		$img_path = DOCROOT."data/$this->site_name/assets/banners/{$_POST['banner']}";
 		if(file_exists($img_path))
-		{
 			if(unlink($img_path))
 				die('Image deleted!');
-		}
+
 		die('Unable to delete image'); 
 	}
 	

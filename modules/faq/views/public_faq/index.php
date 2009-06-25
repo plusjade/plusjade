@@ -12,8 +12,8 @@
 		$url_question = strtolower($url_question);			
 		$url_question = trim($url_question, '_');
 		?>
-		<span id="faq_item_<?php echo $item->id?>" class="faq_item">
-			<dt class="minus" rel="<?php echo $item->id?>">
+		<span id="faq_item_<?php echo $item->id?>" class="faq_item" rel="<?php echo $item->id?>">
+			<dt class="minus">
 				<?php echo ++$x?>. <a href="#<?php echo $url_question?>" class="toggle"><?php echo $item->question?></a>
 			</dt>
 			<dd id="<?php echo $url_question?>" class="faq_answer">

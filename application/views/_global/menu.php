@@ -22,7 +22,7 @@ $pages	= $db->query("
 $this_page_id = (empty($this_page_id)) ? '' : $this_page_id;
 ?>
 
-<ul id="primary_menu">
+<ul>
 	<?php
 		foreach($pages as $page)
 		{
@@ -34,6 +34,3 @@ $this_page_id = (empty($this_page_id)) ? '' : $this_page_id;
 		}
 	?>
 </ul>
-
-
-
