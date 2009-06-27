@@ -93,8 +93,7 @@ $(document).ready(function()
  * updates the tool container #tool_wrapper_<id> 
  * with the updated output from that tool.
 */
-	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, response){
-		
+	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, response){		
 		if(!response) response = 'Updating...';
 		
 		// Set loading status...
@@ -106,11 +105,7 @@ $(document).ready(function()
 		}
 		
 		// Get the tool html output...
-		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){					
-			/* possible actions:
-				1. add
-				2. update
-			 */
+		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){
 			if('add' == action) {
 				// response = guid
 				// get the toolkit to insert red toolbar via ajax
@@ -197,17 +192,7 @@ $(document).ready(function()
 			});
 			return false;
 		},
-		
-		// currently not using...
-		"a.update_tool_html": function(e) {
-			values		= e.target.href.split('/');
-			tool_id		= values.pop();
-			toolname	= values.pop();
-			$.facebox.close();
-			$().jade_update_tool_html('update', toolname, tool_id);
-			return false;
-		},
-		
+	
 		// ACTIVATE action Tool toolkit menus	
 		".actions_link": function(e) {
 			$(e.target).next('ul').toggle();
@@ -215,22 +200,28 @@ $(document).ready(function()
 		},
 		
 		
-		/* testing ----- */
+		/* Click actions for css styler ----- */
 		
-		"a.css_styler": function(e) {
+		"a[rel=css_styler]": function(e) {
 			$('div.styler_wrapper').show();
 			$('div.styler_wrapper .styler_dialog')
 			.html('<div class="loading">Loading...</div>')
 			.load(e.target.href, function(){
-				//this works pretty well!
-				$(document).trigger('reveal.facebox');
+				$('.facebox .show_submit').hide();
+				// just for now ..
+				$(window).resize(function(){
+					state = $('div.styler_wrapper a.toggle').html();
+					height = 435;
+					if('show' == state) height = 32; 
+					$('div.styler_wrapper').css('top', $.getPageHeight()- height);
 				});
+		
+			});
 			return false;
 		},
 		
 		"div.styler_wrapper a.toggle": function(e) {
-			$('div.dialog_wrapper').toggle('fast');
-			
+			$('div.dialog_wrapper').toggle('fast');			
 			value = $(e.target).html();
 			
 			if('hide'== value){
@@ -248,8 +239,10 @@ $(document).ready(function()
 			return false;
 		}
 	}));
-	
-	// testing...
+
+/* 
+ * Add the css styler wrapper into the DOM.
+ */
 	$('body').append('<div class="styler_wrapper admin_reset" style="display:none"> \
 			<div class="actions"> \
 				<a href="#" class="toggle">hide</a> \
@@ -262,7 +255,7 @@ $(document).ready(function()
 		</div>');
 	$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
 
- 
+	
 /* 
  * 1. Activate admin ajax forms.
  */ 
@@ -331,7 +324,7 @@ $(document).ready(function()
  * 2. maintain full height of facebox when window resizing.
  */	
 	$(document).bind('reveal.facebox', function(){
-		//$('body').addClass('disable_body').attr('scroll','no');
+		$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
 		$('textarea.render_html').wysiwyg();
 		
@@ -349,12 +342,6 @@ $(document).ready(function()
 			.css('min-height', height);
 			$('.facebox div.wysiwyg iframe')
 			.css('min-height', height-30);
-			
-			// resize for css_styler
-			state = $('div.styler_wrapper a.toggle').html();
-			height = 435;
-			if('show' == state) height = 32; 
-			$('div.styler_wrapper').css('top', $.getPageHeight()- height);
 		});
 	});
 

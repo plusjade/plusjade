@@ -4,12 +4,22 @@
 		<li class="root_list header">
 			<div class="title_tag">SITEWIDE:</div>
 		</li>
+
+		<li class="root_list dropdown">
+			<div>Sitewide &#8595;</div>
+			<ul>
+				<li><span class="icon page">&nbsp; &nbsp; </span><a href="/get/admin" rel="facebox">Settings</a></li>				
+			</ul>		
+		</li>	
 		
 		<li class="root_list dropdown">
 			<div>Theme &#8595;</div>
 			<ul> 
-				<li><span class="icon rainbow">&nbsp; &nbsp; </span><a href="/get/theme" rel="no_facebox" class="css_styler">Edit Theme</a></li>
+				<li>This Theme &#8594;</li>
+				<li><span class="icon rainbow">&nbsp; &nbsp; </span><a href="/get/theme/templates" rel="facebox">Templates</a></li>
+				<li><span class="icon rainbow">&nbsp; &nbsp; </span><a href="/get/theme/stylesheets" rel="css_styler">Stylesheets</a></li>
 				<li><span class="icon flag">&nbsp; &nbsp; </span><a href="/get/theme/logo" rel="facebox">Edit Logo</a></li>
+				<li>All Themes &#8594;</li>
 				<li><span class="icon flag">&nbsp; &nbsp; </span><a href="/get/theme/change" rel="facebox">New Theme</a></li>
 			</ul>		
 		</li>

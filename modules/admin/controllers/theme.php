@@ -13,11 +13,11 @@ class Theme_Controller extends Controller {
 	}
 
 /*
- * Manage current-theme assets.
+ * edit this themes global templates
  */
-	function index()
+	function templates()
 	{
-		$primary	= new View('theme/manage');
+		$primary	= new View('theme/templates');
 		$db			= new Database;
 		
 		$custom_data_path	= Assets::data_path_theme();		
@@ -27,21 +27,56 @@ class Theme_Controller extends Controller {
 			$contents = str_replace('../images', $theme_url , file_get_contents("$custom_data_path/css/global.css"));
 		
 		
-		
 		$primary->css_files = Jdirectory::contents("$custom_data_path/css");
 		$primary->contents	= $contents;
 		$primary->theme_files = Jdirectory::contents($custom_data_path, 'root', TRUE);
 		die($primary);
 	}
+	
+/*
+ * edit this themes global stylesheets
+ */
+	function stylesheets()
+	{
+		$primary	= new View('theme/stylesheets');
+		$db			= new Database;
+		
+		$custom_data_path	= Assets::data_path_theme();		
+		$theme_url			= Assets::url_path_theme('images');
+		$contents = '';
+		if(file_exists("$custom_data_path/css/global.css"))
+			$contents = str_replace('../images', $theme_url , file_get_contents("$custom_data_path/css/global.css"));
+		
+		$primary->css_files = Jdirectory::contents("$custom_data_path/css");
+		$primary->contents	= $contents;
+		die($primary);
+	}
+
 
 /*
+ * load a filtered css file into the textarea editor
+ * works with self::stylesheets
+ */	
+	function load($filename=NULL)
+	{
+		$path = Assets::data_path_theme("css/$filename");
+		if(!file_exists($path))
+			die('invalid file');
+		
+		$url = Assets::url_path_theme('images');
+		echo str_replace('../images', $url , file_get_contents($path));	
+		die();
+	
+	}
+/*
  * Edit a file from the theme repo
+ * should only be css for now. 
  */
 	function edit($file=NULL)
 	{
 		# CAUTION TODO: these names need to be filtered !!!
-		$file= str_replace(':', '/', $file);
-		$theme_path = Assets::data_path_theme();
+		$fil		= str_replace(':', '/', $file);
+		$theme_path	= Assets::data_path_theme();
 		
 		if(! file_exists("$theme_path/$file") AND empty($_POST['contents']) )
 			die('Invalid File');	
@@ -67,8 +102,8 @@ class Theme_Controller extends Controller {
 	{
 		$db = new Database;
 		
-		if(! empty($_POST['theme']) )
-		{	
+		if(! empty($_POST['theme']))
+		{
 			$new_theme	= $_POST['theme'];
 			$source		= APPPATH . "views/$new_theme";
 			$dest		= DATAPATH . "$this->site_name/themes/$new_theme";				

@@ -201,9 +201,9 @@ class Tool_Controller extends Controller {
 			yaml::delete_value($this->site_name, 'pages_config', $tool_data->page_name);
 		
 		# DELETE custom css file
-		$custom_css = DATAPATH . "$this->site_name/tools_css/$tool_data->name/$tool_data->tool_id.css";
-		if(file_exists($custom_css))
-			unlink($custom_css);
+		$theme_tool_css = Assets::data_path_theme("tools/$tool_data->name/css/$tool_data->tool_id.css");
+		if(file_exists($theme_tool_css))
+			unlink($theme_tool_css);
 		
 		# run tool_deleter
 		$edit_tool	= Load_Tool::edit_factory($tool_data->name);
@@ -331,6 +331,66 @@ class Tool_Controller extends Controller {
 		die($primary);
 		
 	}
+
+
+
+
+
+/*
+ * Edit a custom css file associated with a tool.
+ * Custom files are auto created if none exists.
+ * Stored in /data/tools_css
+ */
+	function css($name_id=NULL, $tool_id=NULL)
+	{
+		valid::id_key($name_id);	
+		valid::id_key($tool_id);		
+		
+		$db = new Database;
+		$tool = $db->query("
+			SELECT LOWER(name) AS name 
+			FROM tools_list 
+			WHERE id='$name_id'
+		")->current();
+		
+		# Overwrite old file with new file contents;
+		if($_POST)
+		{
+			$db->update(
+				"{$tool->name}s",
+				array('attributes' => $_POST['attributes'] ),
+				"id='$tool_id' AND fk_site = '$this->site_id'"
+			);
+			
+			if(isset($_POST['save_template']))
+				die( Css::save_template($tool->name, $_POST['contents']) );
+				
+			die( Css::save_custom_css($tool->name, $tool_id, $_POST['contents']) );
+		}
+
+		$primary = new View('tool/edit_css');			
+		$primary->contents	= Css::get_tool_css($tool->name, $tool_id);
+		$primary->stock		= Css::get_tool_css($tool->name, $tool_id, 'stock');
+		$primary->template	= Css::get_tool_css($tool->name, $tool_id, 'template');
+		$data = array(
+			'tool_id'			=> $tool_id,
+			'name_id'			=> $name_id,
+			'toolname'			=> $tool->name,
+			'js_rel_command'	=> "update-$tool->name-$tool_id",
+		);
+		$primary->data = $data;
+		
+		# get attributes for this tool.
+		$parent = $db->query("
+			SELECT attributes
+			FROM {$tool->name}s
+			WHERE id='$tool_id'
+		")->current();
+		$primary->attributes = $parent->attributes;
+		
+		die($primary);
+	}
+
 	
 /*
  * get the rendered html of a single tool 

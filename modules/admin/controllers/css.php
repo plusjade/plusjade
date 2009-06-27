@@ -16,6 +16,8 @@ class Css_Controller extends Controller {
  * get user custom css for all tools on a page
  * these files should be 100% ready for output.
  * That is any tokens should have been parsed before saved.
+ * tool-css files are saved relative to the installed theme.
+ * ex: /_data/<site_name>/themes/<theme_name>/tools/<toolname>/<tool_id>.css 
  */
 	function tools($page_id=NULL, $admin=FALSE)
 	{
@@ -45,10 +47,10 @@ class Css_Controller extends Controller {
 
 		$tool_types = array();
 		foreach($tool_data as $tool)
-		{
-			$custom_file = DATAPATH . "$this->site_name/tools_css/$tool->name/$tool->tool_id.css";
-			if(file_exists($custom_file))
-				readfile($custom_file);
+		{	
+			$theme_tool_css = Assets::data_path_theme("tools/$tool->name/css/$tool->tool_id.css");
+			if(file_exists($theme_tool_css))
+				readfile($theme_tool_css);
 				
 			$tool_types[$tool->name] = $tool->name;
 		}
@@ -109,59 +111,6 @@ class Css_Controller extends Controller {
 		die( ob_get_clean() );
 	}
 	
-	
-/*
- * Edit a custom css file associated with a tool.
- * Custom files are auto created if none exists.
- * Stored in /data/tools_css
- */
-	function edit($name_id=NULL, $tool_id=NULL)
-	{
-		if(!$this->client->can_edit($this->site_id))
-			die('Please login');
-		valid::id_key($name_id);	
-		valid::id_key($tool_id);		
-		
-		$css_file_path = DATAPATH . "$this->site_name/tools_css";
-		$db = new Database;
-		$tool = $db->query("
-			SELECT LOWER(name) AS name 
-			FROM tools_list 
-			WHERE id='$name_id'
-		")->current();
-		$table = $tool->name.'s';
-		
-		# Overwrite old file with new file contents;
-		if($_POST)
-		{
-			$attributes = $_POST['attributes'];	
-			$db->update(
-				$table,
-				array('attributes' => $attributes ),
-				"id='$tool_id' AND fk_site = '$this->site_id'
-			");
-			
-			die( Css::save_custom_css($tool->name, $tool_id, $_POST['contents'] ) );
-		}
-
-		$primary = new View('css/edit_file');			
-		$primary->contents	= Css::get_tool_css($tool->name, $tool_id);
-		$primary->stock		= Css::get_tool_css($tool->name, $tool_id, TRUE);
-		$primary->tool_id	= $tool_id;
-		$primary->name_id	= $name_id;
-		$primary->toolname	= $tool->name;
-		$primary->js_rel_command = "update-$tool->name-$tool_id";
-		
-		# get attributes for this tool.
-		$parent = $db->query("
-			SELECT attributes
-			FROM $table
-			WHERE id='$tool_id'
-		")->current();
-		$primary->attributes = $parent->attributes;
-		
-		die($primary);
-	}
 }
 
 /* End of file admin.php */

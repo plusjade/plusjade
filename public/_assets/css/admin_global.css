@@ -27,6 +27,8 @@
 .facebox .content a:visited{
 	color:purple;
 }
+.admin_reset label,.admin_reset label:hover{ cursor:pointer; cursor:cursor;}
+
 .admin_reset ul,
 .jade_toolbar_wrapper ul,
 .admin_reset .content ul{
@@ -116,7 +118,7 @@ span.move{background-position:0px -363px}
 	overflow:hidden;
 	top:2px;
 }
-.facebox .close_wrapper .show_submit{
+.admin_reset .show_submit{
 	width:275px;	
 	height:25px;
 	float:right;
@@ -124,7 +126,7 @@ span.move{background-position:0px -363px}
 	overflow:hidden;
 	background: #ffffcc url('/_assets/images/admin/line_loader.gif') no-repeat 6% 50%;
 }
-.facebox .close_wrapper .show_submit div{
+.admin_reset .show_submit div{
 	width:90px;
 	height:25px;
 	float:right;
@@ -204,7 +206,7 @@ span.move{background-position:0px -363px}
 	margin:0 auto;
 	width:300px;
 	height:200px;
-	background: #fff url(/_assets/images/admin/load.gif) no-repeat 50% 50%;
+	background: transparent url(/_assets/images/admin/load.gif) no-repeat 50% 50%;
 	font-size:1.4em;
 	font-weight:bold;
 	line-height:2em;
@@ -294,13 +296,13 @@ ul#admin_bar{
 }
 #admin_bar li.root_list{
 	display:block;
-	float:left;
-	background-attachment:fixed;
-	background:orange url('/_assets/images/admin/gradients.jpg') repeat-x 0px -305px;
 	height:28px;
 	width:100px;
 	padding:0;
 	margin:0;
+	float:left;
+	background-attachment:fixed;
+	background:orange url('/_assets/images/admin/gradients.jpg') repeat-x 0px -305px;
 }
 #admin_bar li.root_list.header{
 	background-attachment:fixed;
@@ -345,6 +347,7 @@ ul#admin_bar{
 	line-height:2em;
 	background:#fff;
 	border:1px solid #777;
+	color:#999;
 }
 #admin_bar div.title_tag{
 	color:#fff;
@@ -763,7 +766,8 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 
 .generic_tabs{
-	padding:7px 0 !important;
+	padding:6px 0 !important;
+	margin:0;
 }
 .generic_tabs div.field_title{
 	float:right;
