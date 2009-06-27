@@ -254,63 +254,85 @@ $(document).ready(function()
 			<div class="actions"> \
 				<a href="#" class="toggle">hide</a> \
 				<a href="#" class="close">close</a> \
+				<div class="show_submit" style="display:none"><div>...Submitting</div></div> \
 			</div> \
 			<div class="dialog_wrapper"> \
 				<div class="styler_dialog">&#160;</div> \
 			</div>\
 		</div>');
 	$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
+
+ 
+/* 
+ * 1. Activate admin ajax forms.
+ */ 
+	$('body').submit($.delegate({
+		'.ajaxForm' : function(e){
+			$(e.target).ajaxSubmit({
+			 
+				beforeSubmit: function(){
+					if(! $("input", $(e.target)).jade_validate() )
+						return false;
+					$('.admin_reset .show_submit').show();
+					$('#show_response_beta').html('waiting for response...');
+				},
+				success: function(data) {
+					$('.admin_reset .show_submit').hide();					
+					var action = $(e.target).attr('rel');
+
+					if( 'undefined' == typeof(action) ) {
+						// TODO: find something good to put here
+						$('#show_response_beta').html(data);
+						alert('this form had no rel attribute');
+					} else {
+						action = action.split('-');
+						//**action = array(action, toolname, tool_id);
+						switch(action[0])
+						{
+							case 'update':
+								$.facebox.close();
+								$().jade_update_tool_html(action[0], action[1], action[2], data);	
+								break;
+							case 'add':
+								$.facebox.close();
+								$().jade_update_tool_html(action[0], action[1], action[2], data);	
+								break;
+							case 'close':
+								// useful for facebox_2 requests TODO: Sanitize this?
+								$.facebox.close('facebox_'+action[1]);
+								break;
+							case 'scope':
+								$('span#guid_'+ action[2]).removeClass('local global');
+								$('span#guid_'+ action[2]).addClass(data);
+								$.facebox.close();			
+								break;
+							case 'reload':
+								$.facebox(data, 'loading_msg', 'facebox_2');
+								location.reload();		
+								break;
+							case 'save_css':
+								alert('css saved =D\n'+ data);
+								break;
+							default:
+								alert(action[0] + 'has no action function');
+						}
+					}
+					$('#show_response_beta').html(data);
+				}
+			}); 
+			return false;
+		}
+	
+	}));
+
 /* 
  * Bind functions to after facebox is revealed event.
- * 1. Activate AJAX FORMS default ajax forms in all facebox windows
- * 2. Activate rich text editor (jwysiwyg)
- */
+ * 1. Activate rich text editor (jwysiwyg)
+ * 2. maintain full height of facebox when window resizing.
+ */	
 	$(document).bind('reveal.facebox', function(){
 		//$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
-		
-		$(".ajaxForm").ajaxForm({
-			beforeSubmit: function(){
-				if(! $(".ajaxForm input").jade_validate() )
-					return false;
-					
-				$('.facebox .show_submit').show();
-				$('#show_response_beta').html('waiting for response...');
-			},
-			success: function(data) {
-				$('.facebox .show_submit').hide();
-				var action = $('form.ajaxForm').attr('rel');
-
-				if( 'undefined' == typeof(action) ) {
-					// TODO: find something good to put here
-					$('#show_response_beta').html(data);
-					alert('this form had no rel attribute');
-				} else {
-					action = action.split('-');
-					//**action = array(action, toolname, tool_id);
-					
-					// useful for facebox_2 requests TODO: Sanitize this?
-					if('close' == action[0] ) {
-						$.facebox.close('facebox_'+action[1]);
-					} else if('scope' == action[0] ) {
-						$('span#guid_'+ action[2]).removeClass('local global');
-						$('span#guid_'+ action[2]).addClass(data);
-						$.facebox.close();	
-					} else if('reload' == action[0] ) {
-						$.facebox(data, 'loading_msg', 'facebox_2');
-						location.reload();
-					} else {
-						// in case of update or add
-						// update tool html output to DOM via ajax
-						$.facebox.close();
-						$().jade_update_tool_html(action[0], action[1], action[2], data);	
-					}
-				}
-				$('#show_response_beta').html(data);
-				return true;
-			}
-		});
-		
 		$('textarea.render_html').wysiwyg();
 		
 		// Expand/contract box-element to fill up full-available facebox view.
