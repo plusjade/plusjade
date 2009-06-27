@@ -1,8 +1,9 @@
 
 
 <div id="common_tool_header" class="buttons">
-	<div id="common_title">Current Theme: <?php echo ucfirst($this->theme)?> -
-	working with stylesheet: <span class="current_sheet">global.css</span>
+	<div id="common_title">
+		Working with stylesheet: "<span class="current_sheet">global.css</span>"
+		from theme "<?php echo ucfirst($this->theme)?>"
 	</div>
 </div>
 
@@ -19,25 +20,6 @@
 			echo "<option value=\"$file\">$file</option>";
 		?>
 	</select> <button id="load_sheet" class="jade_positive">Load</button>
-	
-	<br><br>
-	
-	<h3>Theme Pages</h3>
-	<ul>
-		<?php
-		foreach($theme_files as $dir => $file)
-		{
-			if(! is_array($file) )
-			{
-				?>
-				<li>
-					<a href="<?php echo url::site("get/theme/edit/$file")?>" rel="facebox" id="2"><?php echo $file?></a>
-				</li>
-				<?php
-			}
-		}		
-		?>
-	</ul>
 	
 	<br><br>
 	
@@ -69,12 +51,12 @@
 	</div>
 	
 	
-	<ul class="generic_tabs ui-tabs_nav" style="margin:0;padding:0;">
+	<ul class="generic_tabs ui-tabs_nav">
 		<li><a href="#" class="update">Update</a></li>
 		<li><a href="#" class="show_orig">Reset</a></li>
 		<li><a href="#" class="show_stock">Show Stock</a></li>
 	</ul>
-	<textarea id="edit_css" name="contents" class="blah" style="height:310px"><?php echo $contents?></textarea>
+	<textarea id="edit_css" name="contents" class="blah" style="height:300px"><?php echo $contents?></textarea>
 
 </div>
 	
@@ -109,6 +91,7 @@
 		return false;
 	});
 
+	
 	// delegation for save_pane
 	$('.common_main_panel').click($.delegate({
 		
@@ -141,21 +124,19 @@
 				
 				$('select.files_list').append('<option value="'+ file +'">'+ file +'</option>');
 				
-				setTimeout('$("div.save_pane.helper").remove()', 2000);
+				setTimeout('$("div.save_pane.helper").remove()', 1000);
 			});
 			
 			return false;
 		}	
 		
-		
-		
 	}));	
 	
-	// select dropdown
+	// select dropdown for loading stylesheet files
 	$("#load_sheet").click(function(){
 		value = $("select[name='files'] option:selected").text();		
 		$('textarea#edit_css').val('Loading file...');
-		$.get('<?php echo Assets::url_path_theme('css')?>/'+ value +'?v=39840',
+		$.get('/get/theme/load/'+ value +'?v=39840',
 			function(data){
 				$('textarea#edit_css').val(data);
 				// set file as selected

@@ -15,7 +15,7 @@ http://templates.arcsin.se/license/
 * {margin: 0; padding: 0;}
 
 body {
-	background: #7C6F5C url(..//_data/sprite/themes/custom/images/bg.jpg);
+	background: #7C6F5C url(/_data/sprite/themes/custom/images/bg.jpg);
 	color: #222;
 	font: normal 62.5% sans-serif;
 	padding: 2% 0;

@@ -5,8 +5,6 @@
 
 #album_wrapper_37{
 	margin:5px;
-	ackground:#eee;
-	order:1px solid #ccc;
 }
 #album_wrapper_37 ul.album_lightbox { 
 	list-style: none; 
@@ -16,8 +14,7 @@
 #album_wrapper_37 ul.album_lightbox li { 
 	float:left;
 	height:120px;
-	margin:5px;	
-	order:1px solid #ccc;
+	margin:5px;
 }
 #album_wrapper_37 ul.album_lightbox img {
 

@@ -103,7 +103,7 @@ abstract class Controller_Core {
 		if($this->client->can_edit($this->site_id))
 		{
 			# Get CSS
-			$custom_css	= DATAPATH . "$this->site_name/tools_css/$toolname/$tool_id.css";
+			$custom_css	= Assets::data_path_theme("tools/$toolname/css/$tool_id.css");
 			$contents	= (file_exists($custom_css)) ? file_get_contents($custom_css) : '';
 			$template->custom_css = "
 				<style type=\"text/css\" id=\"$toolname-$tool_id-style\">

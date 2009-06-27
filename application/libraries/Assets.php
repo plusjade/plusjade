@@ -3,7 +3,7 @@
 class Assets_Core {
 
 /*
- * Gets and sets site assets
+ * configures paths to assets directory
  * i.e. images/files etc. These are other than theme and tool specific assets.
  *
  */

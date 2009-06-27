@@ -81,16 +81,15 @@ abstract class Template_Controller extends Controller {
 	{
 		$header		= View::factory('_global/header');
 		$menu		= View::factory('_global/menu');
-		$theme_path	= DATAPATH . "$this->site_name/themes/$this->theme";
 		$template 	= ((NULL == $template)) ? 'master' : $template;
+		$path		= Assets::data_path_theme("templates/$template.html");
 		
 		ob_start();	
-		if (file_exists("$theme_path/$template.html"))
-			readfile("$theme_path/$template.html");	
+		if (file_exists($path))
+			readfile($path);	
 		else
 			die("Could not find '$template.html' for theme: $this->theme");
 		
-		$master = ob_get_clean();
 
 		function get_string_between($string, $start, $end)
 		{
@@ -101,7 +100,7 @@ abstract class Template_Controller extends Controller {
 			$len = strpos($string, $end, $ini) - $ini;
 			return substr($string, $ini, $len);
 		}
-		$master = get_string_between($master, '<body>', '</body>');
+		$master = get_string_between(ob_get_clean(), '<body>', '</body>');
 		
 		$keys = array(
 			'%HEADER%',
@@ -112,12 +111,9 @@ abstract class Template_Controller extends Controller {
 			$menu,
 		);
 		if(! is_array($containers_array) )
-		{
 			$containers_array = array(
-				' ', $containers_array,
-				' ', ' ', ' ', ' '
+				' ', $containers_array,' ', ' ', ' ', ' '
 			);
-		}
 		
 		# 5 containers
 		foreach($containers_array as $key => $content)
@@ -138,7 +134,7 @@ abstract class Template_Controller extends Controller {
 
 		# build the end_body contents
 		# It is bad to open 2 buffers, fix this
-		$tracker_path = DATAPATH."$this->site_name/tracker.html";	
+		$tracker_path = DATAPATH . "$this->site_name/tracker.html";	
 		#ob_start();
 		if ( file_exists("$tracker_path") )
 			readfile("$tracker_path");	

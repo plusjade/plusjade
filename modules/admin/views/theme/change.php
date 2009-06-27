@@ -1,6 +1,6 @@
 
 <?php echo form::open('theme/change', array('class' => 'ajaxForm', 'rel' => $js_rel_command))?>
-	
+
 	<div id="common_tool_header" class="buttons">
 		<div id="common_title">Current Theme: <?php echo $this->theme;?></div>
 	</div>
@@ -9,7 +9,7 @@
 		<ul style="line-height:2em">
 			<?php
 			foreach($themes as $key => $theme)
-				echo "<li><a href=\"#\" class=\"theme_toggle\" rel=\"$theme->id\">$theme->name</a></li>"; 
+				echo "<li><input type=\"radio\" name=\"theme\" value=\"$theme->name\" id=\"$theme->name\"> <label for=\"$theme->name\" class=\"theme_toggle\" rel=\"$theme->id\">$theme->name</label></li>"; 
 			?>
 		</ul>
 	</div>
@@ -42,10 +42,9 @@
 <script type="text/javascript">
 	$('.each_theme').hide();
 	$('#theme_<?php echo $current_theme?>').show();
-	$('div.common_left_panel a.theme_toggle').click(function(){
+	$('div.common_left_panel label.theme_toggle').click(function(){
 		id = $(this).attr('rel');	
 		$('div.each_theme').hide(); 
 		$('#theme_'+id).show();
-		return false;
 	});
 </script>
