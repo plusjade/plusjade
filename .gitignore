@@ -12,6 +12,6 @@ application/logs/*
 application/config/database.php
 public/index.php
 public/.htaccess
-public/data/*
-public/assets/images/_upload*
+public/_data/*
+public/_assets/images/_upload*
 
