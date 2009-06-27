@@ -5,7 +5,7 @@
  *  Create, read, update, delete values in our yaml files.
  *  yaml files exist in site data directory in "protected" folder
 	site_config:
-		makes it easier to load up site data rather than querying the db every time.
+		makes it easier to load site data rather than querying the db every time.
  
 	pages_config: 
 		is needed to determine how to load a page.
