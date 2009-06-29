@@ -1,7 +1,6 @@
 
 
 <div class="blog_navigation">
-
 	<div class="tags_list">
 		<h3>Tags</h3>
 			<ul>

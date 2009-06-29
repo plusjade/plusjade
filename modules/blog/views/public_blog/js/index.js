@@ -31,8 +31,10 @@ $('body').submit($.delegate({
 			success: function(data) {
 				$('.comments_wrapper', form).append(data);
 				$('.add_comment', form).replaceWith('<div class="blog_response">Comment Added!</div>');
+				e.stopPropagation();
 			}
-		});			
+		});
+		e.stopPropagation();		
 		return false;
-	}	
+	}
 }));
