@@ -52,7 +52,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 				'status'	=> $_POST['status'],
 				'title'		=> $_POST['title'],
 				'body'		=> $_POST['body'],
-				'created'	=> date("Y-m-d H:m:s")
+				'created'	=> strftime("%Y-%m-%d %H:%M:%S")
 			);
 			$item_id = $db->insert('blog_items', $data)->insert_id();
 			
@@ -83,7 +83,31 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 				"id = '$id' AND fk_site='$this->site_id'"
 			);
 			self::save_tags($_POST['tags'], $id, $_POST['parent_id']);
-			die('Post Saved'); #status				
+			
+			if(isset($_POST['sticky']))
+			{
+				$sticky_posts = '';
+				
+				if('stick' == $_POST['sticky'])
+					$sticky_posts = $_POST['sticky_posts'] . ",$id";
+				elseif('unstick' == $_POST['sticky'])
+				{
+					$sticky_posts = explode(',', $_POST['sticky_posts']);
+					#print_r($sticky_posts);die();
+					if($key = array_search($id, $sticky_posts))
+						unset($sticky_posts[$key]);
+						
+					$sticky_posts = implode(',', $sticky_posts);
+				}
+	
+				$db->query("
+					UPDATE blogs
+					SET sticky_posts = '$sticky_posts'
+					WHERE id = '$_POST[parent_id]'
+					AND fk_site = '$this->site_id'
+				");	
+			}
+			die('Post Saved'); #status			
 		}
 
 		$primary = new View("edit_blog/edit_item");
@@ -96,6 +120,18 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			AND blog_items.fk_site = '$this->site_id'
 		")->current();
 		$primary->item = $item;
+		
+		$parent = $db->query("
+			SELECT * 
+			FROM blogs
+			WHERE id='$item->parent_id'
+			AND fk_site = '$this->site_id'
+		")->current();
+		
+		$sticky_posts = explode(',', $parent->sticky_posts);
+		$primary->sticky_posts = $parent->sticky_posts;
+		$primary->is_sticky = (in_array($id, $sticky_posts)) ? TRUE : FALSE ;
+		
 		$primary->js_rel_command = "update-blog-$item->parent_id";
 		die($primary);
 	}

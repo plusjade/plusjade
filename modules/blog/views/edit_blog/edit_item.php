@@ -5,6 +5,7 @@
 ?>
 <form action="/get/edit_blog/edit/<?php echo $item->id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
 	<input type="hidden" name="parent_id" value="<?php echo $item->parent_id?>">
+	<input type="hidden" name="sticky_posts" value="<?php echo $sticky_posts?>">
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_images" class="jade_positive">Save Changes</button>
@@ -17,6 +18,15 @@
 			<option <?php echo $status['draft']?>>draft</option>
 			<option <?php echo $status['publish']?>>publish</option>
 		</select>
+		
+		<br><br>
+		<?php
+		if($is_sticky)
+			echo '<input type="checkbox" name="sticky" value="unstick"> <b>Remove Sticky</b>';
+		else
+			echo '<input type="checkbox" name="sticky" value="stick"> <b>Make sticky</b>';
+		?>
+		
 		<p>
 			<b>Add Tags</b>
 			<br><input type="text" name="tags" style="width:150px">	
@@ -35,6 +45,7 @@
 			}
 		?>
 		</ul>
+		
 	</div>
 	
 	<div class="common_main_panel fieldsets">

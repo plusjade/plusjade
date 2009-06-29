@@ -14,6 +14,7 @@ class Blog_Controller extends Controller {
 */
 	function _index($tool_id)
 	{
+		date_default_timezone_set('America/Los_Angeles');# just for now
 		$url_array	= uri::url_array();
 		$page_name	= $this->get_page_name(@$url_array['0'], 'blog', $tool_id);
 		$action		= @$url_array['1'];
@@ -253,7 +254,7 @@ class Blog_Controller extends Controller {
 	{
 		if($_POST)
 		{
-			ini_set('date.timezone', 'America/Los_Angeles');
+			##ini_set('date.timezone', 'America/Los_Angeles');
 
 			$data = array(
 				'parent_id'		=> $_POST['tool_id'],
@@ -263,7 +264,7 @@ class Blog_Controller extends Controller {
 				'name'			=> $_POST['name'],
 				'url'			=> $_POST['url'],
 				'email'			=> $_POST['email'],
-				'created_at'	=> date("Y-m-d H:m:s"),					
+				'created_at'	=> strftime("%Y-%m-%d %H:%M:%S"),					
 			);
 			
 			$insert_id = $this->db->insert('blog_items_comments', $data);
@@ -291,7 +292,7 @@ class Blog_Controller extends Controller {
 			WHERE parent_id = '$tool_id'
 			AND fk_site='$this->site_id'
 			GROUP BY tags.value
-			ORDER BY qty DESC
+			ORDER BY qty DESC, value
 		");
 		return $tags;		
 	}
