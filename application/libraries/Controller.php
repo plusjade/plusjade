@@ -147,13 +147,13 @@ abstract class Controller_Core {
  */
 	public function get_page_name($page_name, $toolname, $tool_id)
 	{
-		if(empty($page_name))
-			return $this->homepage;
-			
-		if('get' != $page_name)
-			return $page_name;
+		if(! empty($page_name) )
+			if('get' == $page_name)
+				return yaml::does_value_exist($this->site_name, 'pages_config', "$toolname-$tool_id");
+			else
+				return $page_name;
 		
-		return yaml::does_value_exist($this->site_name, 'pages_config', "$toolname-$tool_id");
+		return $this->homepage;
 	}
 	
 	

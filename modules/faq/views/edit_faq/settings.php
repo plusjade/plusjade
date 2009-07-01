@@ -1,6 +1,7 @@
 
+<span id="on_close"><?php echo $js_rel_command?></span>
 
-<form action="/get/edit_faq/settings/<?php echo $tool_id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
+<form action="/get/edit_faq/settings/<?php echo $tool_id?>" method="POST" class="ajaxForm">	
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="save_settings" class="jade_positive" accesskey="enter">Save Settings</button>

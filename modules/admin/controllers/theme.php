@@ -15,11 +15,21 @@ class Theme_Controller extends Controller {
 /*
  * edit this themes global templates
  */
+	function manage()
+	{
+		$primary	= new View('theme/manage');
+		$theme_path	= DATAPATH . "$this->site_name/themes";		
+		$primary->themes = Jdirectory::contents($theme_path, 'root', 'list_dir');
+		die($primary);
+	}
+	
+/*
+ * edit this themes global templates
+ */
 	function templates()
 	{
 		$primary	= new View('theme/templates');
-		$db			= new Database;
-		
+
 		$custom_data_path	= Assets::data_path_theme();		
 		$theme_url			= Assets::url_path_theme('images');
 		$contents = '';
@@ -39,7 +49,6 @@ class Theme_Controller extends Controller {
 	function stylesheets()
 	{
 		$primary	= new View('theme/stylesheets');
-		$db			= new Database;
 		
 		$custom_data_path	= Assets::data_path_theme();		
 		$theme_url			= Assets::url_path_theme('images');
@@ -127,7 +136,7 @@ class Theme_Controller extends Controller {
 		}
 
 		$primary	= new View('theme/change');
-		$themes		= $db->query('SELECT * FROM themes');
+		$themes		= $db->query("SELECT * FROM themes WHERE enabled = 'yes'");
 		$primary->themes = $themes;
 		$primary->js_rel_command = 'reload-home';
 		die($primary);	

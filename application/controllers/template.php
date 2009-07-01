@@ -47,7 +47,7 @@ abstract class Template_Controller extends Controller {
 			$this->template->inline_global_css = "<style type=\"text/css\" id=\"global-style\">\n$css\n</style>\n";
 				
 			$this->template->linkCSS('get/css/admin', url::site() );
-			$this->template->admin_linkJS('get/js/admin?v=1.0');
+			$this->template->admin_linkJS('get/js/admin?v=1.1');
 			$this->template->admin_linkJS('get/js/tools');
 
 			# determine if tool is protected so we can omit scope link

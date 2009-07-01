@@ -1,4 +1,6 @@
 
+<span id="on_close">update-album-<?php echo $tool_id?></span>
+
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="save_sort" class="jade_positive">Save Image Order</button>
 	<div id="common_title">Manage Album</div>
@@ -17,7 +19,7 @@
 	#hack, take this out later
 	$url_path = Assets::url_path_direct("tools/albums/$album->id");
 ?>
-<div id="sortable_images_wrapper">
+<div id="sortable_images_wrapper" class="full_height" style="width:610px; height:350px; overflow:auto">
 	<?php
 		foreach($items as $image)
 		{
@@ -77,7 +79,5 @@
 		}
 	});
 		
-	<?php
-		echo javascript::save_sort('album', $album->id, NULL, 'sortable_images_wrapper');	
-	?>
+	<?php echo javascript::save_sort('album', $album->id, NULL, 'sortable_images_wrapper');	?>
 </script>

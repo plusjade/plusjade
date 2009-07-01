@@ -6,7 +6,7 @@
 		<a href="/get/files/contents" rel="ROOT" class="get_folder">Assets</a><span id="breadcrumb" rel=""></span>
 	</div>
 	
-	<div class="common_left_panel">
+	<div class="common_left_panel" style="width:150px">
 		<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/files/add_files" class="add_asset">Add Files</a>
 		<br><br>		
 		<span class="icon add_folder">&nbsp; &nbsp; </span> <a href="/get/files/add_folder" class="add_asset">Add Folder</a>
@@ -14,7 +14,7 @@
 		
 	</div>
 	
-	<div id="directory_window" class="common_main_panel" rel="ROOT">
+	<div id="directory_window" class="common_main_panel full_height" rel="ROOT" style="width:620px; height:350px; overflow:auto">
 		<?php echo View::factory('files/folder', array('files'=> $files))?>
 	</div>
 

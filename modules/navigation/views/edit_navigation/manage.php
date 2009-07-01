@@ -1,3 +1,6 @@
+
+<span id="on_close">update-navigation-<?php echo $tool_id?></span>
+
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">Save Changes</button>
 	<div id="common_title">Edit <b>Navigation</b> Tool.</div>	

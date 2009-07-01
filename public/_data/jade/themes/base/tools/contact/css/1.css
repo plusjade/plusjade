@@ -10,7 +10,7 @@
 	float:left;
 	text-align:center;
 	padding:0 10px;
-	width:80px;
+	width:12%;
 	height:80px;
 }
 #contact_wrapper_1 div.contact_item div.contact_icon.phone{
@@ -37,6 +37,7 @@
 
 #contact_wrapper_1 div.contact_item div.contact_view{
 	float:left;
+width:85%;
 }
 #contact_wrapper_1 div.contact_item div.contact_name{
 	font-weight:bold;

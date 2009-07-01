@@ -1,9 +1,12 @@
 
+<span id="on_close"><?php echo $js_rel_command?></span>
+
+
 <?php 
 $select = array('no' => '', 'yes' => '');
 if( $item->enable == 'no') $select['no'] = 'SELECTED';
 	
-echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm', 'rel' => $js_rel_command));	
+echo form::open("edit_contact/edit/$item->id", array('class' => 'ajaxForm'));	
 ?>
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="update_contact" class="jade_positive">Save & Exit</button>

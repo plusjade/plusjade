@@ -1,6 +1,7 @@
 
+<span id="on_close"><?php echo $js_rel_command?></span>
 
-<form action="/get/edit_faq/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
+<form action="/get/edit_faq/add/<?php echo $tool_id?>" method="POST" class="ajaxForm">	
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_images" class="jade_positive">Add Question</button>

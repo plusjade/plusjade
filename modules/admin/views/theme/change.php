@@ -9,7 +9,7 @@
 		<ul style="line-height:2em">
 			<?php
 			foreach($themes as $key => $theme)
-				echo "<li><input type=\"radio\" name=\"theme\" value=\"$theme->name\" id=\"$theme->name\"> <label for=\"$theme->name\" class=\"theme_toggle\" rel=\"$theme->id\">$theme->name</label></li>"; 
+				echo "<li><input type=\"radio\" name=\"theme\" value=\"$theme->name\" id=\"$theme->name\"> <label for=\"$theme->name\" class=\"theme_toggle\" rel=\"$theme->id\" style=\"display:inline\">$theme->name</label></li>"; 
 			?>
 		</ul>
 	</div>
@@ -27,11 +27,14 @@
 				$class = 'jade_negative';
 			}
 			?>			
-			<div id="theme_<?php echo $theme->id?>" class="each_theme buttons">
+			<div id="theme_<?php echo $theme->id?>" class="each_theme buttons aligncenter">
 				<button type="submit" name="theme" value="<?php echo $theme->name?>" class="<?php echo $class?>" <?php echo $disabled?>>
 					Install <?php echo $theme->name?>
 				</button>
-				<div class="desc"></div>
+				
+				<div class="desc">
+				<img src="<?php echo url::image_path("themes/$theme->name.$theme->image_ext")?>">
+				</div>
 			</div>
 			<?php
 			unset($disabled);

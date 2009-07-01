@@ -166,8 +166,8 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$image = $this->_grab_tool_child('album', $id);
 
 			# Image File delete
-			$image_path	= "$this->site_data_dir/assets/images/albums/$image->parent_id/$image->path";
-			$image_sm	= "$this->site_data_dir/assets/images/albums/$image->parent_id/sm_$image->path";
+			$image_path	= ASSETS::dir_path("tools/albums/$image->parent_id/$image->path");
+			$image_sm	= ASSETS::dir_path("tools/albums/$image->parent_id/sm_$image->path");
 			if( file_exists($image_path) )
 				unlink($image_path);
 			if( file_exists($image_sm) )

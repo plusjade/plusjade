@@ -56,18 +56,19 @@ class Tool_Controller extends Controller {
 
 		if($_POST)
 		{
-			(int) $id = $_POST['tool'];
-			
+			#stupid ie sends button contents rather than value.
+			$field = (is_numeric($_POST['tool'])) ? 'id' : 'name';
+
 			# GET tool name
 			$tool = $db->query("
 				SELECT LOWER(name) AS name, protected
 				FROM tools_list
-				WHERE id='$id'
+				WHERE $field = '{$_POST['tool']}'
 				AND enabled = 'yes'
 			")->current();
+
 			if(! is_object($tool) )
 				die('invalid tool');
-				
 			$table = $tool->name.'s';
 
 			# INSERT row in tool parent table
@@ -87,7 +88,7 @@ class Tool_Controller extends Controller {
 			$data = array(
 				'page_id'	=> $page_id,
 				'fk_site'	=> $this->site_id,
-				'tool'		=> $id,
+				'tool'		=> $_POST['tool'],
 				'tool_id'	=> $tool_insert_id,
 				'position'	=> ($lowest-1)
 			);
@@ -102,7 +103,7 @@ class Tool_Controller extends Controller {
 					WHERE id = '$page_id'
 				")->current();		
 			
-				$newline = "\n$page->page_name:$tool->name-$tool_insert_id,";
+				$newline = "\n$page->page_name:$tool->name-$tool_insert_id";
 				yaml::add_value($this->site_name, 'pages_config', $newline);
 			}
 			

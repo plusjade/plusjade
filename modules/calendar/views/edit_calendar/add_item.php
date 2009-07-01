@@ -1,5 +1,7 @@
 
-<form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" class="ajaxForm" rel="<?php echo $js_rel_command?>">
+<span id="on_close"><?php echo $js_rel_command?></span>
+
+<form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" class="ajaxForm">
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_item" class="jade_positive">

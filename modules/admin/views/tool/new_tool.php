@@ -51,7 +51,7 @@
 				?>
 				<div id="tool_<?php echo $tool->id?>" class="each_tool">
 					<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
-						<img src="/assets/images/admin/add.png" alt="Add"/> <?php echo $tool->name?>
+						<?php echo $tool->name?>
 					</button>
 					<div class="desc"><?php echo $tool->desc?></div>
 				</div>
@@ -80,6 +80,9 @@ $(document).ready(function()
 	// receives the custom url of where the next 'add' page is for the particular tool
 	$('.facebox .custom_ajaxForm').ajaxForm({	
 		beforeSubmit: function(){
+			$('.facebox .custom_ajaxForm button')
+			.attr('disabled','disabled')
+			.removeClass('jade_positive');
 			$('.facebox .show_submit').show();
 		},			
 		success: function(tool_data) {

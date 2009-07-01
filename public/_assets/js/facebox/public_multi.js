@@ -315,8 +315,7 @@ function getPageWidth()
         hideOverlay()
         $('.facebox .loading').remove()
       })
-	}
-	
+	}	
   })
 
 })(jQuery);

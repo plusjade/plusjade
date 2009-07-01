@@ -1,6 +1,7 @@
 
+<span id="on_close"><?php echo $js_rel_command?></span>
 
-<?php echo form::open("edit_contact/add/$tool_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command) )?>
+<?php echo form::open("edit_contact/add/$tool_id", array('class' => 'ajaxForm'))?>
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_contacts" class="jade_positive">Add Contacts</button>
 		<div id="common_title">Add New Contacts</div>	
