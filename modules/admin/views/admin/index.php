@@ -32,9 +32,18 @@
 		
 		<b>Set Timezone</b>
 		<select>
-			<option>Timezone</option>
+			<option>timezone list</option>
 		</select>
-
+<?php
+	/*
+	echo '<pre>';
+	foreach(DateTimeZone::listAbbreviations() as $value)
+		foreach($value as $value)
+			print_r($value);
+	echo '</pre>';
+	*/
+	echo strftime("%Y-%m-%d %H:%M:%S");
+?>	
 	</div>
 	
 </form>

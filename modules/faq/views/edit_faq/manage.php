@@ -1,4 +1,6 @@
 
+<span id="on_close">update-faq-<?php echo $tool_id?></span>
+
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="save_sort" class="jade_positive">Save Order</button>
 	<div id="common_title">Arrange Questions</div>

@@ -3,7 +3,9 @@
 	$status = array('draft'=>'','publish'=>'');
 	$status[$item->status] = 'selected="selected"';
 ?>
-<form action="/get/edit_blog/edit/<?php echo $item->id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
+<span id="on_close"><?php echo $js_rel_command?></span>
+
+<form action="/get/edit_blog/edit/<?php echo $item->id?>" method="POST" class="ajaxForm">	
 	<input type="hidden" name="parent_id" value="<?php echo $item->parent_id?>">
 	<input type="hidden" name="sticky_posts" value="<?php echo $sticky_posts?>">
 	

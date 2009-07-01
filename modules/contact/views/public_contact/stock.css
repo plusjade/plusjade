@@ -7,11 +7,11 @@
 	overflow:hidden;
 }
 #contact_wrapper_++ div.contact_item div.contact_icon{
+	width:12%;
+	height:80px;
 	float:left;
 	text-align:center;
 	padding:0 10px;
-	width:80px;
-	height:80px;
 }
 #contact_wrapper_++ div.contact_item div.contact_icon.phone{
 	background:transparent url('/_assets/tools/contact/images/phone.png') no-repeat 50% 50%;
@@ -37,6 +37,7 @@
 
 #contact_wrapper_++ div.contact_item div.contact_view{
 	float:left;
+	width:85%;
 }
 #contact_wrapper_++ div.contact_item div.contact_name{
 	font-weight:bold;

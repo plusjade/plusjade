@@ -1,6 +1,7 @@
 
+<span id="on_close"><?php echo $js_rel_command?></span>
 
-<form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm" rel="<?php echo $js_rel_command?>">	
+<form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm">	
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="save_changes" class="jade_positive">Save Changes</button>

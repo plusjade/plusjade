@@ -1,3 +1,6 @@
+
+<span id="on_close"><?php echo $js_rel_command?></span>
+
 <?php
 $views = array( 'cycle', 'galleria', 'lightbox' );
 $cycle_params = array( 
@@ -41,7 +44,7 @@ show title
 next/prev buttons,
 pause on hover
 */
-echo form::open("edit_album/settings/$tool_id", array('id' => "$tool_id", 'class' => 'ajaxForm', 'rel' => $js_rel_command));
+echo form::open("edit_album/settings/$tool_id", array('id' => "$tool_id", 'class' => 'ajaxForm'));
 ?>			
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="edit_album" class="jade_positive">Save Settings</button>

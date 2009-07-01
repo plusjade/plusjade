@@ -156,7 +156,7 @@ SWFUpload.prototype.initSettings = function () {
 	this.ensureDefault("button_disabled", false);
 	this.ensureDefault("button_placeholder_id", "");
 	this.ensureDefault("button_placeholder", null);
-	this.ensureDefault("button_cursor", SWFUpload.CURSOR.ARROW);
+	this.ensureDefault("button_cursor", SWFUpload.CURSOR.HAND);
 	this.ensureDefault("button_window_mode", SWFUpload.WINDOW_MODE.WINDOW);
 	
 	// Debug Settings
@@ -981,105 +981,233 @@ SWFUpload.Console.writeLine = function (message) {
 
 
 
+/* Demo Note:  This demo uses a FileProgress class that handles the UI for displaying the file name and percent complete.
+The FileProgress class is not part of SWFUpload.
+*/
 
-/*
-	Queue Plug-in
-	
-	Features:
-		*Adds a cancelQueue() method for cancelling the entire queue.
-		*All queued files are uploaded when startUpload() is called.
-		*If false is returned from uploadComplete then the queue upload is stopped.
-		 If false is not returned (strict comparison) then the queue upload is continued.
-		*Adds a QueueComplete event that is fired when all the queued files have finished uploading.
-		 Set the event handler with the queue_complete_handler setting.
-		
-	*/
 
-var SWFUpload;
-if (typeof(SWFUpload) === "function") {
-	SWFUpload.queue = {};
-	
-	SWFUpload.prototype.initSettings = (function (oldInitSettings) {
-		return function () {
-			if (typeof(oldInitSettings) === "function") {
-				oldInitSettings.call(this);
-			}
-			
-			this.queueSettings = {};
-			
-			this.queueSettings.queue_cancelled_flag = false;
-			this.queueSettings.queue_upload_count = 0;
-			
-			this.queueSettings.user_upload_complete_handler = this.settings.upload_complete_handler;
-			this.queueSettings.user_upload_start_handler = this.settings.upload_start_handler;
-			this.settings.upload_complete_handler = SWFUpload.queue.uploadCompleteHandler;
-			this.settings.upload_start_handler = SWFUpload.queue.uploadStartHandler;
-			
-			this.settings.queue_complete_handler = this.settings.queue_complete_handler || null;
+/* **********************
+   Event Handlers
+   These are my custom event handlers to make my
+   web application behave the way I went when SWFUpload
+   completes different tasks.  These aren't part of the SWFUpload
+   package.  They are part of my application.  Without these none
+   of the actions SWFUpload makes will show up in my application.
+   ********************** */
+
+function swfUploadPreLoad() {
+	var self = this;
+	var loading = function () {
+		//document.getElementById("divSWFUploadUI").style.display = "none";
+		document.getElementById("divLoadingContent").style.display = "";
+
+		var longLoad = function () {
+			document.getElementById("divLoadingContent").style.display = "none";
+			document.getElementById("divLongLoading").style.display = "";
 		};
-	})(SWFUpload.prototype.initSettings);
-
-	SWFUpload.prototype.startUpload = function (fileID) {
-		this.queueSettings.queue_cancelled_flag = false;
-		this.callFlash("StartUpload", [fileID]);
-	};
-
-	SWFUpload.prototype.cancelQueue = function () {
-		this.queueSettings.queue_cancelled_flag = true;
-		this.stopUpload();
-		
-		var stats = this.getStats();
-		while (stats.files_queued > 0) {
-			this.cancelUpload();
-			stats = this.getStats();
-		}
+		this.customSettings.loadingTimeout = setTimeout(function () {
+				longLoad.call(self)
+			},
+			15 * 1000
+		);
 	};
 	
-	SWFUpload.queue.uploadStartHandler = function (file) {
-		var returnValue;
-		if (typeof(this.queueSettings.user_upload_start_handler) === "function") {
-			returnValue = this.queueSettings.user_upload_start_handler.call(this, file);
-		}
-		
-		// To prevent upload a real "FALSE" value must be returned, otherwise default to a real "TRUE" value.
-		returnValue = (returnValue === false) ? false : true;
-		
-		this.queueSettings.queue_cancelled_flag = !returnValue;
-
-		return returnValue;
-	};
-	
-	SWFUpload.queue.uploadCompleteHandler = function (file) {
-		var user_upload_complete_handler = this.queueSettings.user_upload_complete_handler;
-		var continueUpload;
-		
-		if (file.filestatus === SWFUpload.FILE_STATUS.COMPLETE) {
-			this.queueSettings.queue_upload_count++;
-		}
-
-		if (typeof(user_upload_complete_handler) === "function") {
-			continueUpload = (user_upload_complete_handler.call(this, file) === false) ? false : true;
-		} else if (file.filestatus === SWFUpload.FILE_STATUS.QUEUED) {
-			// If the file was stopped and re-queued don't restart the upload
-			continueUpload = false;
-		} else {
-			continueUpload = true;
-		}
-		
-		if (continueUpload) {
-			var stats = this.getStats();
-			if (stats.files_queued > 0 && this.queueSettings.queue_cancelled_flag === false) {
-				this.startUpload();
-			} else if (this.queueSettings.queue_cancelled_flag === false) {
-				this.queueEvent("queue_complete_handler", [this.queueSettings.queue_upload_count]);
-				this.queueSettings.queue_upload_count = 0;
-			} else {
-				this.queueSettings.queue_cancelled_flag = false;
-				this.queueSettings.queue_upload_count = 0;
-			}
-		}
-	};
+	this.customSettings.loadingTimeout = setTimeout(function () {
+			loading.call(self);
+		},
+		1*1000
+	);
 }
+function swfUploadLoaded() {
+	var self = this;
+	clearTimeout(this.customSettings.loadingTimeout);
+	//document.getElementById("divSWFUploadUI").style.visibility = "visible";
+	//document.getElementById("divSWFUploadUI").style.display = "block";
+	document.getElementById("divLoadingContent").style.display = "none";
+	document.getElementById("divLongLoading").style.display = "none";
+	document.getElementById("divAlternateContent").style.display = "none";
+	
+	//document.getElementById("btnBrowse").onclick = function () { self.selectFiles(); };
+	document.getElementById("btnCancel").onclick = function () { self.cancelQueue(); };
+}
+   
+function swfUploadLoadFailed() {
+	clearTimeout(this.customSettings.loadingTimeout);
+	//document.getElementById("divSWFUploadUI").style.display = "none";
+	document.getElementById("divLoadingContent").style.display = "none";
+	document.getElementById("divLongLoading").style.display = "none";
+	document.getElementById("divAlternateContent").style.display = "";
+}
+   
+   
+function fileQueued(file) {
+	try {
+		var progress = new FileProgress(file, this.customSettings.progressTarget);
+		progress.setStatus("Pending...");
+		progress.toggleCancel(true, this);
+
+	} catch (ex) {
+		this.debug(ex);
+	}
+
+}
+
+function fileQueueError(file, errorCode, message) {
+	try {
+		if (errorCode === SWFUpload.QUEUE_ERROR.QUEUE_LIMIT_EXCEEDED) {
+			alert("You have attempted to queue too many files.\n" + (message === 0 ? "You have reached the upload limit." : "You may select " + (message > 1 ? "up to " + message + " files." : "one file.")));
+			return;
+		}
+
+		var progress = new FileProgress(file, this.customSettings.progressTarget);
+		progress.setError();
+		progress.toggleCancel(false);
+
+		switch (errorCode) {
+		case SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT:
+			progress.setStatus("File is too big.");
+			this.debug("Error Code: File too big, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		case SWFUpload.QUEUE_ERROR.ZERO_BYTE_FILE:
+			progress.setStatus("Cannot upload Zero Byte files.");
+			this.debug("Error Code: Zero byte file, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		case SWFUpload.QUEUE_ERROR.INVALID_FILETYPE:
+			progress.setStatus("Invalid File Type.");
+			this.debug("Error Code: Invalid File Type, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		default:
+			if (file !== null) {
+				progress.setStatus("Unhandled Error");
+			}
+			this.debug("Error Code: " + errorCode + ", File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		}
+	} catch (ex) {
+        this.debug(ex);
+    }
+}
+
+function fileDialogComplete(numFilesSelected, numFilesQueued) {
+	try {
+		if (numFilesSelected > 0) {
+			document.getElementById(this.customSettings.cancelButtonId).disabled = false;
+		}
+		
+		/* I want auto start the upload and I can do that here */
+		this.startUpload();
+	} catch (ex)  {
+        this.debug(ex);
+	}
+}
+
+function uploadStart(file) {
+	try {
+		/* I don't want to do any file validation or anything,  I'll just update the UI and
+		return true to indicate that the upload should start.
+		It's important to update the UI here because in Linux no uploadProgress events are called. The best
+		we can do is say we are uploading.
+		 */
+		var progress = new FileProgress(file, this.customSettings.progressTarget);
+		progress.setStatus("Uploading...");
+		progress.toggleCancel(true, this);
+	}
+	catch (ex) {}
+	
+	return true;
+}
+
+function uploadProgress(file, bytesLoaded, bytesTotal) {
+	try {
+		var percent = Math.ceil((bytesLoaded / bytesTotal) * 100);
+
+		var progress = new FileProgress(file, this.customSettings.progressTarget);
+		progress.setProgress(percent);
+		progress.setStatus("Uploading...");
+	} catch (ex) {
+		this.debug(ex);
+	}
+}
+
+function uploadSuccess(file, serverData) {
+	try {
+		var progress = new FileProgress(file, this.customSettings.progressTarget);
+		progress.setComplete();
+		progress.setStatus("Complete.");
+		progress.toggleCancel(false);
+
+	} catch (ex) {
+		this.debug(ex);
+	}
+}
+
+function uploadError(file, errorCode, message) {
+	try {
+		var progress = new FileProgress(file, this.customSettings.progressTarget);
+		progress.setError();
+		progress.toggleCancel(false);
+
+		switch (errorCode) {
+		case SWFUpload.UPLOAD_ERROR.HTTP_ERROR:
+			progress.setStatus("Upload Error: " + message);
+			this.debug("Error Code: HTTP Error, File name: " + file.name + ", Message: " + message);
+			break;
+		case SWFUpload.UPLOAD_ERROR.UPLOAD_FAILED:
+			progress.setStatus("Upload Failed.");
+			this.debug("Error Code: Upload Failed, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		case SWFUpload.UPLOAD_ERROR.IO_ERROR:
+			progress.setStatus("Server (IO) Error");
+			this.debug("Error Code: IO Error, File name: " + file.name + ", Message: " + message);
+			break;
+		case SWFUpload.UPLOAD_ERROR.SECURITY_ERROR:
+			progress.setStatus("Security Error");
+			this.debug("Error Code: Security Error, File name: " + file.name + ", Message: " + message);
+			break;
+		case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
+			progress.setStatus("Upload limit exceeded.");
+			this.debug("Error Code: Upload Limit Exceeded, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		case SWFUpload.UPLOAD_ERROR.FILE_VALIDATION_FAILED:
+			progress.setStatus("Failed Validation.  Upload skipped.");
+			this.debug("Error Code: File Validation Failed, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
+			// If there aren't any files left (they were all cancelled) disable the cancel button
+			if (this.getStats().files_queued === 0) {
+				document.getElementById(this.customSettings.cancelButtonId).disabled = true;
+			}
+			progress.setStatus("Cancelled");
+			progress.setCancelled();
+			break;
+		case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
+			progress.setStatus("Stopped");
+			break;
+		default:
+			progress.setStatus("Unhandled Error: " + errorCode);
+			this.debug("Error Code: " + errorCode + ", File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
+			break;
+		}
+	} catch (ex) {
+        this.debug(ex);
+    }
+}
+
+function uploadComplete(file) {	
+	if (this.getStats().files_queued === 0) {
+		document.getElementById(this.customSettings.cancelButtonId).disabled = true;
+		this.queueEvent("queue_complete_handler");
+	}
+	else {
+		this.startUpload();
+	}
+}
+/*
+function queueComplete(numFilesUploaded) {
+	var status = document.getElementById("divStatus");
+	status.innerHTML = numFilesUploaded + " file" + (numFilesUploaded === 1 ? "" : "s") + " uploaded.";
+}
+*/
 
 /*
 	A simple class for displaying file information and progress
@@ -1097,7 +1225,6 @@ function FileProgress(file, targetID) {
 	this.opacity = 100;
 	this.height = 0;
 	
-
 	this.fileProgressWrapper = document.getElementById(this.fileProgressID);
 	if (!this.fileProgressWrapper) {
 		this.fileProgressWrapper = document.createElement("div");
@@ -1286,180 +1413,3 @@ FileProgress.prototype.disappear = function () {
 };
 
 
-/* Demo Note:  This demo uses a FileProgress class that handles the UI for displaying the file name and percent complete.
-The FileProgress class is not part of SWFUpload.
-*/
-
-
-/* **********************
-   Event Handlers
-   These are my custom event handlers to make my
-   web application behave the way I went when SWFUpload
-   completes different tasks.  These aren't part of the SWFUpload
-   package.  They are part of my application.  Without these none
-   of the actions SWFUpload makes will show up in my application.
-   ********************** */
-function fileQueued(file) {
-	try {
-		var progress = new FileProgress(file, this.customSettings.progressTarget);
-		progress.setStatus("Pending...");
-		progress.toggleCancel(true, this);
-
-	} catch (ex) {
-		this.debug(ex);
-	}
-
-}
-
-function fileQueueError(file, errorCode, message) {
-	try {
-		if (errorCode === SWFUpload.QUEUE_ERROR.QUEUE_LIMIT_EXCEEDED) {
-			alert("You have attempted to queue too many files.\n" + (message === 0 ? "You have reached the upload limit." : "You may select " + (message > 1 ? "up to " + message + " files." : "one file.")));
-			return;
-		}
-
-		var progress = new FileProgress(file, this.customSettings.progressTarget);
-		progress.setError();
-		progress.toggleCancel(false);
-
-		switch (errorCode) {
-		case SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT:
-			progress.setStatus("File is too big.");
-			this.debug("Error Code: File too big, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		case SWFUpload.QUEUE_ERROR.ZERO_BYTE_FILE:
-			progress.setStatus("Cannot upload Zero Byte files.");
-			this.debug("Error Code: Zero byte file, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		case SWFUpload.QUEUE_ERROR.INVALID_FILETYPE:
-			progress.setStatus("Invalid File Type.");
-			this.debug("Error Code: Invalid File Type, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		default:
-			if (file !== null) {
-				progress.setStatus("Unhandled Error");
-			}
-			this.debug("Error Code: " + errorCode + ", File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		}
-	} catch (ex) {
-        this.debug(ex);
-    }
-}
-
-function fileDialogComplete(numFilesSelected, numFilesQueued) {
-	try {
-		if (numFilesSelected > 0) {
-			document.getElementById(this.customSettings.cancelButtonId).disabled = false;
-		}
-		
-		/* I want auto start the upload and I can do that here */
-		this.startUpload();
-	} catch (ex)  {
-        this.debug(ex);
-	}
-}
-
-function uploadStart(file) {
-	try {
-		/* I don't want to do any file validation or anything,  I'll just update the UI and
-		return true to indicate that the upload should start.
-		It's important to update the UI here because in Linux no uploadProgress events are called. The best
-		we can do is say we are uploading.
-		 */
-		var progress = new FileProgress(file, this.customSettings.progressTarget);
-		progress.setStatus("Uploading...");
-		progress.toggleCancel(true, this);
-	}
-	catch (ex) {}
-	
-	return true;
-}
-
-function uploadProgress(file, bytesLoaded, bytesTotal) {
-	try {
-		var percent = Math.ceil((bytesLoaded / bytesTotal) * 100);
-
-		var progress = new FileProgress(file, this.customSettings.progressTarget);
-		progress.setProgress(percent);
-		progress.setStatus("Uploading...");
-	} catch (ex) {
-		this.debug(ex);
-	}
-}
-
-function uploadSuccess(file, serverData) {
-	try {
-		var progress = new FileProgress(file, this.customSettings.progressTarget);
-		progress.setComplete();
-		progress.setStatus("Complete.");
-		progress.toggleCancel(false);
-
-	} catch (ex) {
-		this.debug(ex);
-	}
-}
-
-function uploadError(file, errorCode, message) {
-	try {
-		var progress = new FileProgress(file, this.customSettings.progressTarget);
-		progress.setError();
-		progress.toggleCancel(false);
-
-		switch (errorCode) {
-		case SWFUpload.UPLOAD_ERROR.HTTP_ERROR:
-			progress.setStatus("Upload Error: " + message);
-			this.debug("Error Code: HTTP Error, File name: " + file.name + ", Message: " + message);
-			break;
-		case SWFUpload.UPLOAD_ERROR.UPLOAD_FAILED:
-			progress.setStatus("Upload Failed.");
-			this.debug("Error Code: Upload Failed, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		case SWFUpload.UPLOAD_ERROR.IO_ERROR:
-			progress.setStatus("Server (IO) Error");
-			this.debug("Error Code: IO Error, File name: " + file.name + ", Message: " + message);
-			break;
-		case SWFUpload.UPLOAD_ERROR.SECURITY_ERROR:
-			progress.setStatus("Security Error");
-			this.debug("Error Code: Security Error, File name: " + file.name + ", Message: " + message);
-			break;
-		case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
-			progress.setStatus("Upload limit exceeded.");
-			this.debug("Error Code: Upload Limit Exceeded, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		case SWFUpload.UPLOAD_ERROR.FILE_VALIDATION_FAILED:
-			progress.setStatus("Failed Validation.  Upload skipped.");
-			this.debug("Error Code: File Validation Failed, File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
-			// If there aren't any files left (they were all cancelled) disable the cancel button
-			if (this.getStats().files_queued === 0) {
-				document.getElementById(this.customSettings.cancelButtonId).disabled = true;
-			}
-			progress.setStatus("Cancelled");
-			progress.setCancelled();
-			break;
-		case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
-			progress.setStatus("Stopped");
-			break;
-		default:
-			progress.setStatus("Unhandled Error: " + errorCode);
-			this.debug("Error Code: " + errorCode + ", File name: " + file.name + ", File size: " + file.size + ", Message: " + message);
-			break;
-		}
-	} catch (ex) {
-        this.debug(ex);
-    }
-}
-
-function uploadComplete(file) {
-	if (this.getStats().files_queued === 0) {
-		document.getElementById(this.customSettings.cancelButtonId).disabled = true;
-	}
-}
-
-// This event comes from the Queue Plugin
-function queueComplete(numFilesUploaded) {
-	var status = document.getElementById("divStatus");
-	status.innerHTML = numFilesUploaded + " file" + (numFilesUploaded === 1 ? "" : "s") + " uploaded.";
-}

@@ -10,13 +10,10 @@
 	
 	$data[$item->type] = $item->type;
 ?>
-
 <form action="/get/edit_navigation/edit/<?php echo $item->id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" class="jade_positive">
-			<img src="<? echo url::image_path('check.png')?>" alt=""/> Save Changes
-		</button>
+		<button type="submit" class="jade_positive">Save Changes</button>
 		<div id="common_title">Edit Navigation element</div>
 	</div>	
 	

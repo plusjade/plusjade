@@ -99,8 +99,8 @@ class Jdirectory_Core {
  * DOCS: http://www.the-art-of-web.com/php/dirlist/
 
  $dir 		= full directory path to parse
- $parent	= the parent directory (set to root on first instance) 	
- $recurse	= true to recurse all subdirectories
+ $parent	= the parent directory (set to root on first instance)
+ $recurse	= true to recurse all subdirectories or list_dir to list directory names but no recurse.
  $omit 		= any directory name you wish to omit
  */
 	public static function contents($dir, $parent = 'root', $recurse=false, $omit = null) 
@@ -119,8 +119,11 @@ class Jdirectory_Core {
 				
 			if(is_dir("$dir$entry")) 
 			{
-				if($recurse && is_readable("$dir$entry/"))
-					$retval[$entry] = self::contents("$dir$entry/", $entry, true);	 
+				if('list_dir' == $recurse)
+					array_push($retval, $entry);
+				elseif(TRUE == $recurse && is_readable("$dir$entry/"))
+					$retval[$entry] = self::contents("$dir$entry/", $entry, true);
+
 			} 
 			elseif( is_readable("$dir$entry") && $entry != 'Thumbs.db' ) 
 				array_push($retval, $entry);			 

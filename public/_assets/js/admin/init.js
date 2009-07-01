@@ -1,18 +1,19 @@
 ﻿
 $(document).ready(function()
 {
-
 /*
  * TOGGLE ADMIN BAR	
  */
 	$(".toggle_admin_bar").click(function(){
+		$('#shadow').toggle();
 		$("#admin_bar_wrapper").slideToggle("slow", function(){
 			$(".jade_toolbar_wrapper").slideToggle("slow");
 			$(".jade_admin_item_edit").slideToggle("slow");
 			$("#hide_link").slideToggle("slow");
+			
 		});
 	});
-
+	$('#shadow div').css({background: '#000', opacity: 0.2});
 /*
  * ACTIVATE Sitewide admin bar dropdowns
  */
@@ -21,6 +22,8 @@ $(document).ready(function()
 	$('#admin_bar li.dropdown div').click(function(){
 		$('#admin_bar li.dropdown ul').hide();
 		$(this).next('ul').show();
+		$('#admin_bar li.dropdown div').removeClass('dropdown_selected');
+		$(this).addClass('dropdown_selected');
 		return false;		
 	});
 
@@ -30,6 +33,7 @@ $(document).ready(function()
 	$('body:not(.jade_toolbar_wrapper)').click(function(){
 		$('li.dropdown ul').hide();
 		$('.actions_wrapper ul').hide();
+		$('#admin_bar li.dropdown div').removeClass('dropdown_selected');
 	});
 
 /*
@@ -75,6 +79,25 @@ $(document).ready(function()
 	};	
 
 
+/* testing!
+ * pass form actions to the facebox closer 
+*/	
+	jQuery.fn.admin_actions = function(toolname){
+	
+	
+		toolname = toolname.toLowerCase();
+		$('.'+ toolname +'_item', this).each(function(i){		
+			var id		= $(this).attr('rel');
+			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
+			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
+			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
+			$(this).prepend(toolbar);			
+		});
+		
+		
+	};	
+	
+
 /* display server response
  * ShowRespose in beta mode only.
  * -----------------------------------
@@ -93,28 +116,25 @@ $(document).ready(function()
  * updates the tool container #tool_wrapper_<id> 
  * with the updated output from that tool.
 */
-	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, response){		
-		if(!response) response = 'Updating...';
-		
-		// Set loading status...
+	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, guid){
+
+	// Set loading status...
 		if('add' == action) {
 			// default add to container_1
 			$('div.container_1').prepend('<div id="new_tool_placeholder" class="load_tool_html">Adding Tool...</div>');
 		} else if('update' == action){
 			$('#'+ toolname +'_wrapper_'+ tool_id).html('<div class="load_tool_html">Updating...</div>');
 		}
-		
+				
 		// Get the tool html output...
 		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){
 			if('add' == action) {
-				// response = guid
 				// get the toolkit to insert red toolbar via ajax
-				$.get('/get/tool/toolkit/'+ response, function(toolkit){
-					toolbar = '<div id="toolbar_'+ response +'" class="jade_toolbar_wrapper">' + toolkit + '</div>';
-					
+				$.get('/get/tool/toolkit/'+ guid, function(toolkit){
+					var toolbar = '<div id="toolbar_'+ guid +'" class="jade_toolbar_wrapper">' + toolkit + '</div>';
 					// replace the placeholder with toolbar + html output
 					$('div.container_1 #new_tool_placeholder')
-					.replaceWith('<span id="guid_'+ response +'" class="common_tool_wrapper" rel="local">' + toolbar + data + '</span>');	
+					.replaceWith('<span id="guid_'+ guid +'" class="common_tool_wrapper" rel="local">' + toolbar + data + '</span>');	
 				
 					// add blue per-item toolbars
 					$('#'+ toolname +'_wrapper_'+ tool_id).add_toolkit_items(toolname);
@@ -215,7 +235,26 @@ $(document).ready(function()
 					if('show' == state) height = 32; 
 					$('div.styler_wrapper').css('top', $.getPageHeight()- height);
 				});
-		
+				
+				// activate the form
+				$('.styler_wrapper .ajaxForm').ajaxForm({		 
+					beforeSubmit: function(){
+						if(! $(".facebox .ajaxForm input").jade_validate() )
+							return false;
+							
+						$(".styler_wrapper .ajaxForm button")
+						.attr('disabled','disabled')
+						.removeClass('jade_positive');
+						$('.admin_reset .show_submit').show();
+						$('#show_response_beta').html('waiting for response...');
+					},
+					success: function(data) {
+						// close the styler?
+						$('.admin_reset .show_submit').hide();					
+						$('#show_response_beta').html(data);
+					}
+				});
+				
 			});
 			return false;
 		},
@@ -245,8 +284,8 @@ $(document).ready(function()
  */
 	$('body').append('<div class="styler_wrapper admin_reset" style="display:none"> \
 			<div class="actions"> \
-				<a href="#" class="toggle">hide</a> \
 				<a href="#" class="close">close</a> \
+				<a href="#" class="toggle">hide</a> \
 				<div class="show_submit" style="display:none"><div>...Submitting</div></div> \
 			</div> \
 			<div class="dialog_wrapper"> \
@@ -255,90 +294,46 @@ $(document).ready(function()
 		</div>');
 	$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
 
-	
-/* 
- * 1. Activate admin ajax forms.
- */ 
-	$('body').submit($.delegate({
-		'.ajaxForm' : function(e){
-			$(e.target).ajaxSubmit({
-			 
-				beforeSubmit: function(){
-					if(! $("input", $(e.target)).jade_validate() )
-						return false;
-					$('.admin_reset .show_submit').show();
-					$('#show_response_beta').html('waiting for response...');
-				},
-				success: function(data) {
-					$('.admin_reset .show_submit').hide();					
-					var action = $(e.target).attr('rel');
-
-					if( 'undefined' == typeof(action) ) {
-						// TODO: find something good to put here
-						$('#show_response_beta').html(data);
-						alert('this form had no rel attribute');
-					} else {
-						action = action.split('-');
-						//**action = array(action, toolname, tool_id);
-						switch(action[0])
-						{
-							case 'update':
-								$.facebox.close();
-								$().jade_update_tool_html(action[0], action[1], action[2], data);	
-								break;
-							case 'add':
-								$.facebox.close();
-								$().jade_update_tool_html(action[0], action[1], action[2], data);	
-								break;
-							case 'close':
-								// useful for facebox_2 requests TODO: Sanitize this?
-								$.facebox.close('facebox_'+action[1]);
-								break;
-							case 'scope':
-								$('span#guid_'+ action[2]).removeClass('local global');
-								$('span#guid_'+ action[2]).addClass(data);
-								$.facebox.close();			
-								break;
-							case 'reload':
-								$.facebox(data, 'loading_msg', 'facebox_2');
-								location.reload();		
-								break;
-							case 'save_css':
-								alert('css saved =D\n'+ data);
-								break;
-							default:
-								alert(action[0] + 'has no action function');
-						}
-					}
-					$('#show_response_beta').html(data);
-				}
-			}); 
-			return false;
-		}
-	
-	}));
 
 /* 
  * Bind functions to after facebox is revealed event.
  * 1. Activate rich text editor (jwysiwyg)
- * 2. maintain full height of facebox when window resizing.
+ * 2. Activate admin ajax forms.
+ * 3. maintain full height of facebox when window resizing.
  */	
 	$(document).bind('reveal.facebox', function(){
 		$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
 		$('textarea.render_html').wysiwyg();
+		$('.facebox .ajaxForm').ajaxForm({		 
+			beforeSubmit: function(){
+				if(! $(".facebox .ajaxForm input").jade_validate() )
+					return false;
+					
+				$(".facebox .ajaxForm button")
+				.attr('disabled','disabled')
+				.removeClass('jade_positive');
+				$('.admin_reset .show_submit').show();
+				$('#show_response_beta').html('waiting for response...');
+			},
+			success: function(data) {
+				$.facebox.close();
+				$('.admin_reset .show_submit').hide();					
+				$('#show_response_beta').html(data);
+			}
+		}); 
 		
 		// Expand/contract box-element to fill up full-available facebox view.
 		// Mainly for text editor and asset browsers windows.
 		var height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;
-		$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css')
+		$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css, .full_height')
 		.css('min-height', height);
 		$('.facebox div.wysiwyg iframe')
 		.css('min-height', height-30);
 		
 		$(window).resize(function(){
 			height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;	
-			$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css')
+			$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css, .full_height')
 			.css('min-height', height);
 			$('.facebox div.wysiwyg iframe')
 			.css('min-height', height-30);
@@ -350,6 +345,42 @@ $(document).ready(function()
  */	
 	$(document).bind('close.facebox', function(){
 		$('body').removeClass('disable_body').removeAttr('scroll');
+		
+		/* execute an action after the facebox closes */
+		var action = $('.facebox #on_close').html();	
+		
+		if(null == action) {
+			// TODO: find something good to put here
+			alert('on_close action is empty');
+		} else {
+			action = action.split('-');
+			//**action = array(action, toolname, tool_id);
+			switch(action[0])
+			{
+				case 'update':
+					$().jade_update_tool_html(action[0], action[1], action[2], 'yahboi');	
+					break;
+				case 'add':
+					$().jade_update_tool_html(action[0], action[1], action[2], 'YAHBOI');	
+					break;
+				case 'close':
+					// useful for facebox_2 requests TODO: Sanitize this?
+					break;
+				case 'scope':
+					$('span#guid_'+ action[2]).removeClass('local global');
+					$('span#guid_'+ action[2]).addClass(data);	
+					break;
+				case 'reload':
+					$.facebox(data, 'loading_msg', 'facebox_2');
+					location.reload();
+					break;
+				case 'save_css':
+					alert('css saved =D\n');
+					break;
+				default:
+					alert(action[0] + 'has no action function');
+			}
+		}
 	});
 
 	

@@ -66,8 +66,6 @@
 
 /* -- swf uploader styles ------------------------------- */
 #swf_wrapper{
-	width:450px;
-	margin:0 auto;
 }
 
 #swf_wrapper div.fieldset {
@@ -75,18 +73,17 @@
 	margin: 10px 0;
 	padding: 20px 10px;
 }
-#swf_wrapper div.fieldset span.legend {
-	position: relative;
-	background-color: #FFF;
-	padding: 3px;
-	top: -30px;
+#swf_wrapper span.legend {
+	font-weight:bold;
 	font: 700 14px Arial, Helvetica, sans-serif;
 	color: #73b304;
 }
 
 
 #swf_wrapper div.flash {
-	width: 375px;
+	width: 450px;
+	height:200px;
+	overflow:auto;
 	margin: 10px 5px;
 	border-color: #D9E4FF;
 	-moz-border-radius-topleft : 5px;
@@ -129,7 +126,7 @@
 }
 
 #swf_wrapper .progressWrapper {
-	width: 357px;
+	width: 440px;
 	overflow: hidden;
 }
 
