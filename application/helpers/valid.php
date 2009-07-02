@@ -79,7 +79,11 @@ class valid_Core {
 		return preg_replace("/[^-a-z0-9_]/i", '-', (string) $string);
 	}
 	
-	
+	static function filter_php_filename($string)
+	{
+		$string = trim($string);
+		return preg_replace("/[^-a-z0-9_.]/i", '-', (string) $string);
+	}	
 	/**
 	 * Validate email, commonly used characters only
 	 *

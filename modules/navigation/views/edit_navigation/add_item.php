@@ -22,7 +22,6 @@
 				<option value="email">Link to email address</option>
 				<option value="file">Link to +Jade file</option>	
 			</select>
-			<br><img src="<?php echo url::image_path('admin/arrow_right_down.png')?>" alt="next">  
 		</div>
 		
 		<div class="tier">

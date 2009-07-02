@@ -24,20 +24,20 @@ class Tree_Core {
 				$entry = '<a href="'. url::site($item->data) .'">' . $item->display_name . '</a>'; 						
 				break;
 			case 'url':
-				$entry = '<a href="http://'. $item->data .'">' . $item->display_name . '</a>'; 	
+				$entry = "<a href=\"http://$item->data\">$item->display_name</a>"; 	
 				break;	
 			case 'email':
-				$entry = '<a href="mailto:'.$item->data.'">' . $item->display_name . '</a>'; 
+				$entry = "<a href=\"mailto:$item->data\">$item->display_name</a>"; 
 				break;					
 		}	
-		return '<li id="item_' . $item->id . '"><span>'. $entry .'</span>';
+		return "<li id=\"item_$item->id\"><span>$entry</span>";
 	}
 		
 /* 
  * Uses Tree traversal method to display neat nested ul/li list.
  * $items (object) are required to have lft/rgt values
 */
-	static function display_tree($toolname, $items, $admin=FALSE)
+	static function display_tree($toolname, $items, $page_name=null, $admin=FALSE)
 	{	  
 		# start with an empty $right stack
 		$right		= array();	
@@ -66,7 +66,7 @@ class Tree_Core {
 
 			# generate output for each node	
 			if( is_callable("render_node_$toolname") )
-				$entry = call_user_func("render_node_$toolname", $item);
+				$entry = call_user_func("render_node_$toolname", $item, $page_name);
 			else
 				$entry = call_user_func(array('Tree', 'render_node_navigation'), $item);
 			

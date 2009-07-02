@@ -13,3 +13,4 @@ UPDATE `plusjade`.`themes` SET `image_ext` = 'gif' WHERE `themes`.`id` =9 LIMIT 
 
 INSERT INTO `plusjade`.`themes` (`id`, `name`, `enabled`, `image_ext`) VALUES (NULL, 'natural_essence', 'yes', 'jpg');
 
+ALTER TABLE `showrooms` ADD `home_cat` VARCHAR( 50 ) NOT NULL AFTER `root_id` 

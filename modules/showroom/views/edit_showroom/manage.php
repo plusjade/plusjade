@@ -1,8 +1,7 @@
 
+<span id="on_close">update-showroom-<?php echo $tool_id?></span>
 <div  id="common_tool_header" class="buttons">
-	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">
-		<img src="/images/check.png" alt=""/> Save Category Tree
-	</button>
+	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">Save Category Tree</button>
 	<div id="common_title">Manage Showroom Categories</div>
 </div>	
 
@@ -17,23 +16,21 @@
 		<br>
 		<li><a href="/get/edit_showroom/items/" id="show_items">Show items</a></li>
 	</ul>
-	
+	<a href="#add_new_category" rel="facebox_div" id="2">blah</a>
+
 	<div id="element_data"></div>
 </div>
 
-<div id="admin_navigation_wrapper">
+<div id="admin_showroom_wrapper">
 	<?php echo $tree?>
 </div>
 
-<a href="#add_new_category" rel="facebox_div" id="2">blah</a>
 
 <div id="add_new_category" style="display:none">
-	<form action="/get/edit_showroom/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" rel="close-2" style="min-height:300px">	
+	<form action="/get/edit_showroom/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" style="min-height:300px">	
 		
 		<div  id="common_tool_header" class="buttons">
-			<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">
-				<img src="/images/check.png" alt=""/> Add Category
-			</button>
+			<button type="submit" class="jade_positive" rel="<?php echo $tool_id?>">Add Category</button>
 			<div id="common_title">Add a New Category</div>
 		</div>
 		
@@ -184,7 +181,7 @@
 		var output = "";
 		var tool_id = $(this).attr("rel");
 		
-		$(".facebox #admin_navigation_wrapper ul").each(function(){
+		$(".facebox #admin_showroom_wrapper ul").each(function(){
 			var parentId = $(this).parent().attr("rel");
 			if(!parentId) parentId = 0;
 			var $kids = $(this).children("li:not(.root, .line,.line-last)");
@@ -195,17 +192,11 @@
 			});
 		});
 		//alert (output); return false;
-		$.facebox(function() {
-				$.post('/get/edit_navigation/save_tree/'+tool_id,
-					{output: output},
-					function(data){
-						$.facebox(data, "status_reload", "facebox_response");
-						location.reload();
-					}
-				)
-			}, 
-			"status_reload", 
-			"facebox_response"
-		);
+		$.post('/get/edit_showroom/save_tree/'+tool_id,
+			{output: output},
+			function(data){
+				$.facebox(data, "loading_msg", "facebox_2");
+			}
+		)
 	});	
 </script>

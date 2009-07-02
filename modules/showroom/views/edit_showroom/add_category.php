@@ -1,10 +1,10 @@
 
+
+
 <form action="/get/edit_showroom/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" id="add_links_form" style="min-height:300px;">	
 	
 	<div  id="common_tool_header" class="buttons">
-		<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">
-			<img src="/images/check.png" alt=""/> Add Category
-		</button>
+		<button type="submit" class="jade_positive" rel="<?php echo $tool_id?>">Add Category</button>
 		<div id="common_title">Add a New Category</div>
 	</div>	
 		<div id="common_tool_info">

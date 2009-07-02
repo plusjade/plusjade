@@ -12,16 +12,18 @@ class Showroom_Controller extends Controller {
 	function _index($tool_id)
 	{
 		$db			= new Database;
-		$category	= uri::easy_segment('2');
-		$item		= uri::easy_segment('3');
+		$url_array	= uri::url_array();
+		$page_name	= $this->get_page_name($url_array['0'], 'showroom', $tool_id);		
+		$category	= $url_array['1'];
+		$item		= $url_array['2'];
 		$primary	= new View("public_showroom/index");
-		
+
 		$parent = $db->query("
 			SELECT * FROM showrooms 
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();			
-	
+		
 		# Show products immediately
 		if(	'simple' == $parent->params )
 		{
@@ -55,25 +57,20 @@ class Showroom_Controller extends Controller {
 		}
 		else
 		{
-			if( empty($category) AND empty($item)  )
+			$primary->categories = self::categories($parent->id, $page_name);
+			
+			## default full showroom view
+			#TODO: Make this configurable frontpage and change this hardcoded value.
+			if('get' == $url_array['0'] OR (empty($category) AND empty($item)) )
 			{
-				$primary->categories = $this->_categories($parent->id);
-				
-				#TODO: Make this configurable frontpage
-				$primary->items = $this->_items_category($tool_id, 'Shirts');
+				$primary->items = (empty($parent->home_cat)) ?
+					'Home Category not set' : self::items_category($tool_id, $parent->home_cat, $page_name);
 			}
-			elseif( empty($item) )
-			{
-				$primary->categories = $this->_categories($parent->id);
-				$primary->items = $this->_items_category($tool_id, $category, $parent->view);
-			}
+			elseif(empty($item))
+				$primary->items = self::items_category($tool_id, $category, $page_name, $parent->view);
 			else
-			{ 
-				$primary->categories = $this->_categories($parent->id);
-				$primary->item = $this->_item($category, $item);
-			}
+				$primary->item = self::item($category, $item, $page_name);
 		}
-		
 		
 		$primary->img_path = Assets::url_path("tools/showroom/$parent->id");
 		$primary->parent = $parent;
@@ -90,7 +87,12 @@ class Showroom_Controller extends Controller {
 		return $this->public_template($primary, 'showroom', $tool_id);	
 	}
 
-	function _categories($parent_id)
+	
+/*
+ * get category list from this showroom
+ *
+ */
+	private function categories($parent_id, $page_name)
 	{
 		$db = new Database;
 		$items = $db->query("
@@ -99,16 +101,21 @@ class Showroom_Controller extends Controller {
 			AND fk_site = '$this->site_id' 
 			ORDER BY lft ASC 
 		");		
-		
-		function render_node_showroom($item)
+		if(0 == $items->count())
+			return 'no categories';
+			
+		function render_node_showroom($item, $page_name)
 		{
-			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/showroom/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
+			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
 		}
-		return Tree::display_tree('showroom', $items);
+		return Tree::display_tree('showroom', $items, $page_name);
 	}
 	
-	# Get items from a category
-	function _items_category($tool_id, $category, $view='list')
+/*
+ * show items from a given category
+ *
+ */
+	private function items_category($tool_id, $category, $page_name, $view='list')
 	{
 		$db = new Database;
 		$item_view = new View("public_showroom/items_$view");
@@ -118,37 +125,36 @@ class Showroom_Controller extends Controller {
 			SELECT * FROM showroom_items
 			WHERE parent_id = '$tool_id'
 			AND fk_site = '$this->site_id'
-			AND name = '$category'
+			AND url = '$category'
 		")->current();			
 		
-		if(is_object($parent))
-		{
-			$item_view->img_path = Assets::url_path_direct("tools/showroom/$parent->id");
-		
-			#display items in this cat
-			$items = $db->query("
-				SELECT * FROM showroom_items_meta
-				WHERE cat_id = '$parent->id'	
-				AND fk_site = '$this->site_id'	
-				ORDER by position;
-			");			
-		}
-		else
-			return 'Not a category';
+		if(!is_object($parent))
+			return 'invalid category';
 			
-		if( count($items) > 0 )
-		{
-			$item_view->category = $category;
-			$item_view->items = $items;
-			return $item_view;
-		}
-		else
+		$item_view->img_path = Assets::url_path_direct("tools/showroom/$parent->id");
+	
+		#display items in this cat
+		$items = $db->query("
+			SELECT * FROM showroom_items_meta
+			WHERE cat_id = '$parent->id'	
+			AND fk_site = '$this->site_id'	
+			ORDER by position;
+		");			
+
+		if(0 == count($items))
 			return 'No items. Check back soon!';
-			
+
+		$item_view->category	= $category;
+		$item_view->page_name	= $page_name;
+		$item_view->items		= $items;
+		return $item_view;
 	}
 
-	# Get a single item
-	function _item($category, $item)
+/*
+ * show a single item
+ *
+ */
+	private function item($category, $item, $page_name)
 	{
 		$db = new Database;	
 		$primary = new View('public_showroom/single_item');		
@@ -159,33 +165,33 @@ class Showroom_Controller extends Controller {
 			AND url = '$item' 
 		")->current();			
 		
-		if( count($item_object) > 0 )
-		{
-			$primary->item = $item_object;
-			$primary->category = $category;
-			$primary->img_path = Assets::url_path_direct("tools/showroom/$item_object->cat_id");
-			
-			return $primary;
-		}
-		else
-			return 'item does not exist';
-			
+		if(!is_object($item_object))
+			return 'Invalid item';
+
+		$primary->item		= $item_object;
+		$primary->category	= $category;
+		$primary->img_path	= Assets::url_path_direct("tools/showroom/$item_object->cat_id");
+		$primary->page_name	= $page_name;
+		return $primary;
 	}
 
-
+/*
+ * ajax handler
+ *
+ */
 	function _ajax($url_array, $tool_id)
-	{
-		$category	= @$url_array['2'];
-		$item		= @$url_array['3'];	
-		
+	{		
+		list($page_name, $category, $item) = $url_array;
+
 		if(! empty($category) AND empty($item) )
-			echo $this->_items_category($tool_id, $category);
+			echo  self::items_category($tool_id, $category, $page_name);
 		elseif(! empty($category) AND !empty($item) )
-			echo $this->_item($category, $item);
+			echo self::item($category, $item, $page_name);
 
 		die();
 	}
 	
-}
+}/*end*/
 
-/* -- end of application/controllers/showroom.php -- */
+
+
