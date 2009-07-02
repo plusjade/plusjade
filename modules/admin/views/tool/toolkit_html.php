@@ -4,7 +4,7 @@
 <span id="toolkit_<?php echo $guid?>">	
 	<table><tr>
 		<td class="name_wrapper">
-			<span class="name"><?php echo ucwords($name)?></span>					
+			<span class="name"><span class="icon move">&#160; &#160; </span> <?php echo ucwords($name)?></span>					
 		</td>
 		<td class="actions_wrapper">
 			<a href="#" class="actions_link"><span class="icon cog">&#160; &#160; </span> Edit</a>					

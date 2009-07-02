@@ -7,8 +7,8 @@
 	{
 		?>
 		<li>
-			<a href="<?php echo $img_path.'/'.$image->path?>" title="<?php echo $image->caption?>">
-				<img src="<?php echo $img_path.'/sm_'.$image->path?>" width="120px" alt="" />
+			<a href="<?php echo "$img_path/$image->path"?>" title="<?php echo $image->caption?>">
+				<img src="<?php echo "$img_path/_sm/$image->path"?>" width="120px" alt="" />
 			</a>
 		</li>
 		<?php

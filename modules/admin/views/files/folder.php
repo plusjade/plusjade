@@ -1,7 +1,4 @@
-
-
 <?php
-$url_path = Assets::url_path_direct();
 $image_types = array(
 	'jpg'	=> 'jpeg',
 	'jpeg'	=> 'jpeg',
@@ -15,37 +12,37 @@ foreach ($files as $path => $data)
 	$data = explode('|', $data);
 	list($type, $name) = $data;
 	
+	# show files
 	if('file' == $type)
 	{
-		$id			= str_replace('.', '_', $name);
-		$jw_path	= str_replace(':', '/', $path);
-		$url		= "$url_path/$jw_path";
+		$css_id			= str_replace('.', '_', $name);
+		$url			= Assets::url_path_direct() .'/'. str_replace(':', '/', $path);
+		$url_thumb		= str_replace($name, "_sm/$name", $url);
+		$display_name	= ('10' < strlen($name)) ? substr($name, 0, 10).'...' : $name;
+		$ext			= strtolower(substr(strrchr($name, "."), 1));
 		
-		$display_name = ('10' < strlen($name)) ? substr($name, 0, 10).'...' : $name;
-		
-		$ext = strtolower(substr(strrchr($name, "."), 1));
-		
+		# if image, show the thumbnail version
 		$img = ((array_key_exists($ext, $image_types))) ?
-			"<img src=\"$url\" width=\"75\" height=\"75\" alt=\"\">"
+			"<img src=\"$url_thumb\" class=\"place_file\" rel=\"$url\" width=\"75\" height=\"75\" alt=\"\">"
 			: "<img src=\"/_assets/images/admin/file.jpg\" width=\"75\" height=\"75\" alt=\"\">";
 		
 		?>
-		<div id="<?php echo $id?>" class="file_asset" rel="<?php echo $name?>">
-			<span class="icon cross">&nbsp; &nbsp; </span> 
-			<a href="<?php echo $url?>" class="place_file">Place</a>		
-			<?php echo $img?>
-			<div title="<?php echo $name?>"><?php echo $display_name?></div>
+		<div id="<?php echo $css_id?>" class="file_asset" rel="<?php echo $name?>">
+			<br><?php echo $img?>
+			<br><span title="<?php echo $name?>"><?php echo $display_name?></span>
+			 <span class="icon cross">&nbsp; &nbsp; </span>
 		</div>
 		<?php
 	}
+	# show folders
 	else
 	{
 		$delete = ('tools' == $name AND 'tools' == $path) ? '' : '<span class="icon cross">&nbsp; &nbsp; </span> ';
 		?>
 		<div id="<?php echo $name?>" class="folder_asset" rel="<?php echo $path?>">
-			<?php echo $delete?>
 			<br><img src="/_assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
 			<br><a href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
+			<?php echo $delete?>
 		</div>
 		<?php
 	}

@@ -15,3 +15,8 @@
 		<b>Caption:</b> <input type="text" name="caption" value="<?php echo $item->caption?>" size="35" maxlength="30">
 	</div>
 </form>
+<?php
+	#hack, take this out later
+	$url_path = Assets::url_path_direct("tools/albums/$item->parent_id");
+?>
+<img src="<?php echo "$url_path/_sm/$item->path"?>">
