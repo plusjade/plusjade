@@ -79,25 +79,6 @@ $(document).ready(function()
 	};	
 
 
-/* testing!
- * pass form actions to the facebox closer 
-*/	
-	jQuery.fn.admin_actions = function(toolname){
-	
-	
-		toolname = toolname.toLowerCase();
-		$('.'+ toolname +'_item', this).each(function(i){		
-			var id		= $(this).attr('rel');
-			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
-			$(this).prepend(toolbar);			
-		});
-		
-		
-	};	
-	
-
 /* display server response
  * ShowRespose in beta mode only.
  * -----------------------------------
@@ -223,6 +204,7 @@ $(document).ready(function()
 		/* Click actions for css styler ----- */
 		
 		"a[rel=css_styler]": function(e) {
+			$.facebox.close();
 			$('div.styler_wrapper').show();
 			$('div.styler_wrapper .styler_dialog')
 			.html('<div class="loading">Loading...</div>')
@@ -274,7 +256,9 @@ $(document).ready(function()
 			return false;
 		},
 		"div.styler_wrapper a.close": function(e) {
+			$(document).trigger('close.facebox');
 			$('div.styler_wrapper').hide();
+			$('div.styler_wrapper div.styler_dialog').html('');
 			return false;
 		}
 	}));
@@ -347,11 +331,12 @@ $(document).ready(function()
 		$('body').removeClass('disable_body').removeAttr('scroll');
 		
 		/* execute an action after the facebox closes */
-		var action = $('.facebox #on_close').html();	
+		var action = $('#on_close').html();	
 		
 		if(null == action) {
 			// TODO: find something good to put here
-			alert('on_close action is empty');
+			$('#show_response_beta').html('on_close action is empty');
+			return false;
 		} else {
 			action = action.split('-');
 			//**action = array(action, toolname, tool_id);
@@ -417,7 +402,7 @@ $(document).ready(function()
 			var output = '';
 			page_id = $('#click_hook').attr('rel');
 			
-			$.facebox('Saving...', 'loading_msg', 'facebox_2');
+			$('#show_response_beta').html('Saving tool positions...');
 			$(".CONTAINER_WRAPPER").each(function(){
 				var container = $(this).attr("rel");
 				var kids = $(this).children("span.common_tool_wrapper");
@@ -427,7 +412,6 @@ $(document).ready(function()
 				});
 			});
 			$.post("/get/tool/save_positions/"+page_id, {output: output}, function(data){
-				$.facebox.close()
 				$('#show_response_beta').html(data);
 			});
 		}
