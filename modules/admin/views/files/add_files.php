@@ -1,3 +1,4 @@
+
 <div id="common_tool_header" class="buttons">
 	<div id="common_title">Add Files</div>
 </div>	

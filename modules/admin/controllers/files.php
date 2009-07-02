@@ -1,8 +1,8 @@
 <?php
 class Files_Controller extends Controller {
 
-/* THIS CLASS NEEDS TO BE PROTECTED 
- * sites filesystem/data directory
+/* 
+ *
  *	
  */	 
 	function __construct()
@@ -24,9 +24,10 @@ class Files_Controller extends Controller {
 	public function index()
 	{
 		$dir	= Assets::dir_path();
-		$files	= self::folder_contents($dir);
+		$files	= self::folder_contents($dir, '_sm');
 		
 		$primary = new View('files/index');
+		$primary->is_editor = (empty($_GET['editor'])) ? FALSE : TRUE ;
 		$primary->files = $files;
 		die($primary);
 	}
@@ -38,7 +39,7 @@ class Files_Controller extends Controller {
 	{
 		$folder	= str_replace(':', '/', $folder);
 		$dir	= Assets::dir_path($folder);		
-		$files	= self::folder_contents($dir);
+		$files	= self::folder_contents($dir, '_sm');
 		
 		$primary = new View('files/folder');
 		$primary->files = $files;
@@ -71,22 +72,58 @@ class Files_Controller extends Controller {
 		if(!is_dir($full_path))
 			die('invalid directory');
 
-		# Do we have a file and is it > 9mb
-		if( empty($_FILES['Filedata']['type']) OR ( $_FILES['Filedata']['type'] > 90000 ) )
+		# Do we have a file
+		if(! is_uploaded_file($_FILES['Filedata']['tmp_name']) )
 			die('Invalid File');
-
+		
+		# test for size restrictions?
+		# ( $_FILES['Filedata']['size'] > 90000 )
+		
 		# NOTE:: IS THIS SECURE??
 		# Work-around maintaining the session because Flash Player doesn't send the cookies
 		if(isset($_POST["PHPSESSID"]))
 			session_id($_POST["PHPSESSID"]);
 
+		# sanitize the filename.
+		$ext		= strrchr($_FILES['Filedata']['name'], '.');
+		$filename	= str_replace($ext, '', $_FILES['Filedata']['name']);
+		$ext		= strtolower($ext);
+		$filename	= valid::filter_php_filename($filename).$ext;
+		
 		# place the file.
-		$new_path = "$full_path/".$_FILES['Filedata']['name'];
-		if(move_uploaded_file($_FILES['Filedata']['tmp_name'], $new_path))
-			die('File uploaded');
+		if(!move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename"))
+			die('Error: File not uploaded.');
 		
-		die('File NOT uploaded.');
+		# is file an image?
+		$image_types = array(
+			'.jpg'	=> 'jpeg',
+			'.jpeg'	=> 'jpeg',
+			'.png'	=> 'png',
+			'.gif'	=> 'gif',
+			'.tiff'	=> 'tiff',
+			'.bmp'	=> 'bmp',
+		);
 		
+		if(array_key_exists($ext, $image_types))
+		{
+			# Create sm thumb (TODO: optimize this later)
+			$image_sm	= new Image("$full_path/$filename");			
+			$sm_width	= $image_sm->__get('width');
+			$sm_height	= $image_sm->__get('height');
+			
+			# Make square thumbnails
+			if( $sm_width > $sm_height )
+				$image_sm->resize(75,75,Image::HEIGHT)->crop(75,75);
+			else
+				$image_sm->resize(75,75,Image::WIDTH)->crop(75,75);
+			
+			
+			if(!is_dir("$full_path/_sm"))
+				mkdir("$full_path/_sm");
+				
+			$image_sm->save("$full_path/_sm/$filename");		
+		}		
+		die('File uploaded');
 	}
 /*
  * add new folder to a specific directory
@@ -129,7 +166,9 @@ class Files_Controller extends Controller {
 			die('No path sent');
 		
 		$path		= str_replace(':', '/', $path);
+		$filename	= substr(strrchr($path, '/'), 1);
 		$full_path	= Assets::dir_path($path);
+		$thumb_path	= str_replace($filename, "_sm/$filename", $full_path);
 		
 		if(is_dir($full_path))
 		{
@@ -144,8 +183,11 @@ class Files_Controller extends Controller {
 		elseif(file_exists($full_path))
 		{
 			if(unlink($full_path))
+			{
+				if(file_exists($thumb_path))
+					unlink($thumb_path);
 				die('File deleted');
-				
+			}	
 			die('Could not delete the file.');
 		}
 		die('invalid path');

@@ -26,7 +26,7 @@
 			?>
 			<div id="image_<?php echo $image->id?>">
 				<span>drag</span>
-				<img src="<?php echo "$url_path/sm_$image->path"?>" rel="<?php echo $image->id?>" height="100px" width="100px">	
+				<img src="<?php echo "$url_path/_sm/$image->path"?>" rel="<?php echo $image->id?>" height="100px" width="100px">	
 			</div>
 			<?php
 		}				

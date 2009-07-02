@@ -32,10 +32,13 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	{
 		valid::id_key($tool_id);
 			
-		# validate for file size 5M and type (images)
-		if( empty($_FILES['Filedata']['type']) OR ( $_FILES['Filedata']['type'] > 50000 ) )
+		# Do we have a file
+		if(! is_uploaded_file($_FILES['Filedata']['tmp_name']) )
 			die('Invalid File');
-
+		
+		# test for size restrictions?
+		# ( $_FILES['Filedata']['size'] > 50000 )
+		
 		# NOTE:: IS THIS SECURE??
 		# Work-around maintaining the session because Flash Player doesn't send the cookies
 		if(isset($_POST["PHPSESSID"]))
@@ -51,22 +54,23 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			AND fk_site = '$this->site_id'
 		")->current()->highest;
 
-		# Setup image store directory
-		
+		# Setup image store directory	
 		$image_store = Assets::dir_path('tools/albums');			
 		if(!is_dir($image_store))
 			mkdir($image_store);
 
 		if(! is_dir("$image_store/$tool_id") )
-			mkdir("$image_store/$tool_id");		
+			mkdir("$image_store/$tool_id");	
+
+		if(! is_dir("$image_store/$tool_id/_sm") )
+			mkdir("$image_store/$tool_id/_sm");				
 
 		$tmp_name	= $_FILES['Filedata']['tmp_name'];			
 		$holder		= array ('tmp_name' => $tmp_name);
 		$filename	= upload::save($holder);
 		$image		= new Image($filename);			
 		$ext		= $image->__get('ext');
-		$token		= text::random('alnum', 18);
-		$name		= "$token.$ext";
+		$name		= text::random('alnum', 18).'.'.$ext;
 		
 		if( $image->save("$image_store/$tool_id/$name") )
 		{
@@ -90,7 +94,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			else
 				$image_sm->resize(100,100,Image::WIDTH)->crop(100,100);
 			
-			$image_sm->save("$image_store/$tool_id/sm_$name");
+			$image_sm->save("$image_store/$tool_id/_sm/$name");
 		}
 		unlink($filename);
 		die('Image added');	
@@ -166,12 +170,11 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$image = $this->_grab_tool_child('album', $id);
 
 			# Image File delete
-			$image_path	= ASSETS::dir_path("tools/albums/$image->parent_id/$image->path");
-			$image_sm	= ASSETS::dir_path("tools/albums/$image->parent_id/sm_$image->path");
-			if( file_exists($image_path) )
-				unlink($image_path);
-			if( file_exists($image_sm) )
-				unlink($image_sm);
+			$image_path	= ASSETS::dir_path("tools/albums/$image->parent_id");
+			if( file_exists("$image_path/$image->path") )
+				unlink("$image_path/$image->path");
+			if( file_exists("$image_path/_sm/$image->path") )
+				unlink("$image_path/_sm/$image->path");
 		}
 		
 		$db = new Database;

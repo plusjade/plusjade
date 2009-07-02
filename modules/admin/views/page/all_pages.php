@@ -6,7 +6,12 @@
 	</div>
 	
 	<div class="common_left_panel">
-		<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/page/add" class="new_page">New Page</a>
+		<div style="padding:10px; background:#ffffcc">
+			<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/page/add" class="new_page">New Page</a>
+		</div>
+		<br>
+		Navigate to the folder you want your new page,
+		then add the page.
 		<br><br>		
 		<h3>Key</h3>
 		<small style="line-height:1.7em">

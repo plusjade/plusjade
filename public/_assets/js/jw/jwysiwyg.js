@@ -406,8 +406,8 @@
 			.before('<ul class="ui-tabs-nav generic_tabs"> \
 					<div class="field_title">'+ name +'</div> \
 					<li><a href="#" class="show_edit">Edit</a><li>\
+					<li><a href="#" class="show_files">Add Media</a><li>\
 					<li><a href="#" class="show_html">HTML</a><li>\
-					<li><a href="#" class="show_files">Files</a><li>\
 					<li><a href="#" class="reset">Reset</a><li>\
 				</ul>\
 			');
@@ -487,15 +487,17 @@
 			
 
 			// Load the files browser.
-			$('#show_files').load('/get/files').hide();
-	
+			$('#show_files').hide().load('/get/files?editor=true');
+			
 
 			// Activate "place_file" command in files browser.
-			$('#show_files').click($.delegate({
-				'a.place_file':function(e){
+			$('#show_files').dblclick($.delegate({
+				'img.place_file':function(e){
 					$('div.editor_pane').hide();
+					var url = $(e.target).attr('rel');
+					
 					$('#show_edit').show('fast',function(){
-						self.editorDoc.execCommand('insertImage', false, e.target.href);
+						self.editorDoc.execCommand('insertImage', false, url);
 						self.saveContent();
 					});
 					return false;

@@ -1,5 +1,8 @@
 
+
 <?php extract($data)?>
+<span id="on_close">update-<?php echo "$toolname-$tool_id"?></span>
+
 <?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command))?>
 
 	<div id="common_tool_header" class="buttons">
@@ -14,6 +17,8 @@
 		<button type="submit" name="save_css" class="jade_positive">Save Changes</button>
 		</p>
 		<button type="submit" name="save_template" class="jade_positive" value="true">Save as Tool Template</button>
+		<br><br>
+		<b>Press TAB</b> while in the textarea to update the tool view.
 	</div>
 	
 
@@ -39,6 +44,17 @@
 		$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
 		return false;
 	});
+
+	$('textarea#edit_css').keydown(function(e){
+	// 16 = SHIFT, 9 = tab
+	  if (e.keyCode == 9) {		
+			value	= $('textarea#edit_css').val();
+			css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
+			$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
+			return false;
+		}	
+	});
+
 	
 	original = $('textarea#edit_css').val();
 	$('.show_orig').click(function(){

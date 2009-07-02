@@ -1,4 +1,6 @@
 
+<span id="on_close">update-album-<?php echo $tool_id?></span>
+
 <div id="common_tool_header" class="buttons">
 	<div id="common_title">Add Images to Album</div>
 </div>	
@@ -55,9 +57,7 @@ $(document).ready(function(){
 		upload_success_handler : uploadSuccess,
 		upload_complete_handler :uploadComplete,
 		queue_complete_handler : function(){
-			$('.facebox .show_submit').hide();
-			//$.facebox.close();
-			$().jade_update_tool_html('update', 'album', '<?php echo $tool_id?>');			
+			$.facebox.close();	
 		}		
 	});
 });
