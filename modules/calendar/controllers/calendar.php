@@ -143,18 +143,17 @@ class Calendar_Controller extends Controller {
  * param $tool_id 	= (int) the tool id of the tool.
  */ 	
 	function _ajax($url_array, $tool_id)
-	{
-		list(, , $action, $year, $month, $day) = $url_array;
+	{		
 		/*
 		$action	= @$url_array['2'];
 		$year	= @$url_array['3'];
 		$month	= @$url_array['4'];
 		$day	= @$url_array['5'];
 		*/
-		if('month' == $action)
-			die( $this->month($tool_id, $year, $month) );
-		elseif('day' == $action)
-			die( $this->day($tool_id, $year, $month, $day) );
+		if('month' == $url_array['2'])
+			die( $this->month($tool_id, $url_array['3'], $url_array['4']) );
+		elseif('day' == $url_array['2'])
+			die( $this->day($tool_id, $url_array['3'], $url_array['4'], $url_array['5']) );
 	}
 	
 	

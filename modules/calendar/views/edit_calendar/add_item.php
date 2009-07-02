@@ -1,16 +1,14 @@
 
 <span id="on_close"><?php echo $js_rel_command?></span>
 
-<form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" enctype="multipart/form-data" class="ajaxForm">
+<form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" class="ajaxForm">
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="add_item" class="jade_positive">
-			<img src="<?php echo url::image_path('check.png')?>" alt=""/> Add Event
-		</button>
+		<button type="submit" class="jade_positive">Add Event</button>
 		<div id="common_title">Create New Calendar Entry</div>
 	</div>
 
-	<div class="common_left_panel fieldsets">
+	<div class="common_left_panel">
 		<b>Date</b><input type="text" name="date" id="date_field" READONLY>
 		<div id="datepicker"></div>			
 	</div>

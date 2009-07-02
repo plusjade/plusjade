@@ -1,6 +1,6 @@
 
 <div class="breadcrumb">
-	<a href="/showroom/<?php echo "$category"?>" class="loader"><?php echo $category?></a>
+	<a href="<?php echo url::site("$page_name/$category")?>" class="loader"><?php echo $category?></a>
 	&#8594; <?php echo $item->url?>
 </div>
 
@@ -19,10 +19,10 @@
 	</div>
 
 	<div class="single_image">
-		<img src="<?php echo $img_path.'/'.$item->img?>" alt="">
+		<img src="<?php echo "$img_path/$item->img"?>" alt="">
 	</div>
 
 	<div class="aligncenter">
-		<b>Link to this item:</b> <input type="text" value="<?php echo url::site("showroom/$category/$item->url")?>" style="width:80%">
+		<b>Link to this item:</b> <input type="text" value="<?php echo url::site("$page_name/$category/$item->url")?>" style="width:80%">
 	</div>	
 </div>

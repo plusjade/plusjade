@@ -15,7 +15,7 @@
 		?>
 		<li id="faq_<?php echo $item->id?>" <?php echo $class?>>
 			<table id="menu_page_list"><tr>
-				<td width="80px" class="drag_box"><img src="<?php echo url::image_path('arrow.png')?>" alt="handle" class="handle"></td>
+				<td width="80px" class="drag_box"> <span class="icon move"> &#160; &#160; </span> DRAG </td>
 				<td width="30px" class="aligncenter"><?php echo ++$counter?>. </td>
 				<td class="page_edit"><?php echo $item->question?></td>
 			</tr></table>
@@ -26,6 +26,6 @@
 </ul>
 
 <script type="text/javascript">
-	$('#generic_sortable_list').sortable({handle:'.handle', axis: 'y'});
+	$('#generic_sortable_list').sortable({handle:'.drag_box', axis: 'y'});
 	<?php echo javascript::save_sort('faq', $tool_id)?>
 </script>

@@ -15,11 +15,11 @@ class Blog_Controller extends Controller {
 	function _index($tool_id)
 	{
 		date_default_timezone_set('America/Los_Angeles');# just for now
-		$url_array	= uri::url_array();
-		$page_name	= $this->get_page_name(@$url_array['0'], 'blog', $tool_id);
-		$action		= @$url_array['1'];
-		$value		= @$url_array['2'];
-		$value2		= @$url_array['3'];
+		$url_array	= Uri::url_array();
+		$page_name	= $this->get_page_name($url_array['0'], 'blog', $tool_id);
+		$action		= $url_array['1'];
+		$value		= $url_array['2'];
+		$value2		= $url_array['3'];
 		
 		/*
 		 * need the parent to setup appropriate views and user-specific settings
@@ -342,7 +342,7 @@ class Blog_Controller extends Controller {
  */ 
 	function _ajax($url_array, $tool_id)
 	{
-		@list( , $page_name, $action, $value) = $url_array;
+		list($page_name, $action, $value) = $url_array;
 		
 		switch($action)
 		{

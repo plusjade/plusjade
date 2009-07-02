@@ -92,6 +92,7 @@ span.move{background-position:0px -363px}
 	padding:5px;
 	border:1px solid #777;
 }
+.admin_reset #on_close{display:none}
 
 /* --------------- facebox ---------------*/
 #facebox_base{z-index: 99}
@@ -1202,6 +1203,10 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 
 /* files view */
+#files_browser_wrapper div.editor_info{
+	padding:6px;
+	background:#ffffcc;
+}
 .file_asset, .folder_asset{
 	height:110px;
 	width:110px;
@@ -1213,7 +1218,10 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	text-align:center;
 	
 }
-.folder_asset img{
+.file_asset span.icon ,
+.folder_asset span.icon,
+.folder_asset img,
+.place_file{
 	cursor:pointer;
 	cursor:cursor;
 }
