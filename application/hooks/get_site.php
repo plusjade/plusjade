@@ -86,8 +86,8 @@ function get_site()
 	 */
 
 	# Get page_name
-	$url_array = explode('/', $_SERVER['REQUEST_URI']);
-	$page_name = ( empty($url_array['1']) ) ? $site_row->homepage : $url_array['1'];
+	$url_array = Uri::url_array();
+	$page_name = ( empty($url_array['0']) ) ? $site_row->homepage : $url_array['0'];
 	
 
 	if('files' == $page_name)
@@ -110,7 +110,7 @@ function get_site()
 			
 			$tool = Load_Tool::factory($toolname);
 			
-			$url_array['1'] = $page_name; # make sure the page_name is correct.
+			$url_array['0'] = $page_name; # make sure the page_name is correct.
 			die( $tool->_ajax($url_array, $tool_id) );
 		}
 		else
