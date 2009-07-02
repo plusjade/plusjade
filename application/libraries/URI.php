@@ -74,6 +74,7 @@ class URI_Core extends Router {
 			if(! empty($part) )
 			$url_array[] = $part;
 
+		$url_array = array_pad($url_array, 5, 0);
 		return $url_array;
 	}
 	/**
