@@ -1,9 +1,9 @@
 
 
 <?php extract($data)?>
-<span id="on_close">update-<?php echo "$toolname-$tool_id"?></span>
+<span class="on_close two"><?php echo $js_rel_command?></span>
 
-<?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command))?>
+<?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm'))?>
 
 	<div id="common_tool_header" class="buttons">
 		<div id="common_title"><?php echo $toolname?>(<?php echo $tool_id?>) CSS.</div>

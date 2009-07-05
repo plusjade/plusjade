@@ -23,24 +23,14 @@ class Tool_Controller extends Controller {
 
 		# Get all tool references in pages_tools owned by this site.
 		$tools = $db->query("
-			SELECT pages_tools.*, pages.page_name, tools_list.* 
+			SELECT pages_tools.guid, pages_tools.page_id, pages.page_name, tools_list.name 
 			FROM pages_tools 
 			LEFT JOIN tools_list ON pages_tools.tool = tools_list.id
 			LEFT JOIN pages ON pages_tools.page_id = pages.id
 			WHERE pages_tools.fk_site = '$this->site_id' 
-			ORDER BY tools_list.id, pages_tools.page_id
+			ORDER BY tools_list.name ASC, pages.page_name
 		");
-	
-		# Get all pages belonging to this site.
-		$pages = $db->query("
-			SELECT id, page_name 
-			FROM pages 
-			WHERE fk_site = '$this->site_id' 
-			ORDER BY page_name
-		");
-		
 		$primary->tools = $tools;
-		$primary->pages = $pages;
 		die($primary);
 	}
 

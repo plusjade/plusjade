@@ -27,8 +27,8 @@ foreach ($files as $path => $data)
 			: "<img src=\"/_assets/images/admin/file.jpg\" width=\"75\" height=\"75\" alt=\"\">";
 		
 		?>
-		<div id="<?php echo $css_id?>" class="file_asset" rel="<?php echo $name?>">
-			<br><?php echo $img?>
+		<div id="<?php echo $css_id?>" class="file_asset asset" rel="<?php echo $name?>">
+			<?php echo $img?>
 			<br><span title="<?php echo $name?>"><?php echo $display_name?></span>
 			 <span class="icon cross">&nbsp; &nbsp; </span>
 		</div>
@@ -39,8 +39,8 @@ foreach ($files as $path => $data)
 	{
 		$delete = ('tools' == $name AND 'tools' == $path) ? '' : '<span class="icon cross">&nbsp; &nbsp; </span> ';
 		?>
-		<div id="<?php echo $name?>" class="folder_asset" rel="<?php echo $path?>">
-			<br><img src="/_assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
+		<div id="<?php echo $name?>" class="folder_asset asset" rel="<?php echo $path?>">
+			<img src="/_assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
 			<br><a href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
 			<?php echo $delete?>
 		</div>

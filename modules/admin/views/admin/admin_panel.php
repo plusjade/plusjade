@@ -7,44 +7,37 @@
 		</li>
 
 		<li class="dropdown">
-			<div><span class="icon global">&nbsp; &nbsp; </span> Site</div>
+			<div><span class="icon global">&#160; &#160; </span> Site</div>
 			<ul>
-				<li><a href="/get/admin" rel="facebox"><span class="icon wrench">&nbsp; &nbsp; </span> Settings</a></li>
-				<li><a href="/get/auth/logout"><span class="icon cross">&nbsp; &nbsp; </span> Logout</a></li>
+				<li><a href="/get/admin" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a></li>
+				<li><a href="/get/page/navigation" rel="facebox"><span class="icon sitemap">&#160; &#160; </span>Navigation</a></li>
+				<li><a href="/get/auth/logout"><span class="icon cross">&#160; &#160; </span> Logout</a></li>
 			</ul>		
 		</li>	
 		
 		<li class="dropdown">
-			<div><span class="icon rainbow">&nbsp; &nbsp; </span> Theme</div>
+			<div><span class="icon rainbow">&#160; &#160; </span> Theme</div>
 			<ul> 
-				<li>This Theme &#8594;</li>
-				<li><a href="/get/theme/templates" rel="facebox"><span class="icon rainbow">&nbsp; &nbsp; </span>Templates</a></li>
-				<li><a href="/get/theme/stylesheets" rel="css_styler"><span class="icon rainbow">&nbsp; &nbsp; </span>Stylesheets</a></li>
-				<li><a href="/get/theme/logo" rel="facebox"><span class="icon flag">&nbsp; &nbsp; </span>Edit Logo</a></li>
-				<li>All Themes &#8594;</li>
-				<li><a href="/get/theme/manage" rel="facebox"><span class="icon flag">&nbsp; &nbsp; </span>Your Themes</a></li>
-				<li><a href="/get/theme/change" rel="facebox"><span class="icon flag">&nbsp; &nbsp; </span>New Theme</a></li>
+				<li class="aligncenter" style="background:#ffffcc !important; border-bottom:1px dashed #ccc">This Theme</li>
+				<li><a href="/get/theme/stylesheets" rel="css_styler"><span class="icon rainbow">&#160; &#160; </span>Stylesheets</a></li>
+				<li><a href="/get/theme/templates" rel="facebox"><span class="icon rainbow">&#160; &#160; </span>Templates</a></li>
+				<li><a href="/get/theme/logo" rel="facebox"><span class="icon flag">&#160; &#160; </span>Logo</a></li>
+				<li class="aligncenter" style="background:#ffffcc !important;  border-bottom:1px dashed #ccc">All Themes</li>
+				<li><a href="/get/theme/manage" rel="facebox"><span class="icon flag">&#160; &#160; </span>Your Themes</a></li>
+				<li><a href="/get/theme/change" rel="facebox"><span class="icon flag">&#160; &#160; </span>New Theme</a></li>
 			</ul>		
 		</li>
-		<li class="dropdown">
-			<div><span class="icon page">&nbsp; &nbsp;</span> Pages</div>
-			<ul>
-				<li><a href="/get/page/index/add" rel="facebox"><span class="icon add_page">&nbsp; &nbsp; </span>New Page</a></li>
-				<li><a href="/get/page" rel="facebox"><span class="icon page">&nbsp; &nbsp; </span>All Pages</a></li>
-				<li><a href="/get/page/navigation" rel="facebox"><span class="icon sitemap">&nbsp; &nbsp; </span>Navigation</a></li>
-			</ul>		
+		<li class="direct">
+			<a href="/get/page/index/add" class="block_mode" rel="facebox"><span class="icon page">&#160; &#160;</span> Pages</a>
 		</li>		
 		<li class="dropdown">
-			<div><span class="icon tools">&nbsp; &nbsp; </span> Tools</div>
+			<div><span class="icon tools">&#160; &#160; </span> Tools</div>
 			<ul>
-				<li><a href="/get/tool" rel="facebox"><span class="icon tools">&nbsp; &nbsp; </span>Manage</a></li>
+				<li><a href="/get/tool" rel="facebox"><span class="icon tools">&#160; &#160; </span>Manage</a></li>
 			</ul>
 		</li>
-		<li class="dropdown">
-			<div><span class="icon local">&nbsp; &nbsp; </span> Files</div>
-			<ul>
-				<li><a href="/get/files" rel="facebox"><span class="icon tools">&nbsp; &nbsp; </span>Manage</a></li>
-			</ul>
+		<li class="direct">
+			<a href="/get/files" rel="facebox" class="block_mode"><span class="icon local">&#160; &#160; </span>Files</a>
 		</li>
 		
 		<li class="this_page">
@@ -52,11 +45,11 @@
 		</li>
 		
 		<li class="this_page" style="width:100px">
-			<a href="/get/page/settings/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon wrench">&nbsp; &nbsp; </span> Settings</a>
+			<a href="/get/page/settings/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a>
 		</li>
 
 		<li class="this_page" style="width:129px">
-			<a href="/get/tool/add/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&nbsp; &nbsp; </span> ADD CONTENT</a>
+			<a href="/get/tool/add/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD CONTENT</a>
 		</li>
 		
 		
@@ -66,6 +59,7 @@
 	</ul>
 	
 	<div style="display:none">
+		<span id="global_css_path"><?php echo $global_css_path?></span>
 		<span id="click_hook" rel="<?php echo $page_id?>" style="display:none"></span>
 		<?php						
 		if( '0' < count($tools_array) )
