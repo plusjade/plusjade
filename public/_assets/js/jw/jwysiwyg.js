@@ -74,15 +74,12 @@
         }
 
         var options = $.extend({
-            html : '<'+'?xml version="1.0" encoding="UTF-8"?'+'><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">STYLE_SHEET</head><body style="margin:0;padding:0;font-size:80%;line-height:1.3em;font-family:verdana;">INITIAL_CONTENT</body></html>',
-            css  : {},
-
+            html : '<'+'?xml version="1.0" encoding="UTF-8"?'+'><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">STYLE_SHEET</head><body style="margin:0;padding:0;background:#fff !important">INITIAL_CONTENT</body></html>',
+            css  : $('#global_css_path').html(),
             debug        : true,
-
             autoSave     : true,  // http://code.google.com/p/jwysiwyg/issues/detail?id=11
             rmUnwantedBr : true,  // http://code.google.com/p/jwysiwyg/issues/detail?id=15
             brIE         : true,
-
             controls : {},
             messages : {}
         }, options);
@@ -296,7 +293,6 @@
                     else
                     {
                         this.saveContent();
-						
                        // $(this.original).show();
                     }
 
