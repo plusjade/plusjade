@@ -130,26 +130,40 @@ class Tool_Controller extends Controller {
 			AND enabled = 'yes'
 		");
 		
-		# is page protected? if not show page builders.
+		# is page protected?
 		$page = $db->query("
 			SELECT page_name
 			FROM pages
 			WHERE id = '$page_id'
 		")->current();			
-
-		# If not a sub page and does not have builder installed already..
 		
-		if( FALSE !== strpos($page->page_name, '/') )
+		/*
+		 * Check to see if this page can have page builders.
+		 1. is NOT a sub-page
+		 2. does not already contain page_builder.
+		 3. does not have sub-pages.
+		 */
+		 
+		if(FALSE !== strpos($page->page_name, '/'))
 			$protected_tools = 'Page builders cannot be placed on sub pages';
 		elseif( yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
 			$protected_tools = 'A page builder already exists on this page.';
 		else
 		{
-			$protected_tools = $db->query("
-				SELECT *
-				FROM tools_list
-				WHERE protected = 'yes'
-			");		
+			$children = $db->query("
+				SELECT id
+				FROM pages
+				WHERE fk_site = '$this->site_id'
+				AND page_name LIKE '$page->page_name/%'
+			");
+			if(0 < $children->count())
+				$protected_tools = 'Page builders cannot be on pages having sub-pages.';
+			else
+				$protected_tools = $db->query("
+					SELECT *
+					FROM tools_list
+					WHERE protected = 'yes'
+				");		
 		}
 		$primary->protected_tools = $protected_tools;
 			
