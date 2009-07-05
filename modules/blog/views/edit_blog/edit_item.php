@@ -3,7 +3,7 @@
 	$status = array('draft'=>'','publish'=>'');
 	$status[$item->status] = 'selected="selected"';
 ?>
-<span id="on_close"><?php echo $js_rel_command?></span>
+<span class="on_close"><?php echo $js_rel_command?></span>
 
 <form action="/get/edit_blog/edit/<?php echo $item->id?>" method="POST" class="ajaxForm">	
 	<input type="hidden" name="parent_id" value="<?php echo $item->parent_id?>">

@@ -1,5 +1,5 @@
 
-<span id="on_close"><?php echo $js_rel_command?></span>
+<span class="on_close"><?php echo $js_rel_command?></span>
 
 <?php echo form::open("edit_contact/add/$tool_id", array('class' => 'ajaxForm'))?>
 	<div id="common_tool_header" class="buttons">

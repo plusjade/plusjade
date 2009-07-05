@@ -10,11 +10,13 @@ class Calendar_Controller extends Controller {
 	function _index($tool_id)
 	{
 		$primary	= new View('public_calendar/index');
-		$action		= uri::easy_segment('2');
-		$year		= uri::easy_segment('3');
-		$month		= uri::easy_segment('4');
-		$day		= uri::easy_segment('5');
+		$url_array	= Uri::url_array();
+		$action		= (empty($action)) ? 'nonsense' : $url_array['1'];
+		$year		= $url_array['2'];
+		$month		= $url_array['3'];
+		$day		= $url_array['4'];
 
+		
 		switch($action)
 		{
 			case 'month':				
@@ -145,15 +147,18 @@ class Calendar_Controller extends Controller {
 	function _ajax($url_array, $tool_id)
 	{		
 		/*
-		$action	= @$url_array['2'];
-		$year	= @$url_array['3'];
-		$month	= @$url_array['4'];
-		$day	= @$url_array['5'];
+		$page_name = @$url_array['0'];
+		$action	= @$url_array['1'];
+		$year	= @$url_array['2'];
+		$month	= @$url_array['3'];
+		$day	= @$url_array['4'];
 		*/
-		if('month' == $url_array['2'])
-			die( $this->month($tool_id, $url_array['3'], $url_array['4']) );
-		elseif('day' == $url_array['2'])
-			die( $this->day($tool_id, $url_array['3'], $url_array['4'], $url_array['5']) );
+		if('month' == $url_array['1'])
+			die( self::month($tool_id, $url_array['2'], $url_array['3']) );
+		elseif('day' == $url_array['1'])
+			die( self::day($tool_id, $url_array['2'], $url_array['3'], $url_array['4']) );
+	
+		die('something is wrong with the url');
 	}
 	
 	

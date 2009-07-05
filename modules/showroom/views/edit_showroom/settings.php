@@ -1,7 +1,8 @@
 
+<span class="on_close"><?php echo $js_rel_command?></span>
 <?php
 $views = array( 'list', 'gallery');
-echo form::open("edit_showroom/settings/$tool->id", array('class' => 'ajaxForm', 'rel' => $js_rel_command));
+echo form::open("edit_showroom/settings/$tool->id", array('class' => 'ajaxForm'));
 ?>
 	<div  id="common_tool_header" class="buttons">
 		<button type="submit" name="edit_showroom" class="jade_positive">Save Settings</button>

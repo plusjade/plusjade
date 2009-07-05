@@ -1,5 +1,5 @@
 
-<span id="on_close"><?php echo $js_rel_command?></span>
+<span class="on_close"><?php echo $js_rel_command?></span>
 
 <form action="/get/edit_blog/settings/<?php echo $tool->id?>" method="POST" class="ajaxForm">	
 	

@@ -10,6 +10,9 @@
 	
 	$data[$item->type] = $item->type;
 ?>
+
+<span class="on_close">2 off</span>
+
 <form action="/get/edit_navigation/edit/<?php echo $item->id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 
 	<div id="common_tool_header" class="buttons">
@@ -92,9 +95,7 @@
 		success: function(data) {	
 			text = $("input[name='item']").val();
 			$('li span.active').html(text);
-			
 			$.facebox.close("facebox_2");
-			$('.facebox .show_submit').hide();
 			$('#show_response_beta').html(data);			
 		}
 	});

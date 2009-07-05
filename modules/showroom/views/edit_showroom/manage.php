@@ -1,5 +1,6 @@
 
 <span id="on_close">update-showroom-<?php echo $tool_id?></span>
+
 <div  id="common_tool_header" class="buttons">
 	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">Save Category Tree</button>
 	<div id="common_title">Manage Showroom Categories</div>
@@ -9,7 +10,7 @@
 	Click a category to select it.
 	<ul id="actions_list">	
 		<li><a href="/get/edit_showroom/add/<?php echo $tool_id?>" id="add_node">Add Sub-Category</a></li>
-		<li><a href="/get/edit_showroom/edit/" id="edit_node">Edit Category</a></li>
+		<li><a href="/get/edit_showroom/edit_category/" id="edit_node">Edit Category</a></li>
 		<li><a href="#" id="delete_node">Delete Category</a></li>
 		<br>
 		<li><a href="/get/edit_showroom/add_item/<?php echo $tool_id?>" id="add_item">Add item</a></li>

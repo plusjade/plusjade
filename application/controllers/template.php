@@ -27,7 +27,6 @@ abstract class Template_Controller extends Controller {
 	
 /*
  * Load Assets for Admin edit mode
- *
  */ 
 	function _load_admin($page_id, $page_name)
 	{	
@@ -67,6 +66,7 @@ abstract class Template_Controller extends Controller {
 						'protected_array'	=> $protected_array,
 						'page_id'			=> $page_id,
 						'page_name'			=> $page_name,
+						'global_css_path'	=> "/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-"
 					)
 				);
 			return TRUE;
@@ -79,7 +79,7 @@ abstract class Template_Controller extends Controller {
 	 */	
 	public function build_output($containers_array, $template=NULL)
 	{
-		$header		= View::factory('_global/header');
+		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');
 		$template 	= ((NULL == $template)) ? 'master' : $template;
 		$path		= Assets::data_path_theme("templates/$template.html");
@@ -103,11 +103,11 @@ abstract class Template_Controller extends Controller {
 		$master = get_string_between(ob_get_clean(), '<body>', '</body>');
 		
 		$keys = array(
-			'%HEADER%',
+			'%BANNER%',
 			'%MENU%',
 		);
 		$replacements = array(
-			$header,
+			$banner,
 			$menu,
 		);
 		if(! is_array($containers_array) )

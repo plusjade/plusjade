@@ -21,6 +21,7 @@ class yaml_Core {
 
 /*
  * parse the yaml file and return the key/value array
+ * if the yaml file does not exist, we should build yah!
 */
 	public static function parse($site_name, $filename, $full_path=NULL)
 	{
@@ -38,13 +39,24 @@ class yaml_Core {
 			foreach($lines as $line)
 			{
 				$pieces = explode(':', $line);
-				$key	= trim(@$pieces['0']);
-				$value	= trim(@$pieces['1']);
+				$pieces = array_pad($pieces, 2, 0);
+				$key	= trim($pieces['0']);
+				$value	= trim($pieces['1']);
 				if(! empty($value))
 					$yaml_array[$key] = $value;
-			}
-			
-		}			
+			}	
+			return $yaml_array;
+		}
+		
+		# If pages_config.yml does not exist, create it.
+		# other files get passed here so we limit to pages_config FOR NOW.
+		# This should not need to happen very often.
+		if('pages_config' == $filename)
+		{
+			$page = new Page_Controller();
+			$page->_build_pages_config();
+			return self::parse($site_name, $filename, $full_path);
+		}
 		return $yaml_array;
 	}
 

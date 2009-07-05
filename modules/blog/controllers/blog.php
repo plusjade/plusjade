@@ -41,26 +41,28 @@ class Blog_Controller extends Controller {
 		$primary->recent_comments = $this->get_recent_comments($tool_id);
 		$primary->add_root_js_files('ajax_form/ajax_form.js');
 
+		$action = (empty($action)) ? 'SomethingRandom' : $action ;
 		switch($action)
 		{
 			case 'entry':
-				$content = $this->single_post($page_name, $value);
+				die("blah $action");
+				$content = self::single_post($page_name, $value);
 				break;
 			
 			case 'tag':
-				$content = $this->tag_search($tool_id, $value);
+				$content = self::tag_search($tool_id, $value);
 				break;
 				
 			case 'archive':
-				$content = $this->show_archive($tool_id, $value, $value2);
+				$content = self::show_archive($tool_id, $value, $value2);
 				break;
 
 			case 'comment':
 				valid::id_key($value);
 				if($_POST)
-					$primary->response = $this->post_comment($value);
+					$primary->response = self::post_comment($value);
 				
-				$content = $this->single_post($page_name, NULL, $value);
+				$content = self::single_post($page_name, NULL, $value);
 				break;
 				
 			default:
@@ -216,7 +218,7 @@ class Blog_Controller extends Controller {
 			$tool_id = $parent->parent_id;
 		}			
 			
-		$comments =  $this->db->query("
+		$comments = $this->db->query("
 			SELECT *,
 			DATE_FORMAT(created_at, '%M %e, %Y, %l:%i%p') as clean_date
 			FROM blog_items_comments 
@@ -361,9 +363,9 @@ class Blog_Controller extends Controller {
 				# OR ajax request to view comments
 				valid::id_key($value);
 				if($_POST)
-					die( $this->post_comment($value) );
+					die( self::post_comment($value) );
 				else
-					die( $this->get_comments($page_name, $value) );
+					die( self::get_comments($page_name, $value) );
 				break;
 				
 			default:

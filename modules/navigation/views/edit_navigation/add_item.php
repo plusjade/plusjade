@@ -1,4 +1,6 @@
 
+<span class="on_close">2 off</span>
+
 <form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 	<input type="hidden" name="local_parent" value="<?php echo $local_parent?>">
 
@@ -82,12 +84,7 @@
 			// TODO: This does not work in chrome and safari
 			$simpleTreeCollection.get(0).addNode(data, text);
 			$.facebox.close("facebox_2");
-			$('.facebox .show_submit').hide();
 			$('#show_response_beta').html(data);	
 		}
 	});
-	
-
-
-
 </script>
