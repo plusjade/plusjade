@@ -3,15 +3,13 @@
 class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 /*
- *	Handles all editing logic for Showroom module.
- *	Extends the module template to build page for ajax rendering.
- *	Only Logged in users should have access
- *
+ *	An basic product listing generator with nestable categories.
  */
 	function __construct()
 	{
 		parent::__construct();	
 	}
+	
 /*
  * Display the categories drilldown
  * UPDATE category positions
@@ -105,7 +103,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			
 			# Make URL friendly
 			$category	= trim($_POST['category']);
-			$url		= preg_replace("(\W)", '_', strtolower($category));
+			$url		= valid::filter_php_url($category);
 		
 			$data = array(
 				'parent_id'		=> $tool_id,
@@ -130,7 +128,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * edit a category
  */ 
-	public function edit($cat_id=NULL)
+	public function edit_category($cat_id=NULL)
 	{
 		valid::id_key($cat_id);
 		$db = new Database;
@@ -139,7 +137,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		{
 			# Make URL friendly
 			$category	= trim($_POST['category']);
-			$url		= preg_replace("(\W)", '_', strtolower($category));
+			$url		= valid::filter_php_url($category);
 		
 			$data = array(
 				'url'			=> $url,
@@ -185,7 +183,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			
 			# Make URL friendly
 			$url = trim($_POST['url']);
-			$url = ( empty($url) ) ? $_POST['name'] : $url;
+			$url = (empty($url)) ? $_POST['name'] : $url;
 			$url = valid::filter_php_url($url);
 			
 			$data = array(			
@@ -199,7 +197,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			);	
 			
 			# Upload image if sent
-			if(is_uploaded_file($_FILES['image']['tmp_name']))
+			if(!empty($_FILES['image']['tmp_name']) AND is_uploaded_file($_FILES['image']['tmp_name']))
 				if (! $data['img'] = self::upload_image($_FILES, $_POST['category_id']) )
 					echo 'Image not saved! Must be jpg, gif, or png.';
 			
@@ -221,7 +219,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * Edit single Item
  */
-	public function edit_item($id=NULL)
+	public function edit($id=NULL)
 	{
 		valid::id_key($id);
 		$db = new Database;
@@ -255,7 +253,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 					if( file_exists($old_image) )
 						unlink($old_image);
 			}
-			#If user has changed the category:
+			# If user has changed the category:
 			elseif ($_POST['category'] != $_POST['old_category'])
 			{
 				$new_path = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['category']}";
@@ -457,17 +455,29 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	{
 		$db = new Database;
 		
-		# need a way to handle this, has no parent_id
+		# delete items_meta (items)
 		$db->query("
-			DELETE FROM showroom_items_meta
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
+			DELETE items.*
+			FROM showroom_items as cats, showroom_items_meta as items
+			WHERE cats.fk_site = '$this->site_id'
+			AND cats.parent_id = '$tool_id'
+			AND cats.id = items.cat_id
 		");
-		$db->query("
-			DELETE FROM blog_items_tags
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
-		");
+		
+		# delete data assets
+		$showroom_dir = Assets::dir_path("tools/showrooms/$tool_id");
+		if(is_dir($showroom_dir))
+		{
+			$d = dir($showroom_dir); 
+			while($file = $d->read())
+			{
+				 if('.' != $file && '..' != $file)
+					unlink("$showroom_dir/$file"); 
+			} 
+			$d->close(); 
+			rmdir($showroom_dir);
+		}
+		
 		return TRUE;
 	}
 	

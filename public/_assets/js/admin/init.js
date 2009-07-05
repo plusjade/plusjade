@@ -148,6 +148,20 @@ $(document).ready(function()
 			return false;
 		},
 		
+		// facebox for icon spans since delegation does not bubble.
+		"a[rel=facebox] span.icon": function(e){
+			$parent = $(e.target).parent();
+			url = $parent.attr('href');
+			var pane = "base"; // loads in "base" unless otherwise noted via id
+			if($parent.attr('id')) var pane = "2";			
+			$.facebox(function(){
+					$.get(url, function(data){
+						$.facebox(data, false, "facebox_"+pane);
+					});
+			}, false, "facebox_"+pane);
+			return false;
+		},
+		
 		// facebox load div content
 		"a[rel=facebox_div]": function(e){
 			var pane = "base"; // loads in "base" unless otherwise noted via id
@@ -301,7 +315,9 @@ $(document).ready(function()
 				$('#show_response_beta').html('waiting for response...');
 			},
 			success: function(data) {
-				$.facebox.close();
+				// finish this
+				var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
+				$.facebox.close(whichBox);
 				$('.admin_reset .show_submit').hide();					
 				$('#show_response_beta').html(data);
 			}
@@ -325,21 +341,22 @@ $(document).ready(function()
 	});
 
 /*
- * Bind functions to the close facebox event.
+ * Bind functions to the CLOSE facebox event.
  */	
 	$(document).bind('close.facebox', function(){
 		$('body').removeClass('disable_body').removeAttr('scroll');
-		
+		$('.facebox .show_submit').hide();
 		/* execute an action after the facebox closes */
-		var action = $('#on_close').html();	
 		
+		var action = ((1 == $('.on_close').length)) ?
+			$('.on_close').html() : $('.on_close.two').html();
+
 		if(null == action) {
-			// TODO: find something good to put here
 			$('#show_response_beta').html('on_close action is empty');
 			return false;
 		} else {
-			action = action.split('-');
-			//**action = array(action, toolname, tool_id);
+			action = action.split('-'); //**action = array(action, toolname, tool_id);
+			
 			switch(action[0])
 			{
 				case 'update':
@@ -361,6 +378,9 @@ $(document).ready(function()
 					break;
 				case 'save_css':
 					alert('css saved =D\n');
+					break;
+				case 'update_menu':
+					$('#MAIN_MENU').html('<b>Updating...</b>').load('/get/page/load_menu');
 					break;
 				default:
 					alert(action[0] + 'has no action function');

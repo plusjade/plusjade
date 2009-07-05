@@ -75,7 +75,7 @@ class valid_Core {
 	 */
 	static function filter_php_url($string)
 	{
-		$string = trim($string);
+		$string = strtolower(trim($string));
 		return preg_replace("/[^-a-z0-9_]/i", '-', (string) $string);
 	}
 	
@@ -90,7 +90,7 @@ class valid_Core {
 	 * @param   string   email address
 	 * @return  boolean
 	 */
-	public static function email($email)
+	static function email($email)
 	{
 		return (bool) preg_match('/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*+@(?:(?![-.])[-a-z0-9.]+(?<![-.])\.[a-z]{2,6}|\d{1,3}(?:\.\d{1,3}){3})(?::\d++)?$/iD', (string) $email);
 	}
@@ -102,7 +102,7 @@ class valid_Core {
 	 * @param   string   email address
 	 * @return  boolean
 	 */
-	public static function email_domain($email)
+	static function email_domain($email)
 	{
 		// If we can't prove the domain is invalid, consider it valid
 		// Note: checkdnsrr() is not implemented on Windows platforms
@@ -124,7 +124,7 @@ class valid_Core {
 	 * @param   string   email address
 	 * @return  boolean
 	 */
-	public static function email_rfc($email)
+	static function email_rfc($email)
 	{
 		$qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
 		$dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';

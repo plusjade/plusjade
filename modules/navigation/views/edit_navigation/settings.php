@@ -1,5 +1,5 @@
 
-<span id="on_close"><?php echo $js_rel_command?></span>
+<span class="on_close"><?php echo $js_rel_command?></span>
 
 <?php echo form::open_multipart("edit_navigation/settings/$tool->id", array( 'class' => 'ajaxForm') )?>
 

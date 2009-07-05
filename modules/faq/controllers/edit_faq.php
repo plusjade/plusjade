@@ -120,7 +120,7 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 			); 						
 			die( 'Settings Updated!<br>Updating...'); # success
 		}
-		
+		die("Faq settings are temporarily disabeled while we update our system. Thanks!");
 		die( $this->_view_edit_settings('faq', $tool_id) );
 	}
 	

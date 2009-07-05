@@ -209,7 +209,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	function _tool_deleter($tool_id, $site_id)
 	{
-		$album_dir = DATAPATH . "$this->site_name/assets/tools/albums/$tool_id";
+		$album_dir = Assets::dir_path("tools/albums/$tool_id");
 		if(is_dir($album_dir))
 		{
 			$d = dir($album_dir); 

@@ -1,3 +1,6 @@
+
+<span class="on_close two">close-2</span>
+
 <?php echo form::open_multipart("edit_showroom/add_item/$tool_id", array( 'class' => 'ajaxForm' ) )?>
 
 	<div id="common_tool_header" class="buttons">

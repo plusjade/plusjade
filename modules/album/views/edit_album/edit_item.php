@@ -1,4 +1,5 @@
-<span id="on_close">close-2</span>
+
+<span class="on_close two">close-2</span>
 
 <form action="/get/edit_album/edit_item/<?php echo $item->id?>" method="POST"  class="ajaxForm"> 
 	<input type="hidden" name="parent_id" value="<?php echo $item->parent_id?>">

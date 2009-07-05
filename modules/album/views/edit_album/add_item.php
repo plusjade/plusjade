@@ -1,5 +1,5 @@
 
-<span id="on_close">update-album-<?php echo $tool_id?></span>
+<span class="on_close">update-album-<?php echo $tool_id?></span>
 
 <div id="common_tool_header" class="buttons">
 	<div id="common_title">Add Images to Album</div>

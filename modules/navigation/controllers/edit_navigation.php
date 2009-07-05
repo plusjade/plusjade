@@ -30,7 +30,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span> <small style="display:none">Type: '. $item->type .' <br> Data: '. $item->data .'</small>'; 
 		}
 		
-		$primary->tree = Tree::display_tree('navigation', $items, TRUE);
+		$primary->tree = Tree::display_tree('navigation', $items, NULL, TRUE);
 		$primary->tool_id = $tool_id;	
 		die($primary);
 	}

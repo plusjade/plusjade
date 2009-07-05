@@ -1,5 +1,5 @@
 
-<span id="on_close">update-navigation-<?php echo $tool_id?></span>
+<span class="on_close">update-navigation-<?php echo $tool_id?></span>
 
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">Save Changes</button>
@@ -129,13 +129,11 @@
 			});
 		});
 		//alert (output); return false;
-		
 		$.post('/get/edit_navigation/save_tree/'+tool_id,
 			{output: output},
 			function(data){
-				$.facebox.close();		
-				$().jade_update_tool_html('update', 'navigation', tool_id, data);
-				$('.facebox .show_submit').hide();					
+				$.facebox.close();
+				$('#show_response_beta').html(data);				
 			}
 		)		
 	});		

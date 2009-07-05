@@ -4,9 +4,7 @@
 	<input type="hidden" name="old_category" value="<?php echo $item->cat_id?>">	
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="edit_item" class="jade_positive" accesskey="enter">
-			<img src="/images/check.png" alt=""/>  Save Changes
-		</button>
+		<button type="submit" name="edit_item" class="jade_positive" accesskey="enter"> Save Changes</button>
 		<div id="common_title">Edit Showroom item</div>
 	</div>	
 	

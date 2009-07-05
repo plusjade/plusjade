@@ -12,7 +12,7 @@ class Load_Tool_Core {
 		$tool = ucwords($tool);
 		switch ($tool)
 		{
-			case 'Slide_Panel':
+			case 'Slide_panel':
 				$tool = new Slide_Panel_Controller(); 			
 				break;				
 			case 'About':
@@ -46,7 +46,7 @@ class Load_Tool_Core {
 				$tool = new Blog_Controller(); 			
 				break;						
 			default:
-				die('<b>error:</b> tool does not exist (Load_Tool::factory)');
+				die("<b>error:</b> '$tool' tool does not exist (Load_Tool::factory)");
 		}	
 		return $tool;
 	}
@@ -59,7 +59,7 @@ class Load_Tool_Core {
 		$tool = ucwords($tool);
 		switch ($tool)
 		{
-			case 'Slide_Panel':
+			case 'Slide_panel':
 				$tool = new Edit_Slide_Panel_Controller(); 			
 				break;				
 			case 'About':
@@ -93,7 +93,7 @@ class Load_Tool_Core {
 				$tool = new Edit_Blog_Controller(); 			
 				break;						
 			default:
-				die('<b>error:</b> edit_tool does not exist (Load_Tool::edit_factory)');
+				die("<b>error:</b> '$tool' edit_tool does not exist (Load_Tool::edit_factory)");
 		}	
 		return $tool;
 	}

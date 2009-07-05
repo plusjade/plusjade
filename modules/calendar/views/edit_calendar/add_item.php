@@ -1,5 +1,5 @@
 
-<span id="on_close"><?php echo $js_rel_command?></span>
+<span class="on_close"><?php echo $js_rel_command?></span>
 
 <form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" class="ajaxForm">
 
