@@ -176,7 +176,7 @@ class Theme_Controller extends Controller {
  * Add a logo to the asset repo
  */	
 	function add_logo()
-	{		
+	{
 		if(empty($_FILES['image']['name']))
 			die('Please select an image to upload.');  #error
 	
@@ -190,24 +190,11 @@ class Theme_Controller extends Controller {
 		$filename	= upload::save('image');
 		$image		= new Image($filename);			
 		$ext		= $image->__get('ext');
-		$image_name = basename($filename).'.'.$ext;
-		
-		$image->save(DOCROOT . "data/$this->site_name/assets/banners/$image_name");
-	 
-		# Remove the temporary file
+		$image_name = basename($filename).'.'.$ext;		
+		$image->save( Assets::dir_path("banners/$image_name") );
+
 		unlink($filename);
-		
-		#success message	
-		die("$image_name"); 				
-			
-		if(! empty($_POST['enable']) )
-		{
-			$db		= new Database;
-			$data	= array( 'banner' => $image_name );
-			$db->update('sites', $data, "site_id = $this->site_id"); 
-			$_SESSION['banner'] = $image_name;
-			die('Logo Saved'); # success	  		
-		}			
+		die("$image_name"); # needed to add to DOM via ajax
 	}
 	
 /*
@@ -232,15 +219,15 @@ class Theme_Controller extends Controller {
  */ 
 	function delete_logo()
 	{
-		if(empty($_POST['delete_logo']))
+		if(empty($_POST['banner']))
 			die('nothing sent');
-
-		$img_path = DOCROOT."data/$this->site_name/assets/banners/{$_POST['banner']}";
+			
+		$img_path = Assets::dir_path("banners/{$_POST['banner']}");
 		if(file_exists($img_path))
 			if(unlink($img_path))
-				die('Image deleted!');
+				die('Banner deleted.');
 
-		die('Unable to delete image'); 
+		die('Unable to delete banner'); 
 	}
 	
 } # end 

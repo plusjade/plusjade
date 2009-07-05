@@ -20,7 +20,6 @@
 
 	<div id="common_tool_info" style="background:#eee;padding:5px">
 		<b>Add Logo</b> <input type="file" name="image" rel="text_req">
-		<p>Make this my new logo? <input type="checkbox" name="enable"> YES!</p>
 	</div>
 </form>
 
@@ -37,19 +36,19 @@
 <div class="common_main_panel" style="height:300px">
 <?php
 	foreach($saved_banners as $key => $image)
-	{
-		if($image == $this->banner)
-			$current_banner = $image;
+	{	
+		$selected = (($image == $this->banner)) ? 'class="selected"' : '';
 		?>
-		<img src="<?php echo "$img_path/$image"?>" class="selected_banner" rel="<?php echo $image?>" alt="">
+		<img src="<?php echo "$img_path/$image"?>" <?php echo $selected?> rel="<?php echo $image?>" alt="">
 		<?php
+		unset($selected);
 	}
 		?>
 </div>
 
 
 <script type="text/javascript">
-
+	// add selected orange border.
 	$('.common_main_panel').click($.delegate({
 		'img' : function(e){
 			$('.common_main_panel img').removeClass('selected');
@@ -57,6 +56,7 @@
 		}
 	}));
 
+	// upload a new image.
 	$('.facebox .custom_ajaxForm1').ajaxForm({	
 		beforeSubmit: function(){
 			$('.facebox .show_submit').show();
@@ -66,7 +66,8 @@
 			img.src = '<?php echo $img_path?>/'+ data;
 			
 			$('.facebox .show_submit').hide();
-			html ='<img src="<?php echo $img_path?>/'+ data +'" id="selected_banner" rel="'+ data +'" alt="">';
+			$('.common_main_panel img').removeClass('selected');
+			html ='<img src="<?php echo $img_path?>/'+ data +'" class="selected" rel="'+ data +'" alt="">';
 			$('.common_main_panel').prepend(html);
 			$('#show_response_beta').html(data);
 		}
@@ -78,8 +79,7 @@
 */
 	$('button[name="change_logo"]').click(function(){
 		image = $('.common_main_panel img.selected').attr('rel');
-		if(!image)
-		{
+		if(!image) {
 			alert('Select a banner first.');
 			return false;
 		}
@@ -87,9 +87,25 @@
 		$('.facebox .show_submit').show();
 		$.post('/get/theme/change_logo', {banner: image}, function(data){
 			// the images are already loaded via this facebox so we dont need to load them again?
-			$('#jade_banner_link').html('<img src="<?php echo $img_path?>/' + image +'" id="header_banner" alt="">');
+			$('#BANNER a').html('<img src="<?php echo $img_path?>/' + image +'" id="header_banner" alt="">');
 			$.facebox.close();
 			$('#show_response_beta').html(data);	
+		});
+		return false;
+	});
+	
+// delete a logo
+	$('button[name="delete_logo"]').click(function(){
+		image = $('.common_main_panel img.selected').attr('rel');
+		if(!image) {
+			alert('Select a banner to delete.');
+			return false;
+		}
+		$('.facebox .show_submit').show();
+		$.post('/get/theme/delete_logo', {banner: image}, function(data){
+			$('.common_main_panel img.selected').remove();
+			$('#show_response_beta').html(data);	
+			$('.facebox .show_submit').hide();
 		});
 		return false;
 	});
