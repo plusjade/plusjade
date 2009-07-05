@@ -1,8 +1,8 @@
 
+<span class="on_close">update_menu</span>
+
 <div id="common_tool_header" class="buttons">
-	<button type="submit" id="save_sort" class="jade_positive">
-		<img src="/assets/images/check.png" alt=""/> Save Menu Order
-	</button>
+	<button type="submit" id="save_sort" class="jade_positive">Save Menu Order</button>
 	<div id="common_title">Primary Navigation</div>
 </div>
 
@@ -45,7 +45,6 @@
 		$(".facebox .show_submit").show();
 		$.get("/get/page/save_sort?"+order, function(data){
 			$.facebox.close();
-			$('#MAIN_MENU').html('<b>Updating...</b>').load('/get/page/load_menu');
 			$('#show_response_beta').html(data);				
 		})				
 	});

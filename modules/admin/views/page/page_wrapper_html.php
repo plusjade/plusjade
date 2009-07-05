@@ -1,68 +1,69 @@
 
-<?php extract($vars)?>
-<?php $type = ''?>
+<?php 
+extract($vars);
+$type = '';
+$display_name	= ('10' < strlen($filename)) ? substr($filename, 0, 10).'...' : $filename;
+?>
 <div id="page_wrapper_<?php echo $id?>" class="<?php echo $visibility?> asset">
+	
 	<?php
 	if(TRUE == $is_folder)
 	{
 		$type = 'folder';
 		?>
-		<div class="folder_bar">
-			<a href="/<?php echo $full_path?>" class="open_folder" rel="<?php echo $full_path?>">
-				<span class="icon folder open_folder" rel="<?php echo $full_path?>">&#160; &#160;</span>
-			</a>
-		</div>
+			<img src="/_assets/images/admin/folder.jpg" rel="<?php echo $full_path?>" class="open_folder"> 
+			<span class="icon page">&#160; &#160;</span>
 		<?php 
 	}
+	else
+		echo "<img src=\"/_assets/images/admin/file.jpg\" class=\"file_options\">";
 	?>
-	<div class="page_bar">
+	<span title="<?php echo $filename?>"><?php echo $display_name?></span>
+	<ul class="option_list">
 	
-		<div>
-			<?php
-			if(TRUE == $is_protected)
-			{		
-				?>
-				<span class="icon shield" title="<?php echo $page_builder?>">&#160; &#160; </span>
-				<?php
-			}
+		<?php
+		if(TRUE == $is_protected)
+		{		
 			?>
-		</div>
-		
-		<div>
-			<a href="<?php echo url::site($full_path)?>" class="" title="Go to Page: <?php echo url::site($full_path)?>">
-				<span class="icon magnify">&#160; &#160; </span>
-			</a>
-		</div>
-		
-		<div>
-			<a href="/get/page/settings/<?php echo $id?>" title="Page Settings">
-				<span class="icon cog icon_facebox"> &#160; &#160; </span>
-			</a>
-		</div>
-		
-		<div>
+			<li>
+				<span class="icon shield">&#160; &#160; </span> <?php echo $page_builder?>
+			</li>
 			<?php
-			if(FALSE == $is_folder AND FALSE == $is_protected)
-			{		
-				?>
-				<span class="icon add_folder folderize" id="<?php echo $id?>" rel="<?php echo $full_path?>"> &#160; &#160; </span>
-				<?php
-			}
-			?>
-		</div>
-		
-		<div>
-			<a href="/get/page/delete/<?php echo $id?>" id="<?php echo $id?>" title="Delete Page">
-				<span class="icon cross delete_page" rel="<?php echo $type?>">&#160; &#160; </span>
-			</a>
-		</div>
-		
-	</div>
+		}
+		?>
 
-	<div class="page_icon">
-		<span class="icon page">&#160; &#160; </span>
-		<?php echo $filename?>
-	</div>
+		<li>
+			<span class="icon magnify">&#160; &#160; </span> 
+			<a href="<?php echo url::site($full_path)?>" class="" title="Go to Page: <?php echo url::site($full_path)?>">
+			Go to page
+			</a>
+		</li>
+		
+		<li>
+			<span class="icon cog"> &#160; &#160; </span> 
+			<a href="/get/page/settings/<?php echo $id?>" rel="facebox" id="2">
+				Settings
+			</a>
+		</li>
+		
+		<?php
+		if(FALSE == $is_folder AND FALSE == $is_protected)
+		{		
+			?>
+			<li>
+				<span class="icon add_folder"> &#160; &#160; </span> 
+				 <a href="#" class="folderize" id="<?php echo $id?>" rel="<?php echo $full_path?>" title="<?php echo $filename?>">Make folder</a>
+			</li>
+			<?php
+		}
+		?>
+		
+		<li>
+			<span class="icon cross">&#160; &#160; </span> 
+			<a href="/get/page/delete/<?php echo $id?>" id="<?php echo $id?>"  class="delete_page" rel="<?php echo $type?>">Delete</a>
+		</li>
+		
+	</ul>
 	
 </div>
 
