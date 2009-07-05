@@ -51,11 +51,9 @@
       $('#'+$.facebox.settings.id+' .content').empty()
       $('#'+$.facebox.settings.id+' .body').children().hide().end().
         append('<div class="loading">Loading...</div>')
-		//append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
       $('#'+$.facebox.settings.id).css({
-		top:	getPageScroll()[1], //+ (getPageHeight() / 10)
+		top: getPageScroll()[1], //+ (getPageHeight() / 10)
         left:0
-		//left:	getPageWidth() / 2 - ($('#'+$.facebox.settings.id).width() / 2)
       }).show()
 
       $(document).bind('keydown.facebox', function(e) {
@@ -68,20 +66,19 @@
 
     reveal: function(data, klass) {
       $(document).trigger('beforeReveal.facebox')
-      $('#'+$.facebox.settings.id+' .content').removeClass('loading_msg')
+      $('#'+$.facebox.settings.id+' .content').removeClass('loading_msg').addClass('facebox_active')
 	  if (klass) $('#'+$.facebox.settings.id+' .content').addClass(klass)
       $('#'+$.facebox.settings.id+' .content').append(data)
       $('#'+$.facebox.settings.id+' .loading').remove()
       $('#'+$.facebox.settings.id+' .body').children().fadeIn('normal')
-	  var zi = 100 + ($(".facebox").length * 2);
+	  //var zi = 555 + ($('.facebox').length * 2);
    
 	  $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
 	  $('#facebox_base div.body').css('height', getPageHeight());
-	  $('#'+$.facebox.settings.id).css('z-index', zi);
+	 // $('#'+$.facebox.settings.id).css('z-index', zi); do this with css
 	  
 	  $(window).resize(function(){
 		$('#facebox_base div.body').css('height', getPageHeight());
-		//$('#'+$.facebox.settings.id).css("left", getPageWidth() / 2 - ($('#'+$.facebox.settings.id+' table').width() / 2));
 	  });
 
 /*
@@ -141,10 +138,12 @@
     preload[0].src = $.facebox.settings.closeImage
     preload[1].src = $.facebox.settings.loadingImage
 
+/*
     $('#'+$.facebox.settings.id).find('.b:first, .bl, .br, .tl, .tr').each(function() {
       preload.push(new Image())
       preload.slice(-1).src = $(this).css('background-image').replace(/url\((.+)\)/, '$1')
     })
+*/
 
     $('#'+$.facebox.settings.id+' .close').click(function(e){
 		e.preventDefault()
@@ -152,6 +151,7 @@
 	})
     $('#'+$.facebox.settings.id+' .close_image').attr('src', $.facebox.settings.closeImage)
   }
+
   
   // getPageScroll() by quirksmode.com
   function getPageScroll() {
@@ -239,11 +239,11 @@
       $("body").append('<div id="'+$.facebox.settings.id+'_overlay" class="facebox_overlay facebox_hide"></div>')
 	
 	var id = $.facebox.settings.id;
-	var zi = 99 + ($(".facebox").length * 2);
+	//var zi = 99 + ($(".facebox").length * 2);
 	
     $('#'+id+'_overlay.facebox_overlay').attr("rel", id).hide().addClass("facebox_overlayBG")
       .css('opacity', $.facebox.settings.opacity)
-	  .css('z-index', zi)
+	 // .css('z-index', zi) leave this to css
       .click(function() {
 	  	$(document).trigger('close.facebox', [$(this).attr("rel")])
 		$(this).remove()
@@ -303,15 +303,15 @@ function getPageWidth()
   $(document).bind('close.facebox', function(e, id) {
     $(document).unbind('keydown.facebox')
     if(id != undefined) {
-	  $('#'+id).fadeOut(function() {
-        $('#'+id+' .content').removeClass().addClass('content')
-        hideOverlay(id)
-        $('#'+id+' .loading').remove()
+		  $('#'+id).fadeOut(function() {
+			$('#'+id+' .content').removeClass().addClass('content').empty();
+			hideOverlay(id)
+			$('#'+id+' .loading').remove()
       })
 	}
 	else{
 	  $('.facebox').fadeOut(function() {
-        $('.facebox .content').removeClass().addClass('content')
+        $('.facebox .content').removeClass().addClass('content');
         hideOverlay()
         $('.facebox .loading').remove()
       })
