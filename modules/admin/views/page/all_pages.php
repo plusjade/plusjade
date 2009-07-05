@@ -12,17 +12,14 @@
 		<br>
 		Navigate to the folder you want your new page,
 		then add the page.
-		<br><br>		
+		<p>
+		<b>click</b> on a page for page options.
+		</p>
 		<h3>Key</h3>
 		<small style="line-height:1.7em">
-			<span class="icon magnify">&nbsp; &nbsp; </span> Load page.
-			<br><span class="icon cog">&nbsp; &nbsp; </span> Edit page settings.
-			<br><span class="icon add_folder">&nbsp; &nbsp; </span> Create sub-directory
-			<br><span class="icon cross">&nbsp; &nbsp; </span> Delete page.	
-			<br><span class="icon shield">&nbsp; &nbsp; </span> Contains Page Builder	
-			<br>
-			<br><b style="color:#ccc">Gray:</b> accessible but not in menu.
-			<br><b style="color:red">Red:</b> not publicly accessible.
+			<b>White:</b> Public - On Menu.
+			<br><b style="color:#ccc">Gray:</b> Public - Not in menu.
+			<br><b style="color:red">Red:</b> Private - No public access.
 		</small>
 	</div>
 	
@@ -34,10 +31,21 @@
 
 <script type="text/javascript">
 	$('div.ROOT').show();
+
+	// click away hides file options	
+	$('#page_browser_wrapper:not(.file_options)').click(function(){
+		$('#page_browser_wrapper ul.option_list').hide();
+	});
 	
 	// assign click delegation
 	$('#page_browser_wrapper').click($.delegate({
+		// open file dropdown lists
+		'img.file_options, span.icon.page': function(e){
+			$('#page_browser_wrapper ul.option_list').hide();
+			$(e.target).nextAll('ul').show();
+		},
 		
+		// show a new folder directory
 		'.open_folder': function(e){
 			path = $(e.target).attr('rel');
 			klass = path.replace(/\//g,'_');
@@ -64,23 +72,19 @@
 			return false;
 		},
 		
+		// open new page facebox
 		'a.new_page': function(e){
 			$.facebox(function(){
 				path = $('#breadcrumb').attr('rel');
-				
-				$.get(e.target.href,
-				{
-					directory: path
-				}, 
-				function(data){
-					$.facebox(data, false, 'facebox_2');
-				});
+				$.get(e.target.href, {directory: path}, 
+					function(data){$.facebox(data, false, 'facebox_2')}
+				);
 			}, false, 'facebox_2');
 			return false;
 		},
 		
-		// make img click execute as its parent alink
-		'span.delete_page': function(e){
+		// delete a page
+		'a.delete_page': function(e){
 			if('folder' == $(e.target).attr('rel'))
 			{
 				alert('A page must have no sub-pages before it can be deleted.');
@@ -88,11 +92,9 @@
 			}
 			if (confirm("This cannot be undone! Delete this page?")) {
 				$.parent = $(e.target).parent('a');
-				id = $.parent.attr('id');
-				url = $.parent.attr('href');
+				id = $(e.target).attr('id');
 				
-				$.get(url, function(data){
-					klass = $('#page_wrapper_'+id).parent().attr('rel');
+				$.get(e.target.href, function(data){
 					// remove from container
 					$('#page_wrapper_'+ id).remove();
 					$('#show_response_beta').html(data);	
@@ -100,30 +102,19 @@
 			}
 			return false;
 		},
-		
-		'span.icon_facebox': function(e){
-			$.parent = $(e.target).parent('a');
-			url = $.parent.attr('href');
 
-			$.facebox(function(){
-					$.get(url, function(data){
-						$.facebox(data, false, 'facebox_2');
-					});
-			}, false, 'facebox_2');
-			return false;
-		},
-		
-		'span.folderize': function(e){
+		// turn a page into a folder path
+		'a.folderize': function(e){
 			folder_path = $(e.target).attr('rel');
 			id = $(e.target).attr('id');
+			filename = $(e.target).attr('title');
 			klass = folder_path.replace(/\//g,'_');
-			html = '<div class="folder_bar"><a href="/'+ folder_path +'" rel="'+ folder_path +'" class="open_folder" ><span class="icon add_folder open_folder" rel="'+ folder_path +'"> &nbsp; &nbsp; </span></a></div>';
-			
-			$('#page_wrapper_'+id).prepend(html);
+			html = '<img src="/_assets/images/admin/folder.jpg" rel="'+ folder_path +'" class="open_folder"> <span class="icon page">&#160; &#160;</span> ';
+			$('#page_wrapper_'+ id +' img').replaceWith(html);
 			
 			container = '<div class="'+ klass +' sub_folders"></div>';
 			$('#directory_window').prepend(container);
-			$(e.target).remove();
+			$(e.target).parent('li').remove();
 			return false;
 		}
 		

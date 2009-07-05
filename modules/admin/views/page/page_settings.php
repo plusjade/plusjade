@@ -9,6 +9,8 @@ $is_homepage = ($page->page_name == $this->homepage) ? '<p>This is your homepage
 
 echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') );
 ?>
+	<span class="on_close">update_menu</span>
+	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="update_page" class="jade_positive">Save Settings</button>
 		<div id="common_title">Page Settings - <?php echo $page->label?></div>
@@ -106,19 +108,12 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		success: function(data) {
 			// If the page name changes consider a notification or redirect logic?
 			$.facebox.close();
-			$('.facebox .show_submit').hide();
 			$('#show_response_beta').html(data);					
 		}					
 	};
 	$(".custom_ajaxForm").ajaxForm(options);
 		
 	
-	
-	$("input[name='label']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
-		$("input[name='page_name']").val(input);
-	});
-
 	$("input[name='page_name']").keyup(function(){
 		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
 		$(this).val(input);

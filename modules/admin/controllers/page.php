@@ -2,10 +2,9 @@
 class Page_Controller extends Controller {
 
 /**
- *	Provides CRUD for pages 
+ *	Various functions for interaction/manipulation of "pages" in the +jade system.
  *	
- */
-	
+ */	
 	function __construct()
 	{
 		parent::__construct();
@@ -14,15 +13,13 @@ class Page_Controller extends Controller {
 	}
 /*
  * show file-structure view of all pages
- *
 	**KEY: Variable logic used in this class
 	------------------------------------------
 	sample page_name : about/jade/skills
 		full_path	= about/jade/skills
 		directory	= about/jade
 		filename	= skills
-		
-		! note directory contains no trailing slash
+		NOTE: directory contains no trailing slash
  */
 	function index()
 	{
@@ -126,7 +123,6 @@ class Page_Controller extends Controller {
 			if('ROOT' != $directory)
 				$full_path = "$directory/$filename";
 				
-			
 			$db = new Database;			
 			$max = $db->query("
 				SELECT MAX(position) as highest 
@@ -191,7 +187,6 @@ class Page_Controller extends Controller {
 		# Javascript duplicatate_page name filter Validation
 		# get page_name filter for this path
 		$filter_array = self::get_filename_filter($directory);
-
 		# convert filter_array to string to use as javascript array
 		$filter_string = implode("','",$filter_array);
 		$filter_string = "'$filter_string'";
@@ -234,7 +229,8 @@ class Page_Controller extends Controller {
 	}
 	
 /*
- * Save the Main menu order to db
+ * this may not belong here. 
+ * the view of the primary menu. Used with ajax to reload on-demand
  */		
 	public function load_menu()
 	{
@@ -245,6 +241,7 @@ class Page_Controller extends Controller {
 /*
  * DELETE single page from pages table
  * Note: does not delete any tools owned by this page.
+ * Deleting pages with children is currently set to False;
  */
 	function delete($page_id=NULL)
 	{
@@ -262,7 +259,6 @@ class Page_Controller extends Controller {
 		
 		$id_set = $page_id;
 		
-
 		# Get all pages to look for children.
 		$pages_data = $db->query("
 			SELECT id, page_name
@@ -487,6 +483,36 @@ class Page_Controller extends Controller {
 		return $filter_array;			
 		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
 	}
+
+/*
+ * Creates a proper pages_config.yml file in _data/<site>/protected
+ * yaml::parse test to see if the file exist and calls this if it does not.
+ */
+	public function _build_pages_config()
+	{
+		$config_path = DATAPATH . "$this->site_name/protected/pages_config.yml";
+		if(file_exists($config_path))
+			die('pages_config.yml already exists');
+			
+		$db = new Database;
+		$protected_pages = $db->query("
+			SELECT pages_tools.*, LOWER(tools_list.name) as name, tools_list.protected, pages.page_name
+			FROM pages_tools
+			JOIN tools_list ON tools_list.id = pages_tools.tool
+			JOIN pages ON pages.id = pages_tools.page_id
+			WHERE pages_tools.fk_site = '$this->site_id'
+			AND tools_list.protected = 'yes'
+		");
+		
+		ob_start();
+		# page_name:toolname-tool_id
+		foreach($protected_pages as $page)
+			echo "$page->page_name:$page->name-$page->tool_id\n";
 	
+		if(file_put_contents($config_path, ob_get_clean()))
+			return TRUE;
+			
+		die('page_controller::_build_pages_config() Could not create pages_config.yml');
+	}
 }
 /* End of file page.php */
