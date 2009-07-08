@@ -8,39 +8,206 @@ class Theme_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
-		if(!$this->client->can_edit($this->site_id))
-			die('Please login');
-	}
-
-/*
- * edit this themes global templates
- */
-	function manage()
-	{
-		$primary	= new View('theme/manage');
-		$theme_path	= DATAPATH . "$this->site_name/themes";		
-		$primary->themes = Jdirectory::contents($theme_path, 'root', 'list_dir');
-		die($primary);
+		if(! $this->client->can_edit($this->site_id) )
+		{
+			# hack for allowing swfupload to work in authenticated session...
+			if( empty($_POST['PHPSESSID']) )
+				die('Please login');
+		}
 	}
 	
 /*
- * edit this themes global templates
+ * manage theme assets via file browser
  */
-	function templates()
+	function manage()
 	{
-		$primary	= new View('theme/templates');
-
-		$custom_data_path	= Assets::data_path_theme();		
-		$theme_url			= Assets::url_path_theme('images');
-		$contents = '';
-		if(file_exists("$custom_data_path/css/global.css"))
-			$contents = str_replace('../images', $theme_url , file_get_contents("$custom_data_path/css/global.css"));
+		$themes	= DATAPATH . "$this->site_name/themes";
+		$files	= self::folder_contents("$themes/$this->theme", 'tools');	
+		$themes	= Jdirectory::contents($themes, 'root', 'list_dir');
 		
-		
-		$primary->css_files = Jdirectory::contents("$custom_data_path/css");
-		$primary->contents	= $contents;
-		$primary->theme_files = Jdirectory::contents($custom_data_path, 'root', TRUE);
+		$primary = new View('theme/index');
+		$primary->is_editor = (empty($_GET['editor'])) ? FALSE : TRUE ;
+		$primary->themes = $themes;
+		$primary->files = $files;
 		die($primary);
+	}
+
+/*
+ * manage theme assets via file browser
+ */
+	function add_files($theme=NULL)
+	{
+		$primary = new View('theme/add_files');
+		$primary->theme = $theme;
+		die($primary);
+	}	
+
+	
+/*
+ * Upload files to a specific theme. Swf uploader uses this.
+ */	
+	public function upload($theme=NULL)
+	{
+		$full_path = DATAPATH . "$this->site_name/themes/$theme";
+		if(!is_dir($full_path))
+			die('invalid theme');
+
+		# Do we have a file
+		if(! is_uploaded_file($_FILES['Filedata']['tmp_name']) )
+			die('Invalid File');
+		
+		# test for size restrictions?
+		# ( $_FILES['Filedata']['size'] > 90000 )
+		
+		# NOTE:: IS THIS SECURE??
+		# Work-around maintaining the session because Flash Player doesn't send the cookies
+		if(isset($_POST["PHPSESSID"]))
+			session_id($_POST["PHPSESSID"]);
+
+		# sanitize the filename.
+		$ext		= strrchr($_FILES['Filedata']['name'], '.');
+		$filename	= str_replace($ext, '', $_FILES['Filedata']['name']);
+		$ext		= strtolower($ext);
+		$filename	= valid::filter_php_filename($filename).$ext;
+		
+		# is file allowed?
+		$allowed = array(
+			'.css'	=> 'css',
+			'.html'	=> 'html',
+			'.jpg'	=> 'jpeg',
+			'.jpeg'	=> 'jpeg',
+			'.png'	=> 'png',
+			'.gif'	=> 'gif',
+			'.tiff'	=> 'tiff',
+			'.bmp'	=> 'bmp',
+		);
+		if(!array_key_exists($ext, $allowed))
+			die('Filetype not allowed');
+		
+			
+		if('.css' == $ext)
+			$folder = 'css';
+		elseif('.html' == $ext)
+			$folder = 'templates';
+		else
+			$folder = 'images';
+
+		# place the file.
+		if(move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$folder/$filename"))
+			die('File uploaded');
+			
+		
+		die('Error: File not uploaded.');
+	}
+	
+/*
+ * Show contents of a particular theme. Used for ajax calls.
+ * $folder comes in data format: folder:sub-folder:sub-sub-folder
+ */
+	public function contents($folder=NULL)
+	{
+		$folder	= str_replace(':', '/', $folder);
+		$dir	= DATAPATH . "$this->site_name/themes/$folder";	
+		$files	= self::folder_contents($dir, 'tools');
+		
+		$primary = new View('theme/folder');
+		$primary->files = $files;
+		die($primary);
+	}
+/*
+ * Similar to Jdirectory::contents but only gets contents of one folder/directory at a time.
+ * Builds the array differently for "file browser" specific data handling.
+ */ 
+	 private function folder_contents($full_dir, $omit = null) 
+	 { 
+		$retval = array(); 	
+		# add trailing slash if missing 	
+		if(substr($full_dir, -1) != "/")
+			$full_dir .= "/"; 	
+		# open pointer to directory and read list of files 
+		$d = @dir($full_dir) or die("show_dir_contents: Failed opening directory $full_dir");
+		
+		$stock_dir = DATAPATH . "$this->site_name/themes/";
+		$short_dir = str_replace($stock_dir, '', $full_dir);
+		$short_dir = str_replace('/', ':', $short_dir);
+		
+		while(false !== ($entry = $d->read())) 
+		{
+			# skip hidden files and any omissions
+			if( ($entry[0] == "." ) OR (! empty($omit) AND $entry == "$omit" ) )
+				continue;
+				
+			if(is_dir("$full_dir$entry")) 
+				$retval["$short_dir$entry"] = "folder|$entry"; 
+			else if( is_readable("$full_dir$entry") && $entry != 'Thumbs.db' ) 
+				$retval["$short_dir$entry"] = "file|$entry";	 
+		 } 
+		 $d->close(); 
+		 asort($retval);
+		 return $retval; 
+	}
+		
+/*
+ * delete a file from a particular theme.
+ * TODO: clean this class up.
+ */
+	function delete_browser($path=NULL)
+	{
+		if(NULL == $path)
+			die('No path sent');
+		
+		$path		= str_replace(':', '/', $path);
+		$full_path	= DATAPATH . "$this->site_name/themes/$path";	
+		
+		if(is_dir($full_path))
+			die('Cannot delete directories');
+		
+		if(file_exists($full_path))
+			if(unlink($full_path))
+				die('File deleted');
+
+		die('Could not delete the file.');
+	}
+	
+/*
+ * delete a theme folder from themes folder
+ * TODO: clean this class up.
+ */
+	function delete_theme($theme=NULL)
+	{
+		if(NULL == $theme)
+			die('No path sent');
+		
+		$full_path	= DATAPATH . "$this->site_name/themes/$theme";	
+		
+		if(is_dir($full_path))
+			if(Jdirectory::remove($full_path))
+				die("'$theme' deleted");
+
+		die('Could not delete theme folder');
+	}
+
+/*
+ * delete a theme folder from themes folder
+ * TODO: clean this class up.
+ */
+	function add_theme()
+	{
+		if(empty($_POST['theme']))
+			die('No theme sent');
+			
+		$theme		= valid::filter_php_url($_POST['theme']);
+		$full_path	= DATAPATH . "$this->site_name/themes/$theme";	
+		
+		if(is_dir($full_path))
+			die('Theme already exists');
+		
+		$clone = APPPATH . 'views/_clone';
+		
+		if(Jdirectory::copy($clone, $full_path))
+			die($theme); # need this to update the DOM
+
+		die('Could not add theme.');
 	}
 	
 /*
@@ -61,49 +228,94 @@ class Theme_Controller extends Controller {
 		die($primary);
 	}
 
-
 /*
- * load a filtered css file into the textarea editor
- * works with self::stylesheets
+ * edit this themes global templates
+ */
+	function templates()
+	{		
+		$primary	= new View('theme/templates');
+		$custom_data_path	= Assets::data_path_theme('templates');		
+		$templates_url		= Assets::url_path_theme('templates');		
+		$primary->templates = Jdirectory::contents($custom_data_path, 'root', TRUE);
+		die($primary);
+	}
+	
+/*
+ * load a file from theme repo into the textarea editor
+ * works with self::stylesheets and self::templates
  */	
-	function load($filename=NULL)
+	function load($folder=NULL, $filename=NULL)
 	{
-		$path = Assets::data_path_theme("css/$filename");
+		if('templates' != $folder AND 'css' != $folder)
+			die('invalid folder');
+			
+		$path = Assets::data_path_theme("$folder/$filename");
 		if(!file_exists($path))
 			die('invalid file');
 		
-		$url = Assets::url_path_theme('images');
+		if('css' == $folder)
+			$url = Assets::url_path_theme('images');
+		else
+			die(file_get_contents($path));
+			
 		echo str_replace('../images', $url , file_get_contents($path));	
 		die();
 	
 	}
 /*
- * Edit a file from the theme repo
- * should only be css for now. 
+ * save a file from the theme repo
  */
-	function edit($file=NULL)
+	function save($folder=NULL, $file=NULL)
 	{
-		# CAUTION TODO: these names need to be filtered !!!
-		$fil		= str_replace(':', '/', $file);
-		$theme_path	= Assets::data_path_theme();
+		if('templates' != $folder AND 'css' != $folder)
+			die('invalid folder');
+			
+		$file		= valid::filter_php_filename($file) . $ext;
+		$ext		= ('templates' == $folder) ? '.html' : '.css';
+		$theme_path	= Assets::data_path_theme($folder);
 		
 		if(! file_exists("$theme_path/$file") AND empty($_POST['contents']) )
 			die('Invalid File');	
 
 		if($_POST)
-		{	
-			if( file_put_contents("$theme_path/$file", $_POST['contents']) )
+		{
+			# replace any user-tokens
+			if('css' == $folder)
+				$contents = str_replace('%IMAGES%', Assets::url_path_theme('images'), $_POST['contents']);	
+			else
+				$contents = str_replace('%IMAGES%', Assets::url_path_theme('images'), $_POST['contents']);	
+				
+			if(file_put_contents("$theme_path/$file", $contents))
 				die('File updated.'); # Success	
 			
 			die('Unable to save changes'); # Error
 		}
-
-		$primary = new View('theme/edit_file');
-		$primary->file_name = $file;	
-		$primary->file_contents = file_get_contents("$theme_path/$file");
-		die($primary);
 	}
 
+	
+/*
+ * delete a file from the theme repo
+ * should only be css for now. 
+ */
+	function delete($folder=NULL, $file=NULL)
+	{
+		if('templates' != $folder AND 'css' != $folder)
+			die('invalid folder');
+			
+		#TODO validate the file extion to be only .css or .html.
+		
+		# CAUTION TODO: these names need to be filtered !!!
+		$theme_path	= Assets::data_path_theme($folder);
+		
+		if(! file_exists("$theme_path/$file"))
+			die('Invalid File');	
+
+		if(unlink("$theme_path/$file"))
+			die('File deleted.'); # Success	
+			
+		die('Unable to delete file.'); # Error
+	}	
+	
 /*
  * Change the site's theme
  */
