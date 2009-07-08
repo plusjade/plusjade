@@ -2,16 +2,12 @@
 
 <div id="common_tool_header" class="buttons">
 	<div id="common_title">
-		Working with stylesheet: "<span class="current_sheet">global.css</span>"
-		from theme "<?php echo ucfirst($this->theme)?>"
+		Theme &#8594; <u><?php echo ucfirst($this->theme)?></u> : Stylesheet &#8594; <u><span class="current_sheet">global.css</span></u>
 	</div>
 </div>
 
 
 <div class="common_left_panel" style="width:18%">
-	
-	<button id="save_sheet" class="jade_positive">Save as ...</button>
-	<br><br>
 	
 	<h3>Available Stylesheets</h3>
 	<select name="files" class="files_list">
@@ -19,13 +15,11 @@
 		foreach($css_files as $file)
 			echo "<option value=\"$file\">$file</option>";
 		?>
-	</select> <button id="load_sheet" class="jade_positive">Load</button>
-	
-	<br><br>
-	
-	<b>Need help?</b>
-	<br><a href="http://plusjade.pbwiki.com/">View our Theme Guide.</a>
-	
+	</select>
+	<p>
+		<button id="load_sheet" class="jade_positive">Load</button>
+	</p>
+	<button id="delete_sheet" class="jade_negative"><span class="icon cross">&#160; &#160; </span>Delete</button>
 </div>
 
 <div class="common_main_panel" style="margin:0;padding:0;width:78%">
@@ -55,6 +49,7 @@
 		<li><a href="#" class="update">Update</a></li>
 		<li><a href="#" class="show_orig">Reset</a></li>
 		<li><a href="#" class="show_stock">Show Stock</a></li>
+		<li><button id="save_sheet" class="jade_positive">Save as ...</button></li>
 	</ul>
 	<textarea id="edit_css" name="contents" class="blah" style="height:300px"><?php echo $contents?></textarea>
 
@@ -106,11 +101,11 @@
 			file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
 			$('div.save_pane.helper').html('<div class="loading">Saving '+ file +'...</div>');
 			contents = $('textarea#edit_css').val();
-			$.post('/get/theme/edit/css:'+ file, {contents: contents }, function(data){
+			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
 				$('div.save_pane.helper').html(data);
 				setTimeout('$("div.save_pane.helper").remove()', 2000);
 			});
-			
+		
 			return false;
 		},	
 		
@@ -119,12 +114,12 @@
 			file = $("div.save_pane.helper input[name='new_file']").val() + '.css';	
 			$('div.save_pane.helper').html('Creating ...'+ file);
 			contents = $('textarea#edit_css').val();
-			$.post('/get/theme/edit/css:'+ file, {contents: contents }, function(data){
+			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
 				$('div.save_pane.helper').html(data);
 				
 				$('select.files_list').append('<option value="'+ file +'">'+ file +'</option>');
 				
-				setTimeout('$("div.save_pane.helper").remove()', 1000);
+				setTimeout('$("div.save_pane.helper").remove()', 500);
 			});
 			
 			return false;
@@ -136,7 +131,7 @@
 	$("#load_sheet").click(function(){
 		value = $("select[name='files'] option:selected").text();		
 		$('textarea#edit_css').val('Loading file...');
-		$.get('/get/theme/load/'+ value +'?v=39840',
+		$.get('/get/theme/load/css/'+ value +'?v=39840',
 			function(data){
 				$('textarea#edit_css').val(data);
 				// set file as selected
@@ -144,11 +139,21 @@
 				
 				$('.current_sheet').html(value);
 				$("div.save_pane select[name='update_file'] option[value='"+ value +"']").attr({selected:'selected'});
-
 			}
 		);
 	});
-	
+
+	// delete a stylesheet
+	$("#delete_sheet").click(function(){
+		file = $("select[name='files'] option:selected").text();		
+		if(confirm('This cannot be undone. Delete stylesheet: '+ file))
+			$.get('/get/theme/delete/css/'+ file,
+				function(data){
+					$("select[name='files'] option:selected").remove();
+					$('#show_response_beta').html(data);
+				}
+			);
+	});	
 </script>
 
 
