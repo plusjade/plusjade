@@ -27,10 +27,9 @@ dt{font-weight:bold;}
   padding:10px 0;
   margin-bottom:10px;
 }
-	#header{
-		width:100%;
-		_background: url('images/line_down.png') repeat-x 17px 40px;
-	}
+#header{
+	width:100%;
+}
 #header_banner{
 	float:right;
 	margin-top:5px;

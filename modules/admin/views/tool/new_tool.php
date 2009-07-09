@@ -7,7 +7,7 @@
 	</div>
 		
 	<div id="tool_list_wrapper" class="common_left_panel">
-		<h3>Content Tools</h3>
+		<h3>Basic Tools</h3>
 		<ul>
 		<?php 
 			foreach($tools_list as $key => $tool)
@@ -15,7 +15,7 @@
 		?>
 		</ul>
 		
-		<h3>Page Builders</h3>
+		<h3>Advanced Tools</h3>
 		<?php
 			if( is_object($protected_tools) )
 			{

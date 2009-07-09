@@ -11,31 +11,29 @@
 			<ul>
 				<li><a href="/get/admin" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a></li>
 				<li><a href="/get/page/navigation" rel="facebox"><span class="icon sitemap">&#160; &#160; </span>Navigation</a></li>
+				<li><a href="/get/theme/logo" rel="facebox"><span class="icon asterisk">&#160; &#160; </span>Logo</a></li>				
 				<li><a href="/get/auth/logout"><span class="icon cross">&#160; &#160; </span> Logout</a></li>
 			</ul>		
 		</li>	
 		
 		<li class="dropdown">
-			<div><span class="icon rainbow">&#160; &#160; </span> Theme</div>
+			<div><span class="icon palette">&#160; &#160; </span> Theme</div>
 			<ul> 
-				<li class="aligncenter" style="background:#ffffcc !important; border-bottom:1px dashed #ccc">This Theme</li>
-				<li><a href="/get/theme/stylesheets" rel="css_styler"><span class="icon rainbow">&#160; &#160; </span>Stylesheets</a></li>
-				<li><a href="/get/theme/templates" rel="facebox"><span class="icon rainbow">&#160; &#160; </span>Templates</a></li>
-				<li><a href="/get/theme/logo" rel="facebox"><span class="icon flag">&#160; &#160; </span>Logo</a></li>
-				<li class="aligncenter" style="background:#ffffcc !important;  border-bottom:1px dashed #ccc">All Themes</li>
-				<li><a href="/get/theme/manage" rel="facebox"><span class="icon flag">&#160; &#160; </span>Your Themes</a></li>
-				<li><a href="/get/theme/change" rel="facebox"><span class="icon flag">&#160; &#160; </span>New Theme</a></li>
+				<li><a href="/get/theme" rel="facebox"><span class="icon manage">&#160; &#160; </span>Manage</a></li>
+				<li><a href="/get/theme/edit/stylesheets" rel="css_styler"><span class="icon css">&#160; &#160; </span>Stylesheets</a></li>
+				<li><a href="/get/theme/edit/templates" rel="facebox"><span class="icon template">&#160; &#160; </span>Templates</a></li>
+				<li><a href="/get/theme/change" rel="facebox" style="border-top:1px dashed #ccc"><span class="icon palette">&#160; &#160; </span>New Theme</a></li>
 			</ul>		
 		</li>
+		
 		<li class="direct">
 			<a href="/get/page/index/add" class="block_mode" rel="facebox"><span class="icon page">&#160; &#160;</span> Pages</a>
-		</li>		
-		<li class="dropdown">
-			<div><span class="icon tools">&#160; &#160; </span> Tools</div>
-			<ul>
-				<li><a href="/get/tool" rel="facebox"><span class="icon tools">&#160; &#160; </span>Manage</a></li>
-			</ul>
 		</li>
+		
+		<li class="direct">
+			<a href="/get/tool" rel="facebox" class="block_mode"><span class="icon tools">&#160; &#160; </span>Tools</a>
+		</li>
+		
 		<li class="direct">
 			<a href="/get/files" rel="facebox" class="block_mode"><span class="icon local">&#160; &#160; </span>Files</a>
 		</li>

@@ -1,21 +1,23 @@
 
-<div id="page_browser_wrapper">
 
-	<div id="common_tool_header" class="breadcrumb_wrapper">
-		<a href="#" rel="ROOT" class="open_folder"><?php echo url::site()?></a><span id="breadcrumb" rel=""></span>
-	</div>
+<div id="common_tool_header">
+	<div id="common_title">Website Pages Browser</div>
+</div>
+	
+<div id="page_browser_wrapper">
 	
 	<div class="common_left_panel">
-		<div style="padding:10px; background:#ffffcc">
-			<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/page/add" class="new_page">New Page</a>
-		</div>
+		<img src="/_assets/images/admin/file.jpg" alt="" class="new_page_drop">
 		<br>
-		Navigate to the folder you want your new page,
-		then add the page.
+		<h4>To Add Page:</h4>
+		<i>Drag</i> +page icon into the desired directory window.
+		
 		<p>
-		<b>click</b> on a page for page options.
+		<h4>Page Options:</h4>
+		appear when pages are clicked.
 		</p>
-		<h3>Key</h3>
+		<br><br>
+		<h4>Key</h4>
 		<small style="line-height:1.7em">
 			<b>White:</b> Public - On Menu.
 			<br><b style="color:#ccc">Gray:</b> Public - Not in menu.
@@ -23,6 +25,9 @@
 		</small>
 	</div>
 	
+	<div class="breadcrumb_wrapper">
+		<a href="#" rel="ROOT" class="open_folder"><?php echo trim(url::site(), '/')?></a><span id="breadcrumb" rel=""></span>
+	</div>
 	<div id="directory_window" class="common_main_panel" rel="ROOT">
 		<?php echo $files_structure?>
 	</div>
@@ -32,6 +37,26 @@
 <script type="text/javascript">
 	$('div.ROOT').show();
 
+	
+		$(".new_page_drop").draggable({
+			revert: 'invalid',
+			helper: 'clone'
+		});
+		$("#directory_window").droppable({
+			activeClass: 'ui-state-highlight',
+			drop: function(event, ui) {
+				//ui.draggable.css('border','1px solid red');
+				$.facebox(function(){
+					path = $('#breadcrumb').attr('rel');
+					$.get('get/page/add', {directory: path}, 
+						function(data){$.facebox(data, false, 'facebox_2')}
+					);
+				}, false, 'facebox_2');
+			}
+		});
+
+		
+	
 	// click away hides file options	
 	$('#page_browser_wrapper:not(.file_options)').click(function(){
 		$('#page_browser_wrapper ul.option_list').hide();
@@ -65,7 +90,7 @@
 				var folder_string = '';				
 				for (i=0; i < el_count; i++){
 					result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
-					folder_string += ' &#8594 <a href="/'+ result_string +'" rel="'+ result_string +'" class="open_folder">'+ folder_array[i] +'</a>';
+					folder_string += ' / <a href="/'+ result_string +'" rel="'+ result_string +'" class="open_folder">'+ folder_array[i] +'</a>';
 				}
 			}
 			$('#breadcrumb').attr('rel',path).html(folder_string);

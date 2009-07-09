@@ -2,7 +2,7 @@
 class Page_Controller extends Controller {
 
 /**
- *	Various functions for interaction/manipulation of "pages" in the +jade system.
+ * Functions for interaction/manipulation of "pages" in the +jade system.
  *	
  */	
 	function __construct()
@@ -24,7 +24,7 @@ class Page_Controller extends Controller {
 	function index()
 	{
 		$db			= new Database;				
-		$primary	= new View("page/all_pages");		
+		$primary	= new View("page/index");		
 		$pages_data = $db->query("
 			SELECT id, page_name, menu, enable
 			FROM pages

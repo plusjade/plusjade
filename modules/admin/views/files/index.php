@@ -1,10 +1,10 @@
 
 
-<div id="files_browser_wrapper">
+<div id="common_tool_header">
+	<div id="common_title">Files Browser</div>
+</div>
 
-	<div id="common_tool_header" class="breadcrumb_wrapper">
-		<a href="/get/files/contents" rel="ROOT" class="get_folder">Assets</a><span id="breadcrumb" rel=""></span>
-	</div>
+<div id="files_browser_wrapper">
 	
 	<div class="common_left_panel" style="width:150px">
 		<?php
@@ -17,7 +17,10 @@
 		<span class="icon add_folder">&nbsp; &nbsp; </span> <a href="/get/files/add_folder" class="add_asset">Add Folder</a>
 		
 	</div>
-	
+
+	<div class="breadcrumb_wrapper" style="width:620px;">
+		<a href="/get/files/contents" rel="ROOT" class="get_folder">Assets</a><span id="breadcrumb" rel=""></span>
+	</div>	
 	<div id="directory_window" class="common_main_panel full_height" rel="ROOT" style="width:620px; height:350px; overflow:auto">
 		<?php echo View::factory('files/folder', array('files'=> $files, 'is_editor'=> $is_editor))?>
 	</div>
@@ -27,7 +30,10 @@
 
 <script type="text/javascript">
 
+
 	$('#files_browser_wrapper').click($.delegate({
+	
+	// ajax load a real-directory path
 		'a.get_folder, img.get_folder':function(e){
 			$('#directory_window').html('<div lass="ajax_loading">Loading...</div>');
 			url = $(e.target).attr('href');
@@ -49,13 +55,15 @@
 				// ex: one, one/two, one/two/three.
 				for (i=0; i < folder_count; i++){
 					result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
-					folder_string += ' &#8594 <a href="/get/files/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
+					folder_string += ' / <a href="/get/files/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
 				}
 			}
 			$('#breadcrumb').attr('rel', path).html(folder_string);			
 		
 			return false;
 		},
+		
+	// add a file to a real directory folder
 		'a.add_asset': function(e){
 			$.facebox(function(){
 				path = $('#breadcrumb').attr('rel');
@@ -67,6 +75,8 @@
 			}, false, 'facebox_2');
 			return false;
 		},
+		
+	// delete are a real directory folder from _data
 		'div.folder_asset span.cross': function(e){
 			
 			$parent	= $(e.target).parent('div');
@@ -89,6 +99,8 @@
 			}
 			return false;
 		},
+	
+	// delete a file from _data
 		'div.file_asset span.cross': function(e){
 			if(confirm('This cannot be undone. Delete this file?'))
 			{

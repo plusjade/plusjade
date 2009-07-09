@@ -2,8 +2,10 @@
 class Files_Controller extends Controller {
 
 /* 
- *
- *	
+ * Files refer to a repository for misc. assets uploaded by the user.
+ * Assets other than themes or tool specific assets.
+ * Location: @ /public/_data/$this->site_name/assets.
+ * This class basically does CRUD relative to this folder.
  */	 
 	function __construct()
 	{
@@ -11,7 +13,6 @@ class Files_Controller extends Controller {
 		if(! $this->client->can_edit($this->site_id) )
 		{
 			# hack for allowing swfupload to work in authenticated session...
-			# leave this here to minimize this to edit_tools only.
 			if( empty($_POST['PHPSESSID']) )
 				die('Please login');
 		}
@@ -23,23 +24,22 @@ class Files_Controller extends Controller {
  */
 	public function index()
 	{
-		$dir	= Assets::dir_path();
-		$files	= self::folder_contents($dir, '_sm');
+		$files	= self::folder_contents(Assets::assets_dir(), '_sm');
 		
 		$primary = new View('files/index');
 		$primary->is_editor = (empty($_GET['editor'])) ? FALSE : TRUE ;
 		$primary->files = $files;
 		die($primary);
 	}
+	
 /*
  * Show contents of a particular folder. Used for ajax calls.
  * $folder comes in data format: folder:sub-folder:sub-sub-folder
  */
 	public function contents($folder=NULL)
 	{
-		$folder	= str_replace(':', '/', $folder);
-		$dir	= Assets::dir_path($folder);		
-		$files	= self::folder_contents($dir, '_sm');
+		$folder	= str_replace(':', '/', $folder);	
+		$files	= self::folder_contents(Assets::assets_dir($folder), '_sm');
 		
 		$primary = new View('files/folder');
 		$primary->files = $files;
@@ -53,7 +53,7 @@ class Files_Controller extends Controller {
 	public function add_files($directory=NULL)
 	{
 		$real_dir	= str_replace(':', '/', $directory);
-		$full_path	= Assets::dir_path($real_dir);
+		$full_path	= Assets::assets_dir($real_dir);
 		if(!is_dir($full_path))
 			die('invalid directory');
 
@@ -68,7 +68,7 @@ class Files_Controller extends Controller {
 	public function upload($directory=NULL)
 	{
 		$directory = str_replace(':', '/', $directory);
-		$full_path = Assets::dir_path($directory);
+		$full_path = Assets::assets_dir($directory);
 		if(!is_dir($full_path))
 			die('invalid directory');
 
@@ -132,7 +132,8 @@ class Files_Controller extends Controller {
 	public function add_folder($directory=NULL)
 	{
 		$directory = str_replace(':', '/', $directory);
-		$full_path = Assets::dir_path($directory);
+		$full_path = Assets::assets_dir($directory);
+		
 		if(!is_dir($full_path))
 			die('invalid directory');
 			
@@ -167,7 +168,7 @@ class Files_Controller extends Controller {
 		
 		$path		= str_replace(':', '/', $path);
 		$filename	= substr(strrchr($path, '/'), 1);
-		$full_path	= Assets::dir_path($path);
+		$full_path	= Assets::assets_dir($path);
 		$thumb_path	= str_replace($filename, "_sm/$filename", $full_path);
 		
 		if(is_dir($full_path))
@@ -193,7 +194,40 @@ class Files_Controller extends Controller {
 		die('invalid path');
 	}
 
-	
+
+/*
+ * Similar to Jdirectory::contents but only gets contents of one folder/directory at a time.
+ * Builds the array differently for "file browser" specific data handling.
+ */ 
+	 private function folder_contents($full_dir, $omit = null) 
+	 { 
+		$retval = array(); 	
+		# add trailing slash if missing 	
+		if(substr($full_dir, -1) != "/")
+			$full_dir .= "/"; 	
+		# open pointer to directory and read list of files 
+		$d = @dir($full_dir) or die("show_dir_contents: Failed opening directory $full_dir");
+		
+		$stock_dir = Assets::assets_dir();
+		$short_dir = str_replace("$stock_dir/", '', $full_dir);
+		$short_dir = str_replace('/', ':', $short_dir);
+		
+		while(false !== ($entry = $d->read())) 
+		{
+			# skip hidden files and any omissions
+			if( ($entry[0] == "." ) OR (! empty($omit) AND $entry == "$omit" ) )
+				continue;
+				
+			if(is_dir("$full_dir$entry")) 
+				$retval["$short_dir$entry"] = "folder|$entry"; 
+			else if( is_readable("$full_dir$entry") && $entry != 'Thumbs.db' ) 
+				$retval["$short_dir$entry"] = "file|$entry";	 
+		 } 
+		 $d->close(); 
+		 asort($retval);
+		 return $retval; 
+	}
+
 
 /*
  * Used to give cleaner urls to a website's asset folder.
@@ -224,7 +258,7 @@ class Files_Controller extends Controller {
 		if (0 < count($parsed_url))
 			$dir_path = implode('/', $parsed_url) . '/';
 		
-		$dir_path = Assets::dir_path("$dir_path$filename");
+		$dir_path = Assets::assets_dir("$dir_path$filename");
 	
 		if(!file_exists($dir_path))
 			die('remember to do 404 not found');
@@ -251,40 +285,6 @@ class Files_Controller extends Controller {
 			header("Content-Disposition: attachment; filename=$filename");
 			readfile($dir_path);				
 		}
-	}
-
-
-/*
- * Similar to Jdirectory::contents but only gets contents of one folder/directory at a time.
- * Builds the array differently for "file browser" specific data handling.
- */ 
-	 private function folder_contents($full_dir, $omit = null) 
-	 { 
-		$retval = array(); 	
-		# add trailing slash if missing 	
-		if(substr($full_dir, -1) != "/")
-			$full_dir .= "/"; 	
-		# open pointer to directory and read list of files 
-		$d = @dir($full_dir) or die("show_dir_contents: Failed opening directory $full_dir");
-		
-		$stock_dir = Assets::dir_path();
-		$short_dir = str_replace("$stock_dir/", '', $full_dir);
-		$short_dir = str_replace('/', ':', $short_dir);
-		
-		while(false !== ($entry = $d->read())) 
-		{
-			# skip hidden files and any omissions
-			if( ($entry[0] == "." ) OR (! empty($omit) AND $entry == "$omit" ) )
-				continue;
-				
-			if(is_dir("$full_dir$entry")) 
-				$retval["$short_dir$entry"] = "folder|$entry"; 
-			else if( is_readable("$full_dir$entry") && $entry != 'Thumbs.db' ) 
-				$retval["$short_dir$entry"] = "file|$entry";	 
-		 } 
-		 $d->close(); 
-		 asort($retval);
-		 return $retval; 
 	}
 	
 } /* End of file /modules/admin/files.php */

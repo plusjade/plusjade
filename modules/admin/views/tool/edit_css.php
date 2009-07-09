@@ -6,17 +6,16 @@
 <?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm'))?>
 
 	<div id="common_tool_header" class="buttons">
-		<div id="common_title"><?php echo $toolname?>(<?php echo $tool_id?>) CSS.</div>
+		<div id="common_title"><?php echo $toolname?> - <?php echo $tool_id?> CSS.</div>
 	</div>
 
 	<div class="common_left_panel"  style="width:18%">	
 		<b>Add container class:</b>
 		<br><input type="text" name="attributes" value="<?php echo $attributes?>">
-		<br><br>
 		<p>
 		<button type="submit" name="save_css" class="jade_positive">Save Changes</button>
 		</p>
-		<button type="submit" name="save_template" class="jade_positive" value="true">Save as Tool Template</button>
+		<button type="submit" name="save_template" class="jade_positive" value="true">Save as template</button>
 		<br><br>
 		<b>Press TAB</b> while in the textarea to update the tool view.
 	</div>

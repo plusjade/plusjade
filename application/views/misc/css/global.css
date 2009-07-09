@@ -10,7 +10,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 }
 
 body {
-	background: #A9B3BB url(%PATH%/img01.gif) repeat-x;
+	background: #A9B3BB url(../images/img01.gif) repeat-x;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	color: #555555;
@@ -69,7 +69,7 @@ hr {
 	height: 130px;
 	margin: 0 auto;
 	padding: 70px 0 0 100px;
-	background: url(%PATH%/img02.gif) no-repeat 0px 50px;
+	background: url(../images/img02.gif) no-repeat 0px 50px;
 }
 
 #logo h1, #logo p {
@@ -124,7 +124,7 @@ hr {
 }
 
 #menu .current_page_item a {
-	background: url(%PATH%/img03.gif) no-repeat center bottom;
+	background: url(../images/img03.gif) no-repeat center bottom;
 }
 
 /* Wide Post */
@@ -132,12 +132,12 @@ hr {
 .wide-post {
 	width: 770px;
 	margin: 0 auto;
-	background: #D4D9DD url(%PATH%/img04.gif) repeat-y;
+	background: #D4D9DD url(../images/img04.gif) repeat-y;
 }
 
 .wide-post .title {
 	padding: 30px 30px 20px 30px;
-	background: url(%PATH%/img05.gif) no-repeat;
+	background: url(../images/img05.gif) no-repeat;
 	font-size: 2em;
 }
 
@@ -157,7 +157,7 @@ hr {
 
 .wide-post .bottom {
 	height: 20px;
-	background: url(%PATH%/img06.gif) no-repeat left bottom;
+	background: url(../images/img06.gif) no-repeat left bottom;
 }
 
 .wide-post .links {
@@ -175,22 +175,22 @@ hr {
 
 .wide-post .links .date {
 	padding-left: 20px;
-	background: url(%PATH%/img08.gif) no-repeat left center;
+	background: url(../images/img08.gif) no-repeat left center;
 }
 
 .wide-post .links .author {
 	padding-left: 20px;
-	background: url(%PATH%/img09.gif) no-repeat left center;
+	background: url(../images/img09.gif) no-repeat left center;
 }
 
 .wide-post .links .comments {
 	padding-left: 20px;
-	background: url(%PATH%/img10.gif) no-repeat left center;
+	background: url(../images/img10.gif) no-repeat left center;
 }
 
 .wide-post .links .feeds {
 	padding-left: 10px;
-	background: url(%PATH%/img11.gif) no-repeat left center;
+	background: url(../images/img11.gif) no-repeat left center;
 }
 
 /* Two Columns */
@@ -214,13 +214,13 @@ hr {
 .two-columns .title {
 	height: 28px;
 	padding: 7px 0 0 10px;
-	background: #DB8603 url(%PATH%/img12.gif) no-repeat;
+	background: #DB8603 url(../images/img12.gif) no-repeat;
 	font-size: 1.4em;
 	color: #333333;
 }
 
 .two-columns .entry {
-	background: url(%PATH%/img13.gif) repeat-x;
+	background: url(../images/img13.gif) repeat-x;
 }
 
 /* Recent Posts */
@@ -236,7 +236,7 @@ hr {
 
 #recent-posts li {
 	padding: 5px 15px;
-	background: url(%PATH%/img14.gif) no-repeat left center;
+	background: url(../images/img14.gif) no-repeat left center;
 	border-bottom: 1px solid #949EA4;
 }
 
@@ -253,7 +253,7 @@ hr {
 
 #recent-comments li {
 	padding: 5px 15px 5px 17px;
-	background: url(%PATH%/img15.gif) no-repeat left center;
+	background: url(../images/img15.gif) no-repeat left center;
 	border-bottom: 1px solid #949EA4;
 }
 
@@ -262,7 +262,7 @@ hr {
 #submenu {
 	clear: both;
 	padding: 20px 0;
-	background: #535657 url(%PATH%/img16.gif) repeat-x left bottom;
+	background: #535657 url(../images/img16.gif) repeat-x left bottom;
 	color: #A9B6BB;
 }
 
@@ -291,7 +291,7 @@ hr {
 	float: none;
 	width: auto;
 	padding: 5px 0 5px 10px;
-	background: url(%PATH%/img17.gif) no-repeat left center;
+	background: url(../images/img17.gif) no-repeat left center;
 	border-bottom: 1px solid #424546;
 }
 
@@ -314,7 +314,7 @@ hr {
 
 #footer {
 	padding: 40px 0;
-	background: #3F4244 url(%PATH%/img18.gif) repeat-x;
+	background: #3F4244 url(../images/img18.gif) repeat-x;
 }
 
 #footer p {

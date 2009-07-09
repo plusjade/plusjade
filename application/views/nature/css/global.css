@@ -7,7 +7,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 body {
 	margin: 0;
 	padding: 0;
-	background: #372412 url(%PATH%/img01.gif) repeat-x;
+	background: #372412 url(../images/img01.gif) repeat-x;
 	font-size: 13px;
 	color: #FFFFFF;
 }
@@ -76,13 +76,13 @@ img { border: none; }
 	_border:1px solid red;
 	height: 260px;
 	margin: 0 auto;
-	background: url(%PATH%/img02.jpg) no-repeat;
+	background: url(../images/img02.jpg) no-repeat;
 }
 /* Logo */
 
 #logo {
 	height: 170px;
-	background: url(%PATH%/img07.gif) no-repeat left 65%;
+	background: url(../images/img07.gif) no-repeat left 65%;
 }
 
 #logo a {
@@ -114,7 +114,7 @@ img { border: none; }
 #menu {
 	width: 830px;
 	height: 70px;
-	background: url(%PATH%/img03.jpg) no-repeat;
+	background: url(../images/img03.jpg) no-repeat;
 }
 
 #menu ul {
@@ -142,12 +142,12 @@ img { border: none; }
 }
 
 #menu a:hover {
-	background: url(%PATH%/img09.jpg) no-repeat;
+	background: url(../images/img09.jpg) no-repeat;
 	color: #FFFFFF;
 }
 
 #menu .active a {
-	background: url(%PATH%/img09.jpg) no-repeat;
+	background: url(../images/img09.jpg) no-repeat;
 	color: #372412;
 }
 
@@ -190,7 +190,7 @@ img { border: none; }
 
 .meta a {
 	padding-left: 15px;
-	background: url(%PATH%/img06.gif) no-repeat left center;
+	background: url(../images/img06.gif) no-repeat left center;
 	font-weight: bold;
 }
 
@@ -228,13 +228,13 @@ img { border: none; }
 #sidebar li li {
 	padding-left: 30px;
 	border-bottom: 1px dotted #4A3903;
-	background: url(%PATH%/img06.gif) no-repeat 15px 50%;
+	background: url(../images/img06.gif) no-repeat 15px 50%;
 }
 
 #sidebar h2 {
 	margin: 0;
 	padding: 20px 0 2px 30px;
-	background: url(%PATH%/img05.gif) no-repeat left bottom;
+	background: url(../images/img05.gif) no-repeat left bottom;
 	border-bottom: 2px solid #4A3903;
 }
 
