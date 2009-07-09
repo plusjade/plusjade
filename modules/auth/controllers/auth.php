@@ -222,7 +222,7 @@ class Auth_Controller extends Template_Controller {
 				die('There was a problem creating a new user.');
 			
 			# create the website.
-			#self::create_website($user->id, $site_name);
+			self::create_website($user->id, $site_name);
 			# Log user in
 			Auth::instance()->login($user, $_POST['password']);
 			# Take to user dashboard
@@ -418,6 +418,56 @@ class Auth_Controller extends Template_Controller {
 		}
 		die();
 	}
+
+
+/*
+ * Revert a site to a "safe_mode" theme.
+ * Useful when a an active theme is missing or has corrupted files which
+ * locks a user out of editing the website.
+ */
+	function safe_mode($site_name)
+	{
+		$db = new Database;
+		$user_id = Auth::instance()->get_user()->id;
+		$can_edit = $db->query("
+			SELECT sites_users.*, sites.subdomain, sites.site_id 
+			FROM sites_users 
+			JOIN sites ON sites_users.fk_site = sites.site_id
+			WHERE sites_users.fk_users = '$user_id'
+			AND sites.subdomain = '$site_name'
+		")->current();
+		
+
+		if(!is_object($can_edit))
+			die('You cannot edit this site.');
+
+			
+		$theme_path = DATAPATH . "$site_name/themes/safe_mode";
+		
+		# delete safe-mode if it exists (might be tainted)
+		if(is_dir($theme_path))
+			Jdirectory::remove($theme_path);
+	
+		# create it from stock.
+		if(! Jdirectory::copy(APPPATH . "views/safe_mode", $theme_path) )
+			die('Uh oh, not even this worked. Please contact support@plusjade.com!!'); # Error
+		
+		$db = new Database;		
+		$db->update(
+			'sites',
+			array('theme' => 'safe_mode'),
+			"site_id = '$this->site_id'"
+		);			
+		
+		# on success: should clear the cache and reload the page.
+		if(yaml::edit_site_value($site_name, 'site_config', 'theme', 'safe_mode'))
+			die("Safe-mode activated for <b>$site_name</b>");
+		
+
+		die('safe-mode theme could not be activated');
+	}
+
+
 	
 /**
  * log user out by destroying the session

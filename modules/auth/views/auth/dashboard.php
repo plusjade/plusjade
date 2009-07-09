@@ -23,8 +23,14 @@
 				<div id="site_button_wrapper">
 					<?php
 					foreach($sites_array as $name => $site_id)
-						echo "<p><b>$name</b> &#8594; <a href=\"/get/auth/manage?site=$site_id\">Edit Website</a></p>";
-					
+					{
+						?>
+						<p>
+							<b><?php echo $name?></b> &#8594; <a href="/get/auth/manage?site=<?php echo $site_id?>">Edit Website</a>  -- 
+							<a href="/get/auth/safe_mode/<?php echo $name?>">Activate safe-mode theme</a>
+						</p>
+						<?php
+					}
 					#quick hack - remove later
 					if($this->client->logged_in(2))
 						echo '<p><b>Admin</b> &#8594; <a href="/get/utada">Go to Master</a></p>';
