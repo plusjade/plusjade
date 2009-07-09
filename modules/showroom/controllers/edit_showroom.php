@@ -241,7 +241,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				'intro'		=> $_POST['intro'],
 				'body'		=> $_POST['body'],		
 			);
-			$old_image = Assets::dir_path("showroom/{$_POST['old_category']}/{$_POST['old_image']}");
+			$old_image = Assets::assets_dir("showroom/{$_POST['old_category']}/{$_POST['old_image']}");
 		
 			# Upload image if sent
 			if(is_uploaded_file($_FILES['image']['name']))
@@ -319,7 +319,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		$image = $this->_grab_tool_child('showroom', $id);
 
 		# Image File delete		
-		$image_path = Assets::dir_path("tools/showroom/$image->img");	
+		$image_path = Assets::assets_dir("tools/showroom/$image->img");	
 	
 		if(! empty($image->image) AND file_exists($image_path) )
 			unlink($image_path);
@@ -384,7 +384,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		$image		= new Image($filename);			
 		$ext		= $image->__get('ext');		
 		$name		= text::random('alnum', 18).'.'.$ext;
-		$image_store = Assets::dir_path("tools/showroom");
+		$image_store = Assets::assets_dir("tools/showroom");
 		
 		if(! is_dir($image_store) )
 			mkdir($image_store);
@@ -465,7 +465,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		");
 		
 		# delete data assets
-		$showroom_dir = Assets::dir_path("tools/showrooms/$tool_id");
+		$showroom_dir = Assets::assets_dir("tools/showrooms/$tool_id");
 		if(is_dir($showroom_dir))
 		{
 			$d = dir($showroom_dir); 

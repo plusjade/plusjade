@@ -311,7 +311,7 @@ function getPageWidth()
 	}
 	else{
 	  $('.facebox').fadeOut(function() {
-        $('.facebox .content').removeClass().addClass('content');
+        $('.facebox .content').removeClass().addClass('content').empty();
         hideOverlay()
         $('.facebox .loading').remove()
       })

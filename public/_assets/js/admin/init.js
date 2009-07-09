@@ -202,7 +202,6 @@ $(document).ready(function()
 			$.get(url, function(data) {
 				$.facebox.close();
 				$('#' + el).remove();
-				$('.facebox .show_submit').hide();	
 				$('#show_response_beta').html(data);	
 			});
 			return false;

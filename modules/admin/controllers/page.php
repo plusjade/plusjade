@@ -484,35 +484,5 @@ class Page_Controller extends Controller {
 		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
 	}
 
-/*
- * Creates a proper pages_config.yml file in _data/<site>/protected
- * yaml::parse test to see if the file exist and calls this if it does not.
- */
-	public function _build_pages_config()
-	{
-		$config_path = DATAPATH . "$this->site_name/protected/pages_config.yml";
-		if(file_exists($config_path))
-			die('pages_config.yml already exists');
-			
-		$db = new Database;
-		$protected_pages = $db->query("
-			SELECT pages_tools.*, LOWER(tools_list.name) as name, tools_list.protected, pages.page_name
-			FROM pages_tools
-			JOIN tools_list ON tools_list.id = pages_tools.tool
-			JOIN pages ON pages.id = pages_tools.page_id
-			WHERE pages_tools.fk_site = '$this->site_id'
-			AND tools_list.protected = 'yes'
-		");
-		
-		ob_start();
-		# page_name:toolname-tool_id
-		foreach($protected_pages as $page)
-			echo "$page->page_name:$page->name-$page->tool_id\n";
-	
-		if(file_put_contents($config_path, ob_get_clean()))
-			return TRUE;
-			
-		die('page_controller::_build_pages_config() Could not create pages_config.yml');
-	}
 }
 /* End of file page.php */

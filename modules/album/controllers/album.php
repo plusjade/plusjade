@@ -33,10 +33,10 @@ class Album_Controller extends Controller {
 
 		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
 		
-		$url_path = Assets::url_path_direct("tools/albums/$album->id");	
+		$assets_url = Assets::assets_url("tools/albums/$album->id");	
 		
 		$primary = new View('public_album/index');
-		$primary->display_view = $this->$display_view($images, $url_path);
+		$primary->display_view = $this->$display_view($images, $assets_url);
 		$primary->view_name = $display_view;
 		
 		$primary->add_root_js_files("$display_view/$display_view.js");
@@ -44,11 +44,11 @@ class Album_Controller extends Controller {
 		return $this->public_template($primary, 'album', $tool_id);
 	}
 
-	private function lightbox($images, $url_path)
+	private function lightbox($images, $assets_url)
 	{
 		$primary = new View('public_album/lightbox');
 		$primary->images	= $images;
-		$primary->img_path	= $url_path;
+		$primary->img_path	= $assets_url;
 		return $primary;
 	}
 

@@ -51,7 +51,7 @@ class Showroom_Controller extends Controller {
 			#TODO: Fix this
 			
 			 
-			$item_view->img_path = Assets::url_path("tools/showroom/39");
+			$item_view->img_path = Assets::assets_url("tools/showroom/39");
 			$item_view->category = 'BLAH';
 			$primary->items = $item_view;
 		}
@@ -72,7 +72,7 @@ class Showroom_Controller extends Controller {
 				$primary->item = self::item($category, $item, $page_name);
 		}
 		
-		$primary->img_path = Assets::url_path("tools/showroom/$parent->id");
+		$primary->img_path = Assets::assets_url("tools/showroom/$parent->id");
 		$primary->parent = $parent;
 		
 		
@@ -131,7 +131,7 @@ class Showroom_Controller extends Controller {
 		if(!is_object($parent))
 			return 'invalid category';
 			
-		$item_view->img_path = Assets::url_path_direct("tools/showroom/$parent->id");
+		$item_view->img_path = Assets::assets_url("tools/showroom/$parent->id");
 	
 		#display items in this cat
 		$items = $db->query("
@@ -170,7 +170,7 @@ class Showroom_Controller extends Controller {
 
 		$primary->item		= $item_object;
 		$primary->category	= $category;
-		$primary->img_path	= Assets::url_path_direct("tools/showroom/$item_object->cat_id");
+		$primary->img_path	= Assets::assets_url("tools/showroom/$item_object->cat_id");
 		$primary->page_name	= $page_name;
 		return $primary;
 	}
