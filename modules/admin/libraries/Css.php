@@ -14,7 +14,7 @@ class Css_Core {
  */
 	function generate_tool_css($toolname, $tool_id, $return_contents=FALSE)
 	{
-		$tool_path		= Assets::theme_dir("$this->theme/tools/$toolname");			
+		$tool_path		= Assets::themes_dir("$this->theme/tools/$toolname");			
 		$custom_file	= "$tool_path/css/$tool_id.css";		
 		$theme_file		= "$tool_path/css/stock.css";
 		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
