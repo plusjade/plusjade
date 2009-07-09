@@ -105,7 +105,11 @@
 	
 // delete a theme button
 	$("#delete_theme").click(function(){
-		theme = $("select[name='theme'] option:selected").text();		
+		theme = $("select[name='theme'] option:selected").text();
+		if('<?php echo $this->theme?>' == theme) {
+			alert('Cannot delete active theme.');
+			return false;
+		}	
 		if(confirm('This cannot be undone. Delete this entire theme folder?')) {
 			$.get('/get/theme/delete/'+ theme,
 				function(data){

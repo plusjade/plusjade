@@ -53,7 +53,7 @@ function get_site()
 	
 	if(! file_exists($site_config_path) )
 	{
-		$template = file_get_contents(DATAPATH . 'site_config.template.yml');
+		$template = file_get_contents(DOCROOT . '/_assets/data/site_config.template.yml');
 		$keys = array(
 			'%SITE_ID%',
 			'%SITE_NAME%',

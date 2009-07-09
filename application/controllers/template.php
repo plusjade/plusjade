@@ -15,7 +15,7 @@ abstract class Template_Controller extends Controller {
 			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-");
 		
 		/*
-		$theme_js_path = APPPATH."/views/$this->theme/js/js.php";
+		$theme_js_path = DOCROOT . "_assets/themes/$this->theme/js/stock.js"
 		if( file_exists($theme_js_path) )
 			include($theme_js_path);	
 		*/

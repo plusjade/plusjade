@@ -301,9 +301,12 @@ class Auth_Controller extends Template_Controller {
 		# make sure we always know the site_name does not exist.
 		
 		# create data folder structure for site
-		$source	= DATAPATH . '_stock';
+		$source	= DOCROOT . '_assets/data/_stock';
 		$dest	= DATAPATH . $site_name;			
 		
+		if(!is_dir($source))
+			die('_stock folder does not exist.');
+
 		if(! Jdirectory::copy($source, $dest) )
 			die('Unable to make data folder!'); #status message	
 
@@ -441,16 +444,20 @@ class Auth_Controller extends Template_Controller {
 		if(!is_object($can_edit))
 			die('You cannot edit this site.');
 
-			
-		$theme_path = DATAPATH . "$site_name/themes/safe_mode";
+		
+		$theme_path = Assets::themes_dir('safe_mode');
 		
 		# delete safe-mode if it exists (might be tainted)
 		if(is_dir($theme_path))
 			Jdirectory::remove($theme_path);
 	
 		# create it from stock.
-		if(! Jdirectory::copy(APPPATH . "views/safe_mode", $theme_path) )
+		if(!is_dir(DOCROOT . "_assets/themes/safe_mode"))
+			die('Safe_mode theme does not exist. Please contact support@plusjade.com!!');
+			
+		if(! Jdirectory::copy(DOCROOT . "_assets/themes/safe_mode", $theme_path) )
 			die('Uh oh, not even this worked. Please contact support@plusjade.com!!'); # Error
+
 		
 		$db = new Database;		
 		$db->update(

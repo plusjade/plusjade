@@ -144,9 +144,9 @@ class Theme_Controller extends Controller {
 		if(is_dir($full_path))
 			die('Theme already exists');
 		
-
-		if(Jdirectory::copy(APPPATH.'views/_clone', $full_path))
-			die($theme); # need this to update the DOM
+		if(is_dir(DOCROOT . '_assets/themes/_clone'))
+			if(Jdirectory::copy(DOCROOT . '_assets/themes/_clone', $full_path))
+				die($theme); # need this to update the DOM
 
 		die('Could not add theme.');
 	}
@@ -247,6 +247,9 @@ class Theme_Controller extends Controller {
 		# if trying to delete a theme folder
 		if(0 == $count)
 		{
+			if($path == $this->theme)
+				die('Cannot delete active theme.');
+				
 			if(is_dir($full_path))				
 				if(Jdirectory::remove($full_path))
 					die("'$path' deleted");
@@ -277,12 +280,16 @@ class Theme_Controller extends Controller {
 		if(! empty($_POST['theme']))
 		{
 			$new_theme	= $_POST['theme'];
-			$source		= APPPATH . "views/$new_theme";
-			$dest		= Assets::themes_dir($new_theme);			
+			
+			$source	= DOCROOT . "_assets/themes/$new_theme";
+			$dest	= Assets::themes_dir($new_theme);			
 	
 			# If particular theme directory does not yet exist, create it.
 			if(! is_dir($dest) )
-			{			
+			{
+				if(!is_dir($source))
+					die('This theme does not exist.');
+					
 				if(! Jdirectory::copy($source, $dest) )
 					die('Unable to change theme.'); # Error
 				
