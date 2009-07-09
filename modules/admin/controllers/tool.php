@@ -207,7 +207,7 @@ class Tool_Controller extends Controller {
 			yaml::delete_value($this->site_name, 'pages_config', $tool_data->page_name);
 		
 		# DELETE custom css file
-		$theme_tool_css = Assets::data_path_theme("tools/$tool_data->name/css/$tool_data->tool_id.css");
+		$theme_tool_css = Assets::themes_dir("$this->theme/tools/$tool_data->name/css/$tool_data->tool_id.css");
 		if(file_exists($theme_tool_css))
 			unlink($theme_tool_css);
 		

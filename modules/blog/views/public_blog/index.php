@@ -6,7 +6,7 @@
 			<ul>
 			<?php
 				foreach($tags as $tag)
-					echo '<li><a href="'.url::site("$blog_page_name/tag/$tag->value").'">'.$tag->value . '</a> <span>('.$tag->qty.')</span></li>';
+					echo '<li><a href="'.url::site("$blog_page_name/tag/$tag->value").'">'.$tag->value . ' <span>('.$tag->qty.')</span></a></li>';
 			?>
 			</ul>
 	</div>

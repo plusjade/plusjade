@@ -31,7 +31,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	public function add_image($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-			
+		
 		# Do we have a file
 		if(! is_uploaded_file($_FILES['Filedata']['tmp_name']) )
 			die('Invalid File');
@@ -55,7 +55,9 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		")->current()->highest;
 
 		# Setup image store directory	
-		$image_store = Assets::dir_path('tools/albums');			
+		$image_store = Assets::assets_dir('tools/albums');
+		
+	
 		if(!is_dir($image_store))
 			mkdir($image_store);
 
@@ -65,6 +67,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		if(! is_dir("$image_store/$tool_id/_sm") )
 			mkdir("$image_store/$tool_id/_sm");				
 
+		
 		$tmp_name	= $_FILES['Filedata']['tmp_name'];			
 		$holder		= array ('tmp_name' => $tmp_name);
 		$filename	= upload::save($holder);
@@ -170,7 +173,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$image = $this->_grab_tool_child('album', $id);
 
 			# Image File delete
-			$image_path	= ASSETS::dir_path("tools/albums/$image->parent_id");
+			$image_path	= Assets::assets_dir("tools/albums/$image->parent_id");
 			if( file_exists("$image_path/$image->path") )
 				unlink("$image_path/$image->path");
 			if( file_exists("$image_path/_sm/$image->path") )
@@ -209,7 +212,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	function _tool_deleter($tool_id, $site_id)
 	{
-		$album_dir = Assets::dir_path("tools/albums/$tool_id");
+		$album_dir = Assets::assets_dir("tools/albums/$tool_id");
 		if(is_dir($album_dir))
 		{
 			$d = dir($album_dir); 

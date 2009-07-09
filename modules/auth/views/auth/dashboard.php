@@ -27,7 +27,7 @@
 						?>
 						<p>
 							<b><?php echo $name?></b> &#8594; <a href="/get/auth/manage?site=<?php echo $site_id?>">Edit Website</a>  -- 
-							<a href="/get/auth/safe_mode/<?php echo $name?>">Activate safe-mode theme</a>
+							<a href="/get/auth/safe_mode/<?php echo $name?>">Activate safe-mode</a>
 						</p>
 						<?php
 					}

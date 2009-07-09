@@ -85,10 +85,12 @@
 			file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
 			$('div.save_pane.helper span.replacer').html('<div class="loading">Saving '+ file +'...</div>');
 			contents = $('textarea#edit_html').val();
+			$('.facebox .show_submit').show();
 			$.post('/get/theme/save/templates/'+ file, {contents: contents }, function(data){
+				$('button#show_save').removeAttr('disabled');
 				$('div.save_pane.helper span.replacer').html(data);
 				setTimeout('$("div.save_pane.helper").remove()', 1000);
-				$('button#show_save').removeAttr('disabled');
+				$('.facebox .show_submit').hide();
 			});
 			
 			return false;
@@ -99,11 +101,12 @@
 			file = $("div.save_pane.helper input[name='new_file']").val() + '.html';	
 			$('div.save_pane.helper span.replacer').html('Creating ...'+ file);
 			contents = $('textarea#edit_html').val();
+			$('.facebox .show_submit').show();
 			$.post('/get/theme/save/templates/'+ file, {contents: contents }, function(data){
 				$('select.files_list').append('<option value="'+ data +'">'+ data +'</option>');
 				$("div.save_pane.helper").remove();
 				$('button#show_save').removeAttr('disabled');			
-			
+				$('.facebox .show_submit').hide();
 			});
 			return false;
 		},

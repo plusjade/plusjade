@@ -17,8 +17,7 @@
 		if its not, the page_name = "blog/team/jade" & and passed to build_page.php
  */
 class yaml_Core {
-
-
+	
 /*
  * parse the yaml file and return the key/value array
  * if the yaml file does not exist, we should build yah!
@@ -53,8 +52,9 @@ class yaml_Core {
 		# This should not need to happen very often.
 		if('pages_config' == $filename)
 		{
-			$page = new Page_Controller();
-			$page->_build_pages_config();
+			if(! self::build_pages_config($site_name) )
+				die('yaml::build_pages_config() Could not create pages_config.yml');
+			
 			return self::parse($site_name, $filename, $full_path);
 		}
 		return $yaml_array;
@@ -172,6 +172,50 @@ class yaml_Core {
 			}
 		}		
 		return TRUE;
+	}
+
+	
+	
+/*
+ * Creates a proper pages_config.yml file in _data/<site>/protected
+ * yaml::parse test to see if the file exist and calls this if it does not.
+ */
+	private static function build_pages_config($site_name)
+	{
+		$config_path = DATAPATH . "$site_name/protected/pages_config.yml";
+
+		if(file_exists($config_path))
+			return TRUE;
+			
+		$db = new Database;
+		
+		# OPTIMIZE this later. 2 queries = no good.
+		$site = $db->query("
+			SELECT site_id
+			FROM sites
+			WHERE subdomain = '$site_name'
+		")->current();
+		if(! is_object($site))
+			return FALSE;
+
+		$protected_pages = $db->query("
+			SELECT pages_tools.*, LOWER(tools_list.name) as name, tools_list.protected, pages.page_name
+			FROM pages_tools
+			JOIN tools_list ON tools_list.id = pages_tools.tool
+			JOIN pages ON pages.id = pages_tools.page_id
+			WHERE pages_tools.fk_site = '$site->site_id'
+			AND tools_list.protected = 'yes'
+		");
+		
+		ob_start();
+		# page_name:toolname-tool_id
+		foreach($protected_pages as $page)
+			echo "$page->page_name:$page->name-$page->tool_id\n";
+	
+		if(file_put_contents($config_path, ob_get_clean()))
+			return TRUE;
+			
+		return FALSE;
 	}
 	
 } // End yaml_core

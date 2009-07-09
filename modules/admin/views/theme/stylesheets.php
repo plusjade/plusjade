@@ -19,9 +19,12 @@
 				echo "<option value=\"$file\">$file</option>";
 		?>
 	</select>
-	<p><button id="load_sheet" class="jade_positive">Load</button></p>
-	<button id="delete_sheet" class="jade_negative"><span class="icon cross">&#160; &#160; </span>Delete</button>
-
+	<p><button id="load_sheet" class="jade_positive" style="width:120px">Load</button></p>
+	<button id="delete_sheet" class="jade_negative" style="width:120px"><span class="icon cross">&#160; &#160; </span>Delete</button>
+	<br><br>
+	
+	<b>Press TAB</b> while in the textarea to update the tool view.
+	
 	<br><br>
 	
 	<h3>Tokens</h3>
@@ -29,7 +32,7 @@
 	<br><small><input type="text" value="<?php echo Assets::theme_url('images')?>"></small>
 	<br><br>%FILES%
 	<br><small><input type="text" value="<?php echo Assets::assets_url()?>"></small>
-	<br><small>(url to file directory)</small>	
+	<br><small>(url to file directory)</small>
 	
 </div>
 
@@ -91,6 +94,17 @@
 		return false;
 	});	
 
+// TAB in textarea to update
+	$('textarea#edit_css').keydown(function(e){
+		// 16 = SHIFT, 9 = tab
+		if (e.keyCode == 9) {		
+			value	= $('textarea#edit_css').val();
+			css		= '<style id="global-style" type="text/css">'+ value +'</style>';
+			$('#global-style').replaceWith(css);
+			return false;
+		}	
+	});
+	
 	
 /* ------------------ LOADING AND DELETING  ------------------ */ 
 
