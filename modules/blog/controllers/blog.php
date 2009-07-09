@@ -45,7 +45,7 @@ class Blog_Controller extends Controller {
 		switch($action)
 		{
 			case 'entry':
-				die("blah $action");
+				#die("blah $action");
 				$content = self::single_post($page_name, $value);
 				break;
 			

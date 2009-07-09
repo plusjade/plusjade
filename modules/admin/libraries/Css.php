@@ -1,5 +1,11 @@
 <?php defined('SYSPATH') or die('No direct script access.');
  
+ 
+ 
+/*
+ * This should be css functions relative to tools only.
+ * The theme css is handled via theme controller.
+ */
 class Css_Core {
 
 	
@@ -8,7 +14,7 @@ class Css_Core {
  */
 	function generate_tool_css($toolname, $tool_id, $return_contents=FALSE)
 	{
-		$tool_path		= Assets::data_path_theme("tools/$toolname");			
+		$tool_path		= Assets::theme_dir("$this->theme/tools/$toolname");			
 		$custom_file	= "$tool_path/css/$tool_id.css";		
 		$theme_file		= "$tool_path/css/stock.css";
 		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
@@ -52,7 +58,7 @@ class Css_Core {
  */
 	function get_tool_css($toolname, $tool_id, $stock=FALSE)
 	{
-		$tool_theme		= Assets::data_path_theme("tools/$toolname/css");			
+		$tool_theme		= Assets::themes_dir("$this->theme/tools/$toolname/css");			
 		$custom_file	= "$tool_theme/css/$tool_id.css";
 		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
 		
@@ -99,7 +105,7 @@ class Css_Core {
  */
 	function save_custom_css($toolname, $tool_id, $contents)
 	{	
-		$theme_tool_css = Assets::data_path_theme("tools/$toolname/css/$tool_id.css");
+		$theme_tool_css = Assets::themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
 		$contents = self::replace_tokens($contents);
 		
 		if( file_put_contents($theme_tool_css, $contents) )
@@ -114,7 +120,7 @@ class Css_Core {
  */
 	function save_template($toolname, $contents)
 	{	
-		$template_css	= Assets::data_path_theme("tools/$toolname/css/stock.css");
+		$template_css	= Assets::themes_dir("$this->theme/tools/$toolname/css/stock.css");
 		$contents		= preg_replace("/_(\d+)/", '_++', $contents);
 		
 		if( file_put_contents($template_css, $contents) )
@@ -129,15 +135,13 @@ class Css_Core {
  */ 
 	public function replace_tokens($contents)
 	{
-		$theme_path = Assets::url_path_theme('tools');
-		$files_path = Assets::url_path_direct();
 		$keys = array(
 			'%MY_THEME%',
 			'%MY_FILES%'
 		);
 		$replacements = array(
-			$theme_path,
-			$files_path
+			Assets::theme_url('tools'),
+			Assets::assets_url()
 		);
 		
 		return str_replace($keys, $replacements , $contents);		

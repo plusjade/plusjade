@@ -25,16 +25,18 @@
 			</select>
 			
 			<p>
-				<button id="load_theme" type="submit" class="jade_positive">Load Theme</button>
+				<button id="load_theme" type="submit" class="jade_positive" style="width:140px">Load Theme</button>
 			</p>
-			
-			<button id="delete_theme" type="submit" class="jade_negative">Delete Theme</button>	
+				<button id="activate_theme" type="submit" class="jade_positive" style="width:140px">Activate Theme</button>	
+			<p>
+				<button id="delete_theme" type="submit" class="jade_negative" style="width:140px">Delete Theme</button>	
+			</p>
 		</div>
 		
 		<div style="padding:8px; border:1px dashed #ccc">
 			<h3>Create New Theme</h3>
-			<input type="text" name="add_theme" maxlength="30">
-			<br><br><button id="add_theme" type="submit" class="jade_positive">Add Theme</button>
+			<input type="text" name="add_theme" class="auto_filename" maxlength="30" style="width:140px">
+			<br><br><button id="add_theme" type="submit" class="jade_positive" style="width:140px">Add Theme</button>
 		</div>
 		<!-- TODO: enable theme uploading via zip packager -->
 		
@@ -42,12 +44,16 @@
 
 	
 	<div class="breadcrumb_wrapper">
-		themes <span id="breadcrumb" rel=""> / <a href="/get/theme/contents/<?php echo $this->theme?>" rel="ROOT" class="get_folder"><?php echo $this->theme?></a></span>
+		themes <span id="breadcrumb" rel=""> / <a href="/get/theme/contents/<?php echo $this->theme?>" rel="ROOT" class="get_folder"><?php if('safe_mode' != $this->theme) echo $this->theme?></a></span>
 	</div>	
 	
 	
 	<div id="directory_window" class="common_main_panel full_height" rel="ROOT" style="height:350px; overflow:auto">
-		<?php echo View::factory('theme/folder', array('files'=> $files, 'is_editor'=> $is_editor))?>
+		<?php
+			if(empty($files))
+				echo 'Cannot edit safe-mode theme files. Load another theme.';
+			else
+				echo View::factory('theme/folder', array('files'=> $files))?>
 	</div>
 
 </div>
@@ -58,8 +64,9 @@
 
 <script type="text/javascript">
 
+/* ------------------ LOADING AND DELETING  ------------------ */ 
 	
-	// load a theme button
+// load a theme button
 	$("#load_theme").click(function(){
 		theme = $("select[name='theme'] option:selected").text();		
 		$('#directory_window').html('Loading file...');
@@ -75,13 +82,32 @@
 		return false;
 	});
 
+// activate a theme button
+	$("#activate_theme").click(function(){
+		var theme = $("select[name='theme'] option:selected").text();		
+		if('<?php echo $this->theme?>' == theme) {
+			alert('Theme already active.');
+			return false;
+		}
+		if(confirm('Activate this theme: ' + theme + '?')) {	
+			$('.facebox .show_submit').show();
+			$.post('/get/theme/change', {theme: theme}, function(data){
+				if('TRUE' == data)
+					location.reload();
+				else {
+					alert(data);
+					$.facebox.close();
+				}
+			});
+		}
+		return false;
+	});
 	
-	
-	// delete a theme button
+// delete a theme button
 	$("#delete_theme").click(function(){
 		theme = $("select[name='theme'] option:selected").text();		
 		if(confirm('This cannot be undone. Delete this entire theme folder?')) {
-			$.get('/get/theme/delete_theme/'+ theme,
+			$.get('/get/theme/delete/'+ theme,
 				function(data){
 					$("select[name='theme'] option:selected").remove();	
 					$('#directory_window').empty();
@@ -92,17 +118,15 @@
 		}
 		return false;
 	});
-	
-// sanitize the new page name
-	$("input[name='add_theme']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
-		$(this).val(input);
-	});
+
+
+/* ------------------ ADDING A NEW THEME  ------------------ */ 
+
 // add a theme button
 	$("#add_theme").click(function(){
 		theme = $("input[name='add_theme']").val();
-		if(!theme){
-			alert('specify a theme name');
+		if(!theme || 'safe_mode' == theme){
+			alert('specify a theme name other than "safe_mode"');
 			return false;
 		}
 		$.post('/get/theme/add_theme', {theme : theme},
@@ -115,7 +139,7 @@
 	});
 
 
-
+/* ------------------ FILE BROWSING FUNCTIONS  ------------------ */ 
 	
 	$('#files_browser_wrapper').click($.delegate({
 	
@@ -149,6 +173,7 @@
 			return false;
 		},
 		
+		// add a file asset
 		'a.add_asset': function(e){
 			$.facebox(function(){
 				path = $('#breadcrumb').attr('rel');
@@ -170,7 +195,7 @@
 				file	= $(e.target).parent('div').attr('rel');
 				ufile	= ((path)) ? ':' : '';
 				ufile	+= file;
-				$.get('/get/theme/delete_browser/'+ path + ufile,
+				$.get('/get/theme/delete/'+ path + ufile,
 					function(data){
 						file = file.replace('.', '_')
 						$('#directory_window #' + file).remove();

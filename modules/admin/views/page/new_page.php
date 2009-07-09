@@ -26,11 +26,10 @@
 		<div id="page_exists" class="aligncenter error_msg"></div>
 	
 		<p style="line-height:1.6em">
-			<b>Add to Main Menu?</b>
-			<br><input type="checkbox" name="menu" value="yes"> Yes!
+			<b>Add to Main Menu?</b> <input type="checkbox" name="menu" value="yes" CHECKED> Yes!
 		</p>
 		
-		
+		<b>Page Template</b><br>
 		<select name="template">
 			<?php
 			foreach($templates as $name => $desc)
@@ -55,7 +54,7 @@
 <script type="text/javascript">
 
 	
-	// if page_builder, update the name/label/url views
+// if page_builder, update the name/label/url views
 	$("select[name='page_builder']").change(function(){	
 		value = '';
 		num = $("option:selected", this).val();
@@ -69,7 +68,7 @@
 	});
 	
 	
-	//sanitize and populate page_name fields
+//sanitize and populate page_name fields
 	$("input[name='label']").keyup(function(){
 		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
 		$("input[name='page_name']").val(input);
@@ -81,9 +80,9 @@
 		$('span#link_example').html(input);
 	});
 	
-	/* 
-	 * custom validation to check for unique page_names
-	 */
+/* 
+ * custom validation to check for unique page_names
+ */
 	Array.prototype.in_array = function(p_val) {
 		for(var i = 0, l = this.length; i < l; i++) {
 			if(this[i] == p_val)
@@ -92,13 +91,13 @@
 		return false;
 	}
 	
-	// load the page_name filter
+// load the page_name filter
 	var filter = [<?php echo $filter?>];
 		
-	/* 
-	 * custom ajax form, validates inputs and unique page_names
-	 */		
-	var options = {
+/* 
+ * custom ajax form, validates inputs and unique page_names
+ */		
+	$(".custom_ajaxForm").ajaxForm({
 		beforeSubmit: function(){
 			if(! $(".custom_ajaxForm input").jade_validate() )
 				return false
@@ -120,9 +119,8 @@
 			path_for_css = directory.replace(/\//g,'_');
 			$('div.'+path_for_css).append(data);
 			$('#show_response_beta').html(data);				
-		}					
-	};
-	$(".custom_ajaxForm").ajaxForm(options);
+		}
+	});
 	
 	// template select dropdown
 	selected = $("select[name='template'] option:selected").text();

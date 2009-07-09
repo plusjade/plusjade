@@ -30,21 +30,16 @@ abstract class Template_Controller extends Controller {
  */ 
 	function _load_admin($page_id, $page_name)
 	{	
-		if( $this->client->can_edit($this->site_id) )
+		if($this->client->can_edit($this->site_id))
 		{
-			#inline modular global css
-			$css_path = Assets::data_path_theme('css/global.css');
-			$css = '';
-			if(file_exists($css_path))
-			{
-				$theme_url = Assets::url_path_theme('images');
-				$css = str_replace('../images', $theme_url , file_get_contents($css_path));	
-			}
-			else
-				die("this file does not exist: $css_path"); # for development only
-			
+			# inline modular global css
+			$css_path = Assets::themes_dir("$this->theme/css/global.css");
+
+			$css = (file_exists($css_path)) ?
+				file_get_contents($css_path) : '/* global.css file does not exist. Please create it.*/';
+
 			$this->template->inline_global_css = "<style type=\"text/css\" id=\"global-style\">\n$css\n</style>\n";
-				
+	
 			$this->template->linkCSS('get/css/admin', url::site() );
 			$this->template->admin_linkJS('get/js/admin?v=1.1');
 			$this->template->admin_linkJS('get/js/tools');
@@ -74,22 +69,31 @@ abstract class Template_Controller extends Controller {
 		return FALSE;
 	}
 
-	/*
-	 * Build the output and send to view
-	 */	
+/*
+ * Build the output and send to view (shell.php)
+ * Output is composed of tools data sent from build_page.php or other admin data
+ * from auth/utada.php that needs to be wrapped in a theme-based shell.
+ */	
 	public function build_output($containers_array, $template=NULL)
 	{
 		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');
 		$template 	= ((NULL == $template)) ? 'master' : $template;
-		$path		= Assets::data_path_theme("templates/$template.html");
+		$path		= Assets::themes_dir("$this->theme/templates");
 		
 		ob_start();	
-		if (file_exists($path))
-			readfile($path);	
+		if (file_exists("$path/$template.html"))
+			readfile("$path/$template.html");	
 		else
-			die("Could not find '$template.html' for theme: $this->theme");
-		
+		{
+			if (!file_exists("$path/master.html"))
+			{
+				$rootsite = ROOTDOMAIN;
+				die("Missing 'master.html' for theme: $this->theme : <a href=\"http://$rootsite/get/auth\">enter safe-mode</a>");
+			}
+			readfile("$path/master.html");
+			$this->template->error = "<h1 class=\"aligncenter\">Invalid '$template.html' for theme: $this->theme, using master.html</h1>";
+		}
 
 		function get_string_between($string, $start, $end)
 		{
@@ -110,6 +114,8 @@ abstract class Template_Controller extends Controller {
 			$banner,
 			$menu,
 		);
+		# this is necessary for pages that do not get built via build_page.php
+		# but still need to load into the given theme template.
 		if(! is_array($containers_array) )
 			$containers_array = array(
 				' ', $containers_array,' ', ' ', ' ', ' '

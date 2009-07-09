@@ -213,7 +213,12 @@ $(document).ready(function()
 			$(e.target).next('ul').toggle();
 			return false;
 		},
-		
+
+		// ACTIVATE action Tool toolkit menus for span icons	
+		".actions_link span.icon": function(e) {
+			$(e.target).parent('a').next('ul').toggle();
+			return false;
+		},		
 		
 		/* Click actions for css styler ----- */
 		
@@ -269,6 +274,7 @@ $(document).ready(function()
 			}
 			return false;
 		},
+		
 		"div.styler_wrapper a.close": function(e) {
 			$(document).trigger('close.facebox');
 			$('div.styler_wrapper').hide();
@@ -277,19 +283,32 @@ $(document).ready(function()
 		}
 	}));
 
+	
+/* 
+ * auto-filter form fields delegation
+ */
+$('body').keyup($.delegate({
+	"input.auto_filename": function(e){
+		input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '');
+		$(e.target).val(input);
+	}
+}));
+
+
 /* 
  * Add the css styler wrapper into the DOM.
  */
-	$('body').append('<div class="styler_wrapper admin_reset" style="display:none"> \
-			<div class="actions"> \
-				<a href="#" class="close">close</a> \
-				<a href="#" class="toggle">hide</a> \
-				<div class="show_submit" style="display:none"><div>...Submitting</div></div> \
-			</div> \
-			<div class="dialog_wrapper"> \
-				<div class="styler_dialog">&#160;</div> \
-			</div>\
-		</div>');
+	$('body')
+	.append('<div class="styler_wrapper admin_reset" style="display:none"> \
+		<div class="actions"> \
+			<a href="#" class="close">close</a> \
+			<a href="#" class="toggle">hide</a> \
+			<div class="show_submit" style="display:none"><div>...Submitting</div></div> \
+		</div> \
+		<div class="dialog_wrapper"> \
+			<div class="styler_dialog">&#160;</div> \
+		</div>\
+	</div>');
 	$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
 
 
@@ -315,7 +334,8 @@ $(document).ready(function()
 				$('#show_response_beta').html('waiting for response...');
 			},
 			success: function(data) {
-				// finish this
+				// if 2 fbs are active, we assume the form is submitted from 2
+				// so we close only box 2, else close everything.
 				var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
 				$.facebox.close(whichBox);
 				$('.admin_reset .show_submit').hide();					
@@ -355,7 +375,8 @@ $(document).ready(function()
 			$('#show_response_beta').html('on_close action is empty');
 			return false;
 		} else {
-			action = action.split('-'); //**action = array(action, toolname, tool_id);
+			action = action.split('-'); 
+			//**action = array(action, toolname, tool_id);
 			
 			switch(action[0])
 			{
@@ -405,7 +426,7 @@ $(document).ready(function()
 		cursor: 'move',
 		cursorAt: 'top',
 		//forceHelperSize: true,
-		handle: '.jade_toolbar_wrapper span.name',
+		handle: '.jade_toolbar_wrapper div.name_wrapper',
 		scrollSensitivity: 40,
 		tolerance: 'pointer',
 		helper: 'original',
@@ -437,15 +458,6 @@ $(document).ready(function()
 		}
 		//revert: true
 	});	
-	
-	/*
-	var zIndexNumber = 1000;
-	$('.CONTAINER_WRAPPER div, .CONTAINER_WRAPPER ul ').each(function() {
-		$(this).css('zIndex', zIndexNumber);
-		zIndexNumber -= 10;
-		//alert('blah');
-	});
-	*/
 });
 // end of init.js
 

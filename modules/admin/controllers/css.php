@@ -1,16 +1,17 @@
 <?php
 class Css_Controller extends Controller {
 
-	/**
-	 * Compile the tools css for each page
-	 * edit css files for each tool
-	 * This controller shoudl be renamed to a more specific "tool" css controller
-	 */
+/**
+ * Compile the tools css for each page
+ * edit css files for each tool
+ * This controller shoudl be renamed to a more specific "tool" css controller
+ */
 	
 	function __construct()
 	{
 		parent::__construct();
 	}
+
 	
 /*
  * get user custom css for all tools on a page
@@ -48,7 +49,7 @@ class Css_Controller extends Controller {
 		$tool_types = array();
 		foreach($tool_data as $tool)
 		{	
-			$theme_tool_css = Assets::data_path_theme("tools/$tool->name/css/$tool->tool_id.css");
+			$theme_tool_css = Assets::themes_dir("$this->theme/tools/$tool->name/css/$tool->tool_id.css");
 			if(file_exists($theme_tool_css))
 				readfile($theme_tool_css);
 				

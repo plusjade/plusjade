@@ -44,6 +44,7 @@ class Tool_Controller extends Controller {
 		valid::id_key($page_id);		
 		$db = new Database;		
 
+		# TODO: the page_builder checks should run for post too.
 		if($_POST)
 		{
 			#stupid ie sends button contents rather than value.
@@ -135,9 +136,9 @@ class Tool_Controller extends Controller {
 		 */
 		 
 		if(FALSE !== strpos($page->page_name, '/'))
-			$protected_tools = 'Page builders cannot be placed on sub pages';
-		elseif( yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
-			$protected_tools = 'A page builder already exists on this page.';
+			$protected_tools = 'Advanced tools cannot be placed on sub pages';
+		elseif( $tool = yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
+			$protected_tools = "The advanced tool <b>$tool</b> already exists on this page.";
 		else
 		{
 			$children = $db->query("
@@ -147,7 +148,7 @@ class Tool_Controller extends Controller {
 				AND page_name LIKE '$page->page_name/%'
 			");
 			if(0 < $children->count())
-				$protected_tools = 'Page builders cannot be on pages having sub-pages.';
+				$protected_tools = 'Advanced tools cannot be on pages having sub-pages.';
 			else
 				$protected_tools = $db->query("
 					SELECT *

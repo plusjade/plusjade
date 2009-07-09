@@ -8,10 +8,10 @@
 .admin_reset h1{font-size:1.6em !important; color:#0c7ced !important;}
 .admin_reset h2{font-size:1.4em !important; color:#7c78d3 !important;}
 .admin_reset h3{font-size:1.2em !important; color:#7c78d3 !important;}
-.admin_reset h4{font-size:1.1em !important; color:#7c78d3 !important;}
+.admin_reset h4{font-size:1.1em !important; color:#000 !important;}
 .admin_reset h5{font-size:1em !important; color:#7c78d3 !important;}
 .admin_reset dt{font-weight:bold !important; color:#7c78d3 !important;}
-
+.admin_reset p{margin:10px 0; padding:0;}
 .admin_reset a,
 .jade_toolbar_wrapper a,
 .admin_reset .content a{
@@ -75,12 +75,16 @@ span.magnify{background-position:0px -203px}
 span.global{background-position:0px -219px}
 span.local{background-position:0px -239px}
 span.plus{background-position:0px -255px}
-span.rainbow{background-position:0px -293px}
+span.palette{background-position:0px -293px}
 span.flag{background-position:0px -293px}
 span.folder{background-position:0px -311px}
 span.add_folder{background-position:0px -325px}
 span.asterisk{background-position:0px -343px}
-span.move{background-position:0px -363px}
+span.move{background-position:0px -361px}
+span.template{background-position:0px -380px}
+span.images{background-position:0px -400px}
+span.image{background-position:0px -420px}
+span.info{background-position:0px -440px}
 
 #show_response_beta{
 	position:absolute;
@@ -377,6 +381,7 @@ a.block_mode:hover,
 	list-style:none;
 	background:#fff;
 	margin:0;
+	overflow:hidden;
 	border:1px solid #222;
 	color:#999;
 }
@@ -426,30 +431,46 @@ a.block_mode:hover,
 .jade_toolbar_wrapper{
 	clear:both;
 	font-size:12px !important;
-	font-family: verdana !important;	
-	margin-bottom:7px;
+	font-family: verdana !important;
+	margin-bottom:2px;
 	z-index:200 !important;
 }
-.jade_toolbar_wrapper table{
-	background-attachment:fixed;
+.jade_toolbar_wrapper div.bar{
 	background:#d52020 url(/_assets/images/admin/gradients.jpg) repeat-x 0px -465px;
 	border-collapse:collapse;
 	width:100%;
 	height:30px;
 	border:1px solid #777;	
 }
-.jade_toolbar_wrapper td{
-	padding:0 10px;
+.jade_toolbar_wrapper div.name_wrapper{
+	height:25px;
+	float:left;
+	padding-top:5px;
+	padding-left:10px;
+	padding-right:10px;
+	color:#fff;
+	font-weight:bold;
+	cursor:move;
 }
-.jade_toolbar_wrapper td.actions_wrapper{
-	width:100px;
+.jade_toolbar_wrapper div.actions_wrapper{
+	float:right;
 }
 .jade_toolbar_wrapper a.actions_link{
 	display:block;
+	height:25px;
+	padding-top:5px;
+	padding-left:10px;
+	padding-right:10px;
 	color:white;
 	text-align:right;
 	text-decoration:none;
 }
+.jade_toolbar_wrapper a.actions_link:hover,
+.jade_toolbar_wrapper div.name_wrapper:hover{
+	background:#000;
+	ackground:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important; /*purple*/
+}
+
 .jade_toolbar_wrapper ul.toolkit_dropdown{
 	display:none;
 	clear:both !important;
@@ -468,12 +489,6 @@ a.block_mode:hover,
 }
 .jade_toolbar_wrapper ul.toolkit_dropdown:hover{
 	display:block;
-}
-.jade_toolbar_wrapper span.name{
-	float:left;
-	color:white;
-	font-weight:bold;
-	cursor:move;
 }
 .jade_toolbar_wrapper ul a{
 	color:#333 !important;
@@ -614,6 +629,10 @@ span.msg{
 .buttons{
 	margin-bottom:10px;
 	overflow:auto;
+}
+button{
+	cursor:hand;
+	cursor:pointer;
 }
 .buttons a, .buttons button{
     display:block;
@@ -907,8 +926,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	min-height:350px;
 	float:right;
 	padding:5px;
-	overflow:auto;
-	
+	overflow:auto;	
 }
 
 
@@ -1034,6 +1052,9 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 
 
 /* ----------------------- admin views ----------------------- */
+/* ----------------------- ----------------------- ----------------------- */
+
+
 
 /* @page_settings */
 .enabled_yes{
@@ -1047,6 +1068,8 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 
 
 /* page/manage @all_pages view */
+
+
 #directory_window{
 	background:#e2effc; /*lightblue*/
 }
@@ -1067,9 +1090,22 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 #page_browser_wrapper .breadcrumb_wrapper,
 #files_browser_wrapper .breadcrumb_wrapper{
-	font-size:1.2em;
-	font-weight:bold;
+	width:590px;
+	float:right;
+	padding:5px;	
+	background:lightblue url('/_assets/images/admin/gradients.jpg') repeat-x 0px -110px;
+	color:#fff;
 }
+#page_browser_wrapper .breadcrumb_wrapper a,
+#files_browser_wrapper .breadcrumb_wrapper a{
+	color:#fff;
+	text-decoration:underline;
+}
+#page_browser_wrapper .breadcrumb_wrapper a:hover,
+#files_browser_wrapper .breadcrumb_wrapper a:hover{
+	color:black;
+}
+
 #page_browser_wrapper a{
 	text-decoration:none;
 }
@@ -1122,6 +1158,30 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	padding:6px;
 	background:#ffffcc;
 }
+img.new_page_drop{
+	cursor:move !important;
+	padding:3px !important;
+	border:1px dashed #333 !important;
+}
+.ui-state-highlight{
+	background:lightgreen !important;
+}
+
+.common_main_panel .save_pane{
+	position:absolute;
+	width:350px;
+	height:250px;
+	padding:10px;
+	background:#fff;
+	border:2px solid orange;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+}
+.common_main_panel .save_pane div{
+	padding:10px;
+	border:1px dashed #ccc
+}
 
 /* add new_page */
 
@@ -1150,6 +1210,13 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 #link_example{
 	color:green;
 }	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 /* tool/add @new_tool view */

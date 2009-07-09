@@ -34,6 +34,13 @@
 		<select>
 			<option>timezone list</option>
 		</select>
+		
+		<br><br>
+		Toggle Site building Wizard. 
+		<br> The site wizard walks you through all the basic controls 
+		from start to finish for getting your site up.
+		It's enabled when users first create the site. You can bring it back,
+		at any time by clicking this option!
 <?php
 	/*
 	echo '<pre>';

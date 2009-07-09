@@ -15,6 +15,7 @@
 <body>
 	<?php
 	if(! empty($admin_panel) ) echo $admin_panel;
+	if(! empty($error) ) echo $error;
 	
 	# Required for all controllers passing with primary...	
 	if(! empty($output) )
