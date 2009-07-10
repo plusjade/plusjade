@@ -3,31 +3,17 @@
 <?php echo form::open("tool/add/$page_id", array('class' => 'custom_ajaxForm') )?>
 		
 	<div id="common_tool_header" class="buttons">
-		<div id="common_title">Add New Tool to Page</div>
+		<div id="common_title">Add New Content Tool to this Page</div>
 	</div>
 		
 	<div id="tool_list_wrapper" class="common_left_panel">
-		<h3>Basic Tools</h3>
+		<h3>Content Tools</h3>
 		<ul>
 		<?php 
 			foreach($tools_list as $key => $tool)
 				echo "<li><a href='#' rel='$tool->id'>$tool->name</a></li>";
 		?>
-		</ul>
-		
-		<h3>Advanced Tools</h3>
-		<?php
-			if( is_object($protected_tools) )
-			{
-				echo '<ul>';
-				foreach($protected_tools as $key => $tool)
-					echo "<li><a href='#' rel='$tool->id'>$tool->name</a></li>";
-			
-				echo '</ul>';
-			}
-			else
-				echo "<small>$protected_tools</small>";
-		?>		
+		</ul>	
 	</div>
 	
 	<div id="tool_view_wrapper" class="common_main_panel">		
@@ -42,21 +28,6 @@
 				<div class="desc"><?php echo $tool->desc?></div>
 			</div>
 			<?php
-		}
-		
-		if( is_object($protected_tools) )
-		{
-			foreach($protected_tools as $key => $tool)
-			{
-				?>
-				<div id="tool_<?php echo $tool->id?>" class="each_tool">
-					<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
-						<?php echo $tool->name?>
-					</button>
-					<div class="desc"><?php echo $tool->desc?></div>
-				</div>
-				<?php
-			}
 		}
 		?>
 
@@ -74,10 +45,11 @@ $(document).ready(function()
 		return false;
 	});
 	
-
-	// ACTIVATE custom ajax form
-	// tool_data = post output from this method (above)
-	// receives the custom url of where the next 'add' page is for the particular tool
+/*
+ * ACTIVATE custom ajax form
+ * tool_data = post output from this method (above)
+ * receives the custom url of where the next 'add' page is for the particular tool
+ */
 	$('.facebox .custom_ajaxForm').ajaxForm({	
 		beforeSubmit: function(){
 			$('.facebox .custom_ajaxForm button')

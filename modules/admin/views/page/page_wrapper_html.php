@@ -18,6 +18,7 @@ $display_name	= ('10' < strlen($filename)) ? substr($filename, 0, 10).'...' : $f
 	else
 		echo "<img src=\"/_assets/images/admin/file.jpg\" class=\"file_options\">";
 	?>
+	<?php if(TRUE == $is_protected) echo '<span class="icon shield" title="'.$page_builder.'">&#160; &#160; </span>'?>
 	<span title="<?php echo $filename?>"><?php echo $display_name?></span>
 	<ul class="option_list">
 	

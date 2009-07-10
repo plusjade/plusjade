@@ -34,6 +34,88 @@ class Tool_Controller extends Controller {
 		die($primary);
 	}
 
+	
+/*
+ * actually adds the tool to the database and generates assets.
+ * this is separate so we can use this modularly in other areas.
+ * used here and @ page.php
+ */
+	public function _add_tool($page_id, $tool_id, $allow_protected=FALSE, $javascript=FALSE)
+	{
+		$db = new Database;
+		
+		# GET tool name
+		$tool = $db->query("
+			SELECT id, LOWER(name) AS name, protected
+			FROM tools_list
+			WHERE id = '$tool_id'
+			AND enabled = 'yes'
+		")->current();
+
+		if(! is_object($tool) )
+			die('invalid tool');
+		$table = $tool->name.'s';
+
+		
+		# do we allow protected tools on this page?
+		if('yes' == $tool->protected AND !$allow_protected)
+			die('Cannot add page builders to this page.');
+		
+
+		# INSERT row in tool parent table
+		$data = array(
+			'fk_site'	=> $this->site_id
+		);			
+		$tool_insert_id = $db->insert($table, $data)->insert_id();
+
+		# GET MIN position of tools on page			
+		$lowest = $db->query("
+			SELECT MIN(position) as lowest
+			FROM pages_tools 
+			WHERE page_id ='$page_id'
+		")->current()->lowest;
+		
+		# INSERT pages_tools row inserting tool parent id
+		$data = array(
+			'page_id'	=> $page_id,
+			'fk_site'	=> $this->site_id,
+			'tool'		=> $tool->id,
+			'tool_id'	=> $tool_insert_id,
+			'position'	=> ($lowest-1)
+		);
+		$tool_guid = $db->insert('pages_tools', $data)->insert_id();
+		
+		# if tool is protected, add page to pages_config file.
+		if('yes' == $tool->protected)
+		{
+			$page = $db->query("
+				SELECT page_name
+				FROM pages
+				WHERE id = '$page_id'
+			")->current();		
+		
+			$newline = "\n$page->page_name:$tool->name-$tool_insert_id";
+			yaml::add_value($this->site_name, 'pages_config', $newline);
+		}
+		
+		# generate tool_css file
+		Css::generate_tool_css($tool->name, $tool_insert_id);
+		
+		# run _tool_adder
+		$step_2 = 'add';
+		$edit_tool = Load_Tool::edit_factory($tool->name);
+		if( is_callable(array($edit_tool, '_tool_adder')) )
+			$step2 = $edit_tool->_tool_adder($tool_insert_id, $this->site_id);
+
+		# Pass output to javascript @tool view "add" 
+		# so it can load the next step page
+		# data Format-> toolname:next_step:tool_id:tool_guid
+		if($javascript)
+			return strtolower($tool->name).":$step2:$tool_insert_id:$tool_guid";
+			
+		return TRUE;
+	}
+	
 /*
  *	ADD single tool to specific page.
  *  No tool can start out as an orphan.
@@ -42,77 +124,16 @@ class Tool_Controller extends Controller {
 	function add($page_id=NULL)
 	{		
 		valid::id_key($page_id);		
-		$db = new Database;		
 
-		# TODO: the page_builder checks should run for post too.
 		if($_POST)
 		{
 			#stupid ie sends button contents rather than value.
 			$field = (is_numeric($_POST['tool'])) ? 'id' : 'name';
-
-			# GET tool name
-			$tool = $db->query("
-				SELECT LOWER(name) AS name, protected
-				FROM tools_list
-				WHERE $field = '{$_POST['tool']}'
-				AND enabled = 'yes'
-			")->current();
-
-			if(! is_object($tool) )
-				die('invalid tool');
-			$table = $tool->name.'s';
-
-			# INSERT row in tool parent table
-			$data = array(
-				'fk_site'	=> $this->site_id
-			);			
-			$tool_insert_id = $db->insert($table, $data)->insert_id();
-
-			# GET MIN position of tools on page			
-			$lowest = $db->query("
-				SELECT MIN(position) as lowest
-				FROM pages_tools 
-				WHERE page_id ='$page_id'
-			")->current()->lowest;
-			
-			# INSERT pages_tools row inserting tool parent id
-			$data = array(
-				'page_id'	=> $page_id,
-				'fk_site'	=> $this->site_id,
-				'tool'		=> $_POST['tool'],
-				'tool_id'	=> $tool_insert_id,
-				'position'	=> ($lowest-1)
-			);
-			$tool_guid = $db->insert('pages_tools', $data)->insert_id();
-			
-			# if tool is protected, add page to pages_config file.
-			if('yes' == $tool->protected)
-			{
-				$page = $db->query("
-					SELECT page_name
-					FROM pages
-					WHERE id = '$page_id'
-				")->current();		
-			
-				$newline = "\n$page->page_name:$tool->name-$tool_insert_id";
-				yaml::add_value($this->site_name, 'pages_config', $newline);
-			}
-			
-			# generate tool_css file
-			Css::generate_tool_css($tool->name, $tool_insert_id);
-			
-			# run _tool_adder
-			$step_2 = 'add';
-			$edit_tool = Load_Tool::edit_factory($tool->name);
-			if( is_callable(array($edit_tool, '_tool_adder')) )
-				$step2 = $edit_tool->_tool_adder($tool_insert_id, $this->site_id);
-
-			# Pass output to javascript @tool view "add" 
-			# so it can load the next step page
-			# data Format-> toolname:next_step:tool_id:tool_guid
-			die(strtolower($tool->name).":$step2:$tool_insert_id:$tool_guid");
+			# all tools passed her should be non-protected
+			die(self::_add_tool($page_id, $_POST['tool'], FALSE, TRUE));
 		}	
-			
+		
+		$db = new Database;
 		$primary = new View('tool/new_tool');
 		$tools = $db->query("
 			SELECT * 
@@ -120,44 +141,6 @@ class Tool_Controller extends Controller {
 			WHERE protected = 'no'
 			AND enabled = 'yes'
 		");
-		
-		# is page protected?
-		$page = $db->query("
-			SELECT page_name
-			FROM pages
-			WHERE id = '$page_id'
-		")->current();			
-		
-		/*
-		 * Check to see if this page can have page builders.
-		 1. is NOT a sub-page
-		 2. does not already contain page_builder.
-		 3. does not have sub-pages.
-		 */
-		 
-		if(FALSE !== strpos($page->page_name, '/'))
-			$protected_tools = 'Advanced tools cannot be placed on sub pages';
-		elseif( $tool = yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name) )	
-			$protected_tools = "The advanced tool <b>$tool</b> already exists on this page.";
-		else
-		{
-			$children = $db->query("
-				SELECT id
-				FROM pages
-				WHERE fk_site = '$this->site_id'
-				AND page_name LIKE '$page->page_name/%'
-			");
-			if(0 < $children->count())
-				$protected_tools = 'Advanced tools cannot be on pages having sub-pages.';
-			else
-				$protected_tools = $db->query("
-					SELECT *
-					FROM tools_list
-					WHERE protected = 'yes'
-				");		
-		}
-		$primary->protected_tools = $protected_tools;
-			
 		$primary->tools_list = $tools;
 		$primary->page_id = $page_id;
 		die($primary);

@@ -105,6 +105,16 @@ class Page_Controller extends Controller {
 			echo '</div>';
 		}
 		$primary->files_structure = ob_get_clean();
+		
+		# get page_builders.
+		$page_builders = $db->query("
+			SELECT * 
+			FROM tools_list
+			WHERE protected = 'yes'
+			AND enabled = 'yes'
+			ORDER BY name
+		");
+		$primary->page_builders = $page_builders;
 		die($primary);
 	}
 
@@ -152,17 +162,6 @@ class Page_Controller extends Controller {
 				'filename'		=> $filename,
 			);
 
-			/*
-			# i only need this if enabling auto-add page builders to new pages..
-			# is page protected?
-			if('ROOT' == $directory AND $builder = yaml::does_key_exist($this->site_name, 'pages_config', $filename) )
-			{
-				$builder = explode(':', $builder);
-				$vars['is_protected'] = TRUE;
-				$vars['page_builder'] = $builder['0'];
-			}
-			*/
-			
 			# send html to javascript handler
 			die( View::factory('page/page_wrapper_html', array('vars' => $vars)) );
 		}
@@ -198,43 +197,74 @@ class Page_Controller extends Controller {
 
 	}
 
-/*
- * Sort the Main Menu links
- */
-	function navigation()
-	{		
-		$db			= new Database;				
-		$primary	= new View("page/navigation");
-		
-		$pages = $db->query("
-			SELECT * FROM pages 
-			WHERE fk_site = '$this->site_id'
-			AND menu = 'yes'
-			ORDER BY position
-		");		
-		$primary->pages = $pages;
-		die($primary);
-	}
 
 /*
- * Save the Main menu order to db
- */		
-	public function save_sort()
+ * add a new page with a page_builder pre-installed.
+ */
+	function add_builder($tool_id=NULL, $toolname=NULL)
 	{
-		$db = new Database;
-		foreach($_GET['page'] as $position => $id)
-			$db->update('pages', array('position' => "$position"), "id = '$id' AND fk_site = '$this->site_id'"); 	
+		valid::id_key($tool_id);
+		$toolname = valid::filter_php_filename($toolname);
+		
+		if($_POST)
+		{
+			# Validate page_name & duplicate check
+			$filename = self::validate_page_name($_POST['label'], $_POST['page_name'], 'ROOT');
+
+			$db = new Database;			
+			$max = $db->query("
+				SELECT MAX(position) as highest 
+				FROM pages WHERE fk_site = '$this->site_id'
+			")->current();			
+		
+			$template =
+				(file_exists(Assets::themes_dir("$this->theme/templates/".strtolower($toolname).'.html')))
+				? strtolower($toolname) : 'master';
+		
 			
-		die('Page Sort Order Saved'); # success
-	}
+			# Add to pages table
+			$data = array(
+				'fk_site'	=> $this->site_id,
+				'page_name'	=> $filename,
+				'label'		=> $_POST['label'],
+				'template'	=> $template,
+				'position'	=> ++$max->highest,
+			);
+			if(! empty($_POST['menu']) AND 'yes' == $_POST['menu'])
+				$data['menu'] = 'yes';
+			
+			$page_id = $db->insert('pages', $data)->insert_id();
+
+			#add the tool.
+			$tool_controller = new Tool_Controller();
+			$tool_controller->_add_tool($page_id, $tool_id, TRUE);
 	
-/*
- * this may not belong here. 
- * the view of the primary menu. Used with ajax to reload on-demand
- */		
-	public function load_menu()
-	{
-		die( View::factory('_global/menu') );
+			# send html to javascript handler
+			$visibility	= ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
+			$vars		= array(
+				'id'			=> $page_id,
+				'visibility'	=> $visibility,
+				'is_folder'		=> FALSE,
+				'is_protected'	=> TRUE,
+				'full_path'		=> $filename,
+				'filename'		=> $filename,
+				'page_builder'	=> "$toolname-$tool_id"
+			);
+			die( View::factory('page/page_wrapper_html', array('vars' => $vars)) );
+		}
+
+
+		$primary = new View("page/new_builder");
+		$db		 = new Database;
+		# Javascript duplicatate_page name filter Validation
+		# convert filter_array to string for js
+		$filter_array		= self::get_filename_filter('ROOT');	
+		$filter_string		= "'" . implode("','", $filter_array) . "'";
+		$primary->filter	= $filter_string;
+		$primary->tool_id	= $tool_id;
+		$primary->toolname	= $toolname;
+		
+		die($primary);
 	}
 
 	
@@ -484,5 +514,48 @@ class Page_Controller extends Controller {
 		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
 	}
 
+	/* ----- functions relative to MAIN-MENU handling ----- */
+	
+/*
+ * Sort the Main Menu links
+ */
+	function navigation()
+	{		
+		$db			= new Database;				
+		$primary	= new View("page/navigation");
+		
+		$pages = $db->query("
+			SELECT * FROM pages 
+			WHERE fk_site = '$this->site_id'
+			AND menu = 'yes'
+			ORDER BY position
+		");		
+		$primary->pages = $pages;
+		die($primary);
+	}
+
+/*
+ * Save the Main menu order to db
+ */		
+	public function save_sort()
+	{
+		$db = new Database;
+		foreach($_GET['page'] as $position => $id)
+			$db->update('pages', array('position' => "$position"), "id = '$id' AND fk_site = '$this->site_id'"); 	
+			
+		die('Page Sort Order Saved'); # success
+	}
+	
+/*
+ * this may not belong here. 
+ * the view of the primary menu. Used with ajax to reload on-demand
+ */		
+	public function load_menu()
+	{
+		die( View::factory('_global/menu') );
+	}
+
+	
+	
 }
 /* End of file page.php */
