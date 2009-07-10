@@ -9,13 +9,17 @@
 	<div class="common_left_panel">
 		<img src="/_assets/images/admin/file.jpg" alt="" class="new_page_drop">
 		<br>
-		<h4>To Add Page:</h4>
+		<h3>Add Blank Page &#8594;</h3>
 		<i>Drag</i> +page icon into the desired directory window.
 		
-		<p>
-		<h4>Page Options:</h4>
-		appear when pages are clicked.
-		</p>
+		<br><br>
+		<h3>Add Page Builders &#8594;</h3>
+		<ul class="page_builders">
+			<?php
+			foreach($page_builders as $tool)
+				echo "<li><span class=\"icon shield\">&#160; &#160; </span><a href=\"/get/page/add_builder/$tool->id/$tool->name\" rel=\"facebox\" id=\"2\">$tool->name</a></li>";
+			?>
+		</ul>
 		<br><br>
 		<h4>Key</h4>
 		<small style="line-height:1.7em">
