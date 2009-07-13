@@ -402,7 +402,7 @@
 			.before('<ul class="ui-tabs-nav generic_tabs"> \
 					<div class="field_title">'+ name +'</div> \
 					<li><a href="#" class="show_edit">Edit</a><li>\
-					<li><a href="#" class="show_files">Add Media</a><li>\
+					<li><a href="#" class="get_file_browser" rel="editor">Add Media</a><li>\
 					<li><a href="#" class="show_html">HTML</a><li>\
 					<li><a href="#" class="reset">Reset</a><li>\
 				</ul>\
@@ -426,21 +426,17 @@
             if ( this.options.autoSave )
                 $('form').submit(function() { self.saveContent(); });
 			
-			
-			
-			
+	
 			/* additional functionality ... */
 			
-            $('.reset').bind('click', function()
-            {
+            $('.reset').bind('click', function() {
                 self.setContent( self.initialContent );
                 self.saveContent();
 				return false;
             });	
 			
 			// update edit view
-            $('.show_edit').bind('click', function()
-            {
+            $('.show_edit').bind('click', function() {
 				$('div.editor_pane').hide();
 				$('#show_edit').show();
 				content = $('textarea.initiliazed').val();
@@ -450,56 +446,37 @@
             });
 			
 			// show html view
-            $('.show_html').bind('click', function()
-            {
+            $('.show_html').bind('click', function() {
 				$('div.editor_pane').hide();
 				$('#show_html').show();
 				$('textarea.initiliazed').show();
 				self.saveContent();
 				return false;
             });
-			
-			// show FILES browser
-            $('.show_files').bind('click', function()
-            {
-				$('div.editor_pane').hide();
-				$('#show_files').show();
-				self.saveContent();
-				return false;
-            });	
-			
+
 			// add custom stuff to the editor
-            $('.insert_html').bind('click', function()
-            {
+            $('.insert_html').bind('click', function() {
 				divId = $(this).attr('rel');
 				$('div.editor_pane').hide();
 				$('#show_edit').show();
-				old_content = $('textarea.initiliazed').val();
-				custom = $('div#'+ divId).html();
+				var old_content = $('textarea.initiliazed').val();
+				var custom = $('div#'+ divId).html();
 				self.setContent(old_content + custom);
 				self.saveContent();
 				return false;
             });
-			
 
-			// Load the files browser.
-			$('#show_files').hide().load('/get/files?editor=true');
-			
-
-			// Activate "place_file" command in files browser.
-			$('#show_files').dblclick($.delegate({
-				'img.place_file':function(e){
-					$('div.editor_pane').hide();
+	
+			// Activate "to_editor" command in files browser.
+			$('body').dblclick($.delegate({
+				'#files_browser_wrapper img.to_editor':function(e){
 					var url = $(e.target).attr('rel');
-					
-					$('#show_edit').show('fast',function(){
-						self.editorDoc.execCommand('insertImage', false, url);
-						self.saveContent();
-					});
+					self.editorDoc.execCommand('insertImage', false, url);
+					self.saveContent();
 					return false;
 				}
-			
 			}));
+	
         },
 
         initFrame : function()
