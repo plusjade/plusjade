@@ -1,5 +1,5 @@
 
-<span class="on_close">2 off</span>
+<span class="on_close two">close-two</span>
 
 <form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 	<input type="hidden" name="local_parent" value="<?php echo $local_parent?>">

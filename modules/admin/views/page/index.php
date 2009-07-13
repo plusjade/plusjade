@@ -29,7 +29,7 @@
 		</small>
 	</div>
 	
-	<div class="breadcrumb_wrapper">
+	<div class="breadcrumb_wrapper" style="width:590px">
 		<a href="#" rel="ROOT" class="open_folder"><?php echo trim(url::site(), '/')?></a><span id="breadcrumb" rel=""></span>
 	</div>
 	<div id="directory_window" class="common_main_panel" rel="ROOT">
