@@ -24,7 +24,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			AND fk_site = '$this->site_id'
 		")->current();			
 
-		#show category list.
+		# show category list.
 		$primary = new View("edit_showroom/manage");
 		$items = $db->query("
 			SELECT cat.*, COUNT(items.id) AS item_count
@@ -38,7 +38,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 		function render_node_showroom($item)
 		{
-			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->name . ' <small>('. $item->item_count .')</small></span>'; 
+			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><b rel="' . $item->url . '">' . $item->name . '</b> <small>('. $item->item_count .')</small></span>'; 
 		}
 		
 		$primary->tree = Tree::display_tree('showroom', $items, null, TRUE);		
@@ -46,9 +46,12 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		die($primary);
 	}
 
-	
-	function items($cat_id=NULL)
+/*
+ * manage items view for a particular category
+ */ 
+	function items($tool_id=NULL, $cat_id=NULL)
 	{
+		valid::id_key($tool_id);
 		valid::id_key($cat_id);
 		$db = new Database;
 		$primary = new View('edit_showroom/manage_items');
@@ -62,9 +65,10 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		");			
 		
 		if( '0' == count($items) )
-			die('No items. Check back soon!');	
+			die('<span class="on_close two">close-2</span> No items');	
 
 		$primary->items = $items;
+		$primary->tool_id = $tool_id;
 		die($primary);
 	}
 	
@@ -90,9 +94,16 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	public function add($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		
 		if($_POST)
 		{
+			if(empty($_POST['category']))
+				die('category name is required');
+				
+			# sanitize url
+			$url	= trim($_POST['url']);
+			$url	= (empty($url)) ? trim($_POST['category']) : $url; 
+			$url	= valid::filter_php_url($url);
+			
 			$db = new Database;
 			# Get parent
 			$parent	= $db->query("
@@ -100,24 +111,25 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				WHERE id = '$tool_id' 
 				AND fk_site = '$this->site_id' 
 			")->current();
-			
-			# Make URL friendly
-			$category	= trim($_POST['category']);
-			$url		= valid::filter_php_url($category);
-		
+
+			$_POST['local_parent'] = 
+				((empty($_POST['local_parent']) OR !is_numeric($_POST['local_parent'])))
+				? $parent->root_id : $_POST['local_parent'];
+
 			$data = array(
 				'parent_id'		=> $tool_id,
 				'fk_site'		=> $this->site_id,
 				'url'			=> $url,
-				'name'			=> $category,
-				'local_parent'	=> $parent->root_id,
+				'name'			=> trim($_POST['category']),
+				'local_parent'	=> $_POST['local_parent'],
 				'position'		=> '0'
 			);	
-			$db->insert('showroom_items', $data); 	
+			$insert_id = $db->insert('showroom_items', $data)->insert_id(); 	
 
 			# Update left and right values
 			Tree::rebuild_tree('showroom_items', $parent->root_id, '1');
-			die('Categories added'); #status message			
+			
+			die("$insert_id");  # need for javascript
 		}
 
 		$primary = new View('edit_showroom/add_category');
@@ -135,13 +147,17 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		
 		if($_POST)
 		{
-			# Make URL friendly
-			$category	= trim($_POST['category']);
-			$url		= valid::filter_php_url($category);
+			if(empty($_POST['category']))
+				die('category name is required');
+				
+			# sanitize url
+			$url	= trim($_POST['url']);
+			$url	= (empty($url)) ? trim($_POST['category']) : $url; 
+			$url	= valid::filter_php_url($url);
 		
 			$data = array(
 				'url'			=> $url,
-				'name'			=> $category,
+				'name'			=> trim($_POST['category']),
 			);	
 			$db->update(
 				'showroom_items',
@@ -181,7 +197,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				WHERE cat_id = '{$_POST['category_id']}'
 			")->current();
 			
-			# Make URL friendly
+			# sanitize url
 			$url = trim($_POST['url']);
 			$url = (empty($url)) ? $_POST['name'] : $url;
 			$url = valid::filter_php_url($url);
@@ -193,23 +209,19 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 				'name'		=> $_POST['name'],
 				'intro'		=> $_POST['intro'],
 				'body'		=> $_POST['body'],
+				'images'	=> trim($_POST['images'], '|'),
 				'position'	=> ++$get_highest->highest,				
 			);	
-			
-			# Upload image if sent
-			if(!empty($_FILES['image']['tmp_name']) AND is_uploaded_file($_FILES['image']['tmp_name']))
-				if (! $data['img'] = self::upload_image($_FILES, $_POST['category_id']) )
-					echo 'Image not saved! Must be jpg, gif, or png.';
 			
 			$db->insert('showroom_items_meta', $data);	
 			die('Item added'); #status message
 		}
-		elseif($_GET)
+		elseif(! empty($_GET['category']))
 		{
-			$category = valid::id_key(@$_GET['category']);
+			$_GET['category'] = valid::id_key($_GET['category']);
 			$primary = new View("edit_showroom/add_item");
 			$primary->tool_id = $tool_id;
-			$primary->category = $category;
+			$primary->category = $_GET['category'];
 			die($primary);			
 		}
 		die();
@@ -226,47 +238,22 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			
 		if($_POST)
 		{
-			if( empty($_POST['name']) )
+			if(empty($_POST['name']))
 				die('Name is required'); # error
 				
-			# Make URL friendly
+			# sanitze url
 			$url = trim($_POST['url']);
-			$url = ( empty($url) ) ? $_POST['name'] : $url;
-			$url = preg_replace("(\W)", '_', $url);
+			$url = (empty($url)) ? $_POST['name'] : $url;
+			$url = valid::filter_php_url($url);
 			
 			$data = array(
 				'url'		=> $url,
 				'cat_id'	=> $_POST['category'],
 				'name'		=> $_POST['name'],
 				'intro'		=> $_POST['intro'],
-				'body'		=> $_POST['body'],		
+				'body'		=> $_POST['body'],
+				'images'		=> trim($_POST['images'], '|'),					
 			);
-			$old_image = Assets::assets_dir("showroom/{$_POST['old_category']}/{$_POST['old_image']}");
-		
-			# Upload image if sent
-			if(is_uploaded_file($_FILES['image']['name']))
-			{
-				if (! $data['img'] = self::upload_image($_FILES, $_POST['category']) )
-					echo 'Image must be jpg, gif, or png.';
-				
-				if(! empty($_POST['old_image']) )
-					if( file_exists($old_image) )
-						unlink($old_image);
-			}
-			# If user has changed the category:
-			elseif ($_POST['category'] != $_POST['old_category'])
-			{
-				$new_path = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['category']}";
-				if(! is_dir($new_path) )
-					mkdir($new_path);
-				
-				$small_path = DOCROOT."data/$this->site_name/assets/images/showroom/{$_POST['old_category']}/sm_{$_POST['old_image']}";
-				
-				rename($old_image, "$new_path/{$_POST['old_image']}");
-				rename($small_path, "$new_path/sm_{$_POST['old_image']}");
-			
-			}			
-
 			$db->update(
 				'showroom_items_meta',
 				$data,
@@ -274,15 +261,14 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			);	
 			die('Item saved');
 		}
-
+		// TODO: this seems apsurdly slow...  1.5 seconds.
+		
 		# Grab single item
 		$item = $db->query("
 			SELECT * FROM showroom_items_meta
 			WHERE id = '$id' 
 			AND fk_site = '$this->site_id'
 		")->current();
-		
-		# If item exists & belongs to this site:
 		if(empty($item) )
 			die('item does not exist');
 			
@@ -305,27 +291,36 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		$primary = new View("edit_showroom/edit_item");
 		$primary->categories = $categories;	
 		$primary->item = $item;
+
+		# images 
+		$image_array = explode('|', $item->images);
+		$images = array();
+		foreach($image_array as $image)
+		{
+			if(0 < substr_count($image, '/'))
+			{
+				$filename = strrchr($image, '/');
+				$small = str_replace($filename, "/_sm$filename", $image);
+			}
+			else
+				$small = "/_sm/$image";
+			
+			$images[] = "$small|$image";
+		}
+		$primary->images = $images;	
 		die($primary);	
 	}
 
 /*
- * DELETE showroom (item) single
- * [see root JS in this::manage() ]
- * @PARM (INT) $id = id of showroom item row 
+ * delete a single showroom item
  */
-	public function delete($id=NULL)
+	public function delete($tool_id=NULL, $id=NULL)
 	{
+		valid::id_key($tool_id);
 		valid::id_key($id);				
-		$image = $this->_grab_tool_child('showroom', $id);
-
-		# Image File delete		
-		$image_path = Assets::assets_dir("tools/showroom/$image->img");	
-	
-		if(! empty($image->image) AND file_exists($image_path) )
-			unlink($image_path);
-			
-		# db delete
-		$this->_delete_single_common('showroom', $id);
+		
+		$db = new Database;
+		$db->delete('showroom_items_meta', "id = '$id' AND fk_site ='$this->site_id'");
 		die('Showroom item Deleted');
 	}
 
@@ -346,6 +341,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	public function settings($tool_id=NULL)
 	{
+		die('Showroom settings are currently disabled while we update our code. Thanks!');
 		valid::id_key($tool_id);
 		$db = new Database;
 		
@@ -363,63 +359,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			);
 			die('Showroom updated');		
 		}
-		
 		die( $this->_view_edit_settings('showroom', $tool_id) );
 	}
 	
-/*
- * Upload an image to showroom
- * @Param array $file = $_FILES array
- */ 	
-	private function upload_image($_FILES, $category_id)
-	{		
-		$files = new Validation($_FILES);
-		$files->add_rules('image', 'upload::valid','upload::type[gif,jpg,png]', 'upload::size[1M]');
-		
-		if(!$files->validate())
-			return FALSE;
-			
-		# Temp file name
-		$filename	= upload::save('image');
-		$image		= new Image($filename);			
-		$ext		= $image->__get('ext');		
-		$name		= text::random('alnum', 18).'.'.$ext;
-		$image_store = Assets::assets_dir("tools/showroom");
-		
-		if(! is_dir($image_store) )
-			mkdir($image_store);
-			
-		if(! is_dir("$image_store/$category_id") )
-			mkdir("$image_store/$category_id");	
-
-		if(! is_dir("$image_store/$category_id/_sm") )
-			mkdir("$image_store/$category_id/_sm");	
-			
-		if( $image->__get('width') > 350 )
-			$image->resize(350, 650);
-		
-		$image->save("$image_store/$category_id/$name");
-	  
-		# Create sm thumb (TODO: optimize this later)
-		$image_sm = new Image($filename);			
-		
-		$sm_width = $image_sm->__get('width');
-		$sm_height = $image_sm->__get('height');
-		
-		# Make square thumbnails
-		if( $sm_width > $sm_height )
-			$image_sm->resize(100,100,Image::HEIGHT)->crop(100,100);
-		else
-			$image_sm->resize(100,100,Image::WIDTH)->crop(100,100);
-		
-		$image_sm->save("$image_store/$category_id/_sm/$name");
-		
-		# Remove temp file
-		unlink($filename);
-		
-		return $name;
-	}
-
 
 /*
  * Need this to enable nested showroom categories
@@ -463,7 +405,8 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			AND cats.parent_id = '$tool_id'
 			AND cats.id = items.cat_id
 		");
-		
+		return TRUE;
+		/*
 		# delete data assets
 		$showroom_dir = Assets::assets_dir("tools/showrooms/$tool_id");
 		if(is_dir($showroom_dir))
@@ -477,11 +420,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			$d->close(); 
 			rmdir($showroom_dir);
 		}
-		
-		return TRUE;
+		*/		
 	}
-	
-	
-	
- 
-} /* -- end of application/controllers/showroom.php -- */
+
+} /* -- end -- */

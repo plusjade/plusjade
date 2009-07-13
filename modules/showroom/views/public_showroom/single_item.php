@@ -19,7 +19,14 @@
 	</div>
 
 	<div class="single_image">
-		<img src="<?php echo "$img_path/$item->img"?>" alt="">
+		<?php
+		$img_path = Assets::assets_url();
+		foreach($images as $data)
+		{
+			$data = explode('|', $data);
+			echo "<a href=\"$img_path/$data[1]\"><img src=\"$img_path/$data[0]\" alt=\"\"></a><br>";
+		}
+		?>
 	</div>
 
 	<div class="aligncenter">
