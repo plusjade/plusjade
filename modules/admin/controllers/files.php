@@ -27,7 +27,7 @@ class Files_Controller extends Controller {
 		$files	= self::folder_contents(Assets::assets_dir(), '_sm');
 		
 		$primary = new View('files/index');
-		$primary->is_editor = (empty($_GET['editor'])) ? FALSE : TRUE ;
+		$primary->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
 		$primary->files = $files;
 		die($primary);
 	}
@@ -43,6 +43,7 @@ class Files_Controller extends Controller {
 		
 		$primary = new View('files/folder');
 		$primary->files = $files;
+		$primary->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
 		die($primary);
 	}
 

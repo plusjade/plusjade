@@ -1,4 +1,5 @@
 <?php
+$class = ('albums' == $mode) ? 'to_album' : 'to_editor';
 $image_types = array(
 	'jpg'	=> 'jpeg',
 	'jpeg'	=> 'jpeg',
@@ -16,14 +17,15 @@ foreach ($files as $path => $data)
 	if('file' == $type)
 	{
 		$css_id			= str_replace('.', '_', $name);
-		$url			= Assets::assets_url() .'/'. str_replace(':', '/', $path);
+		$path			= str_replace(':', '/', $path);
+		$url			= Assets::assets_url() .'/'. $path ;
 		$url_thumb		= str_replace($name, "_sm/$name", $url);
 		$display_name	= ('10' < strlen($name)) ? substr($name, 0, 10).'...' : $name;
 		$ext			= strtolower(substr(strrchr($name, "."), 1));
 		
 		# if image, show the thumbnail version
 		$img = ((array_key_exists($ext, $image_types))) ?
-			"<img src=\"$url_thumb\" class=\"place_file\" rel=\"$url\" width=\"75\" height=\"75\" alt=\"\">"
+			"<img src=\"$url_thumb\" class=\"$class\" rel=\"$url\" width=\"75\" height=\"75\" alt=\"$path\">"
 			: "<img src=\"/_assets/images/admin/file.jpg\" width=\"75\" height=\"75\" alt=\"\">";
 		
 		?>
@@ -40,8 +42,8 @@ foreach ($files as $path => $data)
 		$delete = ('tools' == $name AND 'tools' == $path) ? '' : '<span class="icon cross">&nbsp; &nbsp; </span> ';
 		?>
 		<div id="<?php echo $name?>" class="folder_asset asset" rel="<?php echo $path?>">
-			<img src="/_assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
-			<br><a href="/get/files/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
+			<img src="/_assets/images/admin/folder.jpg" href="/get/files/contents/<?php echo "$path?mode=$mode"?>" class="get_folder" rel="<?php echo $path?>"  alt="">
+			<br><a href="/get/files/contents/<?php echo "$path?mode=$mode"?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
 			<?php echo $delete?>
 		</div>
 		<?php
