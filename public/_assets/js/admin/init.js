@@ -10,10 +10,10 @@ $(document).ready(function()
 			$(".jade_toolbar_wrapper").slideToggle("slow");
 			$(".jade_admin_item_edit").slideToggle("slow");
 			$("#hide_link").slideToggle("slow");
-			
 		});
 	});
 	$('#shadow div').css({background: '#000', opacity: 0.2});
+
 /*
  * ACTIVATE Sitewide admin bar dropdowns
  */
@@ -81,18 +81,12 @@ $(document).ready(function()
 
 /* display server response
  * ShowRespose in beta mode only.
- * -----------------------------------
 */
 	$('body').append('<div id="show_response_beta">[Server Response]</div>');
 	$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
-	$(window).resize(function(){
-		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
-	});
-	$(window).scroll(function(){
-		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
-	});
-
-
+	// resizer functions are @ bottom of page.
+	
+	
 /*
  * updates the tool container #tool_wrapper_<id> 
  * with the updated output from that tool.
@@ -106,7 +100,7 @@ $(document).ready(function()
 		} else if('update' == action){
 			$('#'+ toolname +'_wrapper_'+ tool_id).html('<div class="load_tool_html">Updating...</div>');
 		}
-				
+
 		// Get the tool html output...
 		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){
 			if('add' == action) {
@@ -138,22 +132,20 @@ $(document).ready(function()
 	
 		// facebox load ajax
 		"a[rel=facebox]": function(e){
-			var pane = "base"; // loads in "base" unless otherwise noted via id
-			if(e.target.id) var pane = "2";			
+			var pane = ((e.target.id)) ? '2' : 'base';	
 			$.facebox(function(){
 					$.get(e.target.href, function(data){
 						$.facebox(data, false, "facebox_"+pane);
 					});
-			}, false, "facebox_"+pane);
+			}, false, "facebox_"+ pane);
 			return false;
 		},
 		
 		// facebox for icon spans since delegation does not bubble.
 		"a[rel=facebox] span.icon": function(e){
 			$parent = $(e.target).parent();
-			url = $parent.attr('href');
-			var pane = "base"; // loads in "base" unless otherwise noted via id
-			if($parent.attr('id')) var pane = "2";			
+			var url = $parent.attr('href');
+			var pane = ((e.target.id)) ? '2' : 'base';		
 			$.facebox(function(){
 					$.get(url, function(data){
 						$.facebox(data, false, "facebox_"+pane);
@@ -164,10 +156,9 @@ $(document).ready(function()
 		
 		// facebox load div content
 		"a[rel=facebox_div]": function(e){
-			var pane = "base"; // loads in "base" unless otherwise noted via id
-			if(e.target.id) var pane = "2";
-			var url    = e.target.href.split('#')[0]
-			var target = e.target.href.replace(url,'')				
+			var pane = ((e.target.id)) ? '2' : 'base';
+			var url    = e.target.href.split('#')[0];
+			var target = e.target.href.replace(url,'');			
 			$.facebox($(target).clone().show(), false, "facebox_"+pane);
 			return false;
 		},
@@ -219,8 +210,9 @@ $(document).ready(function()
 			return false;
 		},		
 		
-		/* Click actions for css styler ----- */
+	/* Click actions for css styler ----- */
 		
+		// load the styler contents (css)
 		"a[rel=css_styler]": function(e) {
 			$.facebox.close();
 			$('div.styler_wrapper').show();
@@ -228,42 +220,17 @@ $(document).ready(function()
 			.html('<div class="loading">Loading...</div>')
 			.load(e.target.href, function(){
 				$('.facebox .show_submit').hide();
-				// just for now ..
-				$(window).resize(function(){
-					state = $('div.styler_wrapper a.toggle').html();
-					height = 435;
-					if('show' == state) height = 32; 
-					$('div.styler_wrapper').css('top', $.getPageHeight()- height);
-				});
-				
-				// activate the form
-				$('.styler_wrapper .ajaxForm').ajaxForm({		 
-					beforeSubmit: function(){
-						if(! $(".facebox .ajaxForm input").jade_validate() )
-							return false;
-							
-						$(".styler_wrapper .ajaxForm button")
-						.attr('disabled','disabled')
-						.removeClass('jade_positive');
-						$('.admin_reset .show_submit').show();
-						$('#show_response_beta').html('waiting for response...');
-					},
-					success: function(data) {
-						// close the styler?
-						$('.admin_reset .show_submit').hide();					
-						$('#show_response_beta').html(data);
-					}
-				});
-				
+				$(document).trigger('ajaxify.form');				
 			});
 			return false;
 		},
 		
+		// hide the styler dialog
 		"div.styler_wrapper a.toggle": function(e) {
 			$('div.dialog_wrapper').toggle('fast');			
-			value = $(e.target).html();
+			var state = $(e.target).html();
 			
-			if('hide'== value){
+			if('hide'== state){
 				$(e.target).html('show');
 				$('div.styler_wrapper').css('top', $.getPageHeight()- 32);
 			}
@@ -274,14 +241,15 @@ $(document).ready(function()
 			return false;
 		},
 		
+		// close the styler dialog
 		"div.styler_wrapper a.close": function(e) {
-			$(document).trigger('close.facebox');
+			$(document).trigger('on_close.execute');
 			$('div.styler_wrapper').hide();
 			$('div.styler_wrapper div.styler_dialog').html('');
+			$('#files_browser_wrapper img').unbind('dblclick');
 			return false;
 		}
 	}));
-
 	
 /* 
  * auto-filter form fields delegation
@@ -308,25 +276,18 @@ $('body').keyup($.delegate({
 			<div class="styler_dialog">&#160;</div> \
 		</div>\
 	</div>');
-	$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
+	$('div.styler_wrapper').css('top', $.getPageHeight()- 405);
 
+	
+/*
+ * ajaxify the forms 
+ */
+	$(document).bind('ajaxify.form', function(){
+		$('.ajaxForm').ajaxForm({		 
+			beforeSubmit: function(fields, form){
+				if(! $("input", form[0]).jade_validate() ) return false;
 
-/* 
- * Bind functions to after facebox is revealed event.
- * 1. Activate rich text editor (jwysiwyg)
- * 2. Activate admin ajax forms.
- * 3. maintain full height of facebox when window resizing.
- */	
-	$(document).bind('reveal.facebox', function(){
-		$('body').addClass('disable_body').attr('scroll','no');
-		$('.facebox .show_submit').hide();
-		$('textarea.render_html').wysiwyg();
-		$('.facebox .ajaxForm').ajaxForm({		 
-			beforeSubmit: function(){
-				if(! $(".facebox .ajaxForm input").jade_validate() )
-					return false;
-					
-				$(".facebox .ajaxForm button")
+				$('button', form[0])
 				.attr('disabled','disabled')
 				.removeClass('jade_positive');
 				$('.admin_reset .show_submit').show();
@@ -340,33 +301,46 @@ $('body').keyup($.delegate({
 				$('.admin_reset .show_submit').hide();					
 				$('#show_response_beta').html(data);
 			}
-		}); 
+		});
+	});
+	
+
+/* 
+ * Bind functions to after facebox is revealed event.
+ * 1. Activate rich text editor (jwysiwyg)
+ * 2. trigger admin ajax forms.
+ * 3. establish full height of facebox when window resizing.
+ */	
+	$(document).bind('reveal.facebox', function(){
+		$('body').addClass('disable_body').attr('scroll','no');
+		$('.facebox .show_submit').hide();
+		$('textarea.render_html').wysiwyg();
+		$(document).trigger('ajaxify.form');
 		
 		// Expand/contract box-element to fill up full-available facebox view.
 		// Mainly for text editor and asset browsers windows.
 		var height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;
-		$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css, .full_height')
-		.css('min-height', height);
-		$('.facebox div.wysiwyg iframe')
-		.css('min-height', height-30);
-		
-		$(window).resize(function(){
-			height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;	
-			$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css, .full_height')
-			.css('min-height', height);
-			$('.facebox div.wysiwyg iframe')
-			.css('min-height', height-30);
-		});
+		$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css, .full_height').css('min-height', height);
+		$('.facebox div.wysiwyg iframe').css('min-height', height-30);
 	});
 
 /*
  * Bind functions to the CLOSE facebox event.
  */	
-	$(document).bind('close.facebox', function(){
+	$(document).bind('close.facebox', function() {
 		$('body').removeClass('disable_body').removeAttr('scroll');
 		$('.facebox .show_submit').hide();
-		/* execute an action after the facebox closes */
+		$(document).trigger('on_close.execute');
 		
+		// testing, dont no if this works the way i want it to.
+		// supposed to unbind delegated functionality since it has different ones
+		$('#files_browser_wrapper img').unbind('dblclick');
+	});
+
+/*
+ * execute an on_close command
+ */
+	$(document).bind('on_close.execute', function() {
 		var action = ((1 == $('.on_close').length)) ?
 			$('.on_close').html() : $('.on_close.two').html();
 
@@ -380,10 +354,7 @@ $('body').keyup($.delegate({
 			switch(action[0])
 			{
 				case 'update':
-					$().jade_update_tool_html(action[0], action[1], action[2], 'yahboi');	
-					break;
-				case 'add':
-					$().jade_update_tool_html(action[0], action[1], action[2], 'YAHBOI');	
+					$().jade_update_tool_html(action[0], action[1], action[2]);	
 					break;
 				case 'close':
 					// useful for facebox_2 requests TODO: Sanitize this?
@@ -457,6 +428,157 @@ $('body').keyup($.delegate({
 		}
 		//revert: true
 	});	
-});
-// end of init.js
+
+	
+/* 
+ * File Browser function delegation
+ */
+	$('body').click($.delegate({
+	
+		// load the file browser into the bottom pane =D
+		'a.get_file_browser':function(e){
+			var mode = $(e.target).attr('rel');
+			$('div.styler_wrapper').show();
+			$('div.styler_wrapper .styler_dialog')
+			.html('<div class="loading">Loading...</div>')
+			.load('/get/files?mode='+ mode, function(){
+				$('.facebox .show_submit').hide();
+			});
+			return false;
+		},
+		
+	// ajax load a real-directory path
+		'#files_browser_wrapper a.get_folder, img.get_folder':function(e){
+			$('#directory_window').html('<div lass="ajax_loading">Loading...</div>');
+			var url = $(e.target).attr('href');
+			$('#directory_window').load(url);
+			
+			// add the breadcrumb
+			var path = $(e.target).attr('rel');
+			if('ROOT' == path){
+				var folder_string = '';
+				path = '';
+			}
+			else {
+				var folder_array = path.split(':');
+				var folder_string = '';	
+				folder_count = folder_array.length;
+				// This takes a string ex: one/two/three
+				// and outputs all combinations of the nest.
+				// ex: one, one/two, one/two/three.
+				for (i=0; i < folder_count; i++){
+					var result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
+					folder_string += ' / <a href="/get/files/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
+				}
+			}
+			$('#breadcrumb').attr('rel', path).html(folder_string);			
+			return false;
+		},
+		
+	// add a file to a real directory folder
+		'#files_browser_wrapper a.add_asset': function(e){
+			$.facebox(function(){
+				var path = $('#breadcrumb').attr('rel');
+				$.get(e.target.href +'/'+ path,
+					function(data){$.facebox(data, false, 'facebox_2')}
+				);
+			}, false, 'facebox_2');
+			return false;
+		},
+		
+	// delete are a real directory folder from _data
+		'#files_browser_wrapper div.folder_asset span.cross': function(e){
+			$parent	= $(e.target).parent('div');
+			var path	= $parent.attr('rel');
+			var folder	= $parent.attr('id');
+			
+			if('tools' == path){ alert('Tools folder is required.'); return false}
+			if(confirm('This cannot be undone. Delete folder and all inner contents?')) {
+				$.get('/get/files/delete/'+ path,
+					function(data){
+						$('#directory_window #' + folder).remove();
+						$('#show_response_beta').html(data);
+			})};
+			return false;
+		},
+	
+		// delete a file from _data
+		'#files_browser_wrapper div.file_asset span.cross': function(e){
+			if(confirm('This cannot be undone. Delete this file?'))
+			{
+				var path	= $('#breadcrumb').attr('rel');
+				var file	= $(e.target).parent('div').attr('rel');
+				var ufile	= ((path)) ? ':' : '';
+				ufile	+= file;
+				$.get('/get/files/delete/'+ path + ufile,
+					function(data){
+						file = file.replace('.', '_')
+						$('#directory_window #' + file).remove();
+						$('#show_response_beta').html(data);
+			})};
+			return false;
+		},
+		
+	// remove images from gallery	
+		'#remove_images' : function(){
+			$("#sortable_images_wrapper img.ui-selected").each(function(){
+				$(this).parent('div').remove();
+			});
+			return false;		
+		}
+
+	}));
+
+// delegate doubleclick
+	$('body').dblclick($.delegate({
+		
+		// add selected image to gallery.
+		'#files_browser_wrapper img.to_showroom':function(e) {
+			$(e.target).addClass('selected');
+			$(e.target).parent('div').addClass('selected');
+			$(e.target).clone().prependTo('#images .gallery');
+			return false;
+		},
+
+		// add selected image to gallery.
+		'#files_browser_wrapper img.to_album':function(e) {
+			$(e.target).addClass('selected');
+			$(e.target).parent('div').addClass('selected');		
+			
+			$('<div></div>')
+			.prepend('<span>drag</span>')
+			.append($(e.target).clone())
+			.prependTo('#sortable_images_wrapper');
+			return false;
+		}
+		
+	}));
+
+	
+/*
+ * resizing functions yahboi;
+ */
+	$(window).resize(function(){
+		// bottom styler dialog
+		var state = $('div.styler_wrapper a.toggle').html();
+		var height = 405;
+		if('show' == state) height = 32; 
+		$('div.styler_wrapper').css('top', $.getPageHeight()- height);
+		
+		// facebox textareas/content should hold full height.
+		height = (300 > ($.getPageHeight()- 300)) ? 170 : $.getPageHeight()- 250;	
+		$('.facebox div.wysiwyg, .facebox textarea.initiliazed, .render_css, .full_height')
+		.css('min-height', height);
+		$('.facebox div.wysiwyg iframe')
+		.css('min-height', height-30);
+
+		// response left bottom corner
+		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
+	});
+	
+	$(window).scroll(function(){
+		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
+	});			
+
+});  // end of init.js
 
