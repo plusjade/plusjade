@@ -4,11 +4,6 @@
 </li>
 
 <li>
-	<span class="icon plus">&nbsp; &nbsp; </span>  
-	<a href="/get/edit_album/add/<?php echo $identifer?>" rel="facebox">Add Images</a>
-</li>
-
-<li>
 	<span class="icon wrench">&nbsp; &nbsp; </span>  
 	<a href="/get/edit_album/settings/<?php echo $identifer?>" rel="facebox">Settings</a>
 </li>
