@@ -39,7 +39,7 @@ $(document).ready(function()
 {
 	$('#tool_1').show();
 	$('#tool_list_wrapper a').click(function(){
-		id = $(this).attr('rel');	
+		var id = $(this).attr('rel');	
 		$('div.each_tool').hide(); 
 		$('#tool_'+id).show();
 		return false;
@@ -59,15 +59,13 @@ $(document).ready(function()
 		},			
 		success: function(tool_data) {
 			//tool_data format: toolname:load_method:tool_id:tool_guid
-			tool_data = tool_data.split(':');
+			var tool_data = tool_data.split(':');
 			// add tool to DOM
 			$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);	
 			
 			// load the 'load_method' tool::method
 			$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
-				function(data){
-					$.facebox(data, '', 'facebox_base');
-				}
+				function(data){$.facebox(data, false, 'facebox_base')}
 			);
 		}
 	});

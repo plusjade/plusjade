@@ -43,7 +43,7 @@
 	</div>
 
 	
-	<div class="breadcrumb_wrapper">
+	<div class="breadcrumb_wrapper" style="width:590px;">
 		themes <span id="breadcrumb" rel=""> / <a href="/get/theme/contents/<?php echo $this->theme?>" rel="ROOT" class="get_folder"><?php if('safe_mode' != $this->theme) echo $this->theme?></a></span>
 	</div>	
 	
