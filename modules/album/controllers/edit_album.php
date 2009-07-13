@@ -7,104 +7,56 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	}
 	
 /*
- * MANAGE images in page album  
- * Loads into tier 1 Facebox
- * @PARM (INT) $page_id = page id (table pages) album is installed
+ * manage an image album
  */
 	function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		die( $this->_view_manage_tool_items('album', $tool_id) );
-	}
-
-	public function add($tool_id=NULL)
-	{
-		valid::id_key($tool_id);
-		die( $this->_view_add_single('album', $tool_id) );
-	}
-	
-/*
- * ADD images into album.
- * this gets called by the swfloader, once per image uploader.
- * @PARM (INT) $page_id = page id (table pages) album is installed
- */
-	public function add_image($tool_id=NULL)
-	{
-		valid::id_key($tool_id);
-		
-		# Do we have a file
-		if(! is_uploaded_file($_FILES['Filedata']['tmp_name']) )
-			die('Invalid File');
-		
-		# test for size restrictions?
-		# ( $_FILES['Filedata']['size'] > 50000 )
-		
-		# NOTE:: IS THIS SECURE??
-		# Work-around maintaining the session because Flash Player doesn't send the cookies
-		if(isset($_POST["PHPSESSID"]))
-			session_id($_POST["PHPSESSID"]);
-			
 		$db = new Database;	
 		
-		# Get highest position
-		$get_highest = $db->query("
-			SELECT MAX(position) as highest 
-			FROM album_items 
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
-		")->current()->highest;
-
-		# Setup image store directory	
-		$image_store = Assets::assets_dir('tools/albums');
-		
-	
-		if(!is_dir($image_store))
-			mkdir($image_store);
-
-		if(! is_dir("$image_store/$tool_id") )
-			mkdir("$image_store/$tool_id");	
-
-		if(! is_dir("$image_store/$tool_id/_sm") )
-			mkdir("$image_store/$tool_id/_sm");				
-
-		
-		$tmp_name	= $_FILES['Filedata']['tmp_name'];			
-		$holder		= array ('tmp_name' => $tmp_name);
-		$filename	= upload::save($holder);
-		$image		= new Image($filename);			
-		$ext		= $image->__get('ext');
-		$name		= text::random('alnum', 18).'.'.$ext;
-		
-		if( $image->save("$image_store/$tool_id/$name") )
+		if($_POST)
 		{
-			# add to database
 			$data = array(
-				'parent_id'	=> $tool_id,
-				'fk_site'	=> $this->site_id,
-				'path'		=> $name,
-				'position'	=> ++$get_highest,
+				'images'	=> trim($_POST['images'], '|'),
 			);
-			$db->insert('album_items', $data);
-			
-			# Create sm thumb (TODO: optimize this later)
-			$image_sm	= new Image($filename);			
-			$sm_width	= $image_sm->__get('width');
-			$sm_height	= $image_sm->__get('height');
-			
-			# Make square thumbnails
-			if( $sm_width > $sm_height )
-				$image_sm->resize(100,100,Image::HEIGHT)->crop(100,100);
-			else
-				$image_sm->resize(100,100,Image::WIDTH)->crop(100,100);
-			
-			$image_sm->save("$image_store/$tool_id/_sm/$name");
+			$db->update('albums', $data, " id = '$tool_id' AND fk_site = '$this->site_id' ");
+			die('Album saved');
 		}
-		unlink($filename);
-		die('Image added');	
+		
+		$album = $db->query("
+			SELECT * 
+			FROM albums
+			WHERE id = '$tool_id'
+			AND fk_site = '$this->site_id'
+		")->current();
+		
+		$primary = new View('edit_album/manage');
+		$primary->album = $album;
+		
+		# images 
+		$image_array = explode('|', $album->images);
+		$images = array();		
+		foreach($image_array as $image)
+		{
+			if(0 < substr_count($image, '/'))
+			{
+				$filename = strrchr($image, '/');
+				$small = str_replace($filename, "/_sm$filename", $image);
+			}
+			else
+				$small = "/_sm/$image";
+			
+			$images[] = "$small|$image";
+		}
+		$primary->images = $images;	
+		die($primary);
 	}
+
 	
-	
-# Edit_image 
+/*
+ * Edit_image 
+ * currently no way to access this since images are no longer db items
+ */
 	public function edit_item($id=NULL)
 	{
 		valid::id_key($id);
@@ -113,20 +65,16 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		if(! empty($_POST['parent_id']) )
 		{			
 			$data = array(
-				'caption'	=> $_POST['caption'],
+				'caption'	=> $_POST['caption']
 			);
 			$db->update('album_items', $data, array( 'id' => $id, 'fk_site' => $this->site_id) );
 			die('Image updated');
 		}
-		
 		die($this->_view_edit_single('album', $id));
 	}
 
 /*
  * EDIT album settings
- * Loads into tier 1 facebox
- * [see root JS in this::manage() ]
- * @PARM (INT) $tool_id = id of the parent tool item
  */
 	public function settings($tool_id=NULL)
 	{
@@ -147,64 +95,12 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		die( $this->_view_edit_settings('album', $tool_id) );
 	}
 
-
 /*
- * DELETE image single
- * Success Response via JGrowl
- * [see root JS in this::manage() ]
- * @PARM (INT) $id = id of image row 
- */
-	public function delete_image($id_string=NULL)
-	{
-		$id_string = trim($id_string, '-');
-		$id_array = explode('-', $id_string);
-		foreach($id_array as $key => $id)
-			if(! is_numeric($id) )
-				unset($id_array[$key]);
-
-		if( '0' == count($id_array) )
-			die('invalid input');
-			
-		$id_string = implode(',',$id_array);
-		
-		foreach($id_array as $id)
-		{
-			# Get image object
-			$image = $this->_grab_tool_child('album', $id);
-
-			# Image File delete
-			$image_path	= Assets::assets_dir("tools/albums/$image->parent_id");
-			if( file_exists("$image_path/$image->path") )
-				unlink("$image_path/$image->path");
-			if( file_exists("$image_path/_sm/$image->path") )
-				unlink("$image_path/_sm/$image->path");
-		}
-		
-		$db = new Database;
-		$db->query("
-			DELETE FROM album_items
-			WHERE id IN ($id_string)
-			AND fk_site = '$this->site_id'
-		");
-		die('images deleted');
-	}
-
-/*
- * SAVE images sort order
- * Success Response via Facebox_response tier 2
- * [see root JS in this::manage() ]
- */
-	public function save_sort()
-	{
-		if( empty($_GET['image']) )
-			die('No items to sort');
-			
-		die( $this->_save_sort_common($_GET['image'], 'album_items') );
-	}
-	
+ * which function to go after album is created?
+ */	
 	static function _tool_adder($tool_id, $site_id)
 	{
-		return 'add';
+		return 'manage';
 	}
 	
 /*
@@ -212,6 +108,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	function _tool_deleter($tool_id, $site_id)
 	{
+		/*
 		$album_dir = Assets::assets_dir("tools/albums/$tool_id");
 		if(is_dir($album_dir))
 		{
@@ -224,6 +121,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 			$d->close(); 
 			rmdir($album_dir);
 		}
+		*/
 	}	
 }
 /* -- end of application/controllers/home.php -- */

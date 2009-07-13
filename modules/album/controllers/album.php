@@ -6,9 +6,9 @@ class Album_Controller extends Controller {
 		parent::__construct();
 	}
 
-	/*
-	 * Display an album instance
-	 */	
+/*
+ * Display an album instance
+ */	
 	function _index($tool_id)
 	{
 		$db = new Database;
@@ -21,22 +21,29 @@ class Album_Controller extends Controller {
 		")->current();
 		if(! is_object($album) )
 			die('album does not exist');
-			
-		# Get images in album
-		$images = $db->query("
-			SELECT * FROM album_items 
-			WHERE parent_id = '$album->id' 
-			ORDER BY position
-		");
-		if( '0' == $images->count() )
-			return $this->public_template('(no images)', 'album', $tool_id);
 
+		# images 
+		$image_array = explode('|', $album->images);
+		$images = array();
+		foreach($image_array as $image)
+		{
+			if(0 < substr_count($image, '/'))
+			{
+				$filename = strrchr($image, '/');
+				$small = str_replace($filename, "/_sm$filename", $image);
+			}
+			else
+				$small = "/_sm/$image";
+			
+			$images[] = "$small|$image";
+		}
+		// if no images ? == return $this->public_template('(no images)', 'album', $tool_id);
+	
 		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
 		
-		$assets_url = Assets::assets_url("tools/albums/$album->id");	
-		
 		$primary = new View('public_album/index');
-		$primary->display_view = $this->$display_view($images, $assets_url);
+		
+		$primary->display_view = $this->$display_view($images);
 		$primary->view_name = $display_view;
 		
 		$primary->add_root_js_files("$display_view/$display_view.js");
@@ -44,24 +51,27 @@ class Album_Controller extends Controller {
 		return $this->public_template($primary, 'album', $tool_id);
 	}
 
-	private function lightbox($images, $assets_url)
+/*
+ * a view for lightbox functionality
+ */
+	private function lightbox($images)
 	{
 		$primary = new View('public_album/lightbox');
-		$primary->images	= $images;
-		$primary->img_path	= $assets_url;
+		$primary->images = $images;
 		return $primary;
 	}
 
 
-	/* doesnt work need to update */
+/* 
+ * doesnt work need to update
+ */
 	private function cycle($images, $img_path)
 	{
 		$primary = new View('public_album/cycle');
 		# Javascript
 		$primary->add_root_js_files('easing/jquery.easing.1.3.js');										
 		$primary->add_root_js_files('cycle_lite/jquery.cycle.all.min.js');								
-		
-		
+
 		$options = array(
 			'fx'		=> '"scrollDown"',
 			'speedIn'	=> '2000',
@@ -126,7 +136,9 @@ class Album_Controller extends Controller {
 		');	
 	}
 	
-	/* doesnt work need to update */
+/* 
+ * doesnt work need to update
+ */
 	private function galleria($images, $img_path)
 	{
 		$primary = new View('public_album/galleria');
@@ -146,6 +158,5 @@ class Album_Controller extends Controller {
 			});
 		');	
 	}
-}
-
-/* -- end of application/modules/album.php -- */
+	
+} /* -- end -- */
