@@ -1,49 +1,54 @@
 
-<span id="on_close">update-showroom-<?php echo $tool_id?></span>
+<span class="on_close">update-showroom-<?php echo $tool_id?></span>
 
 <div  id="common_tool_header" class="buttons">
-	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">Save Category Tree</button>
+	<button type="submit" id="link_save_sort" class="jade_positive">Save Category Tree</button>
 	<div id="common_title">Manage Showroom Categories</div>
 </div>	
 
-<div id="left_wrapper">
+<div class="common_left_panel">
 	Click a category to select it.
 	<ul id="actions_list">	
-		<li><a href="/get/edit_showroom/add/<?php echo $tool_id?>" id="add_node">Add Sub-Category</a></li>
-		<li><a href="/get/edit_showroom/edit_category/" id="edit_node">Edit Category</a></li>
-		<li><a href="#" id="delete_node">Delete Category</a></li>
+		<li><a href="#" id="add_node">Add child category</a></li>
+		<li><a href="#" id="edit_node">Edit category</a></li>
+		<li><a href="#" id="delete_node">Delete category</a></li>
 		<br>
 		<li><a href="/get/edit_showroom/add_item/<?php echo $tool_id?>" id="add_item">Add item</a></li>
-		<br>
-		<li><a href="/get/edit_showroom/items/" id="show_items">Show items</a></li>
+		<li><a href="/get/edit_showroom/items/<?php echo $tool_id?>/" id="show_items">List items</a></li>
 	</ul>
-	<a href="#add_new_category" rel="facebox_div" id="2">blah</a>
-
-	<div id="element_data"></div>
 </div>
 
-<div id="admin_showroom_wrapper">
+<div id="admin_showroom_wrapper" class="common_main_panel" style="height:400px;overflow:auto">
 	<?php echo $tree?>
 </div>
 
 
-<div id="add_new_category" style="display:none">
-	<form action="/get/edit_showroom/add/<?php echo $tool_id?>" method="POST" class="ajaxForm" style="min-height:300px">	
-		
-		<div  id="common_tool_header" class="buttons">
-			<button type="submit" class="jade_positive" rel="<?php echo $tool_id?>">Add Category</button>
-			<div id="common_title">Add a New Category</div>
-		</div>
-		
-		<div class="fieldsets">
-			<b>Category Name</b>
-			<br><input type="text" name="category" el="text_req" style="width:300px">
-		</div>
-		
-	</form>
+<div id="add_category" class="fieldsets" style="display:none; position:absolute; background:#ffffcc; border:1px solid blue;padding:10px;">
+	<span class="icon cross floatright">&#160; &#160; </span>
+	<div id="common_title">Add a New Category</div>
+	<b>Category Name</b>
+	<br><input type="text" name="new_name" rel="text_req" style="width:300px">
+	<br><b>Category Url</b>
+	<br><input type="text" name="new_url" rel="text_req" class="auto_filename" style="width:300px">
+	<br><br><button type="submit" id="add_cat" class="jade_positive">Add Category</button>
 </div>
 
+<div id="edit_category" class="fieldsets" style="display:none; position:absolute; background:#ffffcc; border:1px solid blue;padding:10px;">
+	<span class="icon cross floatright">&#160; &#160; </span>
+	<div id="common_title">Edit Category</div>
+	<b>Category Name</b>
+	<br><input type="text" name="edit_name" rel="text_req" style="width:300px">
+	<br><b>Category Url</b>
+	<br><input type="text" name="edit_url" rel="text_req" class="auto_filename" style="width:300px">
+	<br><br><button type="submit" id="edit_cat" class="jade_positive">Save Changes</button>
+</div>
+
+
 <script type="text/javascript">
+$(document).ready(function()
+{
+
+// a way to get the active node's data.	
 	function get_active_node(){
 		active = false;
 		$('li span.active').each(function(){
@@ -52,136 +57,152 @@
 		return active;
 	};
 	
-	// initiliaze simpleTree
+// initiliaze simpleTree
 	$simpleTreeCollection = $(".facebox .simpleTree").simpleTree();
-	
+	var ROOT = $('.simpleTree > li.root').attr('rel');
+//Make root the default active node.
+	$('.facebox .simpleTree li.root > span').addClass('active');
+
+// click handler for activing a node as selected	
 	$("li.root > span").click(function(){
 		$('span.active').removeClass('active').addClass('text');
 		$(this).addClass('active');
 		
 	});
+
+// activate close x 
+	$('.facebox').click($.delegate({
+		"span.icon.cross": function(e){
+			$(e.target).parent('div').hide();
+		}	
+	}));
+
+
+// sanitize the url relative to name given.
+	$("input[name='new_name']").keyup(function(){
+		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
+		$("input[name='new_url']").val(input);
+	});
 	
-	
-	/*
-		delegate element click actions
-	*/
-	ROOT = $('.simpleTree > li.root').attr('rel');
-	$('#actions_list').click($.delegate({
+// add a new category logic.
+	$("button#add_cat").click(function(){
+		var el_id = get_active_node();
+		if(! el_id ){alert('Select an item to edit.'); return false};	
+		var name = $("input[name='new_name']").val();
+		var url = $("input[name='new_url']").val();
+		if(!name) {alert('name is empty'); return false};
+		if(!url) {alert('url is empty'); return false};
 		
+		$('.facebox .show_submit').show();
+		$.post('/get/edit_showroom/add/<?php echo $tool_id?>/',
+			{category : name, url: url, local_parent : el_id}, function(data){
+			// data is the new "id"
+			$simpleTreeCollection.get(0).addNode(data, name);
+			$('.facebox .show_submit').hide();
+			$('button#add_cat').parent('div').hide();
+			$('#show_response_beta').html(data);
+		});
+		return false;
+	});
+
+
+// edit category logic.
+	$("button#edit_cat").click(function(){
+		var el_id = get_active_node();
+		if(! el_id ){alert('Select an item to edit.'); return false};
+		
+		var name = $("input[name='edit_name']").val();
+		var url = $("input[name='edit_url']").val();
+		if(!name) {alert('name is empty'); return false};
+		if(!url) {alert('url is empty'); return false};
+	
+		$('.facebox .show_submit').show();
+		$.post('/get/edit_showroom/edit_category/'+ el_id,
+			{category : name, url : url}, function(data){
+			// data is the new "id"
+			$('li span.active b').html(name);
+			$('li span.active b').attr('rel', url);
+			$('.facebox .show_submit').hide();
+			$('button#edit_cat').parent('div').hide();
+			$('#show_response_beta').html(data);
+		});
+		return false;
+	});
+
+	
+//delegate element click actions
+	$('#actions_list').click($.delegate({
+
 		// add element
 		"a#add_node": function(e){
-			el_id = get_active_node();
-			
-			if(! el_id ){
-				alert('Select an item to add element to.');
-				return false;
-			}
-			
-			url = $(e.target).attr('href');
-			$.facebox(function() {
-					$.get(url, {local_parent: el_id}, 
-						function(data){
-							$.facebox(data, false, "facebox_2");
-					})
-				}, 
-				false, 
-				'facebox_2'
-			);
-			return false;			
+			var el_id = get_active_node();
+			if(!el_id) {alert('Select an item to add element to.');return false;}
+			$('#add_category').show();
+			return false;
 		},
 		
 		// edit active element
 		"a#edit_node": function(e){
-			el_id = get_active_node();
-			
-			if(! el_id ){
-				alert('Select an item to edit.');
-				return false;
-			}
-			else if(ROOT == el_id){
-				alert('You cannot edit the root node.');
-				return false;
-			}
-			
-			url = $(e.target).attr('href');
-			$.facebox(function() {
-					$.get(url+el_id, function(data){
-						$.facebox(data, false, "facebox_2");
-					})
-				}, 
-				false, 
-				'facebox_2'
-			);
+			var el_id = get_active_node();
+			if(! el_id ){alert('Select an item to edit.');return false}
+			else if(ROOT == el_id){alert('You cannot edit the root node.');return false}
+			var name = $('li span.active b').html();
+			var url = $('li span.active b').attr('rel');
+			$("input[name='edit_name']").val(name);
+			$("input[name='edit_url']").val(url);
+			$('#edit_category').show();
 			return false;
 		},
 		
 		// delete active element
 		"a#delete_node": function(e){		
-			el_id = get_active_node();
+			var el_id = get_active_node();
 			
 			if(! el_id )
 				alert('Select an item to delete.');
 			else if( ROOT == el_id )
 				alert('You cannot delete the root node.');
-			else if( confirm("Remove element from the list? \n NOTE: Elements are not deleted until you click \"Save Changes\"") )
+			else if( confirm("Remove node and all children? \n NOTE: Elements are not deleted until you click \"Save Changes\"") )
 				$simpleTreeCollection.get(0).delNode();		
 			return false;
 		},
 
 
-		// add element
+		// add item button
 		"a#add_item": function(e){
-			el_id = get_active_node();
-			
-			if(! el_id ){
-				alert('Select category to add item to.');
-				return false;
-			}
+			var el_id = get_active_node();
+			if(!el_id){alert('Select category to add item to.');return false;}
 			
 			url = $(e.target).attr('href');
 			$.facebox(function() {
-					$.get(url, {category: el_id}, 
-						function(data){
-							$.facebox(data, false, "facebox_2");
-					})
-				}, 
-				false, 
-				'facebox_2'
-			);
+				$.get(url, {category: el_id}, 
+					function(data){$.facebox(data, false, "facebox_2");}
+				)
+			}, false, 'facebox_2');
 			return false;			
 		},
 		
 		// show items from category
 		"a#show_items": function(e){
-			el_id = get_active_node();
-			
-			if(! el_id ){
-				alert('Select a category to display items from.');
-				return false;
-			}
+			var el_id = get_active_node();	
+			if(! el_id ){alert('Select a category to display items from.');return false;}
 			
 			url = $(e.target).attr('href');
 			$.facebox(function() {
-					$.get(url+el_id, 
-						function(data){
-							$.facebox(data, false, "facebox_2");
-					})
-				}, 
-				false, 
-				'facebox_2'
-			);
-			return false;			
-		}
-		
+				$.get(url+el_id, 
+					function(data){$.facebox(data, false, "facebox_2");}
+				)
+			}, false, 'facebox_2');
+			return false;	
+		}	
 	}));
 	
 	
-	// Gather and send nest data.
-	// ------------------------
+// Gather and send nest data.
+// ------------------------
 	$(".facebox #link_save_sort").click(function() {
+		$('.facebox .show_submit').show();
 		var output = "";
-		var tool_id = $(this).attr("rel");
-		
 		$(".facebox #admin_showroom_wrapper ul").each(function(){
 			var parentId = $(this).parent().attr("rel");
 			if(!parentId) parentId = 0;
@@ -193,11 +214,13 @@
 			});
 		});
 		//alert (output); return false;
-		$.post('/get/edit_showroom/save_tree/'+tool_id,
-			{output: output},
+		$.post('/get/edit_showroom/save_tree/<?php echo $tool_id?>',
+			{output: output}, 
 			function(data){
-				$.facebox(data, "loading_msg", "facebox_2");
-			}
-		)
-	});	
+				$('.facebox .show_submit').hide();
+				$('#show_response_beta').html(data);
+		});
+	});
+	
+});
 </script>

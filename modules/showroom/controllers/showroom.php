@@ -7,8 +7,10 @@ class Showroom_Controller extends Controller {
 		parent::__construct();
 	}
 
-#TODO: query appropriate page_name when in ajax and homepage mode.
-	
+/*
+ * The index displays various showroom views based on the url and routes as necessary
+ * This is for non-ajax requests. _ajax handles ajax routing.
+ */ 
 	function _index($tool_id)
 	{
 		$db			= new Database;
@@ -27,6 +29,7 @@ class Showroom_Controller extends Controller {
 		# Show products immediately
 		if(	'simple' == $parent->params )
 		{
+			## THIS IS OFFLINE FOR NOW ##
 			$item_view = new View("public_showroom/items_$parent->view");
 			$categories = $db->query("
 				SELECT id FROM showroom_items 
@@ -49,18 +52,16 @@ class Showroom_Controller extends Controller {
 			
 			$item_view->items = $items;
 			#TODO: Fix this
-			
-			 
-			$item_view->img_path = Assets::assets_url("tools/showroom/39");
+
 			$item_view->category = 'BLAH';
 			$primary->items = $item_view;
 		}
 		else
 		{
+			# show the categories list.
 			$primary->categories = self::categories($parent->id, $page_name);
 			
-			## default full showroom view
-			#TODO: Make this configurable frontpage and change this hardcoded value.
+			# default full showroom view
 			if('get' == $url_array['0'] OR (empty($category) AND empty($item)) )
 			{
 				$primary->items = (empty($parent->home_cat)) ?
@@ -71,11 +72,7 @@ class Showroom_Controller extends Controller {
 			else
 				$primary->item = self::item($category, $item, $page_name);
 		}
-		
-		$primary->img_path = Assets::assets_url("tools/showroom/$parent->id");
-		$primary->parent = $parent;
-		
-		
+
 		# Javascript
 		if($this->client->logged_in())
 			$primary->global_readyJS('
@@ -90,7 +87,6 @@ class Showroom_Controller extends Controller {
 	
 /*
  * get category list from this showroom
- *
  */
 	private function categories($parent_id, $page_name)
 	{
@@ -113,7 +109,7 @@ class Showroom_Controller extends Controller {
 	
 /*
  * show items from a given category
- *
+ * TODO: FIX THIS
  */
 	private function items_category($tool_id, $category, $page_name, $view='list')
 	{
@@ -130,17 +126,15 @@ class Showroom_Controller extends Controller {
 		
 		if(!is_object($parent))
 			return 'invalid category';
-			
-		$item_view->img_path = Assets::assets_url("tools/showroom/$parent->id");
-	
-		#display items in this cat
+
+		# display items in this cat
 		$items = $db->query("
-			SELECT * FROM showroom_items_meta
+			SELECT *, SUBSTRING_INDEX(images, '|', 1) AS images
+			FROM showroom_items_meta
 			WHERE cat_id = '$parent->id'	
 			AND fk_site = '$this->site_id'	
 			ORDER by position;
 		");			
-
 		if(0 == count($items))
 			return 'No items. Check back soon!';
 
@@ -152,13 +146,12 @@ class Showroom_Controller extends Controller {
 
 /*
  * show a single item
- *
  */
 	private function item($category, $item, $page_name)
 	{
 		$db = new Database;	
 		$primary = new View('public_showroom/single_item');		
-		#display items in this cat
+
 		$item_object = $db->query("
 			SELECT * FROM showroom_items_meta 
 			WHERE fk_site = '$this->site_id'
@@ -168,9 +161,26 @@ class Showroom_Controller extends Controller {
 		if(!is_object($item_object))
 			return 'Invalid item';
 
-		$primary->item		= $item_object;
+		$primary->item = $item_object;
+		
+		# images  with thumbnails
+		$image_array = explode('|', $item_object->images);
+		$images = array();
+		foreach($image_array as $image)
+		{
+			if(0 < substr_count($image, '/'))
+			{
+				$filename = strrchr($image, '/');
+				$small = str_replace($filename, "/_sm$filename", $image);
+			}
+			else
+				$small = "/_sm/$image";
+			
+			$images[] = "$small|$image";
+		}
+
+		$primary->images	= $images;	
 		$primary->category	= $category;
-		$primary->img_path	= Assets::assets_url("tools/showroom/$item_object->cat_id");
 		$primary->page_name	= $page_name;
 		return $primary;
 	}
