@@ -31,7 +31,16 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		}
 		
 		$primary->tree = Tree::display_tree('navigation', $items, NULL, TRUE);
-		$primary->tool_id = $tool_id;	
+		$primary->tool_id = $tool_id;
+		
+		# get pages 
+		$pages = $db->query("
+			SELECT page_name FROM pages 
+			WHERE fk_site = '$this->site_id'
+			ORDER BY page_name
+		");			
+		$primary->pages = $pages;
+			
 		die($primary);
 	}
 
@@ -41,11 +50,9 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	public function add($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		
 		if($_POST)
 		{
 			$db = new Database;
-
 			# Get parent
 			$parent	= $db->query("
 				SELECT * FROM navigations 
@@ -55,14 +62,18 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			if(! is_object($parent) )
 				die('does not exist');
 				
-			$data_string = ( empty($_POST['data']) ) ? '' : $_POST['data'];
+			$_POST['data'] = (empty($_POST['data'])) ? '' : $_POST['data'];
+			
+			# if for any reason local_parent is null, just add to root.
+			$_POST['local_parent'] = (empty($_POST['local_parent'])) ?
+				$parent->root_id : $_POST['local_parent'];
 
 			$data = array(
 				'parent_id'		=> $tool_id,
 				'fk_site'		=> $this->site_id,
 				'display_name'	=> $_POST['item'],
 				'type'			=> $_POST['type'],
-				'data'			=> $data_string,
+				'data'			=> $_POST['data'],
 				'local_parent'	=> $_POST['local_parent'],
 			);	
 			$insert_id = $db->insert('navigation_items', $data)->insert_id(); 	
@@ -72,23 +83,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			
 			die("$insert_id");#output to javascript
 		}
-		elseif($_GET)
-		{
-			# GET must come from ajax request @ view(edit_navigation/manage)
-			$local_parent = valid::id_key($_GET['local_parent']);
-	
-			$primary = new View('edit_navigation/add_item');
-			$db = new Database;
-			$pages = $db->query("
-				SELECT page_name FROM pages 
-				WHERE fk_site = '$this->site_id'
-				ORDER BY page_name
-			");			
-			$primary->pages = $pages;
-			$primary->tool_id = $tool_id;
-			$primary->local_parent = $local_parent;	
-			die($primary);
-		}	
+		die();
 	}
 
 /*
@@ -199,7 +194,6 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 			array( 'id' => $tool_id, 'fk_site' => $site_id ) 
 		);
 		
-		# which method to invoke after?
 		return 'manage';
 	}
 	

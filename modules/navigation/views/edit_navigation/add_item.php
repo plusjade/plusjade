@@ -1,11 +1,10 @@
 
-<span class="on_close two">close-two</span>
+<span class="icon cross floatright">&#160; &#160; </span>
 
 <form action="/get/edit_navigation/add/<?php echo $tool_id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
 	<input type="hidden" name="local_parent" value="<?php echo $local_parent?>">
 
-	<div id="common_tool_header" class="buttons">
-		<button type="submit" class="jade_positive">Create Element</button>
+	<div id="common_tool_header">
 		<div id="common_title">Add element to Navigation</div>
 	</div>	
 	
@@ -44,6 +43,8 @@
 		</div>
 		
 	</div>
+	<br>
+	<button type="submit" class="jade_positive">Create Element</button>
 </form>
 
 <script type="text/javascript">	
@@ -59,32 +60,5 @@
 			$(span + " > :input").removeAttr("disabled");
 			$(span).show();
 		});
-	});
-
-	/* 
-	 * custom ajax form response needs to populate the nested li list.
-	 *
-	 */		
-	$(".custom_ajaxForm").ajaxForm({
-		beforeSubmit: function(){					
-			if(! $(".custom_ajaxForm input:enabled").jade_validate() )
-				return false;
-			/*	
-			type = $("select[name='type'] > option:selected").val();			
-			
-			if('none' == type)
-				text = $("input[name='item']").val();
-			else
-				text = $("[name='data']:enabled").val();
-			*/
-			$('.facebox .show_submit').show();
-			text = $("input[name='item']").val();	
-		},
-		success: function(data) {
-			// TODO: This does not work in chrome and safari
-			$simpleTreeCollection.get(0).addNode(data, text);
-			$.facebox.close("facebox_2");
-			$('#show_response_beta').html(data);	
-		}
 	});
 </script>
