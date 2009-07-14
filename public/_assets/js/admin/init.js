@@ -248,6 +248,11 @@ $(document).ready(function()
 			$('div.styler_wrapper div.styler_dialog').html('');
 			$('#files_browser_wrapper img').unbind('dblclick');
 			return false;
+		},
+		
+	// cross button hides the pop up dialog
+		'span.icon.cross.floatright' : function(e) {
+			$(e.target).parent('div').hide();
 		}
 	}));
 	
