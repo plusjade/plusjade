@@ -7,16 +7,14 @@
 		'file'	=> '',
 	);	
 	$selected[$item->type] = 'selected="selected"';
-	
 	$data[$item->type] = $item->type;
 ?>
 
-<span class="on_close">2 off</span>
+<span class="icon cross floatright">&#160; &#160; </span>
 
-<form action="/get/edit_navigation/edit/<?php echo $item->id?>" method="POST" class="custom_ajaxForm" id="add_links_form">	
+<form action="/get/edit_navigation/edit/<?php echo $item->id?>" method="POST" id="edit_form">	
 
-	<div id="common_tool_header" class="buttons">
-		<button type="submit" class="jade_positive">Save Changes</button>
+	<div id="common_tool_header">
 		<div id="common_title">Edit Navigation element</div>
 	</div>	
 	
@@ -39,63 +37,55 @@
 		</div>
 		
 		<div class="tier">		
-			<span id="page"  class="hide">Page:
+			<span class="page hide">Page:
 				<select name="data" disabled="disabled">
 					<?php
 					foreach ($pages as $page)
-					{
 						if( $item->data == $page->page_name )
-						{
 							echo '<option selected="selected">', $page->page_name ,'</option>';
-						}
 						else
-						{
 							echo '<option>', $page->page_name ,'</option>';
-						}
-					}
 					?>
 				</select>
 			</span>
-			<span id="url" class="hide">http://<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="text_req" style="width:250px"></span>
-			<span id="email" class="hide">mailto:<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="email_req" style="width:250px"></span>
+			<span class="url hide">http://<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="text_req" style="width:250px"></span>
+			<span class="email hide">mailto:<input type="text" name="data" value= "<?php echo $item->data?>" disabled="disabled" rel="email_req" style="width:250px"></span>
 		</div>
 		
 	</div>
 	
+	<br>
+	<button type="submit" class="jade_positive">Save Changes</button>
 </form>
 
 <script type="text/javascript">
-	$('span#<?php echo $item->type?> > :input').removeAttr("disabled");
-	$('span#<?php echo $item->type?>').show();	
+	$('#edit_form span.<?php echo $item->type?> > :input').removeAttr("disabled");
+	$('#edit_form span.<?php echo $item->type?>').show();	
 	
-	$(".facebox .toggle_type").each(function(){
+	$(".facebox #edit_form .toggle_type").each(function(){
 		$(this).change(function(){
-			var span = "#" + $(this).val();
-			
+			var span = "#edit_form span." + $(this).val();
 			// Disable to start over
-			$(".hide").hide();
-			$(".hide > :input").attr("disabled","disabled");
-			
+			$("#edit_form .hide").hide();
+			$("#edit_form .hide > :input").attr("disabled","disabled");
 			// Enable selection
 			$(span + " > :input").removeAttr("disabled");
 			$(span).show();
 		});
 	});
 
-	
 	/*
 	 * custom ajax form response needs to populate the nested li list.
 	 */
-	$(".custom_ajaxForm").ajaxForm({
+	$("#edit_form").ajaxForm({
 		beforeSubmit: function(){
-			if(! $(".custom_ajaxForm input:enabled").jade_validate() )
-				return false;
+			if(! $("#edit_form input:enabled").jade_validate() ) return false;
 			$('.facebox .show_submit').show();
 		},
 		success: function(data) {	
-			text = $("input[name='item']").val();
+			var text = $("#edit_form input[name='item']").val();
 			$('li span.active').html(text);
-			$.facebox.close("facebox_2");
+			$('#edit_wrapper').hide();
 			$('#show_response_beta').html(data);			
 		}
 	});
