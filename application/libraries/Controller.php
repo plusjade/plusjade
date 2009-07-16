@@ -33,6 +33,9 @@ abstract class Controller_Core {
 		# Auth Instance
 		$this->client = new Auth;	
 		
+		# account instance Instance
+		$this->account_user = new Account;
+		
 		if (Kohana::$instance == NULL)
 		{
 			# Set the instance to the first controller loaded
