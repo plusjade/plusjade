@@ -44,6 +44,9 @@ class Load_Tool_Core {
 				break;
 			case 'Blog':
 				$tool = new Blog_Controller(); 			
+				break;
+			case 'Account':
+				$tool = new Account_Controller(); 			
 				break;						
 			default:
 				die("<b>error:</b> '$tool' tool does not exist (Load_Tool::factory)");
@@ -90,8 +93,11 @@ class Load_Tool_Core {
 				$tool = new Edit_Navigation_Controller(); 			
 				break;
 			case 'Blog':
-				$tool = new Edit_Blog_Controller(); 			
+				$tool = new Edit_Blog_Controller();				
 				break;						
+			case 'Account':
+				$tool = new Edit_Account_Controller();
+				break;
 			default:
 				die("<b>error:</b> '$tool' edit_tool does not exist (Load_Tool::edit_factory)");
 		}	

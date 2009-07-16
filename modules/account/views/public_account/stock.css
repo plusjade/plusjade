@@ -1,0 +1,96 @@
+
+#account_wrapper_++{
+
+}
+
+
+/* auth form views */
+
+/* auth create */
+#account_wrapper_++ #auth_form{
+	width:400px;
+	margin:10px auto;
+	padding:10px;
+}
+#account_wrapper_++ #auth_form div.fieldsets{
+	background:#fff;
+	padding:10px;
+	margin-bottom:10px;
+}
+#account_wrapper_++ #tagline{
+	padding:10px;
+	background:#fff;
+	text-align:center;
+	font-size:2em;
+}
+#account_wrapper_++ #tagline .text_logo{
+	
+}
+#account_wrapper_++ #tagline .text_logo b{
+	color:red;
+}
+#account_wrapper_++ #auth_form input{
+	font-size:1.8em;
+	background:skyblue url('/_assets/images/admin/gradients.jpg') repeat-x 0px -500px;
+	border:1px solid #dedede;
+	width:99%;
+}
+#account_wrapper_++ #auth_form button{
+	width:100%;
+}
+#account_wrapper_++ #auth_form .buttons{
+	margin:0 auto;
+	width:300px;
+}
+
+
+/* login prompt */
+
+#account_wrapper_++ #auth_form div.error{
+	text-align:center;
+	background:#fff;
+	color:red;
+	font-size:1.2em;
+}
+
+#account_wrapper_++ .login_help_toggle{
+	text-align:center;
+	padding:15px;
+}
+
+
+
+
+/* for logged in users dashboard */
+
+#account_wrapper_++ ul.account_user_actions{
+	
+}
+#account_wrapper_++ ul.account_user_actions li{
+	
+}
+#account_wrapper_++ ul.account_user_actions li a{
+	
+}
+#account_wrapper_++ ul.account_user_actions li a:hover,
+#account_wrapper_++ ul.account_user_actions li a.selected
+{
+	
+}
+#account_wrapper_++ div#inject_content_wrapper{
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
