@@ -29,9 +29,9 @@
 	
 	<h3>Tokens</h3>
 	../images/ , %IMAGES%
-	<br><small><input type="text" value="<?php echo Assets::theme_url('images')?>"></small>
+	<br><small><input type="text" value="<?php echo $this->assets->theme_url('images')?>"></small>
 	<br><br>%FILES%
-	<br><small><input type="text" value="<?php echo Assets::assets_url()?>"></small>
+	<br><small><input type="text" value="<?php echo $this->assets->assets_url()?>"></small>
 	<br><small>(url to file directory)</small>
 	
 </div>

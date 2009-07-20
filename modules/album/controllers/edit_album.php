@@ -108,6 +108,10 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
  */
 	function _tool_deleter($tool_id, $site_id)
 	{
+		$db = new Database;
+		$db->delete('album_items', array('parent_id' => $tool_id, 'fk_site' => $site_id));	
+
+			
 		/*
 		$album_dir = Assets::assets_dir("tools/albums/$tool_id");
 		if(is_dir($album_dir))

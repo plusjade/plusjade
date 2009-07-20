@@ -1,21 +1,22 @@
 <?php
 class Tool_Controller extends Controller {
 
-	/**
-	 *	SCOPE: Performs CRUD for tools
-	 *	Tools belong to pages, but manipulating tools themselves,
-	 *  Should be separate from page manipulation
-	 *
-	 */
-	
+/**
+ *	SCOPE: Performs CRUD for tools
+ *	Tools belong to pages, but manipulating tools themselves,
+ *  Should be separate from page manipulation
+ *
+ */
 	function __construct()
 	{
 		parent::__construct();
 		if(!$this->client->can_edit($this->site_id))
 			die('Please login');
 	}
-	
-# List ALL TOOLS for this site.
+
+/*	
+ * List ALL TOOLS for this site.
+ */
 	function index()
 	{
 		$db = new Database;
@@ -34,6 +35,35 @@ class Tool_Controller extends Controller {
 		die($primary);
 	}
 
+/*
+ *	ADD single tool to specific page.
+ *  No tool can start out as an orphan.
+ */
+	function add($page_id=NULL)
+	{		
+		valid::id_key($page_id);		
+
+		if($_POST)
+		{
+			#stupid ie sends button contents rather than value.
+			$field = (is_numeric($_POST['tool'])) ? 'id' : 'name';
+			# all tools passed her should be non-protected
+			die(self::_add_tool($page_id, $_POST['tool'], FALSE, TRUE));
+		}	
+		
+		$db = new Database;
+		$primary = new View('tool/new_tool');
+		$tools = $db->query("
+			SELECT * 
+			FROM tools_list
+			WHERE protected = 'no'
+			AND enabled = 'yes'
+		");
+		$primary->tools_list = $tools;
+		$primary->page_id = $page_id;
+		die($primary);
+		
+	}
 	
 /*
  * actually adds the tool to the database and generates assets.
@@ -99,7 +129,7 @@ class Tool_Controller extends Controller {
 		}
 		
 		# generate tool_css file
-		Css::generate_tool_css($tool->name, $tool_insert_id);
+		self::generate_tool_css($tool->name, $tool_insert_id);
 		
 		# run _tool_adder
 		$step_2 = 'add';
@@ -116,41 +146,10 @@ class Tool_Controller extends Controller {
 		return TRUE;
 	}
 	
-/*
- *	ADD single tool to specific page.
- *  No tool can start out as an orphan.
- *
- */
-	function add($page_id=NULL)
-	{		
-		valid::id_key($page_id);		
 
-		if($_POST)
-		{
-			#stupid ie sends button contents rather than value.
-			$field = (is_numeric($_POST['tool'])) ? 'id' : 'name';
-			# all tools passed her should be non-protected
-			die(self::_add_tool($page_id, $_POST['tool'], FALSE, TRUE));
-		}	
-		
-		$db = new Database;
-		$primary = new View('tool/new_tool');
-		$tools = $db->query("
-			SELECT * 
-			FROM tools_list
-			WHERE protected = 'no'
-			AND enabled = 'yes'
-		");
-		$primary->tools_list = $tools;
-		$primary->page_id = $page_id;
-		die($primary);
-		
-	}
-	
 
 /*
- *	Delete single tool, both parent and children.
- *  Deletes the page reference in pages_tools as well.
+ *	Delete single tool references : parent table & in pages_tools as well.
  *  Comes from the tools js red toolbar
  *  Calls edit_<toolname>::_tool_deleter which is used to delete
  *  assets, run logic specific to said tool.
@@ -173,24 +172,19 @@ class Tool_Controller extends Controller {
 			die('Tool does not exist');
 		
 		$table_parent	= $tool_data->name.'s';
-		$table_child	= $tool_data->name.'_items';
 
-		# DELETE pages_tools row
-		$db->delete('pages_tools', array('guid' => $tool_guid ) );		
-			
+		# DELETE pages_tools reference.
+		$db->delete('pages_tools', array('guid' => $tool_guid));		
+
 		# DELETE tool parent table row ('tool's table) 
-		$db->delete($table_parent, array('id' => $tool_data->tool_id, 'fk_site' => $this->site_id) );	
+		$db->delete($table_parent, array('id' => $tool_data->tool_id, 'fk_site' => $this->site_id));	
 		
-		# DELETE all tool child items
-		if('text' != $tool_data->name)
-			$db->delete($table_child, array('parent_id' => $tool_data->tool_id, 'fk_site' => $this->site_id) );	
-
 		# is tool protected?
 		if('yes' == $tool_data->protected)
 			yaml::delete_value($this->site_name, 'pages_config', $tool_data->page_name);
 		
 		# DELETE custom css file
-		$theme_tool_css = Assets::themes_dir("$this->theme/tools/$tool_data->name/css/$tool_data->tool_id.css");
+		$theme_tool_css = $this->assets->themes_dir("$this->theme/tools/$tool_data->name/css/$tool_data->tool_id.css");
 		if(file_exists($theme_tool_css))
 			unlink($theme_tool_css);
 		
@@ -322,9 +316,6 @@ class Tool_Controller extends Controller {
 	}
 
 
-
-
-
 /*
  * Edit a custom css file associated with a tool.
  * Custom files are auto created if none exists.
@@ -350,17 +341,18 @@ class Tool_Controller extends Controller {
 				array('attributes' => $_POST['attributes'] ),
 				"id='$tool_id' AND fk_site = '$this->site_id'"
 			);
-			
+
 			if(isset($_POST['save_template']))
-				die( Css::save_template($tool->name, $_POST['contents']) );
+				die(self::save_template($tool->name, $_POST['contents']));
 				
-			die( Css::save_custom_css($tool->name, $tool_id, $_POST['contents']) );
+			die(self::save_custom_css($tool->name, $tool_id, $_POST['contents']));
 		}
 
-		$primary = new View('tool/edit_css');			
-		$primary->contents	= Css::get_tool_css($tool->name, $tool_id);
-		$primary->stock		= Css::get_tool_css($tool->name, $tool_id, 'stock');
-		$primary->template	= Css::get_tool_css($tool->name, $tool_id, 'template');
+		$primary = new View('tool/edit_css');	
+		
+		$primary->contents	= self::get_tool_css($tool->name, $tool_id);
+		$primary->stock		= self::get_tool_css($tool->name, $tool_id, 'stock');
+		$primary->template	= self::get_tool_css($tool->name, $tool_id, 'template');
 		$data = array(
 			'tool_id'			=> $tool_id,
 			'name_id'			=> $name_id,
@@ -376,7 +368,7 @@ class Tool_Controller extends Controller {
 			WHERE id='$tool_id'
 		")->current();
 		$primary->attributes = $parent->attributes;
-		
+	
 		die($primary);
 	}
 
@@ -384,38 +376,16 @@ class Tool_Controller extends Controller {
 /*
  * get the rendered html of a single tool 
  * used to insert updated tool data into the DOM via ajax
+ * $().jade_update_tool_html js function @admin/init.js
  */	
-	function html($toolname=NULL, $tool_id=NULL, $full=FALSE)
+	function html($toolname=NULL, $tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		# probably should query this in the db...
+		# TODO: probably should query this in the db...
 		$tool_object = Load_Tool::factory($toolname);			
-		if(!$full)
-			die( $tool_object->_index($tool_id) );
-			
-			
-		# this builds an entire page, used for css builder.
-		$primary = new View('tool/iframe');
-		$primary->global_css = url::site("/_data/$this->site_name/themes/$this->theme/global.css?v=23094823");
-		$primary->html = $tool_object->_index($tool_id);		
-		die($primary);
+		die($tool_object->_index($tool_id));
 	}
 
-/*
- * TESTING...
- * editing environment for tool css for theme creation.
- */	
-	function styler($toolname=NULL)
-	{
-		$tool_id = 68;
-		$primary = new View('tool/styler');
-		$primary->stock_css = Css::get_tool_css($toolname, $tool_id, TRUE);
-		
-		$primary->style_id = "$toolname-$tool_id-style";
-		#change this because it wont work , as this checks for can_edit creds
-		$primary->iframe_url = url::site("get/tool/html/$toolname/$tool_id/TRUE");
-		die($primary);
-	}
 
 /*
  * output red tool toolkit html
@@ -461,4 +431,146 @@ class Tool_Controller extends Controller {
 		$primary->data_array = $data_array;
 		die($primary);
 	}
-}
+	
+
+	
+/*
+ * used @ tool->add to generate a new css file from theme/stock instance
+ */
+	private function generate_tool_css($toolname, $tool_id, $return_contents=FALSE)
+	{
+		$tool_path		= $this->assets->themes_dir("$this->theme/tools/$toolname");			
+		$custom_file	= "$tool_path/css/$tool_id.css";		
+		$theme_file		= "$tool_path/css/stock.css";
+		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
+		$return			= FALSE;
+		
+		# make sure the folders exist.
+		if(! is_dir($tool_path) )
+			mkdir($tool_path);
+
+		if(! is_dir("$tool_path/css") )
+			mkdir("$tool_path/css");
+			
+		ob_start();
+		if(file_exists($theme_file))
+			readfile($theme_file);
+		elseif(file_exists($stock_file))
+			readfile($stock_file);
+		else
+			echo '/* No css available for this tool. */';
+			
+		$source_contents = str_replace('++', $tool_id , ob_get_clean());
+		# TODO: add this to the one above for efficiency
+		$source_contents = self::replace_tokens($source_contents);
+		
+		if( file_put_contents($custom_file, $source_contents) )
+			$return = TRUE;
+		
+		if($return_contents)
+			return $source_contents;
+		
+		return $return;
+	}
+	
+	
+	
+/*
+ * used @ tool->css for intelligently retrieving css file associated with a tool.
+ * Cascades from theme specific , then to stock.
+ *
+ */
+	private function get_tool_css($toolname, $tool_id, $stock=FALSE)
+	{
+		$tool_theme		= $this->assets->themes_dir("$this->theme/tools/$toolname/css");			
+		$custom_file	= "$tool_theme/css/$tool_id.css";
+		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
+		
+		ob_start();
+		# return contents of a template or +jade stock tool css file.
+		if(FALSE != $stock)
+		{
+			switch($stock)
+			{
+				case 'template':
+					if(file_exists("$tool_theme/stock.css"))
+						readfile("$tool_theme/stock.css");
+					else
+						return NULL;
+					break;
+				case 'stock':
+					if(file_exists($stock_file))
+						readfile($stock_file);
+					else
+						return NULL;
+					break;
+				default:
+					return NULL;
+			}
+			return str_replace('++', $tool_id , ob_get_clean());
+		}
+		
+		# this file may not exist if the tool was added before user changes themes.
+		# always generate a file if it does not exist.
+		if(file_exists("$tool_theme/$tool_id.css"))
+		{
+			readfile("$tool_theme/$tool_id.css");
+			return ob_get_clean();
+		}
+		# if it does not exist, generate a new one.
+		return self::generate_tool_css($toolname, $tool_id, TRUE);
+	}
+
+/*
+ * 
+ * save a custom tool css file.
+ */
+	private function save_custom_css($toolname, $tool_id, $contents)
+	{	
+		$theme_tool_css = $this->assets->themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
+		$contents = self::replace_tokens($contents);
+		if( file_put_contents($theme_tool_css, $contents) )
+			return 'CSS Changes Saved.';
+
+		return 'The was a problem saving the file.';	
+	}
+	
+/*
+ * 
+ * save a file as a template.
+ */
+	private function save_template($toolname, $contents)
+	{	
+		$template_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/css/stock.css");
+		$contents		= preg_replace("/_(\d+)/", '_++', $contents);
+		
+		if(file_put_contents($template_css, $contents))
+			return 'Template Saved';
+
+		return 'The was a problem saving the file.';	
+	}
+	
+	
+/*
+ * Replace any tokens with respective real-values.
+ */ 
+	private function replace_tokens($contents)
+	{
+		$keys = array(
+			'%MY_THEME%',
+			'%MY_FILES%'
+		);
+		$replacements = array(
+			$this->assets->theme_url('tools'),
+			$this->assets->assets_url()
+		);
+		return str_replace($keys, $replacements , $contents);		
+	}
+	
+	
+} // end 
+
+ 
+
+
+

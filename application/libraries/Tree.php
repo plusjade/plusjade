@@ -148,7 +148,7 @@ class Tree_Core {
  * $tool_id			= tool id
  * $output			= unformatted string from ul list
  */ 
-	function save_tree($parent_table, $item_table, $tool_id, $output)
+	public static function save_tree($parent_table, $item_table, $tool_id, $site_id, $output)
 	{
 		$db = new Database;
 		$all_items = array();
@@ -164,7 +164,7 @@ class Tree_Core {
 		$parent_object = $db->query("
 			SELECT * FROM $parent_table 
 			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
+			AND fk_site = '$site_id'
 		")->current();
 	
 		# Get all items (omit root) so we can delete items not sent.
@@ -197,7 +197,7 @@ class Tree_Core {
 					'local_parent'	=> $parent,
 					'position'		=> $position
 				);
-				$db->update($item_table, $data, "id = '$id' AND fk_site = $this->site_id"); 	
+				$db->update($item_table, $data, "id = '$id' AND fk_site = $site_id"); 	
 		
 				# Item exists so remove from the delete array.
 				unset($all_items[$id]);
@@ -208,11 +208,11 @@ class Tree_Core {
 		if( 0 < count($all_items) )
 		{
 			$id_string = implode(',', $all_items);
-			$db->delete($item_table, "id IN ($id_string) AND fk_site = '$this->site_id'" ); 
+			$db->delete($item_table, "id IN ($id_string) AND fk_site = '$site_id'" ); 
 		}
 
 		# Update Left and right values of whole tree
-		Tree::rebuild_tree($item_table, $parent_object->root_id, '1');
+		self::rebuild_tree($item_table, $parent_object->root_id, $site_id, '1');
 		
 		return 'Tree Saved'; # status response	
 	}
@@ -225,37 +225,38 @@ class Tree_Core {
  * $local_parent starts with root_id,
  * $left starts with 1
  */
-	public function rebuild_tree($table, $local_parent, $left)
+	public static function rebuild_tree($table, $local_parent, $site_id, $left)
 	{
-	   # the right value of this node is the left value + 1
-	   $right = $left+1;
+		# the right value of this node is the left value + 1
+		$right = $left+1;
 
-	   # get all children of this node
-	   $result = mysql_query("
+		# get all children of this node
+		$result = mysql_query("
 			SELECT id FROM $table 
 			WHERE local_parent='$local_parent' 
-			AND fk_site = '$this->site_id'
+			AND fk_site = '$site_id'
 			ORDER BY position
 		");
 
-	   while ($row = mysql_fetch_array($result))
-	   {
+		while ($row = mysql_fetch_array($result))
+		{
 		   # recursive execution of this function for each
 		   # child of this node
 		   # $right is the current right value, which is
 		   # incremented by the rebuild_tree function
-		   $right = Tree::rebuild_tree($table, $row['id'], $right);
-	   }
+		   $right = Tree::rebuild_tree($table, $row['id'], $site_id, $right);
+		}
 
-	   # we've got the left value, and now that we've processed
-	   # the children of this node we also know the right value
-	   mysql_query("
-		UPDATE $table 
-		SET lft='$left', rgt='$right' 
-		WHERE id='$local_parent' AND fk_site = '$this->site_id'");
+		# we've got the left value, and now that we've processed
+		# the children of this node we also know the right value
+		mysql_query("
+			UPDATE $table 
+			SET lft='$left', rgt='$right' 
+			WHERE id='$local_parent' AND fk_site = '$site_id'
+		");
 
-	   # return the right value of this node + 1
-	   return $right+1;
+		# return the right value of this node + 1
+		return $right+1;
 	} 
 	
 	

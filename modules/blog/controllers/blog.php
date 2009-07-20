@@ -80,7 +80,6 @@ class Blog_Controller extends Controller {
 					AND blog_items.status = 'publish'
 					GROUP BY blog_items.id 
 					ORDER BY created DESC
-					# add custom limit here
 				");
 				$content = new View('public_blog/multiple_posts');	
 				$content->items = $items;	

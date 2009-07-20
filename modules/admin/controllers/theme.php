@@ -22,14 +22,14 @@ class Theme_Controller extends Controller {
  */
 	function index()
 	{		
-		$themes	= Jdirectory::contents(Assets::themes_dir(), 'root', 'list_dir', 'safe_mode');
+		$themes	= Jdirectory::contents($this->assets->themes_dir(), 'root', 'list_dir', 'safe_mode');
 		
 		$primary = new View('theme/index');
 		$primary->themes = $themes;
 		
 		if('safe_mode' != $this->theme)
 		{
-			$files	= self::folder_contents(Assets::themes_dir($this->theme), 'tools');	
+			$files	= self::folder_contents($this->assets->themes_dir($this->theme), 'tools');	
 			$primary->files = $files;
 		}
 		
@@ -48,7 +48,7 @@ class Theme_Controller extends Controller {
 			die('cannot load safe-mode files for editing.');
 			
 		$folder	= str_replace(':', '/', $folder);
-		$files	= self::folder_contents(Assets::themes_dir($folder), 'tools');
+		$files	= self::folder_contents($this->assets->themes_dir($folder), 'tools');
 		
 		$primary = new View('theme/folder');
 		$primary->files = $files;
@@ -70,7 +70,7 @@ class Theme_Controller extends Controller {
  */	
 	public function upload($theme=NULL)
 	{ 
-		$theme_path = Assets::themes_dir($theme);
+		$theme_path = $this->assets->themes_dir($theme);
 		if(!is_dir($theme_path))
 			die('invalid theme');
 
@@ -139,7 +139,7 @@ class Theme_Controller extends Controller {
 			die('No theme sent');
 			
 		$theme		= valid::filter_php_url($_POST['theme']);
-		$full_path	= Assets::themes_dir($theme);	
+		$full_path	= $this->assets->themes_dir($theme);	
 		
 		if(is_dir($full_path))
 			die('Theme already exists');
@@ -166,7 +166,7 @@ class Theme_Controller extends Controller {
 			die('invalid type');
 		
 		$primary	= new View("theme/$type");
-		$theme_path	= Assets::themes_dir($this->theme);
+		$theme_path	= $this->assets->themes_dir($this->theme);
 		
 		switch($type)
 		{
@@ -199,7 +199,7 @@ class Theme_Controller extends Controller {
 		if('templates' != $folder AND 'css' != $folder)
 			die('invalid folder');
 			
-		$path = Assets::themes_dir("$this->theme/$folder/$filename");
+		$path = $this->assets->themes_dir("$this->theme/$folder/$filename");
 		
 		if(file_exists($path))
 			die(readfile($path));
@@ -221,7 +221,7 @@ class Theme_Controller extends Controller {
 		$file	= valid::filter_php_filename($file) . '%';
 		$file	= str_ireplace("$ext%", '', $file) . $ext;
 		
-		if(! file_exists(Assets::themes_dir("$this->theme/$folder").$file) AND empty($_POST['contents']) )
+		if(! file_exists($this->assets->themes_dir("$this->theme/$folder").$file) AND empty($_POST['contents']) )
 			die('Invalid File');	
 
 		if($_POST)
@@ -242,7 +242,7 @@ class Theme_Controller extends Controller {
 			die('cannot delete safe-mode files.');
 			
 		$path		= str_replace(':','/', $path, $count);
-		$full_path	= Assets::themes_dir($path);
+		$full_path	= $this->assets->themes_dir($path);
 		
 		# if trying to delete a theme folder
 		if(0 == $count)
@@ -282,7 +282,7 @@ class Theme_Controller extends Controller {
 			$new_theme	= $_POST['theme'];
 			
 			$source	= DOCROOT . "_assets/themes/$new_theme";
-			$dest	= Assets::themes_dir($new_theme);			
+			$dest	= $this->assets->themes_dir($new_theme);			
 	
 			# If particular theme directory does not yet exist, create it.
 			if(! is_dir($dest) )
@@ -345,8 +345,8 @@ class Theme_Controller extends Controller {
 		$primary = new View("theme/logo");
 		
 		# Get all uploaded Logos
-		$dir_path	= Assets::assets_dir('banners');
-		$url_path	= Assets::assets_url('banners');	
+		$dir_path	= $this->assets->assets_dir('banners');
+		$url_path	= $this->assets->assets_url('banners');	
 		
 		if(is_dir($dir_path))
 		{
@@ -385,7 +385,7 @@ class Theme_Controller extends Controller {
 		$image		= new Image($filename);			
 		$ext		= $image->__get('ext');
 		$image_name = basename($filename).'.'.$ext;		
-		$image->save( Assets::assets_dir("banners/$image_name") );
+		$image->save( $this->assets->assets_dir("banners/$image_name") );
 
 		unlink($filename);
 		die("$image_name"); # needed to add to DOM via ajax
@@ -417,7 +417,7 @@ class Theme_Controller extends Controller {
 		if(empty($_POST['banner']))
 			die('nothing sent');
 			
-		$img_path = Assets::assets_dir("banners/{$_POST['banner']}");
+		$img_path = $this->assets->assets_dir("banners/{$_POST['banner']}");
 		if(file_exists($img_path))
 			if(unlink($img_path))
 				die('Banner deleted.');
@@ -434,17 +434,17 @@ class Theme_Controller extends Controller {
 		if('css' == $type)
 			$filtered = str_replace(
 				array('../images', '%IMAGES%', '%FILES%'),
-				array(Assets::themes_url("$theme/images"), Assets::themes_url("$theme/images"), Assets::assets_url()),
+				array($this->assets->themes_url("$theme/images"), $this->assets->themes_url("$theme/images"), $this->assets->assets_url()),
 				$contents
 			);	
 		else # is html
 			$filtered = str_replace(
 				'%FILES%',
-				Assets::assets_url(),
+				$this->assets->assets_url(),
 				$contents
 			);	
 		
-		if(file_put_contents(Assets::themes_dir("$theme/$type/$filename"), $filtered))
+		if(file_put_contents($this->assets->themes_dir("$theme/$type/$filename"), $filtered))
 			return $filename; # name is needed for DOM update
 		
 		return 'Could not update file.';
@@ -463,7 +463,7 @@ class Theme_Controller extends Controller {
 		# open pointer to directory and read list of files 
 		$d = @dir($full_dir) or die("show_dir_contents: Failed opening directory $full_dir");
 			
-		$stock_dir = Assets::themes_dir(). '/';
+		$stock_dir = $this->assets->themes_dir(). '/';
 		$short_dir = str_replace($stock_dir, '', $full_dir);
 		$short_dir = str_replace('/', ':', $short_dir);
 		

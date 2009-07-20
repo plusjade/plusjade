@@ -91,6 +91,7 @@ class Build_Page_Controller extends Template_Controller {
 		{
 			$this->template->linkCSS("get/css/tools/$page->id", url::site() );
 			$this->template->linkJS('jquery_latest.js');
+			$this->template->linkJS('ajax_form/ajax_form.js');
 			# Load Javascript files if they exist.
 			if (! empty($_SESSION['js_files']) )
 			{

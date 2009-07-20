@@ -2,9 +2,8 @@
 abstract class Edit_Tool_Controller extends Controller {
 
 /*
- *	Creates a template for edit Module controller tasks
- *	views are rendered for ajax mode
- *	provides useful automation functions		
+ * This is pretty darned depreciated - look to remove. not a high priority though.
+ * provides automation functions		
  * 
  */
  

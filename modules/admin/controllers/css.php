@@ -49,7 +49,7 @@ class Css_Controller extends Controller {
 		$tool_types = array();
 		foreach($tool_data as $tool)
 		{	
-			$theme_tool_css = Assets::themes_dir("$this->theme/tools/$tool->name/css/$tool->tool_id.css");
+			$theme_tool_css = $this->assets->themes_dir("$this->theme/tools/$tool->name/css/$tool->tool_id.css");
 			if(file_exists($theme_tool_css))
 				readfile($theme_tool_css);
 				

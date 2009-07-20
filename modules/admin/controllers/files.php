@@ -24,7 +24,7 @@ class Files_Controller extends Controller {
  */
 	public function index()
 	{
-		$files	= self::folder_contents(Assets::assets_dir(), '_sm');
+		$files	= self::folder_contents($this->assets->assets_dir(), '_sm');
 		
 		$primary = new View('files/index');
 		$primary->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
@@ -39,7 +39,7 @@ class Files_Controller extends Controller {
 	public function contents($folder=NULL)
 	{
 		$folder	= str_replace(':', '/', $folder);	
-		$files	= self::folder_contents(Assets::assets_dir($folder), '_sm');
+		$files	= self::folder_contents($this->assets->assets_dir($folder), '_sm');
 		
 		$primary = new View('files/folder');
 		$primary->files = $files;
@@ -54,7 +54,7 @@ class Files_Controller extends Controller {
 	public function add_files($directory=NULL)
 	{
 		$real_dir	= str_replace(':', '/', $directory);
-		$full_path	= Assets::assets_dir($real_dir);
+		$full_path	= $this->assets->assets_dir($real_dir);
 		if(!is_dir($full_path))
 			die('invalid directory');
 
@@ -69,7 +69,7 @@ class Files_Controller extends Controller {
 	public function upload($directory=NULL)
 	{
 		$directory = str_replace(':', '/', $directory);
-		$full_path = Assets::assets_dir($directory);
+		$full_path = $this->assets->assets_dir($directory);
 		if(!is_dir($full_path))
 			die('invalid directory');
 
@@ -133,7 +133,7 @@ class Files_Controller extends Controller {
 	public function add_folder($directory=NULL)
 	{
 		$directory = str_replace(':', '/', $directory);
-		$full_path = Assets::assets_dir($directory);
+		$full_path = $this->assets->assets_dir($directory);
 		
 		if(!is_dir($full_path))
 			die('invalid directory');
@@ -169,7 +169,7 @@ class Files_Controller extends Controller {
 		
 		$path		= str_replace(':', '/', $path);
 		$filename	= substr(strrchr($path, '/'), 1);
-		$full_path	= Assets::assets_dir($path);
+		$full_path	= $this->assets->assets_dir($path);
 		$thumb_path	= str_replace($filename, "_sm/$filename", $full_path);
 		
 		if(is_dir($full_path))
@@ -209,7 +209,7 @@ class Files_Controller extends Controller {
 		# open pointer to directory and read list of files 
 		$d = @dir($full_dir) or die("show_dir_contents: Failed opening directory $full_dir");
 		
-		$stock_dir = Assets::assets_dir();
+		$stock_dir = $this->assets->assets_dir();
 		$short_dir = str_replace("$stock_dir/", '', $full_dir);
 		$short_dir = str_replace('/', ':', $short_dir);
 		
@@ -259,7 +259,7 @@ class Files_Controller extends Controller {
 		if (0 < count($parsed_url))
 			$dir_path = implode('/', $parsed_url) . '/';
 		
-		$dir_path = Assets::assets_dir("$dir_path$filename");
+		$dir_path = $this->assets->assets_dir("$dir_path$filename");
 	
 		if(!file_exists($dir_path))
 			die('remember to do 404 not found');

@@ -18,7 +18,7 @@ foreach ($files as $path => $data)
 	{
 		$css_id			= str_replace('.', '_', $name);
 		$path			= str_replace(':', '/', $path);
-		$url			= Assets::assets_url() .'/'. $path ;
+		$url			= $this->assets->assets_url() .'/'. $path ;
 		$url_thumb		= str_replace($name, "_sm/$name", $url);
 		$display_name	= ('10' < strlen($name)) ? substr($name, 0, 10).'...' : $name;
 		$ext			= strtolower(substr(strrchr($name, "."), 1));

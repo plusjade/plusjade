@@ -218,7 +218,7 @@ class Page_Controller extends Controller {
 			")->current();			
 		
 			$template =
-				(file_exists(Assets::themes_dir("$this->theme/templates/".strtolower($toolname).'.html')))
+				(file_exists($this->assets->themes_dir("$this->theme/templates/".strtolower($toolname).'.html')))
 				? strtolower($toolname) : 'master';
 		
 			

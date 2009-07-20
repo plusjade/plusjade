@@ -3,7 +3,7 @@
 <?php extract($data)?>
 <span class="on_close two"><?php echo $js_rel_command?></span>
 
-<?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm'))?>
+<?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm', 'rel' => 'no_disable'))?>
 
 	<div id="common_tool_header" class="buttons">
 		<div id="common_title"><?php echo $toolname?> - <?php echo $tool_id?> CSS.</div>
@@ -28,7 +28,7 @@
 			<?php if(NULL != $template) echo '<li><a href="#" class="show_template">Theme Template</a></li>'?>
 			<li><a href="#" class="show_stock">+Jade Stock</a></li>
 		</ul>
-		<textarea id="edit_css" name="contents" class="blah" style="height:275px"><?php echo $contents?></textarea>
+		<textarea id="edit_css" name="contents" class="blah" style="height:260px"><?php echo $contents?></textarea>
 	</div>
 	
 	<div id="stock_contents" style="display:none"><?php echo $stock?></div>
