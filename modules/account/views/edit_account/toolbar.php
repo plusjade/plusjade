@@ -1,8 +1,7 @@
 
 
-<!--
+
 <li> 
-	<span class="icon edit_page">&nbsp; &nbsp; </span>  
-	<a href="/get/edit_text/edit/<?php echo $identifer?>" rel="facebox" lass="inline_text" el="<?php echo $identifer?>">Edit Text</a>
+	<span class="icon manage">&nbsp; &nbsp; </span>  
+	<a href="/get/edit_account/manage/<?php echo $identifer?>" rel="facebox">Manage</a>
 </li>
--->

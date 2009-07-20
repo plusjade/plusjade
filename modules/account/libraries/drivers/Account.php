@@ -128,7 +128,7 @@ abstract class Account_Driver {
 	 * @param   string   username
 	 * @return  TRUE
 	 */
-	protected function complete_login($user)
+	protected function complete_login(Account_User_Model $user)
 	{
 		// Regenerate session_id
 		$this->session->regenerate();
