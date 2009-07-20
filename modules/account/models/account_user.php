@@ -4,7 +4,7 @@ class Account_User_Model extends ORM {
 
 	// Relationships
 	protected $has_many = array('account_user_tokens');
-	protected $has_and_belongs_to_many = array('account_user_roles');
+	protected $has_and_belongs_to_many = array('account_user_roles', 'forum_comment_votes');
 
 	// Columns to ignore
 	protected $ignored_columns = array('password_confirm');
@@ -28,7 +28,7 @@ class Account_User_Model extends ORM {
 	 * @param  boolean  save the record when validation succeeds
 	 * @return boolean
 	 */
-	public function validate(array & $array, $save = FALSE)
+	public function validate(Validation $array, $save = FALSE)
 	{
 		$array = Validation::factory($array)
 			->pre_filter('trim')

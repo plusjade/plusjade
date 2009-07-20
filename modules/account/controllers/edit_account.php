@@ -3,7 +3,7 @@
 class Edit_Account_Controller extends Edit_Tool_Controller {
 
 /*
- *
+ * control how account tool functions.
  */
 	function __construct()
 	{
@@ -11,46 +11,40 @@ class Edit_Account_Controller extends Edit_Tool_Controller {
 	}
 	
 /*
- * add single Item
+ * manage user accounts
  */
-	public function add($id=NULL)
+	public function manage($id=NULL)
 	{
-		valid::id_key($id);		
-		$db = new Database;
-
-		if($_POST)
-		{
-			if(!empty($_POST['bio']))
-				$db->update(
-					'texts',
-					array('body' => $_POST['body']),
-					"id = '$id' AND fk_site = '$this->site_id'"
-				);
-			else
-				$db->update(
-					'texts',
-					array('body' => $_POST['body']),
-					"id = '$id' AND fk_site = '$this->site_id'"
-				);
-			die('Changes Saved');
-		}
-		
-		$primary = new View("edit_text/add_item");
-		$parent = $db->query("
-			SELECT * FROM texts 
-			WHERE id = '$id' 
-			AND fk_site = '$this->site_id'
-		")->current();			
-		$primary->item = $parent;
-		$primary->js_rel_command = "update-text-$parent->id";
+		$primary = new View("edit_account/manage");
+		$primary->users = ORM::factory('account_user')
+							->where('fk_site', $this->site_id)
+							->find_all();
 		die($primary);
 	}
+
 /*
- * edit a single item, uses the same logic as add so we're all good.
- */
-	public function edit($id=NULL)
+ * get a singular view of a user.
+ */	
+	function user($user_id=NULL)
 	{
-		$this->add($id);
+		valid::id_key($user_id);
+		$account_user = ORM::factory('account_user', $user_id);
+
+		if(FALSE == $account_user->loaded)
+			die('invalid user');
+		
+		$primary = new View('edit_account/user_view');
+		$primary->user = $account_user;
+		die($primary);
+	}
+	
+	function delete_user($user_id=NULL)
+	{
+		valid::id_key($user_id);
+		ORM::factory('account_user')
+		->where('fk_site', $this->site_id)
+		->delete($user_id);
+		die('User deleted');
 	}
 	
 	static function _tool_adder($tool_id, $site_id)
@@ -64,4 +58,4 @@ class Edit_Account_Controller extends Edit_Tool_Controller {
 	}
 }
 
-/* -- end of application/controllers/showroom.php -- */
+/* -- end -- */
