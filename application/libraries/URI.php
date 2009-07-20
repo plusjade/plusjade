@@ -55,7 +55,7 @@ class URI_Core extends Router {
 	 * jades edit because we tweaked controller display
 	 *
 	 */
-	public function easy_segment($index = 1)
+	public static function easy_segment($index = 1)
 	{
 		$parts	= explode('/', $_SERVER['REQUEST_URI']);	
 		if(!empty($parts["$index"]))
@@ -65,7 +65,7 @@ class URI_Core extends Router {
 	}
 	
 
-	public function url_array()
+	public static function url_array()
 	{
 		$parts	= explode('/', $_SERVER['REQUEST_URI']);	
 		$url_array = array();

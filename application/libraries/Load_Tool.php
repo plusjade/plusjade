@@ -7,7 +7,7 @@ class Load_Tool_Core {
  * Used @ /application/controllers/build_page.php
  *
  */
-	function factory($tool)
+	public static function factory($tool)
 	{
 		$tool = ucwords($tool);
 		switch ($tool)
@@ -47,7 +47,10 @@ class Load_Tool_Core {
 				break;
 			case 'Account':
 				$tool = new Account_Controller(); 			
-				break;						
+				break;
+			case 'Forum':
+				$tool = new Forum_Controller(); 			
+				break;					
 			default:
 				die("<b>error:</b> '$tool' tool does not exist (Load_Tool::factory)");
 		}	
@@ -57,7 +60,7 @@ class Load_Tool_Core {
 /* 
  * Loads a tool instance, but for admin/edit controllers.
 */
-	function edit_factory($tool)
+	public static function edit_factory($tool)
 	{
 		$tool = ucwords($tool);
 		switch ($tool)
@@ -97,6 +100,9 @@ class Load_Tool_Core {
 				break;						
 			case 'Account':
 				$tool = new Edit_Account_Controller();
+				break;
+			case 'Forum':
+				$tool = new Edit_Forum_Controller();
 				break;
 			default:
 				die("<b>error:</b> '$tool' edit_tool does not exist (Load_Tool::edit_factory)");

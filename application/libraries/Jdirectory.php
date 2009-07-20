@@ -8,7 +8,7 @@ class Jdirectory_Core {
  * Copies all files and folders in a directory to another directory
  * //http://us2.php.net/manual/en/function.copy.php#86738
  */
-	public function copy($srcdir, $dstdir, $offset = '', $verbose = false)
+	public static function copy($srcdir, $dstdir, $offset = '', $verbose = false)
 	{
 		if(!isset($offset))
 			$offset=0;
@@ -67,7 +67,7 @@ class Jdirectory_Core {
  * Remove a filled directory recursively
  * DOCS: http://us2.php.net/manual/en/function.rmdir.php#88723
  */
-	public function remove($path)
+	public static function remove($path)
 	{
 		$path = rtrim($path, '/').'/';
 		if(!is_dir($path))

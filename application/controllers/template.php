@@ -33,7 +33,7 @@ abstract class Template_Controller extends Controller {
 		if($this->client->can_edit($this->site_id))
 		{
 			# inline modular global css
-			$css_path = Assets::themes_dir("$this->theme/css/global.css");
+			$css_path = $this->assets->themes_dir("$this->theme/css/global.css");
 
 			$css = (file_exists($css_path)) ?
 				file_get_contents($css_path) : '/* global.css file does not exist. Please create it.*/';
@@ -79,14 +79,14 @@ abstract class Template_Controller extends Controller {
 		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');
 		$template 	= ((NULL == $template)) ? 'master' : $template;
-		$path		= Assets::themes_dir("$this->theme/templates");
+		$path		= $this->assets->themes_dir("$this->theme/templates");
 		
 		ob_start();	
 		if (file_exists("$path/$template.html"))
 			readfile("$path/$template.html");	
 		else
 		{
-			if (!file_exists("$path/master.html"))
+			if(!file_exists("$path/master.html"))
 			{
 				$rootsite = ROOTDOMAIN;
 				die("Missing 'master.html' for theme: $this->theme : <a href=\"http://$rootsite/get/auth\">enter safe-mode</a>");

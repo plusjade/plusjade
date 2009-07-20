@@ -83,7 +83,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			valid::id_key($tool_id);
-			echo Tree::save_tree('showrooms', 'showroom_items', $tool_id, $_POST['output']);
+			echo Tree::save_tree('showrooms', 'showroom_items', $tool_id, $this->site_id, $_POST['output']);
 		}
 		die();
 	}	
@@ -127,7 +127,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			$insert_id = $db->insert('showroom_items', $data)->insert_id(); 	
 
 			# Update left and right values
-			Tree::rebuild_tree('showroom_items', $parent->root_id, '1');
+			Tree::rebuild_tree('showroom_items', $parent->root_id, $this->site_id, '1');
 			
 			die("$insert_id");  # need for javascript
 		}

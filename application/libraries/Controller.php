@@ -27,14 +27,18 @@ abstract class Controller_Core {
 		$this->site_id 		= $site_config['site_id'];
 		$this->site_name 	= $site_config['site_name'];
 		$this->theme 		= $site_config['theme'];
-		$this->banner 		= @$site_config['banner']; # banner can be empty
+		$this->banner 		= @$site_config['banner']; # banner can be empty: fix this.
 		$this->homepage 	= $site_config['homepage'];
+		$this->account_page	= $site_config['account_page'];
 		
 		# Auth Instance
 		$this->client = new Auth;	
 		
 		# account instance Instance
 		$this->account_user = new Account;
+		
+		# load the assets class to fetch appropriate urls.
+		$this->assets = Assets::instance($this->site_name, $this->theme);
 		
 		if (Kohana::$instance == NULL)
 		{
@@ -106,7 +110,7 @@ abstract class Controller_Core {
 		if($this->client->can_edit($this->site_id))
 		{
 			# Get CSS
-			$custom_css	= Assets::themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
+			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
 			$contents	= (file_exists($custom_css)) ? file_get_contents($custom_css) : '';
 			$template->custom_css = "
 				<style type=\"text/css\" id=\"$toolname-$tool_id-style\">

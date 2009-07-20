@@ -62,7 +62,7 @@ $config['enable_hooks'] = TRUE;
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 1;
+$config['log_threshold'] = 3;
 
 /**
  * Message logging directory.
@@ -109,6 +109,7 @@ $config['modules'] = array
 	MODPATH.'faq',
 	MODPATH.'album',
 	MODPATH.'blog',
-	MODPATH.'account'
+	MODPATH.'account',
+	MODPATH.'forum'
 
 );

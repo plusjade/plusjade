@@ -292,9 +292,11 @@ $('body').keyup($.delegate({
 			beforeSubmit: function(fields, form){
 				if(! $("input", form[0]).jade_validate() ) return false;
 
-				$('button', form[0])
-				.attr('disabled','disabled')
-				.removeClass('jade_positive');
+				if('no_disable' != $(form[0]).attr('rel'))
+					$('button', form[0])
+					.attr('disabled','disabled')
+					.removeClass('jade_positive');
+				
 				$('.admin_reset .show_submit').show();
 				$('#show_response_beta').html('waiting for response...');
 			},

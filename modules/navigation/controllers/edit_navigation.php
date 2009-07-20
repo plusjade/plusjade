@@ -96,7 +96,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			valid::id_key($tool_id);
-			echo Tree::save_tree('navigations', 'navigation_items', $tool_id, $_POST['output']);
+			echo Tree::save_tree('navigations', 'navigation_items', $tool_id, $this->site_id, $_POST['output']);
 		}
 		die();
 	}

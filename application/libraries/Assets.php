@@ -11,6 +11,30 @@ class Assets_Core {
  */
 
  
+	public function __construct($site_name, $theme)
+	{
+		$this->site_name = $site_name;
+		$this->theme	 = $theme;
+	}	
+ 
+/**
+ * Returns a singleton instance of assets class.
+ *
+ * @return  object
+ */
+	public static function instance($site_name, $theme)
+	{
+		static $instance;
+
+		if ($instance == NULL)
+		{
+			// Initialize the assets instance
+			$instance = new Assets($site_name, $theme);
+		}
+
+		return $instance;
+	}
+ 
 /*
  * returns the full root path to this site's  _data folder.
  */	
@@ -77,7 +101,7 @@ class Assets_Core {
 
 /*
  * returns the url to the activated theme folder
- */		
+ */	
 	function theme_url($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
