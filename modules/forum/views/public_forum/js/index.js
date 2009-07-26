@@ -1,4 +1,7 @@
-$('#forum_index_wrapper li a').click(function(){
+
+
+// the main left panel links
+$('#forum_navigation_wrapper a').click(function(){
 	var url = $(this).attr('href');
 	$('#forum_content_wrapper')
 	.html('<div class="ajax_loading">Loading...</div>')
@@ -7,20 +10,34 @@ $('#forum_index_wrapper li a').click(function(){
 });
 	
 $('#forum_content_wrapper').click($.delegate({
-	'a.preview': function(e){
-		var id = $(e.target).attr('rel');
-		$('blockquote#preview_'+ id).slideToggle('fast');
-		return false;
-	},	
 	
-	'a.load_post_view' : function(e){
+	// load links into main panel.
+	'a.forum_load_main' : function(e){
 		var url = $(e.target).attr('href');
 		$('#forum_content_wrapper')
 		.html('<div class="ajax_loading">Loading...</div>')
 		.load(url);
+		return false;	
+	},
+	
+	// post preview toggle
+	'a.preview': function(e){
+		var id = $(e.target).attr('rel');
+		$('div#preview_'+ id).slideToggle('fast');
 		return false;
 	},
-
+	
+	// sort tab actions
+	'ul.sort_list a' : function(e){
+		$('ul.sort_list a').removeClass('selected');
+		var url = $(e.target).addClass('selected').attr('href');
+		$('#list_wrapper')
+		.html('<div class="ajax_loading">Loading...</div>')
+		.load(url);
+		return false;
+	},
+	
+	// vote links.
 	'.cast_vote' : function(e){
 		var url = $(e.target).attr('href');
 		var count = $(e.target).siblings('span').html();
@@ -31,9 +48,11 @@ $('#forum_content_wrapper').click($.delegate({
 		
 		$(e.target).parent('div').children('a').remove();
 		
-		$.get(url, function(data){
-		});
+		$.get(url, function(data){});
 		return false;
 	}
 	
 }));
+
+// add friendly time.
+$('abbr[class*=timeago]').timeago();

@@ -16,13 +16,15 @@
 <div class="common_main_panel">	
 	<ul id="generic_sortable_list" class="ui-tabs-nav">
 		<?php foreach($categories as $category):?>
-			<li id="item_<?php echo $category->id?>" class="root_entry"> 
-				<ul class="row_wrapper">
-					<li class="drag_box"><span class="icon move"> &#160; &#160; </span> DRAG </li>
-					<li class="position"><?php echo $category->position?>. </li>
-					<li class="data"><span><?php echo $category->name?></span></li>
-					<li class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/edit_forum/delete/<?php echo $category->id?>" rel="<?php echo $category->id?>">delete</a></li>
+			<li id="category_<?php echo $category->id?>"> 
+				<ul>
+					<li class="drag_box"></li>
 				</ul>
+				
+				<td width="60px" class="drag_box"> <span class="icon move"> &#160; &#160; </span> DRAG </td>
+				<td width="30px" class="aligncenter"><?php echo $category->position?>. </td>
+				<td class="page_edit"><span><?php echo $category->name?></span></td>
+				<td class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/edit_forum/delete/<?php echo "$tool_id/$category->id"?>">delete</a></td>
 			</li>		
 		<?php endforeach;?>
 	</ul>
@@ -31,12 +33,12 @@
 <div class="save_pane fieldsets" style="display:none">
 	<span class="icon cross floatright">&#160; &#160;</span>
 	<form class="add_cat_form" action="/get/edit_forum/add/<?php echo $tool_id?>" method="post">
-		<h2>New Category</h2>
+		<h2>New Category</h2>	
 		<b>Name</b>
-		<br><input type="text" name="name" rel="text_req" class="send_input">
+		<br><input type="text" name="name" rel="text_req">
 		<br><br>
 		<b>Url</b>
-		<br><input type="text" name="url" rel="text_req" class="auto_filename receive_input">
+		<br><input type="text" name="url" rel="text_req" class="auto_filename">
 		<br><br>
 		<button type="submit" class="jade_positive">Add Category</button>
 	</form>
@@ -56,8 +58,7 @@
 			},
 			success: function(data) {
 				var data = data.split('|'); 
-				var html = '<li id="item_'+ data[0] +'" class="root_entry"><ul class="row_wrapper"><li class="drag_box"><span class="icon move"> &#160; &#160; </span> DRAG </li><li class="position">0.</li><li class="data"><span>'+ data[1] +'</span></li><li class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/edit_forum/delete/'+ data[0] +'" rel="'+ data[0] +'">delete</a></li></ul></li>';				
-				
+				var html = '<li id="category_'+ data[0] +'"> <table><tr> <td width="60px" class="drag_box"> <span class="icon move"> &#160; &#160; </span> DRAG </td> <td width="30px" class="aligncenter">0. </td> <td class="page_edit"><span>'+ data[1] +'</span></td></tr></table> </li>';
 				$('#generic_sortable_list').prepend(html);
 				$('div.save_pane.helper').html(data[2]);
 				setTimeout('$("div.save_pane.helper").remove()', 1200);
@@ -75,7 +76,7 @@
 		containment : '.common_main_panel'
 	});
 	
-	<?php echo javascript::save_sort('forum')?>
 	
-	
+		
+	<?php echo javascript::save_sort('forum', $tool_id)?>
 </script>

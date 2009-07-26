@@ -220,3 +220,5 @@ CREATE TABLE IF NOT EXISTS forum_comment_votes (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
  
   
+  
+  ALTER TABLE `forum_cat_posts` ADD `last_active` INT( 10 ) NOT NULL 

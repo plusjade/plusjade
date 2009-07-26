@@ -18,13 +18,13 @@
 
 
 
-.forum_comments_wrapper{
+.forum_comments_list_wrapper{
 margin:10px 0;
 padding:15px 0;
 border-top:3px double #999;
 border-bottom:3px double #999;
 }
-.forum_comments_wrapper div.thread_item{
+.forum_comments_list_wrapper div.thread_item{
 clear:both;
 overflow:auto;
 margin-bottom:10px;
@@ -44,7 +44,7 @@ text-align:center;
 font-size:1.8em;
 }
 
-.forum_comments_wrapper .comment_body{
+.forum_comments_list_wrapper .comment_body{
 width:83%;
 float:right;
 padding:10px;

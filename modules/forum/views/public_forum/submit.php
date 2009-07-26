@@ -9,22 +9,21 @@
 	<select name="forum_cat_id">
 		<?php
 		foreach($categories as $cat)
-			echo "<option value=\"$cat->id\">$cat->name</option>";
+			echo "<option value=\"$cat->id\" rel=\"$cat->url\">$cat->name</option>";
 		?>
 	</select>
 	
 	<br><br>
 	
 	<b>Title</b>
-	<br><input type="text" name="title" rel="text_req">
+	<br><input type="text" name="title" rel="text_req" style="width:500px">
 	
 	<br><br>
 	
 	<b>Post</b>
-	<br><textarea name="body"></textarea>
-	
-	<br><br>
-	<button type="submit">Post</button>
+	<br><textarea name="body" style="height:150px;width:100%"></textarea>
+	<br>
+	<button type="submit">Submit</button>
 </form>
 
 
@@ -33,11 +32,13 @@ $('#forum_submit_item').ajaxForm({
 	//target: "#contact_wrapper_%VAR% #newsletter_form",
 	beforeSubmit: function(fields, form) {
 		if(!$("input[type=text]", form[0]).jade_validate() ) return false;
-		
-		$('#forum_submit_item').html('<div class="ajax_loading">loading...</div>');
 	},
 	success: function(data) {
-		$('#forum_submit_item').html(data);
+		// todo: output a success message man.
+		var category = $('select[name="forum_cat_id"] > option:selected').attr('rel');
+		$('#forum_content_wrapper')
+		.html('<div class="ajax_loading">loading...</div>')
+		.load('<?php echo url::site("$page_name/category")?>/'+ category);
 	}
 });
 
