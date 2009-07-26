@@ -9,25 +9,21 @@ class Text_Controller extends Controller {
 
 	function _index($tool_id)
 	{		
-		$db = new Database;
-		$primary = new View("public_text/index");
-		
-		$parent = $db->query("
-			SELECT * FROM texts 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-		")->current();			
-		
+		$text = ORM::factory('text')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $text->loaded)
+			return $this->public_template('this text id not found.', 'text', $tool_id, '');
+	
 		# Need this to be able to append toolbar in edit mode
-		if( empty($parent->body) AND $this->client->logged_in() )
-			$parent->body = '<p class="aligncenter">(sample text)</p>';
+		if( empty($text->body) AND $this->client->logged_in() )
+			$text->body = '<p class="aligncenter">(sample text)</p>';
 		
-		$primary->item = $parent;
-		
-		
-		return $this->public_template($primary, 'text', $tool_id, $parent->attributes);
+		$primary = new View("public_text/index");
+		$primary->item = $text;
+		return $this->public_template($primary, 'text', $tool_id, $text->attributes);
 	}
 	
 }
 
-/* -- end of application/controllers/showroom.php -- */
+/* -- end -- */

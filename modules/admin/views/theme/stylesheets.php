@@ -79,7 +79,7 @@
 /* ------------------ editor buttons  ------------------ */ 
 
 // store the original
-	original = $('textarea#edit_css').val();
+	var original = $('textarea#edit_css').val();
 
 // revert original css into the textarea
 	$('.show_orig').click(function(){
@@ -88,8 +88,8 @@
 	});
 // update the dom with current css
 	$('a.update').click(function(){
-		value	= $('textarea#edit_css').val();
-		css		= '<style id="global-style" type="text/css">'+ value +'</style>';
+		var value	= $('textarea#edit_css').val();
+		var css		= '<style id="global-style" type="text/css">'+ value +'</style>';
 		$('#global-style').replaceWith(css);
 		return false;
 	});	
@@ -98,8 +98,8 @@
 	$('textarea#edit_css').keydown(function(e){
 		// 16 = SHIFT, 9 = tab
 		if (e.keyCode == 9) {		
-			value	= $('textarea#edit_css').val();
-			css		= '<style id="global-style" type="text/css">'+ value +'</style>';
+			var value	= $('textarea#edit_css').val();
+			var css		= '<style id="global-style" type="text/css">'+ value +'</style>';
 			$('#global-style').replaceWith(css);
 			return false;
 		}	
@@ -110,7 +110,7 @@
 
 // Load file from select dropdown into textarea
 	$("#load_sheet").click(function(){
-		value = $("select[name='files'] option:selected").text();		
+		var value = $("select[name='files'] option:selected").text();		
 		$('textarea#edit_css').val('Loading file...');
 		$.get('/get/theme/load/css/'+ value +'?v=39840',
 			function(data){
@@ -126,7 +126,7 @@
 
 // delete a stylesheet
 	$("#delete_sheet").click(function(){
-		file = $("select[name='files'] option:selected").text();		
+		var file = $("select[name='files'] option:selected").text();		
 		if(confirm('This cannot be undone. Delete stylesheet: '+ file))
 			$.get('/get/theme/delete/<?php echo $this->theme?>:css:'+ file,
 				function(data){
@@ -152,9 +152,9 @@
 
 		// update a file
 		'button.update_file': function(){
-			file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
+			var file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
 			$('div.save_pane.helper').html('<div class="loading">Saving '+ file +'...</div>');
-			contents = $('textarea#edit_css').val();
+			var contents = $('textarea#edit_css').val();
 			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
 				$('div.save_pane.helper').html(data);
 				$('button#show_save').removeAttr('disabled');
@@ -166,9 +166,9 @@
 		
 		// save as new
 		'button.new_file': function(){
-			file = $("div.save_pane.helper input[name='new_file']").val() + '.css';	
+			var file = $("div.save_pane.helper input[name='new_file']").val() + '.css';	
 			$('div.save_pane.helper').html('Creating ...'+ file);
-			contents = $('textarea#edit_css').val();
+			var contents = $('textarea#edit_css').val();
 			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
 				$('select.files_list').append('<option value="'+ data +'">'+ data +'</option>');
 				$("div.save_pane.helper").remove();

@@ -8,7 +8,7 @@
 	</div>	
 		
 	<div id="new_page_url">
-		Your new page URL:
+		Link to this page.
 		<br><b><?php echo url::site()."$directory$slash"?><span id="link_example">...</span></b>
 	</div>	
 	
@@ -19,10 +19,10 @@
 	<div class="common_main_panel fieldsets big">
 
 		<b>Page Label</b>
-		<br><input id="" type="text" name="label" value="" rel="text_req" maxlength="50" style="width:330px">
+		<br><input type="text" name="label" rel="text_req" maxlength="50" class="send_input" style="width:330px">
 		<br><br>
 		<b>Page Link</b>
-		<br><input type="text" name="page_name" maxlength="50" style="width:330px">
+		<br><input type="text" name="page_name" maxlength="50" class="auto_filename receive_input" style="width:330px">
 		<div id="page_exists" class="aligncenter error_msg"></div>
 	
 		<p style="line-height:1.6em">
@@ -52,58 +52,16 @@
 
 <?php if('' == $directory) $directory = 'ROOT' # for javascript?>
 <script type="text/javascript">
-
+	var filter = [<?php echo $filter?>];		
 	
-// if page_builder, update the name/label/url views
-	$("select[name='page_builder']").change(function(){	
-		value = '';
-		num = $("option:selected", this).val();
-		if(0 != num)
-			value = $("option:selected", this).text();
-			
-		$("input[name='label']").val(value);
-		$("input[name='page_name']").val(value.toLowerCase());
-		$('span#link_example').html(value.toLowerCase());
-		
-	});
-	
-	
-//sanitize and populate page_name fields
-	$("input[name='label']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
-		$("input[name='page_name']").val(input);
-		$('span#link_example').html(input);
-	});
-	$("input[name='page_name']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
-		$(this).val(input);
-		$('span#link_example').html(input);
-	});
-	
-/* 
- * custom validation to check for unique page_names
- */
-	Array.prototype.in_array = function(p_val) {
-		for(var i = 0, l = this.length; i < l; i++) {
-			if(this[i] == p_val)
-				return true;
-		}
-		return false;
-	}
-	
-// load the page_name filter
-	var filter = [<?php echo $filter?>];
-		
-/* 
- * custom ajax form, validates inputs and unique page_names
- */		
+// custom ajax form, validates inputs and unique page_names	
 	$(".custom_ajaxForm").ajaxForm({
 		beforeSubmit: function(){
 			if(! $(".custom_ajaxForm input").jade_validate() )
 				return false
 
-			sent_page = $("input[name='page_name']").val();				
-			filter_duplicates = filter.in_array(sent_page);
+			var sent_page = $("input[name='page_name']").val();				
+			var filter_duplicates = filter.in_array(sent_page);
 			
 			if(filter_duplicates) {
 				$('#page_exists').html('Page name already exists');
@@ -115,21 +73,22 @@
 		success: function(data) {
 			$('.facebox .show_submit').hide();
 			$.facebox.close('facebox_2');
-			directory = '<?php echo $directory?>';
-			path_for_css = directory.replace(/\//g,'_');
+			var directory = '<?php echo $directory?>';
+			var path_for_css = directory.replace(/\//g,'_');
 			$('div.'+path_for_css).append(data);
 			$('#show_response_beta').html(data);				
 		}
 	});
 	
-	// template select dropdown
-	selected = $("select[name='template'] option:selected").text();
+// template select dropdown
+	var selected = $("select[name='template'] option:selected").text();
 	$('#template_desc div').hide();
 	$('#template_desc div.'+selected).show();
 	
 	$("select[name='template']").change(function(){
 		$('#template_desc div').hide();
-		value = $('option:selected',this).text();
+		var value = $('option:selected',this).text();
 		$('#template_desc div.'+value).show();
-	});	
+	});
+	
 </script>

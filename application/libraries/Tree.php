@@ -143,76 +143,76 @@ class Tree_Core {
 /*
  * Saves the nested positions of the menu elements
  * Can also delete any elements removed from the list.
- * $parent_table	= name of the parent table
- * $item_table		= name of the items table
+ * $parent_model	= name of tool table model
+ * $item_model		= name of name of the tool item table model
  * $tool_id			= tool id
  * $output			= unformatted string from ul list
+		
+		output variable comes via ajax post request
+		Data Format: < id:local_parent:position| >
  */ 
-	public static function save_tree($parent_table, $item_table, $tool_id, $site_id, $output)
+	public static function save_tree($parent_model, $item_model, $tool_id, $site_id, $output)
 	{
-		$db = new Database;
-		$all_items = array();
+		$all_items	= array();
+		$elements	= explode('|', rtrim($output, '|'));
 		
-		/* output variable comes via ajax post request
-		 * Data Format: < id:local_parent:position| >
-		 */
-		$output	= rtrim($output, '|');
-		$elements	= explode('|', $output);
-		
-		# Get parent table to find children 
-		# *root_id* of the root child.
-		$parent_object = $db->query("
-			SELECT * FROM $parent_table 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$site_id'
-		")->current();
+		$parent_object = ORM::factory($parent_model)
+			->where('fk_site', $site_id)
+			->find($tool_id);
 	
 		# Get all items (omit root) so we can delete items not sent.
-		$items = $db->query("
-			SELECT id FROM $item_table 
-			WHERE parent_id = '$tool_id' 
-			AND local_parent != '0'
-		");
+		$items = ORM::factory($item_model)
+			->where(array(
+				'fk_site' => $site_id,
+				"{$parent_model}_id" => $tool_id,
+				'local_parent != ' => '0'
+			))
+			->find_all();
 	
 		foreach($items as $item)
 			$all_items[$item->id] = $item->id;
+
+		# echo '<pre>';print_r($elements);echo'</pre>';die();
 		
-		# Trouble shoot
-		# echo '<div style="font-size:1.4em; width:300px; height:300px"><pre>';print_r($elements);echo'</pre>';echo '</div>';die();
-		
-		# If at least one still exists...
-		if(! empty($elements['0']) )
+		# if more than one exists ...
+		if(1 < count($elements))
 		{
-			# Data Format is : "id:local_parent:position"
 			foreach($elements as $element)
 			{
 				$element_data = explode(':', $element);
-				list($id, $parent, $position) = $element_data;
 				
-				# If no parent, assign to root_id
-				# Javascript assigns "0" to elements returning no parent
-				if( '0' == $parent ) $parent = $parent_object->root_id;
+				# validate the data so corrupt data does not break the tree.
+				foreach($element_data as $data)
+					if(empty($data) OR !ctype_digit($data))
+						continue 2;
+				
+				list($id, $parent, $position) = $element_data;
 
-				$data = array(
-					'local_parent'	=> $parent,
-					'position'		=> $position
-				);
-				$db->update($item_table, $data, "id = '$id' AND fk_site = $site_id"); 	
-		
+				# If no parent, assign to root_id // Javascript assigns "0" to elements returning no parent
+				if('0' == $parent)
+					$parent = $parent_object->root_id;
+
+				# todo: reference fk_site.
+				$item = ORM::factory($item_model, $id); 
+				$item->local_parent = $parent;
+				$item->position = $position;
+				$item->save();	
+				
 				# Item exists so remove from the delete array.
 				unset($all_items[$id]);
 			}
 		}
 			
 		# Delete elements.
-		if( 0 < count($all_items) )
+		if(0 < count($all_items))
 		{
-			$id_string = implode(',', $all_items);
-			$db->delete($item_table, "id IN ($id_string) AND fk_site = '$site_id'" ); 
+			ORM::factory($item_model)
+				->where('fk_site', $site_id)
+				->delete_all($all_items);
 		}
 
 		# Update Left and right values of whole tree
-		self::rebuild_tree($item_table, $parent_object->root_id, $site_id, '1');
+		self::rebuild_tree($item_model, $parent_object->root_id, $site_id, '1');
 		
 		return 'Tree Saved'; # status response	
 	}
@@ -225,35 +225,33 @@ class Tree_Core {
  * $local_parent starts with root_id,
  * $left starts with 1
  */
-	public static function rebuild_tree($table, $local_parent, $site_id, $left)
+	public static function rebuild_tree($model, $local_parent, $site_id, $left)
 	{
 		# the right value of this node is the left value + 1
 		$right = $left+1;
+		
+		$navigation_items = ORM::factory($model)
+			->where(array(
+				'fk_site'		=> $site_id,
+				'local_parent'	=> $local_parent,
+			))
+			->orderby('position', 'asc')
+			->find_all();	
 
-		# get all children of this node
-		$result = mysql_query("
-			SELECT id FROM $table 
-			WHERE local_parent='$local_parent' 
-			AND fk_site = '$site_id'
-			ORDER BY position
-		");
-
-		while ($row = mysql_fetch_array($result))
+		foreach($navigation_items as $item)
 		{
-		   # recursive execution of this function for each
-		   # child of this node
-		   # $right is the current right value, which is
+		   # recursive function for each child of this node
+		   # $right is the current right value;
 		   # incremented by the rebuild_tree function
-		   $right = Tree::rebuild_tree($table, $row['id'], $site_id, $right);
+		   $right = Tree::rebuild_tree($model, $item->id, $site_id, $right);
 		}
-
+		
 		# we've got the left value, and now that we've processed
 		# the children of this node we also know the right value
-		mysql_query("
-			UPDATE $table 
-			SET lft='$left', rgt='$right' 
-			WHERE id='$local_parent' AND fk_site = '$site_id'
-		");
+		$item = ORM::factory($model, $local_parent); 
+		$item->lft = $left;
+		$item->rgt = $right;
+		$item->save();		
 
 		# return the right value of this node + 1
 		return $right+1;

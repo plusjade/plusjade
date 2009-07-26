@@ -9,29 +9,24 @@ class Calendar_Controller extends Controller {
 
 	function _index($tool_id)
 	{
-		$primary	= new View('public_calendar/index');
 		$url_array	= Uri::url_array();
+		$page_name	= $this->get_page_name($url_array['0'], 'calendar', $tool_id);
 		$action		= (empty($action)) ? 'nonsense' : $url_array['1'];
 		$year		= $url_array['2'];
 		$month		= $url_array['3'];
 		$day		= $url_array['4'];
-
+		$primary	= new View('public_calendar/index');
 		
 		switch($action)
 		{
-			case 'month':				
-				$primary->calendar = $this->month($tool_id, $year, $month);
-				break;
-				
+			case 'month':
+				break;				
 			case 'day':
-				$primary->calendar = $this->month($tool_id, $year, $month);
 				$primary->events = $this->day($tool_id, $year, $month, $day);
-				break;
-				
+				break;			
 			default:
 				$year	= date('Y');
-				$month	= date('m');	
-				$primary->calendar = $this->month($tool_id, $year, $month);
+				$month	= date('m');
 				break;
 		}
 		
@@ -42,64 +37,62 @@ class Calendar_Controller extends Controller {
 					$().add_toolkit_items("calendar");
 				});			
 			');
-			
+
+		$primary->calendar = $this->month($page_name, $tool_id, $year, $month);	
 		return $this->public_template($primary, 'calendar', $tool_id);
 	}
 
-	# Ajax query for month (last and next buttons)
-	function month($tool_id, $year=NULL, $month=NULL)
+/*
+ * Ajax query for month (last and next buttons)
+ */
+	function month($page_name, $tool_id, $year=NULL, $month=NULL)
 	{
 		valid::id_key($tool_id);
 		valid::year($year);
 		valid::month($month);
-		$calendar	= new Calendar;
-		$db			= new Database;
 		$date_array = array();
-		
-		$calendar_page_name	= uri::easy_segment('1');
-		$calendar_page_name = $this->get_page_name($calendar_page_name, 'calendar', $tool_id);
-		
-		# Create array for dates associated with this month
-		$dates = $db->query("
-			SELECT day FROM calendar_items 
-			WHERE fk_site = '$this->site_id'
-			AND parent_id = '$tool_id'
-			AND year = '$year'
-			AND month = '$month'
-			ORDER BY day
-		");		
-		
+
+		$dates = ORM::factory('calendar_item')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'calendar_id'	=> $tool_id,
+				'year'			=> $year,
+				'month'			=> $month,
+			))
+			->find_all();		
 		/*
 		 * Create an array with key/value pairs = day/number of events on day
 		 * This lets the calendar know which dates to show links for.
 		 */
-
 		for($x=0; $x<=31; ++$x)
 			$date_array[$x] = 0;
 
 		foreach($dates as $date)
 			(int) ++$date_array[$date->day];
 	
-		return $calendar->getPhpAjaxCalendar($calendar_page_name, $month, $year, $date_array, 'day_function');
+		$calendar = new Calendar;
+		return $calendar->getPhpAjaxCalendar($page_name, $month, $year, $date_array, 'day_function');
 	}
 	
 	
-# Ajax get a list of events for a certain date
+/* 
+ * Ajax get a list of events for a certain date
+ */
 	public function day($tool_id, $year=NULL, $month=NULL, $day=NULL)
 	{
 		valid::year($year);
 		valid::month($month);
 		valid::day($day);
-		$db = new Database;
-		
-		$events = $db->query("
-			SELECT * FROM calendar_items 
-			WHERE fk_site = '$this->site_id'
-			AND parent_id = '$tool_id'
-			AND year = '$year'  
-			AND month = '$month'
-			AND day = '$day'
-		");
+
+		$events = ORM::factory('calendar_item')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'calendar_id'	=> $tool_id,
+				'year'			=> $year,
+				'month'			=> $month,
+				'day'			=> $day,
+			))
+			->find_all();	
 	
 		$primary = new View('public_calendar/day');
 		$primary->events = $events;
@@ -107,9 +100,12 @@ class Calendar_Controller extends Controller {
 		return $primary;
 	}
 
-	# not in use
+/* 
+ * OFFLINE
+ */
 	public function event($id=NULL)
 	{
+		die('offline');
 		valid::id_key($id);
 		$db = new Database;
 		
@@ -139,10 +135,7 @@ class Calendar_Controller extends Controller {
 	}
 	
 /*
- * page builders frequently use ajax to update their content
- * common method for handling ajax requests.
- * param $url_array = (array) an array of url signifiers
- * param $tool_id 	= (int) the tool id of the tool.
+ * ajax handler.
  */ 	
 	function _ajax($url_array, $tool_id)
 	{		
@@ -154,7 +147,7 @@ class Calendar_Controller extends Controller {
 		$day	= @$url_array['4'];
 		*/
 		if('month' == $url_array['1'])
-			die( self::month($tool_id, $url_array['2'], $url_array['3']) );
+			die( self::month($url_array['0'], $tool_id, $url_array['2'], $url_array['3']) );
 		elseif('day' == $url_array['1'])
 			die( self::day($tool_id, $url_array['2'], $url_array['3'], $url_array['4']) );
 	

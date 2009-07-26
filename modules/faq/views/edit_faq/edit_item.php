@@ -4,7 +4,7 @@
 <form action="/get/edit_faq/edit/<?php echo $item->id?>" method="POST" class="ajaxForm">	
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="save_changes" class="jade_positive">Save Changes</button>
+		<button type="submit" class="jade_positive">Save Changes</button>
 		<div id="common_title">Edit FAQ</div>
 	</div>	
 

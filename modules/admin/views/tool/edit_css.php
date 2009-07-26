@@ -38,8 +38,8 @@
 <script type="text/javascript">
 
 	$('a.update').click(function(){
-		value	= $('textarea#edit_css').val();
-		css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
+		var value	= $('textarea#edit_css').val();
+		var css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
 		$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
 		return false;
 	});
@@ -47,28 +47,28 @@
 	$('textarea#edit_css').keydown(function(e){
 	// 16 = SHIFT, 9 = tab
 	  if (e.keyCode == 9) {		
-			value	= $('textarea#edit_css').val();
-			css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
+			var value	= $('textarea#edit_css').val();
+			var css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
 			$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
 			return false;
 		}	
 	});
 
 	
-	original = $('textarea#edit_css').val();
+	var original = $('textarea#edit_css').val();
 	$('.show_orig').click(function(){
 		$('textarea#edit_css').val(original);
 		return false;
 	});
 	
 	$('.show_template').click(function(){
-		contents = $('#template_contents').html();
+		var contents = $('#template_contents').html();
 		$('textarea#edit_css').val(contents);
 		return false;
 	});
 	
 	$('.show_stock').click(function(){
-		contents = $('#stock_contents').html();
+		var contents = $('#stock_contents').html();
 		$('textarea#edit_css').val(contents);
 		return false;
 	});

@@ -2,7 +2,7 @@
 <span class="on_close">update-showroom-<?php echo $tool_id?></span>
 
 <div  id="common_tool_header" class="buttons">
-	<button type="submit" id="link_save_sort" class="jade_positive">Save Category Tree</button>
+	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>" title="showroom">Save Category Tree</button>
 	<div id="common_title">Manage Showroom Categories</div>
 </div>	
 
@@ -18,7 +18,7 @@
 	</ul>
 </div>
 
-<div id="admin_showroom_wrapper" class="common_main_panel" style="height:400px;overflow:auto">
+<div id="simpletree_wrapper" class="common_main_panel" style="height:400px;overflow:auto">
 	<?php echo $tree?>
 </div>
 
@@ -27,9 +27,9 @@
 	<span class="icon cross floatright">&#160; &#160; </span>
 	<div id="common_title">Add a New Category</div>
 	<b>Category Name</b>
-	<br><input type="text" name="new_name" rel="text_req" style="width:300px">
+	<br><input type="text" name="new_name" rel="text_req" class="send_input" style="width:300px">
 	<br><b>Category Url</b>
-	<br><input type="text" name="new_url" rel="text_req" class="auto_filename" style="width:300px">
+	<br><input type="text" name="new_url" rel="text_req" class="auto_filename receive_input" style="width:300px">
 	<br><br><button type="submit" id="add_cat" class="jade_positive">Add Category</button>
 </div>
 
@@ -47,10 +47,9 @@
 <script type="text/javascript">
 $(document).ready(function()
 {
-
 // a way to get the active node's data.	
 	function get_active_node(){
-		active = false;
+		var active = false;
 		$('li span.active').each(function(){
 			active = $(this).parent().attr('rel');
 		});
@@ -60,29 +59,8 @@ $(document).ready(function()
 // initiliaze simpleTree
 	$simpleTreeCollection = $(".facebox .simpleTree").simpleTree();
 	var ROOT = $('.simpleTree > li.root').attr('rel');
-//Make root the default active node.
 	$('.facebox .simpleTree li.root > span').addClass('active');
 
-// click handler for activing a node as selected	
-	$("li.root > span").click(function(){
-		$('span.active').removeClass('active').addClass('text');
-		$(this).addClass('active');
-		
-	});
-
-// activate close x 
-	$('.facebox').click($.delegate({
-		"span.icon.cross": function(e){
-			$(e.target).parent('div').hide();
-		}	
-	}));
-
-
-// sanitize the url relative to name given.
-	$("input[name='new_name']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
-		$("input[name='new_url']").val(input);
-	});
 	
 // add a new category logic.
 	$("button#add_cat").click(function(){
@@ -196,31 +174,6 @@ $(document).ready(function()
 			return false;	
 		}	
 	}));
-	
-	
-// Gather and send nest data.
-// ------------------------
-	$(".facebox #link_save_sort").click(function() {
-		$('.facebox .show_submit').show();
-		var output = "";
-		$(".facebox #admin_showroom_wrapper ul").each(function(){
-			var parentId = $(this).parent().attr("rel");
-			if(!parentId) parentId = 0;
-			var $kids = $(this).children("li:not(.root, .line,.line-last)");
-			
-			// Data set format: "id:local_parent_id:position#"
-			$kids.each(function(i){
-				output += $(this).attr('rel') + ':' + parentId + ':' + i + "|";
-			});
-		});
-		//alert (output); return false;
-		$.post('/get/edit_showroom/save_tree/<?php echo $tool_id?>',
-			{output: output}, 
-			function(data){
-				$('.facebox .show_submit').hide();
-				$('#show_response_beta').html(data);
-		});
-	});
-	
+		
 });
 </script>

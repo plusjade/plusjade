@@ -4,7 +4,7 @@ $slash		= (('' == $directory)) ? '' : '/';
 $url_dir	= str_replace('/', ':', $directory);
 ?>
 
-<?php echo form::open("files/add_folder/$url_dir", array('class' => 'custom_ajaxForm') )?>
+<?php echo form::open("files/add_folder/$url_dir", array('id' => 'files_add_folder_form') )?>
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" id="add_page_submit" name="add_folder" class="jade_positive">Add Folder</button>
 		<div id="common_title">Add New Folder</div>
@@ -14,12 +14,11 @@ $url_dir	= str_replace('/', ':', $directory);
 
 		<div class="pane_left">
 			<b>Folder Name</b>
-			<br><input type="text" name="folder_name" rel="text_req" maxlength="50" style="width:330px">
+			<br><input type="text" name="folder_name" rel="text_req" class="auto_filename" maxlength="50" style="width:330px">
 			<div id="folder_exists" class="aligncenter error_msg"></div>
 		</div>
 		
-		<div class="pane_right">		
-
+		<div class="pane_right">
 		</div>
 		
 	</div>
@@ -32,37 +31,16 @@ $url_dir	= str_replace('/', ':', $directory);
 
 
 <script type="text/javascript">
-
-	$("input[name='folder_name']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
-		$(this).val(input);
-		$('span#link_example').html(input);
-	});
-	
-	/* 
-	 * custom validation to check for unique folder_names
-	 */
-	Array.prototype.in_array = function(p_val) {
-		for(var i = 0, l = this.length; i < l; i++) {
-			if(this[i] == p_val)
-				return true;
-		}
-		return false;
-	}
-	
-	// load the folder_name filter
 	var filter = [<?php echo $filter?>];
-		
-	/* 
-	 * custom ajax form, validates inputs and unique folder_names
-	 */
-	$(".custom_ajaxForm").ajaxForm({
+
+// custom ajax form, validates inputs and unique folder_names
+	$("#files_add_folder_form").ajaxForm({
 		beforeSubmit: function(){
-			if(! $(".custom_ajaxForm input").jade_validate() )
+			if(! $("#files_add_folder_form input").jade_validate() )
 				return false
 
-			sent_folder = $("input[name='folder_name']").val();				
-			filter_duplicates = filter.in_array(sent_folder);
+			var sent_folder = $("input[name='folder_name']").val();				
+			var filter_duplicates = filter.in_array(sent_folder);
 			
 			if(filter_duplicates) {
 				$('#folder_exists').html('Page name already exists');
@@ -79,6 +57,4 @@ $url_dir	= str_replace('/', ':', $directory);
 			$('#show_response_beta').html(data);
 		}
 	});
-	
-	
 </script>

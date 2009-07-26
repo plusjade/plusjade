@@ -3,8 +3,6 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 
 /*
  *	Handles all editing logic for FAQ module.
- *	Extends the module template to build page quickly in facebox frame mode.
- *	Only Logged in users should have access
  *
  */
 	function __construct()
@@ -12,48 +10,46 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 		parent::__construct();
 	}
 
+	
+/*
+ *	rearrange faq-item positions
+ */
 	function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		$db = new Database;
-		$items = $db->query("
-			SELECT * FROM faq_items 
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
-			ORDER BY position
-		");
-		if('0' == $items->count())
-			$this->add($tool_id);
+		
+		$faq = ORM::factory('faq')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $faq->loaded)
+			die('invalid faq id');
 
 		$primary = new View('edit_faq/manage');
-		$primary->items = $items;
+		$primary->items = $faq->faq_items;
 		$primary->tool_id = $tool_id;
 		die($primary);
 	}
-	
+
+/*
+ * add a faq item
+ */	
 	function add($tool_id=NULL)
 	{
 		valid::id_key($tool_id);	
 		if($_POST)
 		{
-			$db = new Database;
-			
-			# Get highest position
-			$get_highest = $db->query("
-				SELECT MAX(position) as highest 
-				FROM faq_items 
-				WHERE parent_id = '$tool_id' 
-			")->current()->highest;
+			$max = ORM::factory('faq_item')
+				->select('MAX(position) as highest')
+				->where('faq_id', $tool_id)
+				->find();		
 
-			$data = array(
-				'fk_site'	=> $this->site_id,
-				'parent_id'	=> $tool_id,
-				'question'	=> $_POST['question'],
-				'answer'	=> $_POST['answer'],
-				'position'	=> ++$get_highest
-				
-			);
-			$db->insert('faq_items', $data); 
+			$new_item = ORM::factory('faq_item');
+			$new_item->fk_site	= $this->site_id;
+			$new_item->faq_id	= $tool_id;
+			$new_item->question	= $_POST['question'];
+			$new_item->answer	= $_POST['question'];
+			$new_item->position	= ++$max->highest;
+			$new_item->save();			
 			die('Question added'); #success
 		}
 		
@@ -64,65 +60,80 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	}
 
 
+/*
+ * edit a faq item
+ */
 	function edit($id=NULL)
 	{
 		valid::id_key($id);		
+
+		$faq_item = ORM::factory('faq_item')
+			->where('fk_site', $this->site_id)
+			->find($id);	
+		if(FALSE === $faq_item->loaded)
+			die('invalid faq item id');
+			
 		if($_POST)
 		{
-			$db = new Database;
-			$data = array(
-			   'question'	=> $_POST['question'],
-			   'answer'		=> $_POST['answer']
-			);
-			$db->update(
-				'faq_items',
-				$data,
-				"id = '$id' AND fk_site='$this->site_id'"
-			);		
-			die('Faq updated!<br>Updating...'); # success			
+			$faq_item->question = $_POST['question'];
+			$faq_item->answer = $_POST['answer'];
+			$faq_item->save();
+			die('Faq item updated');
 		}
-
-		die( $this->_view_edit_single('faq', $id) );
+		
+		$primary = new View('edit_faq/edit_item');
+		$primary->item = $faq_item;
+		$primary->js_rel_command = "update-faq-$faq_item->faq_id";
+		die($primary);
 	}
 
-	function delete($tool_id=NULL)
+/*
+ * delete a faq item
+ */
+	function delete($id=NULL)
 	{
-		valid::id_key($tool_id);
-		$this->_delete_single_common('faq', $tool_id);
-		die('Faq deleted!'); # success
+		valid::id_key($id);
+		
+		ORM::factory('faq_item')
+			->where('fk_site', $this->site_id)
+			->delete($id);
+		die('Faq item deleted');
 	}
 
-	/* 
-	 * save the positions of the faq questions
-	 * the ids are passed directly from the DOM so we don't need a tool_id
-	 */
+/* 
+ * save the positions of the faq questions
+ * the ids are passed directly from the DOM so we don't need a tool_id
+ */
 	function save_sort()
 	{
-		if(empty($_GET['faq']))
+		if(empty($_GET['item']))
 			die('No items to sort');
-			
-		die( $this->_save_sort_common($_GET['faq'], 'faq_items') );
+
+		$db = new Database;	
+		foreach($_GET['item'] as $position => $id)
+			$db->update('faq_items', array('position' => $position), "id = '$id'"); 	
+		
+		die('Faq item order saved.');
+
+		/* does not work		
+		$faq_item = ORM::factory('faq_item');
+		foreach($_GET['item'] as $position => $id)
+		{
+			$faq_item->position = $position;
+			$faq_item->save($id);
+		}
+		*/
 	}
-	
+
+/*
+ * Configure faq tool settings
+ */ 
 	function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		if($_POST)
-		{
-			$db = new Database;
-			$data = array(
-				'title'	=> $_POST['title'],
-			);
-			$db->update(
-				'faqs',
-				$data,
-				"id='$tool_id' AND fk_site = '$this->site_id'"
-			); 						
-			die( 'Settings Updated!<br>Updating...'); # success
-		}
 		die("Faq settings are temporarily disabeled while we update our system. Thanks!");
-		die( $this->_view_edit_settings('faq', $tool_id) );
 	}
+
 	
 	static function _tool_adder($tool_id, $site_id)
 	{
@@ -131,8 +142,16 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 	
 	static function _tool_deleter($tool_id, $site_id)
 	{
-		return FALSE;
-	}
-}
+		ORM::factory('faq_item')
+			->where(array(
+				'fk_site'	=> $site_id,
+				'faq_id'	=> $tool_id,
+				))
+			->delete_all();
 
-/* -- end of application/controllers/edit_faq.php -- */
+		return TRUE;
+	}
+	
+} /* end */
+
+

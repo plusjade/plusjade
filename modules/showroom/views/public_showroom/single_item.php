@@ -20,7 +20,6 @@
 
 	<div class="single_image">
 		<?php
-		$img_path = Assets::assets_url();
 		foreach($images as $data)
 		{
 			$data = explode('|', $data);

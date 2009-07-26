@@ -11,16 +11,11 @@ class Album_Controller extends Controller {
  */	
 	function _index($tool_id)
 	{
-		$db = new Database;
-		
-		# Get album
-		$album	= $db->query("
-			SELECT * FROM albums 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-		")->current();
-		if(! is_object($album) )
-			die('album does not exist');
+		$album = ORM::factory('album')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $album->loaded)
+			return $this->public_template('album error, please contact support', 'album', $tool_id);
 
 		# images 
 		$image_array = explode('|', $album->images);
@@ -37,18 +32,13 @@ class Album_Controller extends Controller {
 			
 			$images[] = "$small|$image";
 		}
-		// if no images ? == return $this->public_template('(no images)', 'album', $tool_id);
-	
-		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
 		
 		$primary = new View('public_album/index');
-		
+		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
 		$primary->display_view = $this->$display_view($images);
 		$primary->view_name = $display_view;
-		
 		$primary->add_root_js_files("$display_view/$display_view.js");
-		
-		return $this->public_template($primary, 'album', $tool_id);
+		return $this->public_template($primary, 'album', $tool_id, $album->attributes);
 	}
 
 /*
@@ -58,6 +48,7 @@ class Album_Controller extends Controller {
 	{
 		$primary = new View('public_album/lightbox');
 		$primary->images = $images;
+		$primary->img_path = $this->assets->assets_url();
 		return $primary;
 	}
 
@@ -67,6 +58,7 @@ class Album_Controller extends Controller {
  */
 	private function cycle($images, $img_path)
 	{
+		die('offline');
 		$primary = new View('public_album/cycle');
 		# Javascript
 		$primary->add_root_js_files('easing/jquery.easing.1.3.js');										
@@ -141,6 +133,7 @@ class Album_Controller extends Controller {
  */
 	private function galleria($images, $img_path)
 	{
+		die('offline');
 		$primary = new View('public_album/galleria');
 		$primary->add_root_js_files('galleria/galleria.js');
 		$primary->global_readyJS('									

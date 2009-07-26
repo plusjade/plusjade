@@ -4,7 +4,8 @@ class Auth_User_Model extends ORM {
 
 	// Relationships
 	protected $has_many = array('user_tokens');
-	protected $has_and_belongs_to_many = array('roles');
+	protected $has_and_belongs_to_many = array('sites', 'roles');
+
 
 	// Columns to ignore
 	protected $ignored_columns = array('password_confirm');
@@ -20,6 +21,22 @@ class Auth_User_Model extends ORM {
 		parent::__set($key, $value);
 	}
 
+	
+	/**
+	 * Overload saving to set the created time and to create a new token
+	 * when the object is saved.
+	 */
+	public function save()
+	{
+		if ($this->loaded === FALSE)
+		{
+
+		}
+		
+		$this->token = $this->create_token();
+		return parent::save();
+	}
+	
 	/**
 	 * Validates and optionally saves a new user record from an array.
 	 *
@@ -128,6 +145,31 @@ class Auth_User_Model extends ORM {
 			->count_records($this->table_name);
 	}
 
+	
+	/**
+	 * Finds a new unique token, using a loop to make sure that the token does
+	 * not already exist in the database. This could potentially become an
+	 * infinite loop, but the chances of that happening are very unlikely.
+	 *
+	 * @return  string
+	 */
+	protected function create_token()
+	{
+		while (TRUE)
+		{
+			// Create a random token
+			$token = text::random('alnum', 32);
+
+			// Make sure the token does not already exist
+			if ($this->db->select('id')->where('token', $token)->get($this->table_name)->count() === 0)
+			{
+				// A unique token has been found
+				return $token;
+			}
+		}
+	}
+	
+	
 	/**
 	 * Allows a model to be loaded by username or email address.
 	 */

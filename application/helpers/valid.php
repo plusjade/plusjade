@@ -76,7 +76,7 @@ class valid_Core {
 	static function filter_php_url($string)
 	{
 		$string = strtolower(trim($string));
-		return preg_replace("/[^-a-z0-9_]/i", '-', (string) $string);
+		return rtrim(preg_replace("/[^-a-z0-9_]/i", '-', (string) $string), '-');
 	}
 	
 	static function filter_php_filename($string)

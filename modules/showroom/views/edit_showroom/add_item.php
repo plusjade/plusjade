@@ -1,9 +1,10 @@
 
 <span class="on_close two">close-2</span>
 
-<?php echo form::open_multipart("edit_showroom/add_item/$tool_id", array( 'class' => 'ajaxForm' ) )?>
-	<input type="hidden" name="images" value="<?php echo $item->images?>">
+<?php echo form::open_multipart("edit_showroom/add_item/$tool_id", array( 'id' => 'add_showroom_item_form' ) )?>
+	<input type="hidden" name="images" value="">
 	
+
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive" accesskey="enter">Add Item</button>
 		<div id="common_title">Add New Showroom Item</div>
@@ -22,17 +23,17 @@
 	
 		<div id="params" class="toggle fieldsets">
 			<b>Item Name</b>
-			<br><input type="text" name="name" rel="text_req" maxlength="50" style="width:275px">
+			<br><input type="text" name="name" rel="text_req" class="send_input" maxlength="50" style="width:275px">
 			<br>
 			<br><b>URL</b>
-			<br><input type="text" name="url" rel="text_req" class="auto_filename" maxlength="50" style="width:275px">
+			<br><input type="text" name="url" rel="text_req" class="auto_filename receive_input" maxlength="50" style="width:275px">
 
 			<br><br>
 			<b>Category</b> <?php echo $category?>
 			<input type="hidden" name="category_id" value="<?php echo $category?>">
 		</div>
 
-		<div id="images" class="toggle" style="display:none">	
+		<div id="images" class="toggle" style="display:none; min-height:100px">	
 			<div style="padding:10px; background:#ffffcc; margin-bottom:10px">
 				<b>Item Image Gallery</b>
 				- - <span class="icon images">&#160; &#160; </span> <a href="#" class="get_file_browser" rel="albums">Add more images</a>
@@ -75,14 +76,8 @@
 		return false;
 	});
 	
-	// sanitize the url relative to name given.
-	$("input[name='name']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
-		$("input[name='url']").val(input);
-	});
-	
 // custom ajax form
-	$(".custom_ajaxForm").ajaxForm({
+	$("#add_showroom_item_form").ajaxForm({
 		beforeSubmit: function(formData){
 			var output = '';
 			$('#sortable_images_wrapper img').each(function(i){

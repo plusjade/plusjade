@@ -16,72 +16,65 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 	function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		$primary	= new View('edit_navigation/manage');
-		$db			= new Database;	
-		$items		= $db->query("
-			SELECT * FROM navigation_items 
-			WHERE parent_id = '$tool_id' 
-			AND fk_site = '$this->site_id' 
-			ORDER BY lft ASC
-		");
+		
+		$navigation_items = ORM::factory('navigation_item')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'navigation_id'	=> $tool_id,
+			))
+			->find_all();	
+		if(0 == $navigation_items->count())
+			die('Error: this navigation has no root node.');
 
+
+		$pages = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->find_all();	
+			
 		function render_node_navigation($item)
 		{
 			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span> <small style="display:none">Type: '. $item->type .' <br> Data: '. $item->data .'</small>'; 
 		}
-		
-		$primary->tree = Tree::display_tree('navigation', $items, NULL, TRUE);
+
+		$primary = new View('edit_navigation/manage');
+		$primary->tree = Tree::display_tree('navigation', $navigation_items, NULL, TRUE);
 		$primary->tool_id = $tool_id;
-		
-		# get pages 
-		$pages = $db->query("
-			SELECT page_name FROM pages 
-			WHERE fk_site = '$this->site_id'
-			ORDER BY page_name
-		");			
 		$primary->pages = $pages;
-			
 		die($primary);
 	}
 
 /*
- * Add links(s)
+ * Add navigation items (links)  to a navigation 
  */ 
 	public function add($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
 		if($_POST)
 		{
-			$db = new Database;
-			# Get parent
-			$parent	= $db->query("
-				SELECT * FROM navigations 
-				WHERE id = '$tool_id' 
-				AND fk_site = '$this->site_id'
-			")->current();	
-			if(! is_object($parent) )
-				die('does not exist');
-				
-			$_POST['data'] = (empty($_POST['data'])) ? '' : $_POST['data'];
+			$navigation = ORM::factory('navigation')
+				->where('fk_site', $this->site_id)
+				->find($tool_id);	
+			if(FALSE === $navigation->loaded)			
+				die('adding items to invalid navigation list.');
 			
+			$_POST['data'] = (empty($_POST['data'])) ? '' : $_POST['data'];			
 			# if for any reason local_parent is null, just add to root.
 			$_POST['local_parent'] = (empty($_POST['local_parent'])) ?
-				$parent->root_id : $_POST['local_parent'];
+				$navigation->root_id : $_POST['local_parent'];
 
-			$data = array(
-				'parent_id'		=> $tool_id,
-				'fk_site'		=> $this->site_id,
-				'display_name'	=> $_POST['item'],
-				'type'			=> $_POST['type'],
-				'data'			=> $_POST['data'],
-				'local_parent'	=> $_POST['local_parent'],
-			);	
-			$insert_id = $db->insert('navigation_items', $data)->insert_id(); 	
-			
+			$new_item = ORM::factory('navigation_item');
+			$new_item->navigation_id	= $tool_id;
+			$new_item->fk_site			= $this->site_id;
+			$new_item->display_name		= $_POST['item'];
+			$new_item->type				= $_POST['type'];
+			$new_item->data				= $_POST['data'];
+			$new_item->local_parent		= $_POST['local_parent'];
+			$new_item->save();
+	
 			# Update left and right values
-			Tree::rebuild_tree('navigation_items', $parent->root_id, '1');
+			Tree::rebuild_tree('navigation_item', $navigation->root_id, $this->site_id, '1');
 			
-			die("$insert_id");#output to javascript
+			die("$new_item->id"); # output to javascript
 		}
 		die();
 	}
@@ -96,78 +89,69 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			valid::id_key($tool_id);
-			echo Tree::save_tree('navigations', 'navigation_items', $tool_id, $this->site_id, $_POST['output']);
+			echo Tree::save_tree('navigation', 'navigation_item', $tool_id, $this->site_id, $_POST['output']);
 		}
 		die();
 	}
+	
 /*
- * Edit single Item
+ * Edit single navigation Item
  */
 	public function edit($id=NULL)
 	{
 		valid::id_key($id);		
-		$db = new Database;
+
+		$navigation_item = ORM::factory('navigation_item')
+			->where('fk_site', $this->site_id)
+			->find($id);	
+		if(FALSE === $navigation_item->loaded)
+			die('invalid navigation item id');
+		
 		if($_POST)
 		{
-			$data = array(
-				'display_name'	=> $_POST['item'],
-				'type'			=> $_POST['type'],
-				'data'			=> @$_POST['data'],
-			);	
-			$db->update(
-				'navigation_items',
-				$data,
-				array('id' => $id, 'fk_site' => $this->site_id)
-			); 	
-			die('Changes Saved!');
-		}
-		$primary = new View('edit_navigation/edit_item');
-	
-		$item = $db->query("
-			SELECT * FROM navigation_items 
-			WHERE id = '$id'
-			AND fk_site = '$this->site_id'
-		")->current();
-		
-		if(! is_object($item) )
-			die('element does not exist');
+			$_POST['data'] = (empty($_POST['data'])) ? '' : $_POST['data'];
 			
-		$pages = $db->query("
-			SELECT page_name FROM pages 
-			WHERE fk_site = '$this->site_id'
-			ORDER BY page_name
-		");
+			$navigation_item->display_name = $_POST['item'];
+			$navigation_item->type = $_POST['type'];
+			$navigation_item->data = $_POST['data'];
+			$navigation_item->save();
+			die('Navigation item updated.');
+		}
 		
-		$primary->item = $item;
+		$pages = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->find_all();
+		
+		$primary = new View('edit_navigation/edit_item');
+		$primary->item = $navigation_item;
 		$primary->pages = $pages;
 		die($primary);
 	}
-	
+
+/*
+ * configure navigation settings
+ */ 
 	public function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);		
-		$db = new Database;
+
+		$navigation = ORM::factory('navigation')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $navigation->loaded)
+			die('invalid navigation id');
 
 		if($_POST)
-		{	
-			$db->update(
-				'navigations',
-				array('title' => $_POST['title']),
-				"id = '$tool_id' AND fk_site = '$this->site_id'"
-			);
+		{
+			$navigation->title = $_POST['title'];
+			$navigation->save();
 			die('Navigation Settings Saved');	
 		}
 
 		$primary = new View("edit_navigation/settings");
-		$parent = $db->query("
-			SELECT * FROM navigations 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-		")->current();		
-		$primary->tool = $parent;
+		$primary->navigation = $navigation;
 		$primary->js_rel_command = "update-navigation-$tool_id";
 		die($primary);
-			
 	}
 
 
@@ -178,27 +162,37 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
  */		 
 	static function _tool_adder($tool_id, $site_id)
 	{
-		$db = new Database;
-		$data = array(
-			'parent_id'		=> $tool_id,
-			'fk_site'		=> $site_id,
-			'display_name'	=> 'ROOT',
-			'type'			=> 'none',
-			'local_parent'	=> '0',
-			'position'		=> '0'
-		);	
-		$root_insert_id = $db->insert('navigation_items', $data)->insert_id(); 	
+		# this can all be done in the overloaded save function for
+		# navigations model - look into it.
 		
-		$db->update('navigations', 
-			array( 'root_id' => $root_insert_id ), 
-			array( 'id' => $tool_id, 'fk_site' => $site_id ) 
-		);
+		$new_item = ORM::factory('navigation_item');
+		$new_item->navigation_id	= $tool_id;
+		$new_item->fk_site			= $site_id;
+		$new_item->display_name		= 'ROOT';
+		$new_item->type				= 'none';
+		$new_item->data				= 0;
+		$new_item->local_parent		= 0;
+		$new_item->save();
+			
+		$navigation = ORM::factory('navigation')
+			->where('fk_site', $site_id)
+			->find($tool_id);
+		
+		$navigation->root_id = $new_item->id;
+		$navigation->save();
 		
 		return 'manage';
 	}
 	
-	static function _tool_deleter()
+	static function _tool_deleter($tool_id, $site_id)
 	{
-		return false;
+		ORM::factory('navigation_item')
+			->where(array(
+				'fk_site'	=> $site_id,
+				'navigation_id'	=> $tool_id,
+				))
+			->delete_all();	
+
+		return TRUE;
 	}
 }

@@ -2,7 +2,7 @@
 <span class="on_close">update-navigation-<?php echo $tool_id?></span>
 
 <div id="common_tool_header" class="buttons">
-	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>">Save Changes</button>
+	<button id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>" title="navigation">Save Changes</button>
 	<div id="common_title">Edit <b>Navigation</b> Tool.</div>	
 </div>
 
@@ -17,7 +17,7 @@
 	<div id="element_data"></div>
 </div>
 
-<div id="admin_navigation_wrapper" class="common_main_panel">
+<div id="simpletree_wrapper" class="common_main_panel">
 	<?php echo $tree?>
 </div>
 
@@ -85,14 +85,7 @@
 // initiliaze simpleTree
 	$simpleTreeCollection = $(".facebox .simpleTree").simpleTree();
 	var ROOT = $('.simpleTree > li.root').attr('rel');
-//Make root the default active node.
 	$('.facebox .simpleTree li.root > span').addClass('active');
-
-// clicking on node makes it active.	
-	$("li.root > span").click(function(){
-		$('span.active').removeClass('active').addClass('text');
-		$(this).addClass('active');
-	});
 	
 /*
  * delegate element click actions
@@ -114,7 +107,7 @@
 			if(! el_id ){alert('Select an item to edit.');return false}
 			else if(ROOT == el_id){alert('You cannot edit the root node.');return false}
 			var url = $(e.target).attr('href');
-			$('#edit_wrapper').load(url+el_id).show();
+			$('#edit_wrapper').html('Loading...').load(url+el_id).show();
 			return false;
 		},
 		
@@ -133,9 +126,7 @@
 
 
 
-/*  Add a node handler.
- * custom ajax form response needs to populate the nested li list.
- */	
+// for toggling the element type.
 	$(".facebox .toggle_type").each(function(){
 		$(this).change(function(){
 			var span = "#" + $(this).val();
@@ -163,42 +154,4 @@
 			$('#show_response_beta').html(data);	
 		}
 	});
-
-
-
-
-
-
-
-
-
-	
-/*
- * Gather and save nest data.
- * ------------------------
- */
-	$(".facebox #link_save_sort").click(function() {
-		$('.facebox .show_submit').show();	
-		var output = '';
-		var tool_id = $(this).attr("rel");
-		
-		$(".facebox #admin_navigation_wrapper ul").each(function(){
-			var parentId = $(this).parent().attr("rel");
-			if(!parentId) parentId = 0;
-			var $kids = $(this).children("li:not(.root, .line,.line-last)");
-			
-			// Data set format: "id:local_parent_id:position#"
-			$kids.each(function(i){
-				output += $(this).attr('rel') + ':' + parentId + ':' + i + "|";
-			});
-		});
-		//alert (output); return false;
-		$.post('/get/edit_navigation/save_tree/'+tool_id,
-			{output: output},
-			function(data){
-				$.facebox.close();
-				$('#show_response_beta').html(data);				
-			}
-		)		
-	});		
 </script>

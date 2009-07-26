@@ -4,7 +4,6 @@
 	foreach($items as $item)
 	{
 		$image = '';
-		$img_path = Assets::assets_url();
 		if(! empty($item->images))
 		{
 			if(0 < substr_count($item->images, '/'))

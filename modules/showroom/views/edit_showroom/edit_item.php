@@ -1,11 +1,12 @@
 
 <span class="on_close two">close-2</span>
 
+
 <?php echo form::open_multipart("edit_showroom/edit/$item->id", array('class' => 'custom_ajaxForm'))?>
 	<input type="hidden" name="images" value="<?php echo $item->images?>">
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" class="jade_positive" accesskey="enter"> Save Changes</button>
+		<button type="submit" name="blah" class="jade_positive" accesskey="enter"> Save Changes</button>
 		<div id="common_title">Edit Showroom item</div>
 	</div>	
 	
@@ -30,9 +31,9 @@
 			<br><br>
 			<b>Category</b>
 			 <select name="category">
-				<?php 
+				<?php
 				foreach($categories as $category)
-					if ($item->cat_id == $category->id)
+					if ($item->showroom_cat_id == $category->id)
 						echo '<option value="'.$category->id.'" selected="selected">'.$category->name.'</option>'."\n";
 					else
 						echo '<option value="'.$category->id.'">'.$category->name.'</option>'."\n";
@@ -49,7 +50,6 @@
 				
 			<div id="sortable_images_wrapper">
 				<?php
-				$img_path = Assets::assets_url();
 				foreach($images as $data)
 				{
 					$data = explode('|', $data);
@@ -70,7 +70,7 @@
 		</div>
 		
 		<input type="hidden" name="body" value="offline">
-		<input type="hidden" name="old_category" value="<?php echo $item->cat_id?>">	
+		<input type="hidden" name="old_category" value="<?php echo $item->showroom_cat_id?>">	
 	
 		<!-- 
 		<div id="desc" class="toggle" style="display:none">
@@ -81,21 +81,13 @@
 	</div>
 </form>
 
+
 <script type="text/javascript">
 
 // make images sortable and selectable
 	$("#sortable_images_wrapper").sortable({items:'div', handle:'span'});
 	$("#sortable_images_wrapper").selectable({filter:'img'});
 
-
-// toggle panes
-	$('.common_left_panel li a').click(function(){
-		$('.common_left_panel li a').removeClass('selected');
-		var div = $(this).addClass('selected').attr('rel');
-		$('.common_main_panel div.toggle').hide();
-		$('.common_main_panel div#'+ div).toggle('fast');
-		return false;
-	});
 	
 // custom ajax form
 	$(".custom_ajaxForm").ajaxForm({
@@ -113,4 +105,13 @@
 		}
 	});
 	
+	
+// toggle panes
+	$('.common_left_panel li a').click(function(){
+		$('.common_left_panel li a').removeClass('selected');
+		var div = $(this).addClass('selected').attr('rel');
+		$('.common_main_panel div.toggle').hide();
+		$('.common_main_panel div#'+ div).toggle('fast');
+		return false;
+	});
 </script>

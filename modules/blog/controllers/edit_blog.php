@@ -3,9 +3,6 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 
 /*
  *	Handles all editing logic for blog module.
- *	Extends the module template to build page quickly in facebox frame mode.
- *	Only Logged in users should have access
- *
  */
 	function __construct()
 	{
@@ -23,13 +20,13 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		
 		# Show drafts
 		$items = $db->query("
-			SELECT blog_items.*, 
+			SELECT blog_posts.*, 
 			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on 
-			FROM blog_items
-			WHERE blog_items.parent_id = '$tool_id'
-			AND blog_items.fk_site = '$this->site_id'					
+			FROM blog_posts
+			WHERE blog_posts.blog_id = '$tool_id'
+			AND blog_posts.fk_site = '$this->site_id'					
 			AND status = 'draft'
-			GROUP BY blog_items.id 
+			GROUP BY blog_posts.id 
 			ORDER BY created DESC
 		");
 		$primary->items = $items;
@@ -44,22 +41,24 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		valid::id_key($tool_id);	
 		if($_POST)
 		{
-			$db = new Database;	
-			$data = array(
-				'fk_site'	=> $this->site_id,
-				'parent_id'	=> $tool_id,
-				'url'		=> $_POST['url'],
-				'status'	=> $_POST['status'],
-				'title'		=> $_POST['title'],
-				'body'		=> $_POST['body'],
-				'created'	=> strftime("%Y-%m-%d %H:%M:%S")
-			);
-			$item_id = $db->insert('blog_items', $data)->insert_id();
-			
-			self::save_tags($_POST['tags'], $item_id, $tool_id);
+			$new_post = ORM::factory('blog_post');
+			$new_post->fk_site	= $this->site_id;
+			$new_post->blog_id	= $tool_id;
+			$new_post->url		= $_POST['url'];
+			$new_post->title	= $_POST['title'];
+			$new_post->body		= $_POST['body'];
+			$new_post->created	= strftime("%Y-%m-%d %H:%M:%S");
+			$new_post->save();
+
+
+			self::save_tags($_POST['tags'], $new_post->id, $tool_id);
 			die('Post added'); # success
 		}
-		die( $this->_view_add_single('blog', $tool_id) );
+
+		$primary = new View('edit_blog/add_item');
+		$primary->tool_id = $tool_id;
+		$primary->js_rel_command = "update-blog-$tool_id";
+		die($primary);	
 	}
 
 /*
@@ -68,21 +67,23 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	function edit($id=NULL)
 	{
 		valid::id_key($id);
-		$db = new Database;
+		
+		
 		if($_POST)
 		{
-			$data = array(
-				'title'		=> $_POST['title'],
-				'body'		=> $_POST['body'],
-				'url'		=> $_POST['url'],
-				'status'	=> $_POST['status'],
-			);
-			$db->update(
-				'blog_items',
-				$data,
-				"id = '$id' AND fk_site='$this->site_id'"
-			);
-			self::save_tags($_POST['tags'], $id, $_POST['parent_id']);
+			$post = ORM::factory('blog_post')
+				->where('fk_site', $this->site_id)
+				->find($id);
+			if(FALSE === $post->loaded)
+				die('invalid post id');
+			
+			$post->url		= $_POST['url'];
+			$post->title	= $_POST['title'];
+			$post->body		= $_POST['body'];
+			$post->status	= $_POST['status'];
+			$post->save();
+			
+			self::save_tags($_POST['tags'], $id, $_POST['blog_id']);
 			
 			if(isset($_POST['sticky']))
 			{
@@ -100,39 +101,42 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 					$sticky_posts = implode(',', $sticky_posts);
 				}
 	
-				$db->query("
-					UPDATE blogs
-					SET sticky_posts = '$sticky_posts'
-					WHERE id = '$_POST[parent_id]'
-					AND fk_site = '$this->site_id'
-				");	
+				$blog = ORM::factory('blog')
+					->where('fk_site', $this->site_id)
+					->find($_POST['blog_id']);
+				if(FALSE === $blog->loaded)
+					die('invalid blog id');
+					
+				$blog->sticky_posts = $sticky_posts;	
+				$blog->save();
 			}
 			die('Post Saved'); #status			
 		}
 
+		$db = new Database;
+		$post = $db->query("
+			SELECT blog_posts.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
+			GROUP_CONCAT(DISTINCT blog_post_tags.value, CONCAT('_',blog_post_tags.id) ORDER BY blog_post_tags.value  separator ',') as tag_string
+			FROM blog_posts 
+			LEFT JOIN blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+			WHERE blog_posts.id = '$id'
+			AND blog_posts.fk_site = '$this->site_id'
+		")->current();
+		
+		$blog = ORM::factory('blog')
+			->where('fk_site', $this->site_id)
+			->find($post->blog_id);
+		if(FALSE === $blog->loaded)
+			die('invalid blog id');
+
+	
+		$sticky_posts = explode(',', $blog->sticky_posts);
+	
 		$primary = new View("edit_blog/edit_item");
-		$item = $db->query("
-			SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
-			GROUP_CONCAT(DISTINCT blog_items_tags.value, CONCAT('_',blog_items_tags.id) ORDER BY blog_items_tags.value  separator ',') as tag_string
-			FROM blog_items 
-			LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
-			WHERE blog_items.id = '$id'
-			AND blog_items.fk_site = '$this->site_id'
-		")->current();
-		$primary->item = $item;
-		
-		$parent = $db->query("
-			SELECT * 
-			FROM blogs
-			WHERE id='$item->parent_id'
-			AND fk_site = '$this->site_id'
-		")->current();
-		
-		$sticky_posts = explode(',', $parent->sticky_posts);
-		$primary->sticky_posts = $parent->sticky_posts;
-		$primary->is_sticky = (in_array($id, $sticky_posts)) ? TRUE : FALSE ;
-		
-		$primary->js_rel_command = "update-blog-$item->parent_id";
+		$primary->item			 = $post;
+		$primary->sticky_posts	 = $blog->sticky_posts;
+		$primary->is_sticky		 = (in_array($id, $sticky_posts)) ? TRUE : FALSE ;
+		$primary->js_rel_command = "update-blog-$post->blog_id";
 		die($primary);
 	}
 
@@ -140,7 +144,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
  * Save tags to database.
  * (string) $tags (comma dilemenated)
  */
-	private function save_tags($tags, $item_id, $parent_id)
+	private function save_tags($tags, $blog_post_id, $blog_id)
 	{
 		$tags = trim($tags);
 		if (empty($tags))
@@ -155,11 +159,11 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			$tag = preg_replace("(/W)", '_', $tag);
 			$data = array(
 			   'fk_site'	=> $this->site_id,
-			   'item_id'	=> $item_id,
-			   'parent_id'	=> $parent_id,
+			   'blog_post_id'	=> $blog_post_id,
+			   'blog_id'	=> $blog_id,
 			   'value'		=> $tag,					
 			);
-			$db->insert('blog_items_tags', $data);
+			$db->insert('blog_post_tags', $data);
 		}
 		return TRUE;
 	}
@@ -170,21 +174,27 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	function delete($id=NULL)
 	{
 		valid::id_key($id);
-		$db = new Database;
-		$db->delete(
-			'blog_items',
-			array('id' => $id, 'fk_site' => $this->site_id)
-		);	
-		$db->query("
-			DELETE FROM blog_items_tags
-			WHERE item_id = '$id'
-			AND fk_site = '$this->site_id'
-		");
-		$db->query("
-			DELETE FROM blog_items_comments
-			WHERE item_id = '$id'
-			AND fk_site = '$this->site_id'
-		");
+
+		ORM::factory('blog_post')
+			->where(array(
+				'fk_site' => $this->site_id,
+			))
+			->delete($id);
+			
+		ORM::factory('blog_post_tag')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'blog_post_id'	=> $id,
+			))
+			->delete_all();
+
+		ORM::factory('blog_post_comment')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'blog_post_id'	=> $id,
+			))
+			->delete_all();
+			
 		die('Post deleted!'); #status
 	}
 
@@ -194,8 +204,11 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	function delete_tag($id=NULL)
 	{
 		valid::id_key($id);
-		$db = new Database;
-		$db->delete('blog_items_tags', array('id' => "$id", 'fk_site' => "$this->site_id") );	
+		ORM::factory('blog_post_tag')
+			->where(array(
+				'fk_site' => $this->site_id,
+			))
+			->delete($id);	
 		die('Tag deleted!'); #status
 	}	
 
@@ -205,8 +218,11 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	function delete_comment($id=NULL)
 	{
 		valid::id_key($id);
-		$db = new Database;
-		$db->delete('blog_items_comments', array('id' => "$id", 'fk_site' => $this->site_id) );	
+		ORM::factory('blog_post_comment')
+			->where(array(
+				'fk_site' => $this->site_id,
+			))
+			->delete($id);	
 		die('Comment deleted!'); #status
 	}
 	
@@ -216,21 +232,26 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
+		
+		$blog = ORM::factory('blog')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $blog->loaded)
+			die('invalid blog id');
+	
 		if($_POST)
 		{
 			die('testing');
-			$db = new Database;
-			$data = array(
-				'title'	=> $_POST['title'],
-			);
-			$db->update(
-				'blogs',
-				$data,
-				"id='$tool_id' AND fk_site = '$this->site_id'"
-			); 						
-			die('Blog Settings Updated.'); #success
+			
+			$blog->title = $_POST['title'];
+			$blog->save();
+			die('Blog settings updated.');
 		}
-		die( $this->_view_edit_settings('blog', $tool_id) );
+		
+		$primary = new View('edit_blog/settings');
+		$primary->tool = $blog;
+		$primary->js_rel_command = "update-blog-$tool_id";			
+		die($primary);
 	}
 
 /*
@@ -246,17 +267,26 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
  */	
 	function _tool_deleter($tool_id, $site_id)
 	{
-		$db = new Database;
-		$db->query("
-			DELETE FROM blog_items_comments
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
-		");
-		$db->query("
-			DELETE FROM blog_items_tags
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
-		");
+		ORM::factory('blog_post')
+			->where(array(
+				'fk_site'	=> $site_id,
+				'blog_id'	=> $tool_id,
+			))
+			->delete_all();
+			
+		ORM::factory('blog_post_tag')
+			->where(array(
+				'fk_site'	=> $site_id,
+				'blog_id'	=> $tool_id,
+			))
+			->delete_all();
+
+		ORM::factory('blog_post_comment')
+			->where(array(
+				'fk_site'	=> $site_id,
+				'blog_id'	=> $tool_id,
+			))
+			->delete_all();
 		return TRUE;
 	}
 }

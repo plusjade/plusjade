@@ -86,6 +86,7 @@
 			var text = $("#edit_form input[name='item']").val();
 			$('li span.active').html(text);
 			$('#edit_wrapper').hide();
+			$('.facebox .show_submit').hide();
 			$('#show_response_beta').html(data);			
 		}
 	});

@@ -7,40 +7,29 @@ class Navigation_Controller extends Controller {
 		parent::__construct();
 	}
 
-	/*
-	 * Displays a nestable navigation element menu
-	 */	 
+/*
+ * Displays a nestable navigation element menu
+ */	 
 	function _index($tool_id)
 	{
-		valid::id_key($tool_id);	
-		$db = new Database;
+		valid::id_key($tool_id);
 		
-		$parent	= $db->query("
-			SELECT * FROM navigations 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-		")->current();
-			
-		$items	= $db->query("
-			SELECT * FROM navigation_items 
-			WHERE parent_id = '$parent->id' 
-			AND fk_site = '$this->site_id' 
-			ORDER BY lft ASC
-		");		
-		
+		$navigation = ORM::factory('navigation')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $navigation->loaded)
+			return $this->public_template('this navigation id not found.', 'navigation', $tool_id, '');
+	
 		# There will always be a root_holder so no items is actually =1
-		if('1' == $items->count())
+		if('1' == $navigation->navigation_items->count())
 			return $this->public_template('(no items)', 'navigation', $tool_id);
 		
 		$primary = new View('public_navigation/index');	
-		$primary->parent = $parent;
-		
+		$primary->navigation = $navigation;
 		# public node_generation function is contained in the tree class...
-		$primary->tree = Tree::display_tree('navigation', $items);
-	
-		return $this->public_template($primary, 'navigation', $tool_id, $parent->attributes);
+		$primary->tree = Tree::display_tree('navigation', $navigation->navigation_items);
+		return $this->public_template($primary, 'navigation', $tool_id, $navigation->attributes);
 	}
   
-}
+}  /* -- end -- */
 
-/* -- end of application/controllers/showroom.php -- */

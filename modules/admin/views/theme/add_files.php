@@ -22,43 +22,29 @@
 </div>
 	
 
-
 <script type="text/javascript">
-	swfu = new SWFUpload({
-		flash_url : "/_assets/js/swfupload/Flash/swfupload.swf",
+	var swfu = new SWFUpload({
 		upload_url: "<?php echo url::site("get/theme/upload/$theme")?>",
 		post_params: {"PHPSESSID" : "<?php echo session_id()?>"},
-		file_size_limit : "20 MB",
 		file_types : "*.html;*.css;*.jpg;*.jpeg;*.gif;*.png",
 		file_types_description : "images, css, html",
-		file_upload_limit : 20,
-		file_queue_limit : 12,
 		custom_settings : {
 			progressTarget : "fsUploadProgress",
 			cancelButtonId : "btnCancel"
 		},
 		debug: false,
-
-		// Button settings
-		button_image_url: "/_assets/images/admin/browse.png",
-		button_width: "87",
-		button_height: "40",
-		button_placeholder_id: "spanButtonPlaceHolder",		
-		// The event handler functions are defined in handlers.js
-		file_queued_handler : fileQueued,
-		file_queue_error_handler : fileQueueError,
-		file_dialog_complete_handler : fileDialogComplete,
 		upload_start_handler :  function(){
 			$('.facebox .show_submit').show();
 		},
-		upload_progress_handler : uploadProgress,
-		upload_error_handler : uploadError,
-		upload_success_handler : uploadSuccess,
-		upload_complete_handler :uploadComplete,
 		queue_complete_handler : function(){
+			swfu.destroy();
 			$('.facebox .show_submit').hide();
 			$.facebox.close('facebox_2');
-			//$('#show_response_beta').html(data);
 		}		
 	});
+	
+	$(document).bind('close.facebox', function() {
+		swfu.destroy();
+	});
+	
 </script>

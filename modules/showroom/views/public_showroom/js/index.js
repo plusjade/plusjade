@@ -1,6 +1,6 @@
 
-target_div = '#showroom_wrapper_%VAR% div.showroom_items';
-loading = '<div class="ajax_loading">Loading...</div>';
+var target_div = '#showroom_wrapper_%VAR% div.showroom_items';
+var loading = '<div class="ajax_loading">Loading...</div>';
 
 $("#showroom_wrapper_%VAR%").click($.delegate({		
 	"a.loader": function(e){
@@ -13,7 +13,7 @@ $("#showroom_wrapper_%VAR%").click($.delegate({
 	
 	"a img.loader": function(e){
 			$(target_div).html(loading);
-			url = $(e.target).parent("a").attr("href");
+			var url = $(e.target).parent("a").attr("href");
 			$(target_div).load(url, function(){
 				$('#click_hook').click();
 			});

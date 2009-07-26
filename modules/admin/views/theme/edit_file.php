@@ -14,8 +14,3 @@
 	</div>
 </form>
 
-
-<script language="javascript">
-	$(document).ready(function(){		 
-	});	
-</script>

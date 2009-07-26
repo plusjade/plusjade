@@ -35,15 +35,16 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	
 	<div class="common_main_panel fieldsets">
 	
-		<div style="text-align:center;padding:5px">
-			Page URL: <?php echo url::site(),$directory?><span></span>
+		<div id="new_page_url">
+			Link to this page
+			<br><b><?php echo url::site(),$directory?><span id="link_example"><?php echo $filename?></span></b>
 		</div>
 		<b>Label Name</b><br>
 		<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
 		<br><br>
 		<b>Page Link</b>
 		<?php if($is_protected) echo '<span style="color:red">(protected)</span>'?>
-		<br><input type="text" name="page_name" value="<?php echo $filename?>" size="30" maxlength="50">		
+		<br><input type="text" name="page_name" value="<?php echo $filename?>" class="auto_filename" size="30" maxlength="50">		
 		
 		<div id="page_exists" class="aligncenter error_msg"></div>	
 
@@ -80,23 +81,17 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 </form>
 
 <script type="text/javascript">
-	/* custom validation to check for unique page_names */
-	Array.prototype.in_array = function(p_val) {
-		for(var i = 0, l = this.length; i < l; i++) {
-			if(this[i] == p_val) {
-				return true;
-			}
-		}
-		return false;
-	}
+	
+// custom validation to check for unique page_names
+
 	var v_array = [<?php echo $page_filter_js?>];
 
-	var options = {
+	$(".custom_ajaxForm").ajaxForm({
 		beforeSubmit: function(){
 			if(! $(".custom_ajaxForm input").jade_validate() )
 				return false
 
-			sent_page = $("input[name='page_name']").val();			
+			var sent_page = $("input[name='page_name']").val();			
 			if(v_array.in_array(sent_page)) {	
 				$('#page_exists').html('Page name already exists');
 				$("input[name='page_name']").addClass('input_error');
@@ -109,17 +104,11 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			// If the page name changes consider a notification or redirect logic?
 			$.facebox.close();
 			$('#show_response_beta').html(data);					
-		}					
-	};
-	$(".custom_ajaxForm").ajaxForm(options);
-		
-	
-	$("input[name='page_name']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
-		$(this).val(input);
+		}		
 	});
+		
 
-	// visibility select dropdowns
+// visibility select dropdowns
 	$("select[name='enable'], select[name='menu']").change(function(){	
 		value = $('option:selected',this).val();
 		if('yes' == value)
@@ -128,8 +117,8 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			$(this).removeClass().addClass('enabled_no');
 	});
 	
-	// template select dropdown
-	selected = $("select[name='template'] option:selected").text();
+// template select dropdown
+	var selected = $("select[name='template'] option:selected").text();
 	$('#template_desc div').hide();
 	$('#template_desc div.'+selected).show();
 	

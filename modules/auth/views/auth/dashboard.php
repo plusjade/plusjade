@@ -102,5 +102,5 @@
 </div>
 
 <script type="text/javascript">
-	$("#container-1").tabs();
+
 </script>

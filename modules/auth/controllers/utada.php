@@ -220,6 +220,8 @@ class Utada_Controller extends Template_Controller {
 		$site_ids = array();
 		$table_names = array();
 		$protected_tables = array(
+			'account_roles',
+			'account_user_tokens',
 			'contact_types',
 			'roles',
 			'roles_users',
@@ -229,6 +231,7 @@ class Utada_Controller extends Template_Controller {
 			'users',
 			'user_tokens',
 			'sites_users',
+			'version',
 		);
 		
 		# Get all tables from database
@@ -246,7 +249,7 @@ class Utada_Controller extends Template_Controller {
 				unset($table_names[$table]);	
 		
 		#troubleshoot
-		#echo'<pre>'; print_r($table_names);echo '</pre>'; die();
+		echo'<pre>'; print_r($table_names);echo '</pre>'; die();
 		
 		# Get all site ids
 		$sites = $db->query("

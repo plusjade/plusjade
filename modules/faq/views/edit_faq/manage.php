@@ -6,26 +6,26 @@
 	<div id="common_title">Arrange Questions</div>
 </div>
 
-<ul id="generic_sortable_list" class="ui-tabs-nav">
-	<?php
-	$counter = 0;
-	foreach($items as $item)
-	{
-		$class='';
-		?>
-		<li id="faq_<?php echo $item->id?>" <?php echo $class?>>
-			<table id="menu_page_list"><tr>
-				<td width="80px" class="drag_box"> <span class="icon move"> &#160; &#160; </span> DRAG </td>
-				<td width="30px" class="aligncenter"><?php echo ++$counter?>. </td>
-				<td class="page_edit"><?php echo $item->question?></td>
-			</tr></table>
-		</li>		
-		<?php
-	}
-	?>
-</ul>
+<div class="common_left_panel">
+
+</div>
+
+<div class="common_main_panel">
+	<ul id="generic_sortable_list" class="ui-tabs-nav">
+		<?php foreach($items as $item):?>
+			<li id="item_<?php echo $item->id?>" class="root_entry">
+				<ul class="row_wrapper">
+					<li class="drag_box"><span class="icon move"> &#160; &#160; </span> DRAG </li>
+					<li class="position"><?php echo $item->position?>. </li>
+					<li class="data"><?php echo $item->question?></li>
+					<li class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/edit_faq/delete/<?php echo $item->id?>" rel="<?php echo $item->id?>">delete</a></li>
+				</ul>
+			</li>		
+		<?php endforeach;?>
+	</ul>
+</div>
 
 <script type="text/javascript">
 	$('#generic_sortable_list').sortable({handle:'.drag_box', axis: 'y'});
-	<?php echo javascript::save_sort('faq', $tool_id)?>
+	<?php echo javascript::save_sort('faq')?>
 </script>

@@ -67,7 +67,7 @@
 <script type="text/javascript">
 	$('.jade_delete_tool').click(function(){
 		if(confirm('This cannot be undone. Delete this tool?')) {
-			guid = $(this).attr('rel');
+			var guid = $(this).attr('rel');
 			$.get($(this).attr('href'), function(data){
 				alert('tr#row_'+ guid);
 				$('tr#row_'+ guid).remove();

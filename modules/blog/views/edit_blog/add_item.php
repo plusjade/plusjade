@@ -23,23 +23,11 @@
 	
 	<div class="common_main_panel fieldsets">
 		<div class="inputs">
-			<b>Title</b> <input type="text" name="title" rel="text_req">
-		</div>
-		
-		<div class="inputs">
-			<b>Url</b> <input type="text" name="url" rel="text_req">
+			<b>Title</b> <input type="text" name="title" class="send_input" rel="text_req">
+			<br><br>
+			<b>Url</b> <input type="text" name="url" class="auto_filename receive_input" rel="text_req">
 		</div>
 		<textarea name="body" class="render_html"></textarea>
 	</div>
 </form>
 
-<script type="text/javascript">
-	$("input[name='title']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-').toLowerCase();
-		$("input[name='url']").val(input);
-	});
-	$("input[name='url']").keyup(function(){
-		input = $(this).val().replace(<?php echo valid::filter_js_url()?>, '-');
-		$(this).val(input);
-	});
-</script>

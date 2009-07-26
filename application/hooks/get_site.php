@@ -62,7 +62,7 @@ function get_site()
 			'%HOMEPAGE%',
 		);
 		$replacements = array(
-			$site_row->site_id,
+			$site_row->id,
 			$site_row->subdomain,
 			$site_row->theme,
 			$site_row->banner,
@@ -127,7 +127,7 @@ function get_site()
 			# Grab the page row
 			$page_object = $db->query("
 				SELECT * FROM pages 
-				WHERE fk_site = '$site_row->site_id' 
+				WHERE fk_site = '$site_row->id' 
 				AND page_name = '$page_name'
 			")->current();
 			

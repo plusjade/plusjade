@@ -86,12 +86,14 @@ class Build_Page_Controller extends Template_Controller {
 		
 		# Drop Tool array into admin Panel if logged in
 		if($admin_mode)
+		{
 			$this->template->set_global('tools_array', $tools_array);
+		}
 		else
 		{
 			$this->template->linkCSS("get/css/tools/$page->id", url::site() );
-			$this->template->linkJS('jquery_latest.js');
-			$this->template->linkJS('ajax_form/ajax_form.js');
+			$this->template->admin_linkJS('get/js/live?v=1.0');
+			
 			# Load Javascript files if they exist.
 			if (! empty($_SESSION['js_files']) )
 			{
@@ -104,11 +106,8 @@ class Build_Page_Controller extends Template_Controller {
 		# Renew Javascript file requests
 		unset($_SESSION['js_files']);	
 		
-		/*
-		 * Build the output and send to view
-		 */
+		# Build the output and send to view
 		parent::build_output($containers_array, $page->template);
-
 
 		# needed to hide 404 not found on controller name (its really a page_name)
 		Event::clear('system.404');

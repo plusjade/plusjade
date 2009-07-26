@@ -20,7 +20,6 @@
 </div>
 <div id="sortable_images_wrapper" class="common_main_panel full_height" style="height:350px; overflow:auto">	
 	<?php
-	$img_path = Assets::assets_url();
 	foreach($images as $data)
 	{
 		$data = explode('|', $data);
@@ -58,9 +57,11 @@
 			output += $(this).attr('alt') + '|';
 		});
 		$('.facebox .show_submit').show();
-		$.post('/get/edit_album/manage/<?php echo $album->id?>', {images : output},function(){
-			$.facebox.close();
-		});
+		$.post('/get/edit_album/manage/<?php echo $album->id?>', {images : output},
+			function(data){
+				$('#show_response_beta').html(data);
+				$('.facebox .show_submit').hide();
+			});
 		
 		return false;
 	});	

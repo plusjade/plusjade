@@ -16,7 +16,7 @@ class Contact_Controller extends Controller {
 			WHERE id = '$tool_id' 
 			AND fk_site = '$this->site_id'
 		")->current();
-		$primary->parent_id = $parent->id;
+		
 		
 		$contacts = $db->query("
 			SELECT * FROM contact_items 
@@ -30,6 +30,7 @@ class Contact_Controller extends Controller {
 			return $this->public_template('(no contact types)', 'contact', $tool_id);		
 		
 		$primary = new View("public_contact/index");
+		$primary->parent_id = $parent->id;
 		$primary->email_form = new View("public_contact/email_form");		
 		$primary->contacts = $contacts;
 		

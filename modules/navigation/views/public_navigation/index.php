@@ -1,6 +1,6 @@
 <?php 
-	if(! empty($parent->title) ) 
-		echo "<h2 class=\"navigation_title\">$parent->title</h2>";
+	if(! empty($navigation->title) ) 
+		echo "<h2 class=\"navigation_title\">$navigation->title</h2>";
 	
 	echo $tree;
 ?>

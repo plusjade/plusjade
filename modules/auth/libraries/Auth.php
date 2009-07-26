@@ -103,19 +103,22 @@ class Auth_Core {
 	{
 		if(NULL == $user_id AND !$this->driver->logged_in($role) )
 			return FALSE;
-		
-		$user_id = (NULL == $user_id) ? $this->get_user()->id : $user_id;
 			
+		$user_id = (NULL == $user_id) ? $this->get_user()->id : $user_id;
+		
+		# FIX THIS !!!!!!!!!!!!!!!!!1
 		#HACK- fix this later. check if user can edit this site.
+		#$user->has(ORM::factory('role', 1));
+
 		$db = new Database; 
 		$sites = $db->query("
 			SELECT * 
 			FROM sites_users 
-			WHERE fk_users = '$user_id'
-			AND fk_site = '$site_id'
+			WHERE user_id = '$user_id'
+			AND site_id = '$site_id'
 		")->current();
 
-		if(empty($sites->fk_users))
+		if(empty($sites->site_id))
 			return FALSE;
 			
 		return TRUE;

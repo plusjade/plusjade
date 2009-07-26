@@ -17,23 +17,19 @@
 	</div>
 	
 	<div id="tool_view_wrapper" class="common_main_panel">		
-		<?php	
-		foreach($tools_list as $key => $tool)
-		{
-			?>
+		<?php foreach($tools_list as $key => $tool):?>
 			<div id="tool_<?php echo $tool->id?>" class="each_tool">
 				<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
 					<?php echo $tool->name?>
 				</button>
 				<div class="desc"><?php echo $tool->desc?></div>
 			</div>
-			<?php
-		}
-		?>
+		<?php endforeach;?>
 
 	</div>
 
 </form>
+
 <script type="text/javascript">
 $(document).ready(function()
 {
@@ -60,7 +56,6 @@ $(document).ready(function()
 		success: function(tool_data) {
 			//tool_data format: toolname:load_method:tool_id:tool_guid
 			var tool_data = tool_data.split(':');
-			// add tool to DOM
 			$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);	
 			
 			// load the 'load_method' tool::method

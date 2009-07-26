@@ -1,12 +1,10 @@
 
-<div id="files_browser_wrapper">
+<div id="files_browser_wrapper" class="data_files">
 
 	<div id="common_tool_header">
 		<div id="common_title">Files Browser</div>
 	</div>
-	
-<div id="files_browser_wrapper">
-		
+
 	<div class="common_left_panel" style="width:150px">
 		<?php if($mode) echo '<div class="editor_info"><b><i>Double Click</i></b> the file you want to place into the editor.</div>';?>
 		
@@ -17,12 +15,15 @@
 	</div>
 	
 	<div class="breadcrumb_wrapper" style="float:right; width:620px">
-		<a href="/get/files/contents?mode=<?php echo $mode?>" rel="ROOT" class="get_folder">Assets</a><span id="breadcrumb" rel=""></span>
-	</div>	
+		<a href="/get/files/contents?mode=<?php echo $mode?>" rel="ROOT" class="get_folder">Assets</a>
+		<span id="breadcrumb" rel="" class="files"></span>
+	</div>
+	
 	<div id="directory_window" class="common_main_panel full_height" rel="ROOT" style="width:620px; height:350px; overflow:auto">
 		<?php echo View::factory('files/folder', array('files'=> $files, 'mode'=> $mode))?>
 	</div>
 	
 </div>
+
 <div class="clearboth"></div>
 

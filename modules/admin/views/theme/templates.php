@@ -52,7 +52,7 @@
 
 // Load file from select dropdown into textarea
 	$("#load_file").click(function(){
-		value = $("select[name='files'] option:selected").text();		
+		var value = $("select[name='files'] option:selected").text();		
 		$('textarea#edit_html').val('Loading file...');
 		$.get('/get/theme/load/templates/'+ value +'?v=39840',
 			function(data){
@@ -82,9 +82,9 @@
 
 		// save as update
 		'button.update_file': function(){
-			file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
+			var file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
 			$('div.save_pane.helper span.replacer').html('<div class="loading">Saving '+ file +'...</div>');
-			contents = $('textarea#edit_html').val();
+			var contents = $('textarea#edit_html').val();
 			$('.facebox .show_submit').show();
 			$.post('/get/theme/save/templates/'+ file, {contents: contents }, function(data){
 				$('button#show_save').removeAttr('disabled');
@@ -96,11 +96,11 @@
 			return false;
 		},	
 		
-		// save as new
+	// save as new
 		'button.new_file': function(){
-			file = $("div.save_pane.helper input[name='new_file']").val() + '.html';	
+			var file = $("div.save_pane.helper input[name='new_file']").val() + '.html';	
 			$('div.save_pane.helper span.replacer').html('Creating ...'+ file);
-			contents = $('textarea#edit_html').val();
+			var contents = $('textarea#edit_html').val();
 			$('.facebox .show_submit').show();
 			$.post('/get/theme/save/templates/'+ file, {contents: contents }, function(data){
 				$('select.files_list').append('<option value="'+ data +'">'+ data +'</option>');
@@ -111,7 +111,7 @@
 			return false;
 		},
 		
-		// close the save pane
+	// close the save pane
 		'div.save_pane .icon.cross':function(e){
 			$('div.save_pane.helper').remove();
 			return false;	

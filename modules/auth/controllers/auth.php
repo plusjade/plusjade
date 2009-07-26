@@ -15,11 +15,10 @@ class Auth_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		
-		$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-");
 		$this->template->linkCSS('/_assets/css/admin_global.css');
-		$this->template->linkJS('jquery_latest.js');
-		$this->template->linkJS('ui/ui_latest_lite.js');	
+		$this->template->admin_linkJS('get/js/live?v=1.0');
+		#$this->template->linkJS('ui/ui_latest_lite.js');
+
 	}
 
 /*
@@ -33,6 +32,7 @@ class Auth_Controller extends Template_Controller {
 		
 		if( Auth::instance()->logged_in() )
 		{
+			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
 			$primary = $this->display_dashboard();
 		}
 		elseif($_POST)
@@ -65,21 +65,14 @@ class Auth_Controller extends Template_Controller {
 		$this->template->title = 'My dashboard';	
 		$primary = new View("auth/dashboard");
 		$primary->user = Auth::instance()->get_user();	
+
+		$user = ORM::factory('user', $primary->user->id);
 		
-		$user_id = Auth::instance()->get_user()->id;
-		
-		$db = new Database;
-		$sites = $db->query("
-			SELECT sites_users.*, sites.subdomain, sites.site_id 
-			FROM sites_users 
-			JOIN sites ON sites_users.fk_site = sites.site_id
-			WHERE sites_users.fk_users = '$user_id'
-		");		
-		foreach($sites as $site)
+		foreach($user->sites as $site)
 		{
 			$first	= text::random('numeric', 5);
 			$last	= text::random('numeric', 6);
-			$sites_array[$site->subdomain] = "$first$site->site_id$last";
+			$sites_array[$site->subdomain] = "$first$site->id$last";
 		}
 		$primary->sites_array = $sites_array;
 		
@@ -104,8 +97,7 @@ class Auth_Controller extends Template_Controller {
 			$token	= $_GET['tKn'];
 			$user	= ORM::factory('user')->where('token', $token)->find();
 			
-			# if token does not match any user...
-			if( empty($user->username) )
+			if(!$user->loaded)
 				url::redirect();
 			
 			# Log user in ONLY IF site ids match (user is attached to this site)
@@ -126,20 +118,13 @@ class Auth_Controller extends Template_Controller {
 				die('Please login');
 			
 			# get the real site_id using the correct offsets
-			$site_id		= (string) $_GET['site'];
-			$site_id		= substr($site_id, 5);
+			$site_id		= substr($_GET['site'], 5);
 			$length			= strlen($site_id) - 6;
 			(int)$site_id	= substr($site_id, 0, $length);	
 			$token			= $this->client->get_user()->token;	
 			
-			$db = new Database;
-			$site = $db->query("
-				SELECT subdomain 
-				FROM sites 
-				WHERE site_id = '$site_id'
-			")->current();
-			
-			if(! is_object($site) )
+			$site = ORM::factory('site', $site_id);
+			if(!$site->loaded)
 				die('invalid input');
 				
 			$user_site = "http://$site->subdomain.". ROOTDOMAIN ."/get/auth/manage?tKn=$token";
@@ -182,51 +167,28 @@ class Auth_Controller extends Template_Controller {
 				$errors	= arr::overwrite($errors, $post->errors('form_error_messages'));
 				$values	= arr::overwrite($values, $post->as_array()); 
 				$this->display_create($errors, $values);
-				die('im dead');
 			}
-			
-			# Create new user
-			$user = ORM::factory('user');	
-			$site_name = $_POST['username'];
-			
-			if($user->username_exists($site_name))
-				die('domain already exists');
-
-			if($user->username_exists($_POST['email']))
-				die('email already exists');
-				
-			
-			# HACK function for creating token for users.
-			# GET THIS OUT OF HERE
-			function quick_token()
+			else
 			{
-				$db = new Database;
-				while (TRUE)
-				{
-					$token = text::random('alnum', 32);
-
-					# Make sure the token does not already exist
-					if ($db->select('id')->where('token', $token)->get('users')->count() === 0)
-						return $token;
-				}
-			}	
-			$_POST['token'] = quick_token();
-
-			# load vars to user table
-			foreach ($_POST as $key => $val)
-				if($key != 'password2' AND 'beta' != $key)
-					$user->$key = $val;
-		
-			# create new user with appropriate roles
-			if(!$user->save() OR !$user->add(ORM::factory('role', 'login')))
-				die('There was a problem creating a new user.');
+				# Create new user
+				$user = ORM::factory('user');
+				
+				if($user->username_exists($_POST['username']))
+					die('username already exists');
+					
+				# load vars to user table
+				foreach ($_POST as $key => $val)
+					if($key != 'password2' AND 'beta' != $key)
+						$user->$key = $val;
 			
-			# create the website.
-			self::create_website($user->id, $site_name);
-			# Log user in
-			Auth::instance()->login($user, $_POST['password']);
-			# Take to user dashboard
-			url::redirect('get/auth');
+				# create new user with appropriate roles
+				if(!$user->add(ORM::factory('role', 'login')) OR !$user->save())
+					die('There was a problem creating a new user.');
+				
+				self::create_website($user->id, $_POST['username']);
+				Auth::instance()->login($user, $_POST['password']);
+				url::redirect('/get/auth');
+			}
 		}
 		
 		$this->display_create();
@@ -242,16 +204,6 @@ class Auth_Controller extends Template_Controller {
 		
 		$primary->errors = $errors;
 		$primary->values = $values;
-		
-		/*
-		#Javascript
-		$this->template->global_readyJS('
-			$("form input, form select").focus(function(){
-				$("form input, form select").removeClass("input_focus");
-				$(this).addClass("input_focus");
-			});	
-		');
-		*/
 		parent::build_output($primary);
 	}
 
@@ -268,20 +220,13 @@ class Auth_Controller extends Template_Controller {
 			$site_name = trim($_POST['site_name']);
 			$site_name = valid::filter_php_url($_POST['site_name']);	
 		
-			# make sure this sitename does not exist
-			$db = new Database;
-			$site = $db->query("
-				SELECT subdomain
-				FROM sites 
-				WHERE subdomain = '$site_name'
-			")->current();
-			
-			if(is_object($site))
+			$site = ORM::factory('site');
+			if($site->subdomain_exists($site_name))
 				die('sitename already exists');
 			
 			# Create the website
 			self::create_website($this->client->get_user()->id, $site_name);
-			# Display the dashboard
+			
 			parent::build_output($this->display_dashboard());
 		}
 		else
@@ -298,8 +243,6 @@ class Auth_Controller extends Template_Controller {
  */
 	private static function create_website($user_id, $site_name)
 	{
-		# make sure we always know the site_name does not exist.
-		
 		# create data folder structure for site
 		$source	= DOCROOT . '_assets/data/_stock';
 		$dest	= DATAPATH . $site_name;			
@@ -308,44 +251,42 @@ class Auth_Controller extends Template_Controller {
 			die('_stock folder does not exist.');
 
 		if(! Jdirectory::copy($source, $dest) )
-			die('Unable to make data folder!'); #status message	
+			die('Unable to make data folder');
 
-		$db = new Database;
+		$new_site = ORM::factory('site');
+		$new_site->subdomain = $site_name;
+		$new_site->theme 	 = 'base';
+		$new_site->add(ORM::factory('user', $user_id));
+		$new_site->save();
 
-		# create db sites record
-		$data = array(
-			'subdomain'	=> $site_name,
-			'theme'		=> 'base',		
-		);
-		$site_id = $db->insert('sites', $data)->insert_id();
-	
-		# create sites_users record so this user can edit this site.
-		$data = array(
-			'fk_users' => "$user_id",
-			'fk_site' => "$site_id"
-		);
-		$db->insert('sites_users', $data);
-			
-		# create home page
-		$data = array(
-			'fk_site'	=> $site_id,
-			'page_name'	=> 'home',
-			'label'		=> 'Home',
-			'position'	=> '0',
-			'menu'		=> 'yes',									
-		);
-		$query = $db->insert('pages', $data);
+	/* TODO - auto page-building yahboi
+		cool homepage
+		users account
+		blog
+		forum
+		calendar
+		contact 
+		about
+	*/
 		
-		# create about page
-		$data = array(
-			'fk_site'	=> $site_id,
-			'page_name'	=> 'about',
-			'label'		=> 'About',
-			'position'	=> '1',
-			'menu'		=> 'yes',								
-		);
-		$query = $db->insert('pages', $data);
+		$new_page = ORM::factory('page');
+		$new_page->fk_site		= $new_site->id;
+		$new_page->page_name	= 'home';
+		$new_page->label		= 'Home';
+		$new_page->position		= 0;
+		$new_page->menu			= 'yes';
+		$new_page->save();
 		
+		/*
+		# About page
+		$new_page->clear();
+		$new_page->fk_site		= $new_site->id;
+		$new_page->page_name	= 'about';
+		$new_page->label		= 'About';
+		$new_page->position		= 0;
+		$new_page->menu			= 'yes';
+		$new_page->save();
+		*/
 		return TRUE;
 	}
 	
@@ -371,12 +312,10 @@ class Auth_Controller extends Template_Controller {
 			unset($_POST['old_password']);
 			
 			if($old_password == $auth->get_user()->password)
-			{
-				if( $auth->get_user()->change_password($_POST, $save = TRUE) )
+				if($auth->get_user()->change_password($_POST, $save = TRUE))
 					$primary->success = TRUE;
 				else
 					$primary->error = 'New Password Error';
-			}
 			else
 				$primary->error = 'Old password is incorrect';
 		}
@@ -389,37 +328,23 @@ class Auth_Controller extends Template_Controller {
  */
 	public function reset_password()
 	{
-		if(ROOTACCOUNT != $this->site_name OR !$this->client->logged_in())
+		if(ROOTACCOUNT != $this->site_name)
 			url::redirect();	
 		
-		if($_POST)
+		if(!empty($_POST['username']))
 		{
-			$email = $_POST['email']; 
-			if(!valid::email($email))
-				die('email is not valid');
+			$user = ORM::factory('user', $_POST['username']);	
+			if(FALSE === $user->loaded)
+				die('This username does not exist in our records.');
 				
-			$db = new Database;
-			$user_db = $db->query("
-				SELECT id, username
-				FROM users 
-				WHERE email = '$email'
-			")->current();
-			
-			if(! is_object($user_db))
-				die('This email does not exist in our records.');
-				
-			# Load the user model	
-			$user = ORM::factory('user', $user_db->id);
-			
-			$new_password = text::random('alnum', 10);
-			$user->password = $new_password;
+			$user->password = text::random('alnum', 10);
 			
 			if($user->save())
-				die("new password has been generated: $user->username: $new_password");
+				die("New password has been generated for: $user->username. PW: $user->password");
 		
 			# Remember to send the email!!!
 		}
-		die();
+		die('nothing sent');
 	}
 
 
@@ -430,21 +355,11 @@ class Auth_Controller extends Template_Controller {
  */
 	function safe_mode($site_name)
 	{
-		$db = new Database;
 		$user_id = Auth::instance()->get_user()->id;
-		$can_edit = $db->query("
-			SELECT sites_users.*, sites.subdomain, sites.site_id 
-			FROM sites_users 
-			JOIN sites ON sites_users.fk_site = sites.site_id
-			WHERE sites_users.fk_users = '$user_id'
-			AND sites.subdomain = '$site_name'
-		")->current();
-		
-
-		if(!is_object($can_edit))
+		$site = ORM::factory('site', $site_name);
+		if(!$site->has(ORM::factory('user', $user_id)))
 			die('You cannot edit this site.');
-
-		
+			
 		$theme_path = Assets::themes_dir('safe_mode');
 		
 		# delete safe-mode if it exists (might be tainted)
@@ -458,14 +373,10 @@ class Auth_Controller extends Template_Controller {
 		if(! Jdirectory::copy(DOCROOT . "_assets/themes/safe_mode", $theme_path) )
 			die('Uh oh, not even this worked. Please contact support@plusjade.com!!'); # Error
 
-		
-		$db = new Database;		
-		$db->update(
-			'sites',
-			array('theme' => 'safe_mode'),
-			"site_id = '$this->site_id'"
-		);			
-		
+		$site = ORM::factory('site', $this->site_id);
+		$site->theme = 'safe_mode';
+		$site->save();
+	
 		# on success: should clear the cache and reload the page.
 		if(yaml::edit_site_value($site_name, 'site_config', 'theme', 'safe_mode'))
 			die("Safe-mode activated for <b>$site_name</b>");
@@ -479,7 +390,7 @@ class Auth_Controller extends Template_Controller {
 /**
  * log user out by destroying the session
  */ 
-	function logout()
+	public function logout()
 	{
 		Auth::instance()->logout();
 		url::redirect();

@@ -1,16 +1,14 @@
 
 
 
-<h2 class="faq_header"><?php echo $parent->title?></h2> 
+<h2 class="faq_header"><?php echo $faq->title?></h2> 
 
 <dl class="faq_list">
 	<?php
 	$x=0;
-	foreach($items as $item)
+	foreach($faq->faq_items as $item)
 	{
-		$url_question = preg_replace("(\W)", '_', $item->question);
-		$url_question = strtolower($url_question);			
-		$url_question = trim($url_question, '_');
+		$url_question = valid::filter_php_url($item->question);
 		?>
 		<span id="faq_item_<?php echo $item->id?>" class="faq_item" rel="<?php echo $item->id?>">
 			<dt class="minus">

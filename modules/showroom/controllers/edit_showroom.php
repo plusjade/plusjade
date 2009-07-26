@@ -17,65 +17,42 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
-		$db = new Database;
-		$parent = $db->query("
-			SELECT * FROM showrooms 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-		")->current();			
+		
+		$showroom = ORM::factory('showroom')
+			->where('fk_site' , $this->site_id)
+			->find($tool_id);
 
 		# show category list.
-		$primary = new View("edit_showroom/manage");
+		$db = new Database;
 		$items = $db->query("
 			SELECT cat.*, COUNT(items.id) AS item_count
-			FROM showroom_items AS cat
-			LEFT JOIN showroom_items_meta AS items ON cat.id = items.cat_id
-			WHERE parent_id = '$parent->id' 
+			FROM showroom_cats AS cat
+			LEFT JOIN showroom_cat_items AS items ON cat.id = items.showroom_cat_id
+			WHERE showroom_id = '$showroom->id' 
 			AND cat.fk_site = '$this->site_id'
 			GROUP BY cat.id
 			ORDER BY cat.lft ASC 
 		");
 
+
 		function render_node_showroom($item)
 		{
 			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><b rel="' . $item->url . '">' . $item->name . '</b> <small>('. $item->item_count .')</small></span>'; 
 		}
-		
+		$primary = new View("edit_showroom/manage");
 		$primary->tree = Tree::display_tree('showroom', $items, null, TRUE);		
 		$primary->tool_id = $tool_id;
 		die($primary);
 	}
 
-/*
- * manage items view for a particular category
- */ 
-	function items($tool_id=NULL, $cat_id=NULL)
-	{
-		valid::id_key($tool_id);
-		valid::id_key($cat_id);
-		$db = new Database;
-		$primary = new View('edit_showroom/manage_items');
-		
-		#display items in this cat
-		$items = $db->query("
-			SELECT * FROM showroom_items_meta 
-			WHERE cat_id = '$cat_id' 
-			AND fk_site = '$this->site_id'
-			ORDER by position;
-		");			
-		
-		if( '0' == count($items) )
-			die('<span class="on_close two">close-2</span> No items');	
 
-		$primary->items = $items;
-		$primary->tool_id = $tool_id;
-		die($primary);
-	}
-	
-	
 /*
  * Save nested positions of the category menus
  * Can also delete any links removed from the list.
+ 
+ TODO: deleting a category should also delete the items. 
+	or at least put them in a purgatory!
+ 
  * Gets output positions from this::manage
  */ 
 	function save_tree($tool_id)
@@ -83,7 +60,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			valid::id_key($tool_id);
-			echo Tree::save_tree('showrooms', 'showroom_items', $tool_id, $this->site_id, $_POST['output']);
+			echo Tree::save_tree('showroom', 'showroom_cat', $tool_id, $this->site_id, $_POST['output']);
 		}
 		die();
 	}	
@@ -98,38 +75,32 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		{
 			if(empty($_POST['category']))
 				die('category name is required');
-				
-			# sanitize url
+
+			$showroom = ORM::factory('showroom')
+				->where('fk_site', $this->site_id)
+				->find($tool_id);	
+			if(FALSE === $showroom->loaded)			
+				die('adding categories to invalid showroom.');
+
 			$url	= trim($_POST['url']);
 			$url	= (empty($url)) ? trim($_POST['category']) : $url; 
-			$url	= valid::filter_php_url($url);
-			
-			$db = new Database;
-			# Get parent
-			$parent	= $db->query("
-				SELECT * FROM showrooms 
-				WHERE id = '$tool_id' 
-				AND fk_site = '$this->site_id' 
-			")->current();
 
 			$_POST['local_parent'] = 
 				((empty($_POST['local_parent']) OR !is_numeric($_POST['local_parent'])))
-				? $parent->root_id : $_POST['local_parent'];
+				? $showroom->root_id : $_POST['local_parent'];
 
-			$data = array(
-				'parent_id'		=> $tool_id,
-				'fk_site'		=> $this->site_id,
-				'url'			=> $url,
-				'name'			=> trim($_POST['category']),
-				'local_parent'	=> $_POST['local_parent'],
-				'position'		=> '0'
-			);	
-			$insert_id = $db->insert('showroom_items', $data)->insert_id(); 	
-
-			# Update left and right values
-			Tree::rebuild_tree('showroom_items', $parent->root_id, $this->site_id, '1');
+			$new_cat = ORM::factory('showroom_cat');
+			$new_cat->showroom_id	= $tool_id;
+			$new_cat->fk_site		= $this->site_id;
+			$new_cat->url			= valid::filter_php_url($url);
+			$new_cat->name			= trim($_POST['category']);
+			$new_cat->local_parent	= $_POST['local_parent'];
+			$new_cat->position		= 0;
+			$new_cat->save();
 			
-			die("$insert_id");  # need for javascript
+			# Update left and right values
+			Tree::rebuild_tree('showroom_cat', $showroom->root_id, $this->site_id, 1);
+			die("$new_cat->id");  # need for javascript
 		}
 
 		$primary = new View('edit_showroom/add_category');
@@ -143,38 +114,53 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	public function edit_category($cat_id=NULL)
 	{
 		valid::id_key($cat_id);
-		$db = new Database;
+		
+		$category = ORM::factory('showroom_cat')
+			->where('fk_site', $this->site_id)
+			->find($cat_id);	
+		if(FALSE === $category->loaded)
+			die('invalid category item id');
 		
 		if($_POST)
 		{
 			if(empty($_POST['category']))
 				die('category name is required');
-				
-			# sanitize url
-			$url	= trim($_POST['url']);
-			$url	= (empty($url)) ? trim($_POST['category']) : $url; 
-			$url	= valid::filter_php_url($url);
+	
+			$url = trim($_POST['url']);
+			$url = (empty($url)) ? trim($_POST['category']) : $url; 
 		
-			$data = array(
-				'url'			=> $url,
-				'name'			=> trim($_POST['category']),
-			);	
-			$db->update(
-				'showroom_items',
-				$data,
-				"id='$cat_id' and fk_site = '$this->site_id'"
-			); 
+			$category->url = valid::filter_php_url($url);
+			$category->name = trim($_POST['category']);
+			$category->save();
 			die('Showroom category updated.');
 		}
-	
-		$cat = $db->query("
-			SELECT * FROM showroom_items
-			WHERE id = '$cat_id' 
-			AND fk_site = '$this->site_id' 
-		")->current();
+
 		$primary = new View('edit_showroom/edit_category');
-		$primary->cat = $cat;				
+		$primary->cat = $category;				
 		die($primary);	
+	}
+
+/*
+ * manage items view for a particular category
+ */ 
+	function items($tool_id=NULL, $cat_id=NULL)
+	{
+		valid::id_key($tool_id);
+		valid::id_key($cat_id);
+	
+		$items = ORM::factory('showroom_cat_item')
+			->where(array(
+				'fk_site'			=> $this->site_id,
+				'showroom_cat_id'	=> $cat_id,
+			))
+			->find_all();
+		if(0 === $items->count())
+			die('<span class="on_close two">close-2</span> No items');	
+
+		$primary = new View('edit_showroom/manage_items');
+		$primary->items = $items;
+		$primary->tool_id = $tool_id;
+		die($primary);
 	}
 	
 /*
@@ -183,38 +169,31 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	public function add_item($tool_id=NULL)
 	{	
 		valid::id_key($tool_id);
-		$db = new Database;	
-		
+
 		if($_POST)
 		{
-			if( empty($_POST['name']) )
+			if(empty($_POST['name']))
 				die('Name is required'); # error
 			
-			# Get highest position
-			$get_highest = $db->query("
-				SELECT MAX(position) as highest 
-				FROM showroom_items_meta 
-				WHERE cat_id = '{$_POST['category_id']}'
-			")->current();
-			
+			$max = ORM::factory('showroom_cat_item')
+				->select('MAX(position) as highest')
+				->where('showroom_cat_id', $_POST['category_id'])
+				->find();	
+				
 			# sanitize url
 			$url = trim($_POST['url']);
 			$url = (empty($url)) ? $_POST['name'] : $url;
-			$url = valid::filter_php_url($url);
 			
-			$data = array(			
-				'fk_site'	=> $this->site_id,
-				'url'		=> $url,
-				'cat_id'	=> $_POST['category_id'],
-				'name'		=> $_POST['name'],
-				'intro'		=> $_POST['intro'],
-				'body'		=> $_POST['body'],
-				'images'	=> trim($_POST['images'], '|'),
-				'position'	=> ++$get_highest->highest,				
-			);	
-			
-			$db->insert('showroom_items_meta', $data);	
-			die('Item added'); #status message
+			$new_item = ORM::factory('showroom_cat_item');
+			$new_item->fk_site			= $this->site_id;
+			$new_item->url				= valid::filter_php_url($url);
+			$new_item->showroom_cat_id	= $_POST['category_id'];
+			$new_item->name				= $_POST['name'];
+			$new_item->intro			= $_POST['body'];
+			$new_item->images			= trim($_POST['images'], '|');
+			$new_item->position			= ++$max->highest;
+			$new_item->save();
+			die('Showroom item added');
 		}
 		elseif(! empty($_GET['category']))
 		{
@@ -234,7 +213,12 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	public function edit($id=NULL)
 	{
 		valid::id_key($id);
-		$db = new Database;
+
+		$item = ORM::factory('showroom_cat_item')
+			->where('fk_site', $this->site_id)
+			->find($id);	
+		if(FALSE === $item->loaded)
+			die('invalid showroom item id');
 			
 		if($_POST)
 		{
@@ -244,53 +228,31 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			# sanitze url
 			$url = trim($_POST['url']);
 			$url = (empty($url)) ? $_POST['name'] : $url;
-			$url = valid::filter_php_url($url);
 			
-			$data = array(
-				'url'		=> $url,
-				'cat_id'	=> $_POST['category'],
-				'name'		=> $_POST['name'],
-				'intro'		=> $_POST['intro'],
-				'body'		=> $_POST['body'],
-				'images'		=> trim($_POST['images'], '|'),					
-			);
-			$db->update(
-				'showroom_items_meta',
-				$data,
-				"id = '$id' AND fk_site = '$this->site_id'"
-			);	
-			die('Item saved');
+			$item->url				= valid::filter_php_url($url);
+			$item->showroom_cat_id	= $_POST['category'];
+			$item->name				= $_POST['name'];
+			$item->intro			= $_POST['body'];
+			$item->images			= trim($_POST['images'], '|');
+			$item->save();
+			die('Showroom item saved');
 		}
+
 		// TODO: this seems apsurdly slow...  1.5 seconds.
-		
-		# Grab single item
-		$item = $db->query("
-			SELECT * FROM showroom_items_meta
-			WHERE id = '$id' 
-			AND fk_site = '$this->site_id'
-		")->current();
-		if(empty($item) )
-			die('item does not exist');
-			
+
 		# Get list of categories 
 		# TODO: could probably join these no?
-		$category = $db->query("
-			SELECT id, name, parent_id 
-			FROM showroom_items
-			WHERE id = '$item->cat_id' 
-			AND fk_site = '$this->site_id'
-		")->current();
+		$category = ORM::factory('showroom_cat')
+			->where('fk_site', $this->site_id)
+			->find($item->showroom_cat_id);
 		
-		$categories = $db->query("
-			SELECT id, name FROM showroom_items
-			WHERE parent_id = '$category->parent_id' 
-			AND fk_site = '$this->site_id'
-			AND local_parent != '0'
-			ORDER BY lft ASC
-		");
-		$primary = new View("edit_showroom/edit_item");
-		$primary->categories = $categories;	
-		$primary->item = $item;
+		$categories = ORM::factory('showroom_cat')
+			->where(array(
+				'fk_site'			=> $this->site_id,
+				'showroom_id'		=> $category->showroom_id,
+				'local_parent !='	=> 0,
+			))
+			->find_all();
 
 		# images 
 		$image_array = explode('|', $item->images);
@@ -307,20 +269,25 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			
 			$images[] = "$small|$image";
 		}
-		$primary->images = $images;	
+		
+		$primary = new View("edit_showroom/edit_item");
+		$primary->categories	= $categories;	
+		$primary->item			= $item;
+		$primary->images		= $images;
+		$primary->img_path		= $this->assets->assets_url();	
 		die($primary);	
 	}
 
 /*
  * delete a single showroom item
  */
-	public function delete($tool_id=NULL, $id=NULL)
+	public function delete($id=NULL)
 	{
-		valid::id_key($tool_id);
 		valid::id_key($id);				
-		
-		$db = new Database;
-		$db->delete('showroom_items_meta', "id = '$id' AND fk_site ='$this->site_id'");
+
+		ORM::factory('showroom_cat_item')
+			->where('fk_site', $this->site_id)
+			->delete($id);
 		die('Showroom item Deleted');
 	}
 
@@ -331,7 +298,14 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */
 	public function save_sort()
 	{
-		die( $this->_save_sort_common($_GET['showroom'], 'showroom_items') );
+		if(empty($_GET['item']))
+			die('No items to sort');
+
+		$db = new Database;	
+		foreach($_GET['item'] as $position => $id)
+			$db->update('showroom_cat_items', array('position' => $position), "id = '$id' AND fk_site = '$this->site_id'"); 	
+		
+		die('Showroom item order saved.');
 	}
 	
 /*
@@ -343,23 +317,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	{
 		die('Showroom settings are currently disabled while we update our code. Thanks!');
 		valid::id_key($tool_id);
-		$db = new Database;
-		
-		if($_POST)
-		{
-			$data = array(
-				'name'		=> $_POST['name'],
-				'view'		=> $_POST['view'],
-				'params'	=> $_POST['params'],
-			);
-			$db->update(
-				'showrooms',
-				$data,
-				"id = '$tool_id' AND fk_site = '$this->site_id'"
-			);
-			die('Showroom updated');		
-		}
-		die( $this->_view_edit_settings('showroom', $tool_id) );
+
 	}
 	
 
@@ -371,56 +329,50 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */	
 	function _tool_adder($tool_id)
 	{
-		$db = new Database;
-		$data = array(
-			'parent_id'		=> $tool_id,
-			'fk_site'		=> $this->site_id,
-			'name'			=> 'ROOT',
-			'local_parent'	=> '0',
-			'position'		=> '0'
-		);	
-		$root_insert_id = $db->insert('showroom_items', $data)->insert_id(); 	
-		
-		$db->update('showrooms', 
-			array( 'root_id' => $root_insert_id ), 
-			array( 'id' => $tool_id, 'fk_site' => $this->site_id ) 
-		);	
 	
+		# this can all be done in the overloaded save function for
+		# navigations model - look into it.	
+		$new_cat = ORM::factory('showroom_cat');
+		$new_cat->showroom_id	= $tool_id;
+		$new_cat->fk_site		= $this->site_id;
+		$new_cat->name			= 'ROOT';
+		$new_cat->local_parent	= 0;
+		$new_cat->position		= 0;
+		$new_cat->save();
+			
+		$showroom = ORM::factory('showroom')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);
+		
+		$showroom->root_id = $new_cat->id;
+		$showroom->save();
+
 		return 'manage';
 	}
 	
 /*
- * logic executed after this blog tool is deleted from site.
- * TOD0: finish this.
+ * TODO: This works but we need to make this ORM.
  */	
 	function _tool_deleter($tool_id, $site_id)
 	{
 		$db = new Database;
-		
-		# delete items_meta (items)
 		$db->query("
-			DELETE items.*
-			FROM showroom_items as cats, showroom_items_meta as items
-			WHERE cats.fk_site = '$this->site_id'
-			AND cats.parent_id = '$tool_id'
-			AND cats.id = items.cat_id
+			DELETE cats.*, items.*
+			FROM showroom_cats as cats, showroom_cat_items as items
+			WHERE cats.fk_site = '$site_id'
+			AND cats.showroom_id = '$tool_id'
+			AND cats.id = items.showroom_cat_id
 		");
+		
+		# hack to remove the root node which has no items on it.
+		ORM::factory('showroom_cat')
+			->where(array(
+				'fk_site'		=> $site_id,
+				'showroom_id'	=> $tool_id,
+			))
+			->delete_all();
+		
 		return TRUE;
-		/*
-		# delete data assets
-		$showroom_dir = Assets::assets_dir("tools/showrooms/$tool_id");
-		if(is_dir($showroom_dir))
-		{
-			$d = dir($showroom_dir); 
-			while($file = $d->read())
-			{
-				 if('.' != $file && '..' != $file)
-					unlink("$showroom_dir/$file"); 
-			} 
-			$d->close(); 
-			rmdir($showroom_dir);
-		}
-		*/		
 	}
 
 } /* -- end -- */

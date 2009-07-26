@@ -12,7 +12,7 @@ abstract class Template_Controller extends Controller {
 		
 		# Global CSS			
 		if(! $this->client->can_edit($this->site_id) )
-			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-");
+			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
 		
 		/*
 		$theme_js_path = DOCROOT . "_assets/themes/$this->theme/js/stock.js"
@@ -95,16 +95,17 @@ abstract class Template_Controller extends Controller {
 			$this->template->error = "<h1 class=\"aligncenter\">Invalid '$template.html' for theme: $this->theme, using master.html</h1>";
 		}
 
-		function get_string_between($string, $start, $end)
+
+		$string = " ". ob_get_clean();
+		$ini = strpos($string, '<body>');
+		if ($ini == 0)
+			$master = '';
+		else
 		{
-			$string = " ".$string;
-			$ini = strpos($string, $start);
-			if ($ini == 0) return "";
-			$ini += strlen($start);   
-			$len = strpos($string, $end, $ini) - $ini;
-			return substr($string, $ini, $len);
+			$ini += strlen('<body>');   
+			$len = strpos($string, '</body>', $ini) - $ini;
+			$master = substr($string, $ini, $len);
 		}
-		$master = get_string_between(ob_get_clean(), '<body>', '</body>');
 		
 		$keys = array(
 			'%BANNER%',

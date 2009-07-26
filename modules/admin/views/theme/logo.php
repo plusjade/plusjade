@@ -78,7 +78,7 @@
  * Change logo functionality
 */
 	$('button[name="change_logo"]').click(function(){
-		image = $('.common_main_panel img.selected').attr('rel');
+		var image = $('.common_main_panel img.selected').attr('rel');
 		if(!image) {
 			alert('Select a banner first.');
 			return false;
@@ -96,7 +96,7 @@
 	
 // delete a logo
 	$('button[name="delete_logo"]').click(function(){
-		image = $('.common_main_panel img.selected').attr('rel');
+		var image = $('.common_main_panel img.selected').attr('rel');
 		if(!image) {
 			alert('Select a banner to delete.');
 			return false;

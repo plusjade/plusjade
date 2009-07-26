@@ -4,33 +4,13 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 
 /*
  *	Handles all editing logic for calendar module.
- *	Extends the module template to build page quickly for ajax rendering.
- *	Only Logged in users should have access
- *
  */
  
 	function __construct()
 	{
 		parent::__construct();	
 	}
-	
-/*
- * THIS DOES NOT WORK, SHOULD NOT WORK
- */
-	function manage($tool_id=NULL)
-	{
-		die('blah');
-		valid::id_key($tool_id);
-		$calendar = new Calendar;
-		$db = new Database;
-		# Create array for dates associated with this month
-		$dates = $db->query("
-			SELECT * FROM calendar_items 
-			WHERE parent_id = '$tool_id'
-			AND fk_site = '$this->site_id'
-		");
-		
-	}
+
 
 /*
  * Add Event(s)
@@ -40,29 +20,25 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 		valid::id_key($tool_id);	
 		if($_POST)
 		{
-			$db = new Database;
 			$dates = explode('/', $_POST['date']);
 			
-			$data = array(			
-				'parent_id'	=> $tool_id,
-				'fk_site'	=> $this->site_id,
-				'year'		=> $dates['2'],
-				'month'		=> $dates['0'],
-				'day'		=> $dates['1'],
-				'title'		=> $_POST['title'],
-				'desc'		=> $_POST['desc'],				
-			);	
-
-			# Upload image if sent
-			if(!empty($_FILES['image']['name']))
-				if (! $data['image'] = $this->_upload_image($_FILES) )
-					echo 'Image must be jpg, gif, or png.';
-
-			$db->insert('calendar_items', $data);
-			die('Event added'); #status message
+			$new_item = ORM::factory('calendar_item');
+			
+			$new_item->fk_site		= $this->site_id;
+			$new_item->calendar_id	= $tool_id;
+			$new_item->year			= $dates['2'];
+			$new_item->month		= $dates['0'];
+			$new_item->day			= $dates['1'];
+			$new_item->title		= $_POST['title'];
+			$new_item->desc			= $_POST['desc'];
+			$new_item->save();
+			die('Event added'); # success message
 		}
-		
-		die( $this->_view_add_single('calendar', $tool_id) );	
+
+		$primary = new View("edit_calendar/add_item");
+		$primary->tool_id = $tool_id;
+		$primary->js_rel_command = "update-calendar-$tool_id";
+		die($primary);
 	}
 	
 /*
@@ -71,118 +47,50 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	public function edit($id=NULL)
 	{
 		valid::id_key($id);
-		$db = new Database;
+
+		$item = ORM::factory('calendar_item')
+			->where('fk_site', $this->site_id)
+			->find($id);
+		if(FALSE === $item->loaded)
+			die('invalid calendar item.');
+
 		if($_POST)
 		{
-			$data = array(
-				'title'	=> $_POST['title'],
-				'desc'	=> $_POST['desc'],		
-			);		
-			$db->update(
-				'calendar_items',
-				$data,
-				"id = '$id' AND fk_site = '$this->site_id'"
-			);
+			$item->title = $_POST['title'];
+			$item->desc = $_POST['desc'];
+			$item->save();
 			die('Event Saved');
 		}
 
-		$primary = new View("edit_calendar/edit_item");		
-		$parent = $db->query("
-			SELECT * FROM calendar_items 
-			WHERE id = '$id' 
-			AND fk_site = '$this->site_id'
-		")->current();
-		$primary->item = $parent;
-		$primary->js_rel_command = "update-calendar-$parent->parent_id";
+		$primary = new View("edit_calendar/edit_item");
+		$primary->item = $item;
+		$primary->js_rel_command = "update-calendar-$item->calendar_id";
 		die($primary);
 	}
 
 /*
- * DELETE showroom (item) single
- * Success Response via inline JGrowl
- * [see root JS in this::manage() ]
- * @PARM (INT) $id = id of showroom item row 
+ * delete a calendar item.
  */
 	public function delete($id=NULL)
 	{
-		valid::id_key($id);				
-		die( $this->_delete_single_common('calendar', $id) );
+		valid::id_key($id);
+		
+		ORM::factory('calendar_item')
+			->where('fk_site', $this->site_id)
+			->delete($id);
+			
+		die('Calendar item deleted.');
 	}
 
+/*
+ * calendar settings.
+ */
 	function settings()
 	{
-		die('Edit Calendar settings...');
+		die('Calendar Settings have been disabled while we update our code. Thanks!');
 	}
 	
-# Ajax get a list of events for a certain date
-	public function day($date=NULL)
-	{
-		# Format: month/day/year
-		$pieces = explode('-', $date);
-		
-		valid::id_key($pieces['0']);
-		valid::id_key($pieces['1']);
-		valid::id_key($pieces['2']);
-		
-		$month	= $pieces['0'];
-		$day	= $pieces['1'];
-		$year	= $pieces['2'];
-		$db = new Database;
-		
-		$events = $db->query("
-			SELECT * FROM calendar_items 
-			WHERE fk_site = '$this->site_id'
-			AND year = '$year'  
-			AND month = '$month'
-			AND day = '$day'
-		");
-	
-		if( $events->count() > 0 )
-		{
-			$primary = new View('edit_calendar/day');
-			$primary->events = $events;
-			$primary->date = $date;
-			die($primary);
-		}
-		else
-			die('no events on this day');
 
-	}
-	
-/*
- * Upload an image
- * @Param array $file = $_FILES array
- */ 	
-	private function _upload_image($_FILES)
-	{		
-		$files = new Validation($_FILES);
-		$files->add_rules('image', 'upload::valid','upload::type[gif,jpg,png]', 'upload::size[1M]');
-		
-		if ($files->validate())
-		{
-			# Temp file name
-			$filename	= upload::save('image');
-			$image		= new Image($filename);			
-			$ext		= $image->__get('ext');
-			$file_name	= basename($filename).'.'.$ext;
-			$directory	= DOCROOT."data/{$this->site_name}/assets/images/showroom";			
-			
-			if(! is_dir($directory) )
-				mkdir($directory);	
-			
-			if( $image->__get('width') > 350 )
-				$image->resize(350, 650);
-			
-			$image->save("$directory/$file_name");
-		 
-			unlink($filename);
-			
-			return $file_name;
-		}
-		else
-			return FALSE;
-	}
-	
 	static function _tool_adder($tool_id, $site_id)
 	{
 		return 'add';
@@ -190,6 +98,13 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	
 	static function _tool_deleter($tool_id, $site_id)
 	{
-		return FALSE;
+		ORM::factory('calendar_item')
+			->where(array(
+				'fk_site'		=> $site_id,
+				'calendar_id'	=> $tool_id,
+				))
+			->delete_all();	
+
+		return TRUE;
 	}
 }

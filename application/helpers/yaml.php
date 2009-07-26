@@ -29,11 +29,21 @@ class yaml_Core {
 		else
 			$config_path = DATAPATH . "$site_name/$full_path.yml";
 		
+		
 		$yaml_array = array();
+		if('site_config' == $filename)
+			$yaml_array = array(
+				'site_id'		=> '',
+				'site_name'		=> '',
+				'theme'			=> '',
+				'banner'		=> '',
+				'homepage'		=> '',
+				'account_page'	=> ''
+			);
+
 		if( file_exists($config_path) )
 		{
-			$yaml_array	= array();
-			$lines		= file($config_path, FILE_SKIP_EMPTY_LINES);
+			$lines = file($config_path, FILE_SKIP_EMPTY_LINES);
 
 			foreach($lines as $line)
 			{

@@ -8,29 +8,14 @@ class Faq_Controller extends Controller {
   
 	function _index($tool_id)
 	{
-		$db = new Database;
+		$faq = ORM::factory('faq')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $faq->loaded)
+			return $this->public_template('this faq id not found.', 'faq', $tool_id, $parent->attributes);
+	
 		$primary = new View("public_faq/index");
-		
-		$parent = $db->query("
-			SELECT * FROM faqs 
-			WHERE id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-		")->current();	
-
-		$items = $db->query("
-			SELECT * FROM faq_items 
-			WHERE parent_id = '$tool_id' 
-			AND fk_site = '$this->site_id'
-			ORDER BY position
-		");
-		if('0' == $items->count())
-			return $this->public_template('(no questions)', 'faq', $tool_id);
-		
-		$primary->parent = $parent;	
-		$primary->items = $items;
-
+		$primary->faq = $faq;	
 		return $this->public_template($primary, 'faq', $tool_id);
 	}
-}
-
-/* -- end of application/controllers/faq.php -- */
+} # end

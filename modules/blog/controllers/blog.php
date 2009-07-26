@@ -16,36 +16,27 @@ class Blog_Controller extends Controller {
 	{
 		date_default_timezone_set('America/Los_Angeles');# just for now
 		$url_array	= Uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'blog', $tool_id);
-		$action		= $url_array['1'];
-		$value		= $url_array['2'];
-		$value2		= $url_array['3'];
+		list($page_name, $action, $value, $value2) = $url_array;
+		$page_name	= $this->get_page_name($page_name, 'blog', $tool_id);
+		$action		= (empty($action)) ? 'SomethingRandom' : $action ;
 		
-		/*
-		 * need the parent to setup appropriate views and user-specific settings
-		 */
-		# get parent 
-		$parent = $this->db->query("
-			SELECT * FROM blogs 
-			WHERE id = '$tool_id'
-			AND fk_site = '$this->site_id'
-		")->current();	
-		if(!is_object($parent))
-			die('invalid tool');
+		$blog = ORM::factory('blog')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $blog->loaded)
+			return $this->public_template('blog error, please contact support', 'blog', $tool_id);
 		
 		$primary = new View("public_blog/index");
 		$primary->tool_id = $tool_id;
 		$primary->set_global('blog_page_name', $page_name);
 		$primary->tags = $this->_get_tags($tool_id);
-		$primary->sticky_posts = $this->get_sticky_posts($parent->sticky_posts);
+		$primary->sticky_posts = $this->get_sticky_posts($blog->sticky_posts);
 		$primary->recent_comments = $this->get_recent_comments($tool_id);
-		$primary->add_root_js_files('ajax_form/ajax_form.js');
 
-		$action = (empty($action)) ? 'SomethingRandom' : $action ;
+		
 		switch($action)
 		{
 			case 'entry':
-				#die("blah $action");
 				$content = self::single_post($page_name, $value);
 				break;
 			
@@ -68,17 +59,17 @@ class Blog_Controller extends Controller {
 			default:
 				# blog homepage
 				$items = $this->db->query("
-					SELECT blog_items.*, 					
+					SELECT blog_posts.*, 					
 					DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on,
-					GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string,
-					COUNT(DISTINCT blog_items_comments.id) as comments
-					FROM blog_items
-					LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
-					LEFT JOIN blog_items_comments ON blog_items.id = blog_items_comments.item_id
-					WHERE blog_items.parent_id = '$tool_id'
-					AND blog_items.fk_site = '$this->site_id'					
-					AND blog_items.status = 'publish'
-					GROUP BY blog_items.id 
+					GROUP_CONCAT(DISTINCT blog_post_tags.value ORDER BY blog_post_tags.value  separator ',') as tag_string,
+					COUNT(DISTINCT blog_post_comments.id) as comments
+					FROM blog_posts
+					LEFT JOIN blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+					LEFT JOIN blog_post_comments ON blog_posts.id = blog_post_comments.blog_post_id
+					WHERE blog_posts.blog_id = '$tool_id'
+					AND blog_posts.fk_site = '$this->site_id'					
+					AND blog_posts.status = 'publish'
+					GROUP BY blog_posts.id 
 					ORDER BY created DESC
 				");
 				$content = new View('public_blog/multiple_posts');	
@@ -107,20 +98,20 @@ class Blog_Controller extends Controller {
 		}
 		
 		$item = $this->db->query("
-			SELECT blog_items.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
-			GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string
-			FROM blog_items 
-			LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
-			WHERE blog_items.$field = '$url'
-			AND blog_items.fk_site = '$this->site_id'
-			AND blog_items.status = 'publish'
+			SELECT blog_posts.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
+			GROUP_CONCAT(DISTINCT blog_post_tags.value ORDER BY blog_post_tags.value  separator ',') as tag_string
+			FROM blog_posts 
+			LEFT JOIN blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+			WHERE blog_posts.$field = '$url'
+			AND blog_posts.fk_site = '$this->site_id'
+			AND blog_posts.status = 'publish'
 		")->current();
 
 		if(! is_object($item) )
 			return 'This post does not exist';
 		
 		$content->item = $item;	
-		$content->comments = $this->get_comments($page_name, $item->id, $item->parent_id);
+		$content->comments = $this->get_comments($page_name, $item->id, $item->blog_id);
 		$content->blog_page_name = $page_name;
 		return $content;
 	}
@@ -133,18 +124,18 @@ class Blog_Controller extends Controller {
 	{
 		$content = new View('public_blog/multiple_posts');
 		$items = $this->db->query("
-			SELECT blog_items.*,					
-			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, blog_items_tags.value,
-			GROUP_CONCAT(DISTINCT blog_items_tags.value ORDER BY blog_items_tags.value  separator ',') as tag_string,
-			FIND_IN_SET('$tag', GROUP_CONCAT(DISTINCT blog_items_tags.value)) as tag_match,
-			COUNT(DISTINCT blog_items_comments.id) as comments
-			FROM blog_items
-			LEFT JOIN blog_items_tags ON blog_items.id = blog_items_tags.item_id
-			LEFT JOIN blog_items_comments ON blog_items.id = blog_items_comments.item_id
-			WHERE blog_items.parent_id = '$tool_id'
-			AND blog_items.fk_site = '$this->site_id'					
-			AND blog_items.status = 'publish'
-			GROUP BY blog_items.id HAVING tag_match > '0'
+			SELECT blog_posts.*,					
+			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, blog_post_tags.value,
+			GROUP_CONCAT(DISTINCT blog_post_tags.value ORDER BY blog_post_tags.value  separator ',') as tag_string,
+			FIND_IN_SET('$tag', GROUP_CONCAT(DISTINCT blog_post_tags.value)) as tag_match,
+			COUNT(DISTINCT blog_post_comments.id) as comments
+			FROM blog_posts
+			LEFT JOIN blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
+			LEFT JOIN blog_post_comments ON blog_posts.id = blog_post_comments.blog_post_id
+			WHERE blog_posts.blog_id = '$tool_id'
+			AND blog_posts.fk_site = '$this->site_id'					
+			AND blog_posts.status = 'publish'
+			GROUP BY blog_posts.id HAVING tag_match > '0'
 			ORDER BY created DESC
 		");
 		$content->items = $items;
@@ -185,13 +176,13 @@ class Blog_Controller extends Controller {
 		}
 
 		$items = $this->db->query("
-			SELECT blog_items.*, 
+			SELECT blog_posts.*, 
 			DATE_FORMAT(created, '%Y') as year,
 			DATE_FORMAT(created, '%M') as month,
 			DATE_FORMAT(created, '%e') as day
-			FROM blog_items 
-			WHERE blog_items.parent_id = '$tool_id' 
-			AND blog_items.fk_site = '$this->site_id'
+			FROM blog_posts 
+			WHERE blog_posts.blog_id = '$tool_id' 
+			AND blog_posts.fk_site = '$this->site_id'
 			$date_search
 			ORDER BY created
 			LIMIT 0, 10
@@ -211,22 +202,22 @@ class Blog_Controller extends Controller {
 		if(NULL == $tool_id)
 		{
 			$parent =  $this->db->query("
-				SELECT parent_id FROM blog_items 
+				SELECT blog_id FROM blog_posts 
 				WHERE id = '$post_id' AND fk_site = '$this->site_id'
 			")->current();
-			$tool_id = $parent->parent_id;
+			$tool_id = $parent->blog_id;
 		}			
 			
 		$comments = $this->db->query("
 			SELECT *,
 			DATE_FORMAT(created_at, '%M %e, %Y, %l:%i%p') as clean_date
-			FROM blog_items_comments 
-			WHERE item_id = '$post_id'
+			FROM blog_post_comments 
+			WHERE blog_post_id = '$post_id'
 			AND fk_site = '$this->site_id'
 			ORDER BY created_at
 		");
 		$content->comments = $comments;
-		$content->item_id = $post_id;
+		$content->blog_post_id = $post_id;
 		$content->tool_id = $tool_id;
 		$content->blog_page_name = $page_name;
 		
@@ -258,8 +249,8 @@ class Blog_Controller extends Controller {
 			##ini_set('date.timezone', 'America/Los_Angeles');
 
 			$data = array(
-				'parent_id'		=> $_POST['tool_id'],
-				'item_id'		=> $post_id,
+				'blog_id'		=> $_POST['tool_id'],
+				'blog_post_id'		=> $post_id,
 				'fk_site'		=> $this->site_id,
 				'body'			=> $_POST['body'],
 				'name'			=> $_POST['name'],
@@ -268,7 +259,7 @@ class Blog_Controller extends Controller {
 				'created_at'	=> strftime("%Y-%m-%d %H:%M:%S"),					
 			);
 			
-			$insert_id = $this->db->insert('blog_items_comments', $data);
+			$insert_id = $this->db->insert('blog_post_comments', $data);
 			return '		
 			<div class="comment_item">				
 				<div class="comment_name">'.$_POST['name'].' says...</div>
@@ -289,8 +280,8 @@ class Blog_Controller extends Controller {
 		$tags = $this->db->query("
 			SELECT id, value,
 			COUNT(tags.id) as qty
-			FROM blog_items_tags as tags
-			WHERE parent_id = '$tool_id'
+			FROM blog_post_tags as tags
+			WHERE blog_id = '$tool_id'
 			AND fk_site='$this->site_id'
 			GROUP BY tags.value
 			ORDER BY qty DESC, value
@@ -307,8 +298,8 @@ class Blog_Controller extends Controller {
 			return false;
 			
 		$item =  $this->db->query("
-			SELECT blog_items.title, blog_items.url
-			FROM blog_items
+			SELECT blog_posts.title, blog_posts.url
+			FROM blog_posts
 			WHERE id IN ($id_string)
 			AND fk_site = '$this->site_id'
 			LIMIT 0,5
@@ -322,10 +313,10 @@ class Blog_Controller extends Controller {
 	private function get_recent_comments($tool_id=Null)
 	{
 		$comments =  $this->db->query("
-			SELECT comments.name, blog_items.title, blog_items.url
-			FROM blog_items_comments as comments
-			JOIN blog_items ON blog_items.id = comments.item_id
-			WHERE comments.parent_id = '$tool_id' AND comments.fk_site = '$this->site_id'
+			SELECT comments.name, blog_posts.title, blog_posts.url
+			FROM blog_post_comments as comments
+			JOIN blog_posts ON blog_posts.id = comments.blog_post_id
+			WHERE comments.blog_id = '$tool_id' AND comments.fk_site = '$this->site_id'
 			ORDER BY comments.created_at DESC
 			LIMIT 0,5
 		");
@@ -336,10 +327,7 @@ class Blog_Controller extends Controller {
 
 	
 /*
- * page builders frequently use ajax to update their content
- * common method for handling ajax requests.
- * param $url_array = (array) an array of url signifiers
- * param $tool_id 	= (int) the tool id of the tool.
+ * ajax handler.
  */ 
 	function _ajax($url_array, $tool_id)
 	{
