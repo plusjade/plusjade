@@ -83,9 +83,7 @@ $(document).ready(function()
  * ShowRespose in beta mode only.
 */
 	$('body').append('<div id="show_response_beta">[Server Response]</div>');
-	$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
-	// resizer functions are @ bottom of page.
-	
+
 	
 /*
  * updates the tool container #tool_wrapper_<id> 
@@ -184,6 +182,16 @@ $(document).ready(function()
 			$.facebox.close();
 			return false;	
 		},
+
+		'ul.row_wrapper .delete_item a' :function(e){
+			if(confirm('This cannot be undone. Delete this item?')){
+				var id = $(e.target).attr('rel');
+				$.get(e.target.href, function(){
+					$('#item_'+ id).remove();
+				});
+			}
+			return false;
+		},
 		
 		// DELETE CONFIRMED common button in facebox
 		"a.jade_confirm_delete_common": function(e) {
@@ -260,9 +268,17 @@ $(document).ready(function()
  * auto-filter form fields delegation
  */
 $('body').keyup($.delegate({
+
+	"input.send_input": function(e){
+		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '-');
+		$(e.target).siblings('input.receive_input').val(input);
+		$('span#link_example').html(input);
+	},
+	
 	"input.auto_filename": function(e){
-		input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '');
+		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '');
 		$(e.target).val(input);
+		$('span#link_example').html(input);
 	}
 }));
 
@@ -303,8 +319,11 @@ $('body').keyup($.delegate({
 			success: function(data) {
 				// if 2 fbs are active, we assume the form is submitted from 2
 				// so we close only box 2, else close everything.
-				var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
-				$.facebox.close(whichBox);
+				
+				
+				/* TESTING : disable auto facebox close */
+				//var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
+				//$.facebox.close(whichBox);
 				$('.admin_reset .show_submit').hide();					
 				$('#show_response_beta').html(data);
 			}
@@ -436,13 +455,106 @@ $('body').keyup($.delegate({
 		//revert: true
 	});	
 
+
+// 	
+// ------------------------------------------------------------------------------
+
+
+/* Centralize the main admin interfaces here so we can cache
+ * Pages, Files and theme handling.
+*/
+
+/* 
+ * Pages browser function delegation.
+ */
+	$('body').click($.delegate({
+	// open file dropdown lists
+		'#page_browser_wrapper img.file_options, #page_browser_wrapper span.icon.page': function(e){
+			$('#page_browser_wrapper ul.option_list').hide();
+			$(e.target).nextAll('ul').show();
+		},
+		
+	// show a new folder directory
+		'#page_browser_wrapper .open_folder': function(e){
+			var path = $(e.target).attr('rel');
+			var klass = path.replace(/\//g,'_');
+			
+			$('div.sub_folders').hide();
+			$('#directory_window').attr('rel',klass);		
+			$('div.'+klass).show();
+			
+			// add the breadcrumb
+			var folder_string = '';	
+			if('ROOT' == path){
+				path = '';
+			}
+			else{
+				var folder_array = path.split('/');
+				var el_count = folder_array.length;
+
+				for (i=0; i < el_count; i++){
+					var result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
+					folder_string += ' / <a href="/'+ result_string +'" rel="'+ result_string +'" class="open_folder">'+ folder_array[i] +'</a>';
+				}
+			}
+			$('#breadcrumb').attr('rel',path).html(folder_string);
+			return false;
+		},
+		
+	// open new page facebox
+		'#page_browser_wrapper a.new_page': function(e){
+			$.facebox(function(){
+				var path = $('#breadcrumb').attr('rel');
+				$.get(e.target.href, {directory: path}, 
+					function(data){$.facebox(data, false, 'facebox_2')}
+				);
+			}, false, 'facebox_2');
+			return false;
+		},
+		
+	// delete a page
+		'#page_browser_wrapper a.delete_page': function(e){
+			if('folder' == $(e.target).attr('rel'))
+			{
+				alert('A page must have no sub-pages before it can be deleted.');
+				return false;
+			}
+			if (confirm("This cannot be undone! Delete this page?")) {
+				$.parent = $(e.target).parent('a');
+				var id = $(e.target).attr('id');
+				
+				$.get(e.target.href, function(data){
+					// remove from container
+					$('#page_wrapper_'+ id).remove();
+					$('#show_response_beta').html(data);	
+				});
+			}
+			return false;
+		},
+
+	// turn a page into a folder path
+		'#page_browser_wrapper a.folderize': function(e){
+			var folder_path = $(e.target).attr('rel');
+			var id = $(e.target).attr('id');
+			var filename = $(e.target).attr('title');
+			var klass = folder_path.replace(/\//g,'_');
+			var html = '<img src="/_assets/images/admin/folder.jpg" rel="'+ folder_path +'" class="open_folder"> <span class="icon page">&#160; &#160;</span> ';
+			$('#page_wrapper_'+ id +' img').replaceWith(html);
+			
+			var container = '<div class="'+ klass +' sub_folders"></div>';
+			$('#directory_window').prepend(container);
+			$(e.target).parent('li').remove();
+			return false;
+		}	
+	}));	
+	
 	
 /* 
  * File Browser function delegation
  */
 	$('body').click($.delegate({
 	
-		// load the file browser into the bottom pane =D
+	// load the file browser into the bottom pane =D
 		'a.get_file_browser':function(e){
 			var mode = $(e.target).attr('rel');
 			$('div.styler_wrapper').show();
@@ -453,34 +565,35 @@ $('body').keyup($.delegate({
 			});
 			return false;
 		},
+
 		
 	// ajax load a real-directory path
-		'#files_browser_wrapper a.get_folder, img.get_folder':function(e){
+		'#files_browser_wrapper .get_folder' : function(e){
 			$('#directory_window').html('<div lass="ajax_loading">Loading...</div>');
 			var url = $(e.target).attr('href');
 			$('#directory_window').load(url);
 			
 			// add the breadcrumb
 			var path = $(e.target).attr('rel');
+			var type = $('#breadcrumb').attr('class');
+			var folder_string = '';	
 			if('ROOT' == path){
-				var folder_string = '';
 				path = '';
 			}
 			else {
 				var folder_array = path.split(':');
-				var folder_string = '';	
-				folder_count = folder_array.length;
-				// This takes a string ex: one/two/three
-				// and outputs all combinations of the nest.
+				var folder_count = folder_array.length;
+				// takes string "one/two/three" & outputs breadcrumb.
 				// ex: one, one/two, one/two/three.
 				for (i=0; i < folder_count; i++){
 					var result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
-					folder_string += ' / <a href="/get/files/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
+					folder_string += ' / <a href="/get/'+ type +'/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
 				}
 			}
 			$('#breadcrumb').attr('rel', path).html(folder_string);			
 			return false;
 		},
+
 		
 	// add a file to a real directory folder
 		'#files_browser_wrapper a.add_asset': function(e){
@@ -492,9 +605,27 @@ $('body').keyup($.delegate({
 			}, false, 'facebox_2');
 			return false;
 		},
-		
+
+	// delete a file from data or theme
+		'#files_browser_wrapper div.file_asset span.cross': function(e){
+			if(confirm('This cannot be undone. Delete this file?'))
+			{
+				var path	= $('#breadcrumb').attr('rel');
+				var type	= $('#breadcrumb').attr('class');
+				var file	= $(e.target).parent('div').attr('rel');
+				var ufile	= ((path)) ? ':' : '';
+				ufile	+= file;
+				$.get('/get/'+ type +'/delete/'+ path + ufile,
+					function(data){
+						file = file.replace('.', '_')
+						$('#directory_window #' + file).remove();
+						$('#show_response_beta').html(data);
+			})};
+			return false;
+		},
+
 	// delete are a real directory folder from _data
-		'#files_browser_wrapper div.folder_asset span.cross': function(e){
+		'#files_browser_wrapper.data_files div.folder_asset span.cross': function(e){
 			$parent	= $(e.target).parent('div');
 			var path	= $parent.attr('rel');
 			var folder	= $parent.attr('id');
@@ -504,23 +635,6 @@ $('body').keyup($.delegate({
 				$.get('/get/files/delete/'+ path,
 					function(data){
 						$('#directory_window #' + folder).remove();
-						$('#show_response_beta').html(data);
-			})};
-			return false;
-		},
-	
-		// delete a file from _data
-		'#files_browser_wrapper div.file_asset span.cross': function(e){
-			if(confirm('This cannot be undone. Delete this file?'))
-			{
-				var path	= $('#breadcrumb').attr('rel');
-				var file	= $(e.target).parent('div').attr('rel');
-				var ufile	= ((path)) ? ':' : '';
-				ufile	+= file;
-				$.get('/get/files/delete/'+ path + ufile,
-					function(data){
-						file = file.replace('.', '_')
-						$('#directory_window #' + file).remove();
 						$('#show_response_beta').html(data);
 			})};
 			return false;
@@ -535,11 +649,11 @@ $('body').keyup($.delegate({
 		}
 
 	}));
-
-// delegate doubleclick
+	
+// doubleclick file browser actions
 	$('body').dblclick($.delegate({
-		
-		// add selected image to gallery.
+	
+	// add selected image to gallery.
 		'#files_browser_wrapper img.to_showroom':function(e) {
 			$(e.target).addClass('selected');
 			$(e.target).parent('div').addClass('selected');
@@ -547,7 +661,7 @@ $('body').keyup($.delegate({
 			return false;
 		},
 
-		// add selected image to gallery.
+	// add selected image to gallery.
 		'#files_browser_wrapper img.to_album':function(e) {
 			$(e.target).addClass('selected');
 			$(e.target).parent('div').addClass('selected');		
@@ -558,12 +672,69 @@ $('body').keyup($.delegate({
 			.prependTo('#sortable_images_wrapper');
 			return false;
 		}
-		
 	}));
-
 	
+
 /*
- * resizing functions yahboi;
+	SimpleTree stuff
+	as much as we can centralize, but is not everything.
+*/
+	$('body').click($.delegate({
+	// Gather and save nest data.
+		'.facebox #link_save_sort' : function(e) {	
+			var output = '';
+			var tool = $(e.target).attr("title");
+			var tool_id = $(e.target).attr("rel");
+			
+			$(".facebox #simpletree_wrapper ul").each(function(){
+				var parentId = $(this).parent().attr("rel");
+				if(!parentId) parentId = 0;
+				var $kids = $(this).children("li:not(.root, .line, .line-last)");
+				
+				// Data set format: "id:local_parent_id:position#"
+				$kids.each(function(i){
+					if(undefined == $(this).attr('rel')) return true;
+					output += $(this).attr('rel') + ':' + parentId + ':' + i + "|";
+				});
+			});
+			if(!output){alert('Nothing to save.'); return false;}
+			// alert (output); return false;
+			$('.facebox .show_submit').show();
+			$.post('/get/edit_'+ tool +'/save_tree/'+tool_id,
+				{output: output},
+				function(data){
+					$('.facebox .show_submit').hide();
+					$('#show_response_beta').html(data);				
+				}
+			)	
+		},
+		
+		'#simpletree_wrapper li.root > span' : function(e){
+			$('#simpletree_wrapper span.active')
+			.removeClass('active')
+			.addClass('text');
+			$(e.target).addClass('active');
+			return false;
+		}
+}));
+
+
+	$("#save_sort").click(function() {
+		var order = $("#generic_sortable_list").sortable("serialize");
+		var url = $(this).attr('rel');
+		if(!order){
+			alert("No items to sort");
+			return false;
+		}
+		$(".facebox .show_submit").show();
+		$.get('/get/'+ url +'/save_sort?'+order, function(data){
+			$(".facebox .show_submit").hide();
+		})				
+	});
+			
+			
+/*
+ * resizing functions
  */
 	$(window).resize(function(){
 		// bottom styler dialog
@@ -578,14 +749,23 @@ $('body').keyup($.delegate({
 		.css('min-height', height);
 		$('.facebox div.wysiwyg iframe')
 		.css('min-height', height-30);
-
-		// response left bottom corner
-		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
 	});
 	
-	$(window).scroll(function(){
-		$('#show_response_beta').css('top', $.getPageHeight()- 30 + $.getPageScroll()[1]);
-	});			
+	// $(window).scroll(function(){});	
+
+
+// --- misc funcitons ---
+ 
+/*
+ * checks if a value is in an array.
+ */
+	Array.prototype.in_array = function(p_val) {
+		for(var i = 0, l = this.length; i < l; i++) {
+			if(this[i] == p_val)
+				return true;
+		}
+		return false;
+	}		
 
 });  // end of init.js
 

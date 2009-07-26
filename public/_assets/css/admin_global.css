@@ -87,13 +87,15 @@ span.image{background-position:0px -420px}
 span.info{background-position:0px -440px}
 
 #show_response_beta{
-	position:absolute;
+	position:fixed;
+	top:40px;
 	left:0;
 	height:15px;
+	padding:5px;
 	background:#ffffcc;
 	font-size:10px;
 	color:#777;
-	padding:5px;
+	overflow:hidden;
 	border:1px solid #777;
 }
 .admin_reset .on_close{display:none}
@@ -821,42 +823,66 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	
 .facebox #generic_sortable_list{
 	clear:both;
-	padding:10px;
 }
-.facebox #generic_sortable_list li{
+.facebox #generic_sortable_list li.root_entry{
 	margin:0;
 	padding:0;
 	margin-bottom:5px;
 	clear:both;
 }
-.facebox #generic_sortable_list li table{
+
+.facebox #generic_sortable_list ul.row_wrapper{
 	width:100%;
-	border-collapse: collapse;
 	margin:0;
 	padding:0;
+	list-style:none;
 	background:#e3eff3;
-	border:1px solid lightblue;		
+	overflow:auto;
 }
-.facebox #generic_sortable_list li table td{
-	padding:5px;
+.facebox #generic_sortable_list ul.row_wrapper li{
+	padding:8px;
 }
-.facebox #generic_sortable_list .not_enabled table{
+
+.facebox #generic_sortable_list ul .drag_box{
+	width:60px;
+	float:left;
+	cursor:pointer;
+	cursor:cursor;
+	background:lightblue;
+}
+.facebox #generic_sortable_list ul .drag_box:hover{
+	background:#66cc66;
+}
+.facebox #generic_sortable_list ul .position{
+	width:20px;
+	float:left;
+	text-align:center;
+}
+.facebox #generic_sortable_list ul .data{
+	float:left;
+}
+.facebox #generic_sortable_list ul .delete_item{
+	width:75px;
+	float:right;
+	text-align:center;
+}
+.facebox #generic_sortable_list ul .delete_item:hover{
+	background:orange;
+}
+
+.facebox #generic_sortable_list .not_enabled ul{
 	background:#eee;
 	border:1px solid #ccc;	
 }
-.facebox #generic_sortable_list .no_menu table{
+.facebox #generic_sortable_list .no_menu ul{
 	background:#eee;
 }
-.facebox #generic_sortable_list .no_access table{
+.facebox #generic_sortable_list .no_access ul{
 	background:#ffcccc;
 }
-.facebox #generic_sortable_list li table td.right{
-	text-align:right;
-}
 
-.facebox #generic_sortable_list li a,
-.generic_sortable_list li a{
-	display:block;
+.facebox #generic_sortable_list li.root_entry a,
+.generic_sortable_list li a.root_entry{
 	color:#333;
 	padding:5px;
 	text-decoration:none;
@@ -869,14 +895,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 .facebox #generic_sortable_list li a small{
 	color:#999
 }
-.facebox #generic_sortable_list .drag_box{
-	background:lightblue;
-	cursor:pointer;
-	cursor:cursor;
-}
-.facebox #generic_sortable_list .drag_box:hover{
-	background:#66cc66;
-}
+
 
 /* --------------- common tool elements --------------- */
 

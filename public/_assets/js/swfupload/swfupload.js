@@ -136,25 +136,25 @@ SWFUpload.prototype.initSettings = function () {
 	// File Settings
 	this.ensureDefault("file_types", "*.*");
 	this.ensureDefault("file_types_description", "All Files");
-	this.ensureDefault("file_size_limit", 0);	// Default zero means "unlimited"
-	this.ensureDefault("file_upload_limit", 0);
-	this.ensureDefault("file_queue_limit", 0);
+	this.ensureDefault("file_size_limit", "20 MB");	// Default zero means "unlimited"
+	this.ensureDefault("file_upload_limit", 20);
+	this.ensureDefault("file_queue_limit", 12);
 
 	// Flash Settings
-	this.ensureDefault("flash_url", "swfupload.swf");
+	this.ensureDefault("flash_url", "/_assets/js/swfupload/Flash/swfupload.swf");
 	this.ensureDefault("prevent_swf_caching", true);
 	
 	// Button Settings
-	this.ensureDefault("button_image_url", "");
-	this.ensureDefault("button_width", 1);
-	this.ensureDefault("button_height", 1);
+	this.ensureDefault("button_image_url", "/_assets/images/admin/browse.png");
+	this.ensureDefault("button_width", 87);
+	this.ensureDefault("button_height", 40);
 	this.ensureDefault("button_text", "");
 	this.ensureDefault("button_text_style", "color: #000000; font-size: 16pt;");
 	this.ensureDefault("button_text_top_padding", 0);
 	this.ensureDefault("button_text_left_padding", 0);
 	this.ensureDefault("button_action", SWFUpload.BUTTON_ACTION.SELECT_FILES);
 	this.ensureDefault("button_disabled", false);
-	this.ensureDefault("button_placeholder_id", "");
+	this.ensureDefault("button_placeholder_id", "spanButtonPlaceHolder");
 	this.ensureDefault("button_placeholder", null);
 	this.ensureDefault("button_cursor", SWFUpload.CURSOR.HAND);
 	this.ensureDefault("button_window_mode", SWFUpload.WINDOW_MODE.WINDOW);
@@ -167,15 +167,15 @@ SWFUpload.prototype.initSettings = function () {
 	this.settings.return_upload_start_handler = this.returnUploadStart;
 	this.ensureDefault("swfupload_loaded_handler", null);
 	this.ensureDefault("file_dialog_start_handler", null);
-	this.ensureDefault("file_queued_handler", null);
-	this.ensureDefault("file_queue_error_handler", null);
-	this.ensureDefault("file_dialog_complete_handler", null);
+	this.ensureDefault("file_queued_handler", fileQueued);
+	this.ensureDefault("file_queue_error_handler", fileQueueError);
+	this.ensureDefault("file_dialog_complete_handler", fileDialogComplete);
 	
 	this.ensureDefault("upload_start_handler", null);
-	this.ensureDefault("upload_progress_handler", null);
-	this.ensureDefault("upload_error_handler", null);
-	this.ensureDefault("upload_success_handler", null);
-	this.ensureDefault("upload_complete_handler", null);
+	this.ensureDefault("upload_progress_handler", uploadProgress);
+	this.ensureDefault("upload_error_handler", uploadError);
+	this.ensureDefault("upload_success_handler", uploadSuccess);
+	this.ensureDefault("upload_complete_handler", uploadComplete);
 	
 	this.ensureDefault("debug_handler", this.debugMessage);
 

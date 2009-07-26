@@ -34,7 +34,7 @@
 			<div class="close_wrapper"> \
 				<a href="#" class="close"> \
 					<img src="/_assets/images/facebox/closelabel.gif" title="close" class="close_image" /> \
-				</a> <div class="show_submit" style="display:none"><div>Submitting...</div></div> \
+				</a> <div class="server_response" style="display:none">Server Response</div> <div class="show_submit" style="display:none"><div>Submitting...</div></div> \
 			</div> \
 			<div class="body"> \
 				<div class="content"></div> \
