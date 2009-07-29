@@ -275,8 +275,6 @@ class Theme_Controller extends Controller {
  */
 	function change()
 	{
-		$db = new Database;
-		
 		if(! empty($_POST['theme']))
 		{
 			$new_theme	= $_POST['theme'];
@@ -316,11 +314,9 @@ class Theme_Controller extends Controller {
 				}
 			}
 
-			$db->update(
-				'sites',
-				array('theme' => $new_theme),
-				"site_id = '$this->site_id'"
-			);			
+			$site = ORM::factory('site', $this->site_id);
+			$site->theme = $new_theme;
+			$site->save();	
 			
 			# on success: should clear the cache and reload the page.
 			if(yaml::edit_site_value($this->site_name, 'site_config', 'theme', $new_theme ))
@@ -329,9 +325,8 @@ class Theme_Controller extends Controller {
 			die('There was a problem changing the theme.');
 		}
 
-		$primary	= new View('theme/change');
-		$themes		= $db->query("SELECT * FROM themes WHERE enabled = 'yes'");
-		$primary->themes = $themes;
+		$primary = new View('theme/change');
+		$primary->themes = ORM::factory('theme')->where('enabled', 'yes')->find_all();
 		$primary->js_rel_command = 'reload-home';
 		die($primary);	
 	}
@@ -398,10 +393,10 @@ class Theme_Controller extends Controller {
 	{
 		if($_POST)
 		{
-			$db		= new Database;
-			$data	= array('banner' => $_POST['banner']);
-			$db->update('sites', $data, "site_id = $this->site_id"); 
-			
+			$site = ORM::factory('site', $this->site_id);
+			$site->banner = $_POST['banner'];
+			$site->save();
+
 			if(yaml::edit_site_value($this->site_name, 'site_config', 'banner', $_POST['banner']))
 				die('Banner changed.'); # success		
 		}
@@ -427,24 +422,38 @@ class Theme_Controller extends Controller {
 
 /*
  * Parses the file for theme tokens and saves the result to disk.
+ * setting the site name means we can parse themes relative to any site.
+ * this is useful when adding themes to newly-created sites (@ plusjade).
  */ 
-	private function parse_and_save($theme, $type, $filename, $contents)
+	private function parse_and_save($theme, $type, $filename, $contents, $site_name=FALSE)
 	{
-		# replace any user-tokens
+		if(!$site_name)
+		{
+			$images	= $this->assets->themes_url("$theme/images");
+			$files	= $this->assets->assets_url();
+			$dest	= $this->assets->themes_dir("$theme/$type/$filename");
+		}
+		else
+		{
+			$images	= "/_data/$site_name/themes/$theme/images";
+			$files	= "_data/$site_name/assets";
+			$dest	= DATAPATH . "$site_name/themes/$theme/$type/$filename";
+		}
+		
 		if('css' == $type)
 			$filtered = str_replace(
 				array('../images', '%IMAGES%', '%FILES%'),
-				array($this->assets->themes_url("$theme/images"), $this->assets->themes_url("$theme/images"), $this->assets->assets_url()),
+				array($images, $images, $files ),
 				$contents
 			);	
 		else # is html
 			$filtered = str_replace(
 				'%FILES%',
-				$this->assets->assets_url(),
+				$files,
 				$contents
 			);	
 		
-		if(file_put_contents($this->assets->themes_dir("$theme/$type/$filename"), $filtered))
+		if(file_put_contents($dest, $filtered))
 			return $filename; # name is needed for DOM update
 		
 		return 'Could not update file.';
@@ -482,5 +491,71 @@ class Theme_Controller extends Controller {
 		 asort($retval);
 		 return $retval; 
 	}
+	
+	
+/*
+ * Change the site's theme
+ */
+	public static function _new_website_theme($site_name, $theme)
+	{
+		$source	= DOCROOT . "_assets/themes/$theme";
+		$dest	= DATAPATH . "$site_name/themes/$theme";			
+
+		if(!is_dir($source))
+			die('This theme does not exist.');
+			
+		if(!Jdirectory::copy($source, $dest))
+			die('Unable to create theme.'); # Error
+		
+		# Parse tokens.
+		$type = 'css';
+		if(is_dir("$dest/$type"))
+		{
+			$dir = dir("$dest/$type"); 
+			while($file = $dir->read())
+				if('.' != $file && '..' != $file)
+					self::new_parse_and_save(
+						$theme,
+						$type,
+						$file,
+						file_get_contents("$dest/$type/$file"),
+						$site_name
+					);
+			$dir->close(); 
+		}
+
+		return TRUE;
+	}
+	
+/*
+ * Parses the file for theme tokens and saves the result to disk.
+ * setting the site name means we can parse themes relative to any site.
+ * this is useful when adding themes to newly-created sites (@ plusjade).
+ */ 
+	private static function new_parse_and_save($theme, $type, $filename, $contents, $site_name)
+	{
+		$images	= "/_data/$site_name/themes/$theme/images";
+		$files	= "_data/$site_name/assets";
+		$dest	= DATAPATH . "$site_name/themes/$theme/$type/$filename";
+
+		if('css' == $type)
+			$filtered = str_replace(
+				array('../images', '%IMAGES%', '%FILES%'),
+				array($images, $images, $files ),
+				$contents
+			);	
+		else # is html
+			$filtered = str_replace(
+				'%FILES%',
+				$files,
+				$contents
+			);	
+		
+		if(file_put_contents($dest, $filtered))
+			return $filename; # name is needed for DOM update
+		
+		return 'Could not update file.';
+	}
+	
 	
 } # end 

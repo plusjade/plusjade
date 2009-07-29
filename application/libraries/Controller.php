@@ -108,7 +108,10 @@ abstract class Controller_Core {
 		{
 			# Get CSS
 			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
-			$contents	= (file_exists($custom_css)) ? file_get_contents($custom_css) : '';
+			$contents	= (file_exists($custom_css))
+				? file_get_contents($custom_css)
+				: Tool_Controller::_generate_tool_css($toolname, $tool_id, $this->site_name, $this->theme, TRUE);
+
 			$template->custom_css = "
 				<style type=\"text/css\" id=\"$toolname-$tool_id-style\">
 					$contents

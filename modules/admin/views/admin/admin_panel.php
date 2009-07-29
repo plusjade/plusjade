@@ -80,6 +80,7 @@
 	</div>
 </div>
 <div id="shadow"><div></div></div>
+<noscript>Editing Your website requires Javascript to be enabled.</noscript>
 
 <div id="hide_link">
 	<a class="toggle_admin_bar" href="#">Show</a>

@@ -22,15 +22,12 @@ class Page_Controller extends Controller {
 		NOTE: directory contains no trailing slash
  */
 	function index()
-	{
-		$db			= new Database;				
-		$primary	= new View("page/index");		
-		$pages_data = $db->query("
-			SELECT id, page_name, menu, enable
-			FROM pages
-			WHERE fk_site = '$this->site_id'
-			ORDER BY page_name
-		");
+	{		
+		$pages_data = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->orderby('page_name')
+			->find_all();
+
 		$page_name_array = array();
 		$folders_array = array();
 		
@@ -104,17 +101,18 @@ class Page_Controller extends Controller {
 			
 			echo '</div>';
 		}
-		$primary->files_structure = ob_get_clean();
 		
-		# get page_builders.
-		$page_builders = $db->query("
-			SELECT * 
-			FROM tools_list
-			WHERE protected = 'yes'
-			AND enabled = 'yes'
-			ORDER BY name
-		");
-		$primary->page_builders = $page_builders;
+		$page_builders = ORM::factory('system_tool')
+			->where(array(
+				'protected'	=> 'yes',
+				'enabled'	=> 'yes',
+				'visible'	=> 'yes'
+			))
+			->find_all();
+		
+		$primary = new View("page/index");
+		$primary->files_structure	= ob_get_clean();
+		$primary->page_builders		= $page_builders;
 		die($primary);
 	}
 
@@ -132,29 +130,27 @@ class Page_Controller extends Controller {
 
 			if('ROOT' != $directory)
 				$full_path = "$directory/$filename";
-				
-			$db = new Database;			
-			$max = $db->query("
-				SELECT MAX(position) as highest 
-				FROM pages WHERE fk_site = '$this->site_id'
-			")->current();			
-		
-			# Add to pages table
-			$data = array(
-				'fk_site'	=> $this->site_id,
-				'page_name'	=> $full_path,
-				'label'		=> $_POST['label'],
-				'template'	=> $_POST['template'],
-				'position'	=> ++$max->highest,
-			);
+
+			$max = ORM::factory('page')
+				->select('MAX(position) as highest')
+				->where('fk_site', $this->site_id)
+				->find();	
+
+			$new_page = ORM::factory('page');
+			$new_page->fk_site		= $this->site_id;
+			$new_page->page_name	= $full_path;
+			$new_page->label		= $_POST['label'];
+			$new_page->template		= $_POST['template'];
+			$new_page->position		= ++$max->highest;
 			if(! empty($_POST['menu']) AND 'yes' == $_POST['menu'])
-				$data['menu'] = 'yes';
-			
+				$new_page->menu	= 'yes';
+				
+			$new_page->save();
+
 			# setup vars...
-			$page_id = $db->insert('pages', $data)->insert_id();
 			$visibility = ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
 			$vars = array(
-				'id'			=> $page_id,
+				'id'			=> $new_page->id,
 				'visibility'	=> $visibility,
 				'is_folder'		=> FALSE,
 				'is_protected'	=> FALSE,
@@ -163,7 +159,7 @@ class Page_Controller extends Controller {
 			);
 
 			# send html to javascript handler
-			die( View::factory('page/page_wrapper_html', array('vars' => $vars)) );
+			die(View::factory('page/page_wrapper_html', array('vars' => $vars)));
 		}
 
 		# directory comes from all_pages javascript loader
@@ -171,7 +167,6 @@ class Page_Controller extends Controller {
 			die('no directory selected');
 			
 		$primary		= new View("page/new_page");
-		$db				= new Database;
 		$directory		= $_GET['directory'];
 		$path_array		= explode('/', $directory);
 		$primary->directory = $directory;
@@ -184,86 +179,89 @@ class Page_Controller extends Controller {
 
 		
 		# Javascript duplicatate_page name filter Validation
-		# get page_name filter for this path
-		$filter_array = self::get_filename_filter($directory);
 		# convert filter_array to string to use as javascript array
-		$filter_string = implode("','",$filter_array);
-		$filter_string = "'$filter_string'";
+		$filter_array	= self::get_filename_filter($directory);
+		$filter_string	= implode("','",$filter_array);
+		$filter_string	= "'$filter_string'";
 
 		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
 		#echo $filter_string;die();
 		$primary->filter = $filter_string;
 		die($primary);
-
 	}
 
 
 /*
  * add a new page with a page_builder pre-installed.
+ * possibly unecessry to pass toolname since we have the id.
  */
-	function add_builder($tool_id=NULL, $toolname=NULL)
+	function add_builder($system_tool_id=NULL)
 	{
-		valid::id_key($tool_id);
-		$toolname = valid::filter_php_filename($toolname);
+		valid::id_key($system_tool_id);
+		
+		$system_tool = ORM::factory('system_tool')
+			->select('*, LOWER(name) AS name')
+			->where(array(
+				'enabled' => 'yes',
+				'visible' => 'yes', # this protects account from being added twice.
+			))
+			->find($system_tool_id);
+		if(!$system_tool->loaded)
+			die('invalid tool.');
+
+		$toolname = valid::filter_php_filename($system_tool->name);
 		
 		if($_POST)
 		{
 			# Validate page_name & duplicate check
 			$filename = self::validate_page_name($_POST['label'], $_POST['page_name'], 'ROOT');
-
-			$db = new Database;			
-			$max = $db->query("
-				SELECT MAX(position) as highest 
-				FROM pages WHERE fk_site = '$this->site_id'
-			")->current();			
+	
+			$max = ORM::factory('page')
+				->select('MAX(position) as highest')
+				->where('fk_site', $this->site_id)
+				->find();		
 		
 			$template =
 				(file_exists($this->assets->themes_dir("$this->theme/templates/".strtolower($toolname).'.html')))
 				? strtolower($toolname) : 'master';
 		
-			
-			# Add to pages table
-			$data = array(
-				'fk_site'	=> $this->site_id,
-				'page_name'	=> $filename,
-				'label'		=> $_POST['label'],
-				'template'	=> $template,
-				'position'	=> ++$max->highest,
-			);
+			$new_page = ORM::factory('page');
+			$new_page->fk_site		= $this->site_id;
+			$new_page->page_name	= $filename;
+			$new_page->label		= $_POST['label'];
+			$new_page->template		= $template;
+			$new_page->position		= ++$max->highest;
 			if(! empty($_POST['menu']) AND 'yes' == $_POST['menu'])
-				$data['menu'] = 'yes';
-			
-			$page_id = $db->insert('pages', $data)->insert_id();
+				$new_page->menu	= 'yes';
+				
+			$new_page->save();
 
 			#add the tool.
-			$tool_controller = new Tool_Controller();
-			$tool_controller->_add_tool($page_id, $tool_id, TRUE);
+			Tool_Controller::_add_tool($new_page->id, $system_tool_id, $this->site_name, TRUE);
 	
 			# send html to javascript handler
 			$visibility	= ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
 			$vars		= array(
-				'id'			=> $page_id,
+				'id'			=> $new_page->id,
 				'visibility'	=> $visibility,
 				'is_folder'		=> FALSE,
 				'is_protected'	=> TRUE,
 				'full_path'		=> $filename,
 				'filename'		=> $filename,
-				'page_builder'	=> "$toolname-$tool_id"
+				'page_builder'	=> "$toolname-$system_tool_id"
 			);
 			die( View::factory('page/page_wrapper_html', array('vars' => $vars)) );
 		}
 
-
-		$primary = new View("page/new_builder");
-		$db		 = new Database;
 		# Javascript duplicatate_page name filter Validation
 		# convert filter_array to string for js
 		$filter_array		= self::get_filename_filter('ROOT');	
 		$filter_string		= "'" . implode("','", $filter_array) . "'";
-		$primary->filter	= $filter_string;
-		$primary->tool_id	= $tool_id;
-		$primary->toolname	= $toolname;
 		
+		$primary = new View("page/new_builder");
+		$primary->filter			= $filter_string;
+		$primary->system_tool_id	= $system_tool_id;
+		$primary->toolname			= $toolname;
 		die($primary);
 	}
 
@@ -276,26 +274,17 @@ class Page_Controller extends Controller {
 	function delete($page_id=NULL)
 	{
 		valid::id_key($page_id);
-		$db = new Database;		
-		# the page to be deleted.
-		$page = $db->query("
-			SELECT page_name
-			FROM pages
-			WHERE id='$page_id'
-		")->current();
-		
-		if(! is_object($page))
+
+		$page = ORM::factory('page', $page_id);
+		if(!$page->loaded)
 			die('invalid page');
 		
-		$id_set = $page_id;
-		
 		# Get all pages to look for children.
-		$pages_data = $db->query("
-			SELECT id, page_name
-			FROM pages
-			WHERE fk_site = '$this->site_id'
-			ORDER BY page_name
-		");
+		$pages_data = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->orderby('page_name')
+			->find_all();
+			
 		$page_name_array = array();
 		$folders_array = array();
 		
@@ -326,12 +315,10 @@ class Page_Controller extends Controller {
 		# if deleting a protected page
 		yaml::delete_value($this->site_name, 'pages_config', $page->page_name);
 
-		$db->query("
-			DELETE FROM pages
-			WHERE id IN ($id_set)
-			AND fk_site = '$this->site_id'
-		");
-		die('Page deleted.'); # success			
+		ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->delete($page_id);
+		die('Page deleted.');		
 	}
 
 	
@@ -343,6 +330,12 @@ class Page_Controller extends Controller {
 		valid::id_key($page_id);
 		$db = new Database;
 
+		$page = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->find($page_id);
+		if(!$page->loaded)
+			die('invalid page id');
+			
 		if($_POST)
 		{
 			# Validate page_name & duplicate check
@@ -352,22 +345,15 @@ class Page_Controller extends Controller {
 			if(! empty($directory) )
 				$full_path = "$directory/$filename";
 			
-			# Update pages table
-			$data = array(
-				'page_name'	=> $full_path,
-				'title'		=> $_POST['title'],
-				'meta'		=> $_POST['meta'],
-				'label'		=> $_POST['label'],
-				'template'	=> $_POST['template'],
-				'menu'		=> $_POST['menu'],
-				'enable'	=> $_POST['enable'],
-			);
-			$db->update(
-				'pages',
-				$data,
-				"id = '$page_id' AND fk_site = '$this->site_id'
-			"); 			
-
+			$page->page_name	= $full_path;
+			$page->title		= $_POST['title'];
+			$page->meta			= $_POST['meta'];
+			$page->label		= $_POST['label'];
+			$page->template		= $_POST['template'];
+			$page->menu			= $_POST['menu'];
+			$page->enable		= $_POST['enable'];
+			$page->save();
+			
 			# if new page name & page is protected update the page_config file.
 			if($filename != $_POST['old_page_name'])
 				yaml::edit_key($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
@@ -378,24 +364,16 @@ class Page_Controller extends Controller {
 				$db->update('sites', array('homepage' => $filename), "site_id = '$this->site_id'");
 				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $filename );
 			}
+			
+			# if the page was the account page, update site_config
+			if($this->account_page == $_POST['old_page_name'])
+				yaml::edit_site_value($this->site_name, 'site_config', 'account_page', $filename);
+
 
 			
 			die('Page Settings Saved'); # success				
 		}
-
-		$page = $db->query("
-			SELECT *
-			FROM pages
-			WHERE id = '$page_id' 
-			AND fk_site = '$this->site_id'
-		")->current();
-
-		if(! is_object($page) )
-			die('Page not found'); # error
-
-		$primary = new View("page/page_settings");	
-		$primary->page = $page;	
-		
+	
 		# Is this a subpage?
 		$filename	= $page->page_name;
 		$directory	= '';
@@ -406,6 +384,9 @@ class Page_Controller extends Controller {
 			$filename	=  array_pop($directory_array);
 			$directory	= implode('/', $directory_array);
 		}
+
+		$primary = new View("page/page_settings");	
+		$primary->page		= $page;	
 		$primary->filename	= $filename;	
 		$primary->directory	= $directory;				
 
@@ -417,17 +398,16 @@ class Page_Controller extends Controller {
 			$primary->templates = array('master' => 'default layout');
 			
 		# Javascript duplicate page_name filter Validation
-		$filter_array = self::get_filename_filter($directory, $filename);
-
 		# convert filter_array to string to use as javascript array
+		$filter_array = self::get_filename_filter($directory, $filename);
 		$filter_string = implode("','",$filter_array);			
 		$primary->page_filter_js = "'$filter_string'";
 		
-		
-		# is page protected?
-		$primary->is_protected = FALSE;
-		if(yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
-			$primary->is_protected = TRUE;
+		# is page protected?		
+		$primary->is_protected = 
+			(yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+			? TRUE
+			: FALSE;
 		
 		die($primary);
 	}
@@ -447,7 +427,7 @@ class Page_Controller extends Controller {
 			die('Name is required'); #error	
 		
 		$page_name = trim($page_name);
-		if( empty($page_name) )
+		if(empty($page_name))
 			$page_name = strtolower($label);
 
 		# Sanitize page_name
@@ -473,14 +453,13 @@ class Page_Controller extends Controller {
 */
 	private function get_filename_filter($directory='ROOT', $omit=NULL)
 	{
-		$db = new Database;
-		$directory = ( empty($directory) ) ? 'ROOT' : $directory;
+		$directory = (empty($directory)) ? 'ROOT' : $directory;
 		$filter_array = array();
-		$pages = $db->query("
-			SELECT CONCAT('%%', page_name) as page_name
-			FROM pages
-			WHERE fk_site = '$this->site_id'
-		");	
+		
+		$pages = ORM::factory('page')
+			->select(array("CONCAT('%%', page_name) as page_name"))
+			->where('fk_site', $this->site_id)
+			->find_all();
 	
 		if('ROOT' == $directory)
 		{
@@ -490,9 +469,11 @@ class Page_Controller extends Controller {
 				if('0' == $count)
 					$filter_array[] = ltrim($page->page_name, '%');
 			}
-			# Reserved page_names: add _assets, _data, index.php
+			# Reserved page_names: add _assets, _data, index.php, get, file
 			$filter_array[] = '_assets';
 			$filter_array[] = '_data';
+			$filter_array[] = 'get';
+			$filter_array[] = 'file';
 			$filter_array[] = 'index.php';
 		}
 		else
@@ -514,22 +495,24 @@ class Page_Controller extends Controller {
 		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
 	}
 
+	
+	
 	/* ----- functions relative to MAIN-MENU handling ----- */
 	
 /*
  * Sort the Main Menu links
  */
 	function navigation()
-	{		
-		$db			= new Database;				
-		$primary	= new View("page/navigation");
+	{			
+		$pages = ORM::factory('page')
+			->where(array(
+				'fk_site' => $this->site_id,
+				'menu' => 'yes'
+			))
+			->orderby('position')
+			->find_all();
 		
-		$pages = $db->query("
-			SELECT * FROM pages 
-			WHERE fk_site = '$this->site_id'
-			AND menu = 'yes'
-			ORDER BY position
-		");		
+		$primary = new View('page/navigation');
 		$primary->pages = $pages;
 		die($primary);
 	}

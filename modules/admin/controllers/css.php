@@ -31,9 +31,9 @@ class Css_Controller extends Controller {
 		
 		$db = new Database;
 		$tool_data = $db->query("
-			SELECT pages_tools.*, LOWER(tools_list.name) as name
+			SELECT pages_tools.*, LOWER(system_tools.name) as name
 			FROM pages_tools
-			JOIN tools_list ON tools_list.id = pages_tools.tool
+			JOIN system_tools ON system_tools.id = pages_tools.system_tool_id
 			WHERE (pages_tools.page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
 			AND fk_site = '$this->site_id'
 			ORDER BY container, position
@@ -52,6 +52,8 @@ class Css_Controller extends Controller {
 			$theme_tool_css = $this->assets->themes_dir("$this->theme/tools/$tool->name/css/$tool->tool_id.css");
 			if(file_exists($theme_tool_css))
 				readfile($theme_tool_css);
+			else # this should only happen when changing themes initially.
+				echo Tool_Controller::_generate_tool_css($tool->name, $tool->tool_id, $this->site_name, $this->theme, TRUE);
 				
 			$tool_types[$tool->name] = $tool->name;
 		}
@@ -93,12 +95,12 @@ class Css_Controller extends Controller {
 		
 		# load all admin-mode tool css files.
 		$db = new Database;
-		$tools_list = $db->query("
-			SELECT LOWER(name) as name
-			FROM tools_list
-		");
-	
-		foreach($tools_list as $tool)
+		
+		$system_tools = ORM::factory('system_tool')
+			->select('LOWER(name) AS name')
+			->find_all();
+
+		foreach($system_tools as $tool)
 		{
 			$admin_css	= MODPATH . "$tool->name/views/edit_$tool->name/admin.css";
 			$js_css		= MODPATH . "$tool->name/views/public_$tool->name/js/js.css";

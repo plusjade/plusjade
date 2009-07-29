@@ -53,14 +53,6 @@ function get_site()
 	
 	if(! file_exists($site_config_path) )
 	{
-		$template = file_get_contents(DOCROOT . '/_assets/data/site_config.template.yml');
-		$keys = array(
-			'%SITE_ID%',
-			'%SITE_NAME%',
-			'%THEME%',
-			'%BANNER%',
-			'%HOMEPAGE%',
-		);
 		$replacements = array(
 			$site_row->id,
 			$site_row->subdomain,
@@ -68,9 +60,7 @@ function get_site()
 			$site_row->banner,
 			$site_row->homepage
 		);
-		$content = str_replace($keys, $replacements , $template);
-		if(!file_put_contents($site_config_path, $content))
-			die('Could not create site_config.yml file.');
+		yaml::new_site_config($site_name, $replacements);
 	}
 	# the site_config file is parsed in the root Controller_Core library file.
 	

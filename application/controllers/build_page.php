@@ -37,9 +37,9 @@ class Build_Page_Controller extends Template_Controller {
 		# Grab tools for this page in pages_tools table
 		# 0-10 are reserved for global tools. we only use 1-5 
 		$tools = $db->query("
-			SELECT *, LOWER(tools_list.name) AS name
+			SELECT *, LOWER(system_tools.name) AS name
 			FROM pages_tools 
-			JOIN tools_list ON tools_list.id = pages_tools.tool
+			JOIN system_tools ON system_tools.id = pages_tools.system_tool_id
 			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page->id')
 			AND fk_site = '$this->site_id'
 			ORDER BY container, position
@@ -66,7 +66,7 @@ class Build_Page_Controller extends Template_Controller {
 					$tools_array[$tool->guid] = array(
 						'guid'		=> $tool->guid,
 						'name'		=> $tool->name,
-						'name_id'	=> $tool->tool,
+						'name_id'	=> $tool->system_tool_id,
 						'tool_id'	=> $tool->tool_id,
 						'scope'		=> $scope,
 					);

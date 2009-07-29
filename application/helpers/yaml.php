@@ -41,7 +41,7 @@ class yaml_Core {
 				'account_page'	=> ''
 			);
 
-		if( file_exists($config_path) )
+		if(file_exists($config_path))
 		{
 			$lines = file($config_path, FILE_SKIP_EMPTY_LINES);
 
@@ -227,5 +227,26 @@ class yaml_Core {
 			
 		return FALSE;
 	}
+	
+/* 
+ * Create a new site_config file for a specified website
+ */	
+	public static function new_site_config($site_name, $replacements)
+	{
+		$site_config_path = DATAPATH . "$site_name/protected/site_config.yml";
+		$template = file_get_contents(DOCROOT . '/_assets/data/site_config.template.yml');
+		$keys = array(
+			'%SITE_ID%',
+			'%SITE_NAME%',
+			'%THEME%',
+			'%BANNER%',
+			'%HOMEPAGE%',
+		);
+		if(!file_put_contents($site_config_path, str_replace($keys, $replacements , $template)))
+			die('Could not create site_config.yml file.');	
+
+		return TRUE;
+	}
+	
 	
 } // End yaml_core

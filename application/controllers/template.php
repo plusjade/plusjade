@@ -7,7 +7,7 @@ abstract class Template_Controller extends Controller {
 	{
 		parent::__construct();	
 		#$this->profiler = new Profiler;		
-		$this->template = new View("shell");	
+		$this->template = new View('shell');	
 
 		
 		# Global CSS			
@@ -44,12 +44,11 @@ abstract class Template_Controller extends Controller {
 			$this->template->admin_linkJS('get/js/admin?v=1.1');
 			$this->template->admin_linkJS('get/js/tools');
 
-			# determine if tool is protected so we can omit scope link
-			$db = new Database;
-			$protected_tools = $db->query("
-				SELECT * FROM tools_list
-				WHERE protected = 'yes'
-			");	
+			# determine if tool is protected so we can omit scope link			
+			$protected_tools = ORM::factory('system_tool')
+				->where('protected', 'yes')
+				->find_all();
+			
 			$protected_array = array();
 			foreach($protected_tools as $tool)
 				$protected_array[] = $tool->id;

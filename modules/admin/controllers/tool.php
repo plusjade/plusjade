@@ -14,6 +14,7 @@ class Tool_Controller extends Controller {
 			die('Please login');
 	}
 
+
 /*	
  * List ALL TOOLS for this site.
  */
@@ -24,12 +25,12 @@ class Tool_Controller extends Controller {
 
 		# Get all tool references in pages_tools owned by this site.
 		$tools = $db->query("
-			SELECT pages_tools.guid, pages_tools.page_id, pages.page_name, tools_list.name 
+			SELECT pages_tools.guid, pages_tools.page_id, pages.page_name, system_tools.name 
 			FROM pages_tools 
-			LEFT JOIN tools_list ON pages_tools.tool = tools_list.id
+			LEFT JOIN system_tools ON pages_tools.system_tool_id = system_tools.id
 			LEFT JOIN pages ON pages_tools.page_id = pages.id
 			WHERE pages_tools.fk_site = '$this->site_id' 
-			ORDER BY tools_list.name ASC, pages.page_name
+			ORDER BY system_tools.name ASC, pages.page_name
 		");
 		$primary->tools = $tools;
 		die($primary);
@@ -48,56 +49,91 @@ class Tool_Controller extends Controller {
 			#stupid ie sends button contents rather than value.
 			$field = (is_numeric($_POST['tool'])) ? 'id' : 'name';
 			# all tools passed her should be non-protected
-			die(self::_add_tool($page_id, $_POST['tool'], FALSE, TRUE));
+			die(self::_add_tool($page_id, $_POST['tool'], $this->site_name, FALSE, FALSE, TRUE));
 		}	
 		
-		$db = new Database;
+		$tools = ORM::factory('system_tool')
+			->where(array(
+				'protected'	=> 'no',
+				'enabled'	=> 'yes',
+				'visible'	=> 'yes'
+			))
+			->find_all();
+		
 		$primary = new View('tool/new_tool');
-		$tools = $db->query("
-			SELECT * 
-			FROM tools_list
-			WHERE protected = 'no'
-			AND enabled = 'yes'
-		");
 		$primary->tools_list = $tools;
 		$primary->page_id = $page_id;
 		die($primary);
 		
 	}
+
+/*
+ * auto add a page_builder to a predefined page.
+ * used at auth->create_website() to automatically load page_builders to new websites.
+ 
+	This can be a static function since we should not reference "this" site,
+	but rather any given site. (this site would reference the plusjade site).
+	
+ * this should only be used internally so no need for crazy validation.
+ */
+	public static function _auto_tool($toolname, $site_id, $site_name, $theme)
+	{
+		$toolname = strtolower($toolname);
+	
+		$max = ORM::factory('page')
+			->select('MAX(position) as highest')
+			->where('fk_site', $site_id)
+			->find();		
+	
+		$template =
+			(file_exists(DATAPATH . "$site_name/themes/$theme/templates/$toolname.html"))
+			? $toolname : 'master';
+	
+		$new_page = ORM::factory('page');
+		$new_page->fk_site		= $site_id;
+		$new_page->page_name	= valid::filter_php_filename($toolname);
+		$new_page->label		= ucfirst($toolname);
+		$new_page->template		= $template;
+		$new_page->position		= ++$max->highest;
+		$new_page->menu			= 'yes';
+		$new_page->save();
+		
+		# attempt to add the tool.
+		if(TRUE !== self::_add_tool($new_page->id, $toolname, $site_name, TRUE, TRUE))
+			die("Could not add $toolname");
+		
+		return TRUE;
+}
+
 	
 /*
  * actually adds the tool to the database and generates assets.
  * this is separate so we can use this modularly in other areas.
  * used here and @ page.php
+ * 
  */
-	public function _add_tool($page_id, $tool_id, $allow_protected=FALSE, $javascript=FALSE)
+	public static function _add_tool($page_id, $toolname, $site_name, $allow_protected=FALSE, $sample=FALSE, $javascript=FALSE)
 	{
-		$db = new Database;
-		
-		# GET tool name
-		$tool = $db->query("
-			SELECT id, LOWER(name) AS name, protected
-			FROM tools_list
-			WHERE id = '$tool_id'
-			AND enabled = 'yes'
-		")->current();
-
-		if(! is_object($tool) )
-			die('invalid tool');
-		$table = $tool->name.'s';
-
+		$system_tool = ORM::factory('system_tool')
+			->select('*, LOWER(name) AS name')
+			->where('enabled','yes')
+			->find($toolname);
+			
+		if(!$system_tool->loaded)
+			die('invalid system_tool');
 		
 		# do we allow protected tools on this page?
-		if('yes' == $tool->protected AND !$allow_protected)
+		if('yes' == $system_tool->protected AND !$allow_protected)
 			die('Cannot add page builders to this page.');
 		
+		$site_config = yaml::parse($site_name, 'site_config');
 
-		# INSERT row in tool parent table
-		$data = array(
-			'fk_site'	=> $this->site_id
-		);			
-		$tool_insert_id = $db->insert($table, $data)->insert_id();
-
+		# INSERT row in system_tool parent table
+		$tool_table = ORM::factory($system_tool->name);
+		$tool_table->fk_site = $site_config['site_id'];
+		$tool_table->save();
+		
+		$db = new Database;
 		# GET MIN position of tools on page			
 		$lowest = $db->query("
 			SELECT MIN(position) as lowest
@@ -107,45 +143,41 @@ class Tool_Controller extends Controller {
 		
 		# INSERT pages_tools row inserting tool parent id
 		$data = array(
-			'page_id'	=> $page_id,
-			'fk_site'	=> $this->site_id,
-			'tool'		=> $tool->id,
-			'tool_id'	=> $tool_insert_id,
-			'position'	=> ($lowest-1)
+			'page_id'		 => $page_id,
+			'fk_site'		 => $site_config['site_id'],
+			'system_tool_id' => $system_tool->id,
+			'tool_id'		 => $tool_table->id,
+			'position'		 => ($lowest-1)
 		);
 		$tool_guid = $db->insert('pages_tools', $data)->insert_id();
 		
 		# if tool is protected, add page to pages_config file.
-		if('yes' == $tool->protected)
+		if('yes' == $system_tool->protected)
 		{
-			$page = $db->query("
-				SELECT page_name
-				FROM pages
-				WHERE id = '$page_id'
-			")->current();		
+			$page = ORM::factory('page', $page_id);
 		
-			$newline = "\n$page->page_name:$tool->name-$tool_insert_id";
-			yaml::add_value($this->site_name, 'pages_config', $newline);
+			$newline = "\n$page->page_name:$system_tool->name-$tool_table->id";
+			yaml::add_value($site_name, 'pages_config', $newline);
 		}
 		
 		# generate tool_css file
-		self::generate_tool_css($tool->name, $tool_insert_id);
+		self::_generate_tool_css($system_tool->name, $tool_table->id, $site_name, $site_config['theme']);
 		
 		# run _tool_adder
 		$step_2 = 'add';
-		$edit_tool = Load_Tool::edit_factory($tool->name);
-		if( is_callable(array($edit_tool, '_tool_adder')) )
-			$step2 = $edit_tool->_tool_adder($tool_insert_id, $this->site_id);
+		$edit_tool = Load_Tool::edit_factory($system_tool->name);
+		if(is_callable(array($edit_tool, '_tool_adder')))
+			$step2 = $edit_tool->_tool_adder($tool_table->id, $site_config['site_id'], $sample);
 
 		# Pass output to javascript @tool view "add" 
 		# so it can load the next step page
 		# data Format-> toolname:next_step:tool_id:tool_guid
 		if($javascript)
-			return strtolower($tool->name).":$step2:$tool_insert_id:$tool_guid";
+			return "$system_tool->name:$step2:$tool_table->id:$tool_guid";
 			
 		return TRUE;
 	}
-	
+
 
 
 /*
@@ -160,9 +192,9 @@ class Tool_Controller extends Controller {
 		$db = new Database;	
 	
 		$tool_data = $db->query("
-			SELECT pages_tools.*, LOWER(tools_list.name) as name, tools_list.protected, pages.page_name
+			SELECT pages_tools.*, LOWER(system_tools.name) as name, system_tools.protected, pages.page_name
 			FROM pages_tools
-			JOIN tools_list ON pages_tools.tool = tools_list.id
+			JOIN system_tools ON pages_tools.system_tool_id = system_tools.id
 			LEFT JOIN pages ON pages_tools.page_id = pages.id
 			WHERE guid = '$tool_guid' 
 			AND pages_tools.fk_site = '$this->site_id'
@@ -171,6 +203,12 @@ class Tool_Controller extends Controller {
 		if(! is_object($tool_data) )
 			die('Tool does not exist');
 		
+
+		# Protect the account tool.
+		if('account' == $tool_data->name)
+			die('Account tool cannot be deleted, since other tools depend on it!');
+			
+			
 		$table_parent	= $tool_data->name.'s';
 
 		# DELETE pages_tools reference.
@@ -215,13 +253,12 @@ class Tool_Controller extends Controller {
 			die('Tool moved!!');
 		}
 
-		$primary	= new View('tool/move');
-		$pages = $db->query("
-			SELECT id, page_name 
-			FROM pages 
-			WHERE fk_site = '$this->site_id' 
-			ORDER BY page_name
-		");
+		$pages = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->orderby('page_name')
+			->find_all();
+			
+		$primary = new View('tool/move');
 		$primary->pages = $pages;
 		$primary->tool_guid = $tool_guid;
 		die($primary);	
@@ -296,11 +333,11 @@ class Tool_Controller extends Controller {
 		")->current();
 		if(! is_object($tool_data) )
 			die('tool does not exist');
+		
 			
-		$protected_tools = $db->query("
-			SELECT * FROM tools_list
-			WHERE protected = 'yes'
-		");
+		$protected_tools = ORM::factory('system_tool')
+			->where('protected', 'yes')
+			->find_all();
 		
 		foreach($protected_tools as $tool)
 			if($tool_data->tool == $tool->id)
@@ -321,54 +358,43 @@ class Tool_Controller extends Controller {
  * Custom files are auto created if none exists.
  * Stored in /data/tools_css
  */
-	function css($name_id=NULL, $tool_id=NULL)
+	function css($system_tool_id=NULL, $tool_id=NULL)
 	{
-		valid::id_key($name_id);	
+		valid::id_key($system_tool_id);	
 		valid::id_key($tool_id);		
 		
-		$db = new Database;
-		$tool = $db->query("
-			SELECT LOWER(name) AS name 
-			FROM tools_list 
-			WHERE id='$name_id'
-		")->current();
+		$system_tool = ORM::factory('system_tool')
+			->select('*, LOWER(name) AS name')
+			->find($system_tool_id);
+
+		$tool = ORM::factory($system_tool->name)
+			->where('fk_site', $this->site_id)
+			->find($tool_id);
 		
 		# Overwrite old file with new file contents;
 		if($_POST)
 		{
-			$db->update(
-				"{$tool->name}s",
-				array('attributes' => $_POST['attributes'] ),
-				"id='$tool_id' AND fk_site = '$this->site_id'"
-			);
+			$tool->attributes = $_POST['attributes'];
+			$tool->save();
 
 			if(isset($_POST['save_template']))
-				die(self::save_template($tool->name, $_POST['contents']));
+				die(self::save_template($system_tool->name, $_POST['contents']));
 				
-			die(self::save_custom_css($tool->name, $tool_id, $_POST['contents']));
+			die(self::save_custom_css($system_tool->name, $tool_id, $_POST['contents']));
 		}
 
 		$primary = new View('tool/edit_css');	
-		
-		$primary->contents	= self::get_tool_css($tool->name, $tool_id);
-		$primary->stock		= self::get_tool_css($tool->name, $tool_id, 'stock');
-		$primary->template	= self::get_tool_css($tool->name, $tool_id, 'template');
+		$primary->attributes = $tool->attributes;
+		$primary->contents	= self::get_tool_css($system_tool->name, $tool_id);
+		$primary->stock		= self::get_tool_css($system_tool->name, $tool_id, 'stock');
+		$primary->template	= self::get_tool_css($system_tool->name, $tool_id, 'template');
 		$data = array(
 			'tool_id'			=> $tool_id,
-			'name_id'			=> $name_id,
-			'toolname'			=> $tool->name,
-			'js_rel_command'	=> "update-$tool->name-$tool_id",
+			'name_id'			=> $system_tool_id,
+			'toolname'			=> $system_tool->name,
+			'js_rel_command'	=> "update-$system_tool->name-$tool_id",
 		);
 		$primary->data = $data;
-		
-		# get attributes for this tool.
-		$parent = $db->query("
-			SELECT attributes
-			FROM {$tool->name}s
-			WHERE id='$tool_id'
-		")->current();
-		$primary->attributes = $parent->attributes;
-	
 		die($primary);
 	}
 
@@ -400,9 +426,9 @@ class Tool_Controller extends Controller {
 		$db = new Database;
 		
 		$tool_data = $db->query("
-			SELECT pages_tools.*, LOWER(tools_list.name) as name
+			SELECT pages_tools.*, LOWER(system_tools.name) as name
 			FROM pages_tools
-			JOIN tools_list ON tools_list.id = pages_tools.tool
+			JOIN system_tools ON system_tools.id = pages_tools.system_tool_id
 			WHERE pages_tools.guid = '$tool_guid'
 			AND pages_tools.fk_site = '$this->site_id'
 		")->current();
@@ -411,10 +437,10 @@ class Tool_Controller extends Controller {
 		
 		# determine if tool is protected so we can omit scope link
 		$protected = FALSE;
-		$protected_tools = $db->query("
-			SELECT * FROM tools_list
-			WHERE protected = 'yes'
-		");
+		$protected_tools = ORM::factory('system_tool')
+			->where('protected', 'yes')
+			->find_all();
+			
 		foreach($protected_tools as $tool)
 			if($tool->id == $tool_data->tool)
 				$protected = TRUE;		
@@ -437,9 +463,10 @@ class Tool_Controller extends Controller {
 /*
  * used @ tool->add to generate a new css file from theme/stock instance
  */
-	private function generate_tool_css($toolname, $tool_id, $return_contents=FALSE)
+	public static function _generate_tool_css($toolname, $tool_id, $site_name, $theme, $return_contents=FALSE)
 	{
-		$tool_path		= $this->assets->themes_dir("$this->theme/tools/$toolname");			
+		$tool_path = DATAPATH . "$site_name/themes/$theme/tools/$toolname";
+		
 		$custom_file	= "$tool_path/css/$tool_id.css";		
 		$theme_file		= "$tool_path/css/stock.css";
 		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
@@ -462,9 +489,9 @@ class Tool_Controller extends Controller {
 			
 		$source_contents = str_replace('++', $tool_id , ob_get_clean());
 		# TODO: add this to the one above for efficiency
-		$source_contents = self::replace_tokens($source_contents);
+		$source_contents = self::replace_tokens($source_contents, $site_name, $theme);
 		
-		if( file_put_contents($custom_file, $source_contents) )
+		if(file_put_contents($custom_file, $source_contents))
 			$return = TRUE;
 		
 		if($return_contents)
@@ -507,7 +534,7 @@ class Tool_Controller extends Controller {
 				default:
 					return NULL;
 			}
-			return str_replace('++', $tool_id , ob_get_clean());
+			return str_replace('++', $tool_id, ob_get_clean());
 		}
 		
 		# this file may not exist if the tool was added before user changes themes.
@@ -518,7 +545,7 @@ class Tool_Controller extends Controller {
 			return ob_get_clean();
 		}
 		# if it does not exist, generate a new one.
-		return self::generate_tool_css($toolname, $tool_id, TRUE);
+		return self::_generate_tool_css($toolname, $tool_id, $this->site_name, $this->theme, TRUE);
 	}
 
 /*
@@ -528,7 +555,7 @@ class Tool_Controller extends Controller {
 	private function save_custom_css($toolname, $tool_id, $contents)
 	{	
 		$theme_tool_css = $this->assets->themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
-		$contents = self::replace_tokens($contents);
+		$contents = self::replace_tokens($contents, $this->site_name, $this->theme);
 		if( file_put_contents($theme_tool_css, $contents) )
 			return 'CSS Changes Saved.';
 
@@ -554,15 +581,15 @@ class Tool_Controller extends Controller {
 /*
  * Replace any tokens with respective real-values.
  */ 
-	private function replace_tokens($contents)
+	private static function replace_tokens($contents, $site_name, $theme)
 	{
 		$keys = array(
 			'%MY_THEME%',
 			'%MY_FILES%'
 		);
 		$replacements = array(
-			$this->assets->theme_url('tools'),
-			$this->assets->assets_url()
+			"/_data/$site_name/themes/$theme/tools",
+			"/_data/$site_name/assets"
 		);
 		return str_replace($keys, $replacements , $contents);		
 	}

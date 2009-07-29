@@ -18,15 +18,15 @@ class Admin_Controller extends Controller {
  */	
 	function index()
 	{
-		$db = new Database;
-		
+		$site = ORM::factory('site', $this->site_id);
+		if(!$site->loaded)
+			die('site not found');
+			
 		if($_POST)
 		{
-			$data = array(
-				'custom_domain' => $_POST['custom_domain'],
-				'homepage' => $_POST['homepage'],
-			);
-			$db->update('sites', $data, "site_id = '$this->site_id'");
+			$site->custom_domain = $_POST['custom_domain'];
+			$site->homepage		 = $_POST['homepage'];
+			$site->save();
 			
 			# update site_config.yml if new homepage
 			if($this->homepage != $_POST['homepage'])
@@ -35,22 +35,13 @@ class Admin_Controller extends Controller {
 			die('Sitewide settings saved.');
 		}
 		
+		$pages = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->orderby('page_name')
+			->find_all();
+		
 		$primary = new View('admin/index');
-		$db = new Database;
-		
-		# TODO: optimize this later, should be a better way to get the custom domain.
-		$site = $db->query("
-			SELECT *
-			FROM sites 
-			WHERE site_id = '$this->site_id'
-		")->current();
-		$pages = $db->query("
-			SELECT page_name
-			FROM pages 
-			WHERE fk_site = '$this->site_id'
-		");
 		$primary->pages = $pages;
-		
 		$primary->custom_domain = $site->custom_domain;
 		$primary->js_rel_command = 'close-base';
 		die($primary);

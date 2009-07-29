@@ -1,11 +1,10 @@
 <?php
 $page_enable = array('yes' => '', 'no' => '');
 $menu_enable = array('yes' => '', 'no' => '');
-
-
 $page_enable['no'] = (('no' == $page->enable)) ?  'SELECTED' : '';
 $menu_enable['no'] = (('no' == $page->menu)) ?  'SELECTED' : '';
 $is_homepage = ($page->page_name == $this->homepage) ? '<p>This is your homepage</p>' : '';
+$add_slash = (empty($directory)) ? '' : '/';
 
 echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') );
 ?>
@@ -37,7 +36,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	
 		<div id="new_page_url">
 			Link to this page
-			<br><b><?php echo url::site(),$directory?><span id="link_example"><?php echo $filename?></span></b>
+			<br><b><?php echo url::site(),$directory,$add_slash?><span id="link_example"><?php echo $filename?></span></b>
 		</div>
 		<b>Label Name</b><br>
 		<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">

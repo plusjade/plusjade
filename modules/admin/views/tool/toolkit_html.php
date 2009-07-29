@@ -13,7 +13,9 @@
 				<?php if(FALSE == $protected):?>
 					<li><span class="icon <?php echo $scope?> ">&#160; &#160; </span> <a href="/get/tool/scope/<?php echo "$guid/$page_id"?>" rel="facebox">Scope</a></li>
 				<?php endif;?>
-				<li><span class="icon cross">&#160; &#160; </span> <a href="/get/tool/delete/<?php echo $guid?>" class="js_admin_delete" rel="guid_<?php echo $guid?>">Delete</a></li>	
+				<?php if('account' != $name):?>
+					<li><span class="icon cross">&#160; &#160; </span> <a href="/get/tool/delete/<?php echo $guid?>" class="js_admin_delete" rel="guid_<?php echo $guid?>">Delete</a></li>	
+				<?php endif;?>
 			</ul>
 		</div>
 
