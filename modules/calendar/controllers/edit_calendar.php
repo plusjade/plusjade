@@ -23,7 +23,6 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			$dates = explode('/', $_POST['date']);
 			
 			$new_item = ORM::factory('calendar_item');
-			
 			$new_item->fk_site		= $this->site_id;
 			$new_item->calendar_id	= $tool_id;
 			$new_item->year			= $dates['2'];
@@ -91,8 +90,20 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 	}
 	
 
-	static function _tool_adder($tool_id, $site_id)
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
+		if($sample)
+		{			
+			$new_item = ORM::factory('calendar_item');
+			$new_item->fk_site		= $site_id;
+			$new_item->calendar_id	= $tool_id;
+			$new_item->year			= date("Y");
+			$new_item->month		= date("m");
+			$new_item->day			= date("d");
+			$new_item->title		= 'New Website Launch!';
+			$new_item->desc			= "Pizza party at my house to celebrate my new website launch. Starts at 3pm, bring your buddies!";
+			$new_item->save();		
+		}
 		return 'add';
 	}
 	

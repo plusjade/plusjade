@@ -19,7 +19,7 @@
 	<h3>Categories</h3>	
 	<ul id="forum_categories">
 		<li><a href="<?php echo url::site("$page_name/category/all")?>">All</a></li>
-	<?php foreach($categories as $cats):?>
+	<?php if(FALSE !== $categories) foreach($categories as $cats):?>
 		<li><a href="<?php echo url::site("$page_name/category/$cats->url")?>"><?php echo $cats->name?></a></li>
 	<?php endforeach;?>
 	</ul>

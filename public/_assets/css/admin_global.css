@@ -1,6 +1,16 @@
 
 
 /* ------------ Overide theme styles for admin views  ------------*/
+noscript{
+	position:fixed;
+	width:100%;
+	text-align:center;
+	background:#ffffcc;
+	padding:10px;
+	font-weight:bold;
+	font-size:1.4em;
+	top:40px;
+}
 .admin_reset img{border:0}
 .admin_reset h1,.admin_reset h2, .admin_reset h3,.admin_reset h4,.admin_reset h5,.admin_reset h6{
 	font-size:1em !important; padding:0 !important; margin:0 !important; margin-bottom:10px !important; background:none !important;
@@ -1036,13 +1046,14 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 
 
-	/* Vertical Tab Navigation */
+	/* Vertical Tab Navigation  for auth*/
 #vertical_tabs{
 	margin:0;
 	padding:0;
 	width:15%;
 	float:left;
 	overflow:hidden;
+	min-height:400px;
 }
 #vertical_tabs li{
 	margin-bottom:10px;
@@ -1065,7 +1076,11 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	font-size:1.2em;
 	font-weight:bold;
 }
-
+#auth_content_wrapper{
+	width:80%;
+	float:left;
+	margin-left:10px;	
+}
 
 /* ----------------------- admin views ----------------------- */
 /* ----------------------- ----------------------- ----------------------- */

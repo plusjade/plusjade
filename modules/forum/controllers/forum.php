@@ -63,7 +63,7 @@ class Forum_Controller extends Controller {
 			->where(array('forum_id' => $forum_id, 'fk_site' => $this->site_id))
 			->find_all();
 		if(0 == $categories->count())
-			return 'no categories';
+			return FALSE;
 			
 		return $categories;
 	}

@@ -32,6 +32,24 @@ CHANGE `fk_site` `site_id` INT( 7 ) UNSIGNED NOT NULL ;
 
 ALTER TABLE `sites` CHANGE `site_id` `id` INT( 7 ) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
+RENAME TABLE tools_list TO system_tools;
+ALTER TABLE `pages_tools` CHANGE `tool` `system_tool_id` INT( 2 ) UNSIGNED NOT NULL;
+
+ALTER TABLE `system_tools` ADD `visible` ENUM( 'yes', 'no' ) NOT NULL DEFAULT 'yes' AFTER `enabled`;
+UPDATE `plusjade`.`system_tools` SET `visible` = 'no' WHERE `system_tools`.`id` =10 LIMIT 1 ;
+
+ALTER TABLE `account_users` DROP INDEX `uniq_email`;
+ALTER TABLE `account_users` ADD INDEX ( `email` ) ;
+
+ALTER TABLE `account_users` DROP INDEX `uniq_username` ;
+
+ALTER TABLE `accounts` CHANGE `params` `login_title` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+CHANGE `sticky_posts` `create_title` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+
+
+ALTER TABLE `accounts` ADD UNIQUE (
+`fk_site`
+);
 
 
 
