@@ -9,19 +9,11 @@
 	{
 		echo "<li><div>User: <b><a href=\"/get/utada/get_user/$user->id\">$user->username</a></b></div>";
 		
-		if(!empty($user->site_string))
-		{
-			$site_array = explode('|', $user->site_string);
-			echo '<ul style="font-size:0.9em">';
-			foreach($site_array as $site)
-			{
-				$data = explode(':', $site);
-				list ($id, $site_name) = $data;
-				echo "<li><a href=\"/get/utada/get_site/$id\">$site_name</a> ($id)</li>";
-			}
-			echo '</ul>';
-		}
-		echo '</li>';
+		echo '<ul style="font-size:0.9em">';
+		foreach($user->sites as $site)
+			echo "<li><a href=\"/get/utada/get_site/$site->id\">$site->subdomain</a> ($site->id)</li>";
+		
+		echo '</ul></li>';
 	}
 	?>
 </ul>

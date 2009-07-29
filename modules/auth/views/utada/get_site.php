@@ -23,13 +23,13 @@ Site Subdomain: <?php echo $site->subdomain?>
 	<br>	
 	<form action="/get/utada/grant_access" method="post">
 		Grant Temp Access
-		<input type="hidden" name="site_id" value="<?php echo $site->site_id?>">
+		<input type="hidden" name="site_id" value="<?php echo $site->id?>">
 		<br>Password: <input type="password" name="password" maxlength="20">
 		<button type="submit">Submit</button>
 	</form>	
 	<br>
 	<br>	
-	<a href="/get/utada/destroy_site/<?php echo "$site->site_id/$site->subdomain"?>">Delete <?php echo $site->subdomain?></a>
+	<a href="/get/utada/destroy_site/<?php echo "$site->id/$site->subdomain"?>">Delete <?php echo $site->subdomain?></a>
 	
 
 </p>

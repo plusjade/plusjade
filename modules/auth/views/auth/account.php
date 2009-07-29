@@ -1,6 +1,13 @@
 
 
-<form id="jade_login_form" action="/get/auth/change_password" method="POST">
+<h2>Update email address</h2>
+<br><input type="text" name="email" value="<?php echo $user->email?>"> <button type="submit"> Save Email</button>
+
+<br>
+<br>
+
+<h2>Change Password</h2>
+<form id="jade_login_form" action="/get/auth/account" method="POST">
 	
 	<div id="auth_form" class="create_form">
 	

@@ -22,17 +22,9 @@ class Utada_Controller extends Template_Controller {
  */	
 	public function index()
 	{
-		$primary = new View('utada/index');
-		$db = new Database;
-		
-		$user_id = Auth::instance()->get_user()->id;
-		$sites = $db->query("
-			SELECT sites_users.*, sites.subdomain, sites.site_id 
-			FROM sites_users 
-			JOIN sites ON sites_users.fk_site = sites.site_id
-			WHERE sites_users.fk_users = '$user_id'
-		");
-		$primary->sites = $sites;
+		$user = ORM::factory('user', $this->client->get_user()->id);
+		$primary = new View('utada/index');		
+		$primary->sites = $user->sites;
 		parent::build_output($primary);
 	}
 	
@@ -42,18 +34,7 @@ class Utada_Controller extends Template_Controller {
 	public function all_users()
 	{			
 		$primary = new View('utada/all_users');
-		$db = new Database;
-		
-		$users = $db->query("
-			SELECT users.id,users.username, sites_users.*, sites.subdomain, sites.site_id,
-			GROUP_CONCAT(CONCAT(sites.site_id, ':', sites.subdomain) separator '|') as site_string
-			FROM users
-			LEFT JOIN sites_users ON users.id = sites_users.fk_users
-			LEFT JOIN sites ON sites_users.fk_site = sites.site_id
-			GROUP BY users.username 
-			ORDER BY users.username
-		");
-		$primary->users = $users;
+		$primary->users = ORM::factory('user')->find_all();
 		die($primary);
 	}
 
@@ -64,13 +45,16 @@ class Utada_Controller extends Template_Controller {
 	public function all_sites()
 	{			
 		$primary = new View('utada/all_sites');
+		$primary->sites = ORM::factory('site')->find_all();
+		die($primary);
+		
 		$db = new Database;
 		$sites = $db->query("
 			SELECT sites.*,
 			GROUP_CONCAT(users.username) as users_string
 			FROM sites
-			LEFT JOIN sites_users ON sites.site_id = sites_users.fk_site
-			LEFT JOIN users ON sites_users.fk_users = users.id
+			LEFT JOIN sites_users ON sites.id = sites_users.site_id
+			LEFT JOIN users ON sites_users.user_id = users.id
 			GROUP BY sites.subdomain
 			ORDER BY sites.subdomain
 		");
@@ -84,22 +68,18 @@ class Utada_Controller extends Template_Controller {
 	public function get_site($site_id=NULL)
 	{
 		valid::id_key($site_id);		
-		$primary = new View('utada/get_site');
+		
+		$site = ORM::factory('site', $site_id);
+		
 		$db = new Database;
-		
-		$site = $db->query("
-			SELECT * 
-			FROM sites 
-			WHERE site_id='$site_id'
-		")->current();	
-		$primary->site = $site;
-		
 		$users = $db->query("
 			SELECT sites_users.*, users.username 
 			FROM sites_users
-			JOIN users ON sites_users.fk_users = users.id
-			WHERE fk_site='$site_id'
+			JOIN users ON sites_users.user_id = users.id
+			WHERE sites_users.site_id='$site_id'
 		");	
+		$primary = new View('utada/get_site');
+		$primary->site = $site;
 		$primary->users = $users;
 		
 		die($primary);
@@ -113,13 +93,7 @@ class Utada_Controller extends Template_Controller {
 	{
 		valid::id_key($user_id);		
 		$primary = new View('utada/get_user');
-		$db = new Database;
-		$user = $db->query("
-			SELECT * 
-			FROM users 
-			WHERE id='$user_id'
-		")->current();	
-		$primary->user = $user;	
+		$primary->user = ORM::factory('user', $user_id);
 		die($primary);
 	}
 
@@ -133,15 +107,10 @@ class Utada_Controller extends Template_Controller {
 	{
 		if('adjf8w9eu4589ua8a' === $_POST['password'])
 		{
-			$site_id = valid::id_key($_POST['site_id']);
-			
 			# Create a sites_users access row for the master account
-			$db = new Database;
-			$data = array(
-				'fk_site'	=> $site_id,
-				'fk_users'	=> $this->client->get_user()->id,
-			);
-			$db->insert('sites_users', $data);
+			$user = ORM::factory('user', $this->client->get_user()->id);
+			$user->add(ORM::factory('site', valid::id_key($_POST['site_id'])));
+			$user->save();
 			
 			$first	= text::random('numeric', 5);
 			$last	= text::random('numeric', 6);
@@ -158,16 +127,12 @@ class Utada_Controller extends Template_Controller {
 	public function remove_access($site_id, $user_id=NULL)
 	{
 		valid::id_key($site_id);
-		$db = new Database;
-		
 		$user_id = ((NULL === $user_id)) ?
 			$this->client->get_user()->id : $user_id;
 		
-		$data = array(
-			'fk_site'	=> $site_id,
-			'fk_users'	=> $user_id,
-		);		
-		$db->delete('sites_users', $data);
+		$user = ORM::factory('user', $user_id);
+		$user->remove(ORM::factory('site', $site_id));
+		$user->save();
 		die('access removed');
 	}
 	
@@ -184,24 +149,22 @@ class Utada_Controller extends Template_Controller {
 			
 		if(FALSE === $confirm)
 			die('add confirm to the url...');
-			
-		$db = new Database;	
+
+		# delete pages rows
+		ORM::factory('page')
+			->where('fk_site', $site_id)
+			->delete_all();
+
+		# delete site rows.
+		$site = ORM::factory('site', $site_id);
+		$site->remove(ORM::factory('site', $site_id));
+		$site->delete();
 		
-		# DELETE ALL DATABASE ENTRIES	
-		$db->delete('sites', array('site_id' => $site_id));
-		$db->delete('sites_users', array('fk_site' => $site_id));
-		$db->delete('pages', array('fk_site' => $site_id));
-		# do this for all db tables?
 		
 		# NOTE (see the clean_db method in this class)
-	
-		# not deleting user stuff...
-		# $db->delete('users', array('fk_site' => $site_id));
-		
-		# DELETE DATA FOLDER
-		$data_path = DATAPATH ."$site_name";
-		
-		if( Jdirectory::remove($data_path) )
+
+		# DELETE DATA FOLDER		
+		if(Jdirectory::remove(DATAPATH . $site_name))
 			die('Site destroyed! =(');			
 		
 		die('Unable to destory data folder'); # error

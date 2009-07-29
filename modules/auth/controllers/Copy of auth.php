@@ -188,26 +188,6 @@ class Auth_Controller extends Template_Controller {
 	}
 
 
-	
-/*
- * create a new beta website without a user account
- *
- */ 
-	public function new_beta_website()
-	{
-		if($_POST)
-		{
-			# beta code
-			if('DOTHEDEW' != $_POST['beta'])
-				return $this->display_create('The beta code is not valid', $_POST);
-
-				
-			#$_POST['site_name']
-			#$_POST['theme']
-		}
-	}
-	
-	
 /*
  * View enabling the creation of another website for the currently logged in user.
  */	

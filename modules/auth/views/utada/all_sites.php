@@ -7,18 +7,11 @@
 
 	foreach($sites as $site)
 	{
-		echo "<li><div><a href=\"/get/utada/get_site/$site->site_id\">$site->subdomain</a></div>";
-		if(!empty($site->users_string))
-		{
-			$users_array = explode(',', $site->users_string);
-			echo '<ul style="font-size:0.9em">';
-			foreach($users_array as $user)
-			{
-				echo "<li>$user</li>";
-			}
-			echo '</ul>';
-		}
-		echo '</li>';
+		echo "<li><div><a href=\"/get/utada/get_site/$site->id\">$site->subdomain</a></div>";
+		echo '<ul style="font-size:0.9em">';
+		foreach($site->users as $user)
+			echo "<li>$user->username</li>";
+		echo '</ul></li>';
 	}
 	?>
 </ul>

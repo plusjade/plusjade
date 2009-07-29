@@ -37,7 +37,7 @@
 		<ul>
 		<?php 
 			foreach($sites as $site)
-				echo "<li>$site->subdomain<br><a href=\"/get/utada/remove_access/$site->site_id\">[x]Access</a></li>";
+				echo "<li>$site->subdomain<br><a href=\"/get/utada/remove_access/$site->id\">[x]Access</a></li>";
 
 		?>
 		</ul>

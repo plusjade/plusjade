@@ -1,12 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
 class Site_Model extends ORM {
-
-	protected $has_and_belongs_to_many = array('users');
 	
-	// Relationships	
-	#protected $has_many = array('users');
-	#protected $has_and_belongs_to_many = array('roles');
+	// Relationships
+	protected $has_and_belongs_to_many = array('users');
+	#protected $has_many = array('pages');
 
 
 	public function __set($key, $value)
