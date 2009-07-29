@@ -1,4 +1,3 @@
-
 #account_wrapper_++{
 
 }
@@ -59,32 +58,45 @@
 }
 
 
-
-
 /* for logged in users dashboard */
-
-#account_wrapper_++ ul.account_user_actions{
-	
-}
-#account_wrapper_++ ul.account_user_actions li{
-	
-}
-#account_wrapper_++ ul.account_user_actions li a{
-	
-}
-#account_wrapper_++ ul.account_user_actions li a:hover,
-#account_wrapper_++ ul.account_user_actions li a.selected
-{
-	
-}
 #account_wrapper_++ div#inject_content_wrapper{
 	
 }
 
+#account_wrapper_++ ul.account_user_actions{
+list-style:none;
+margin:0;
+padding:10px;
+}
 
+#account_wrapper_++ ul.account_user_actions li{
+display:inline;
+}
 
+#account_wrapper_++ ul.account_user_actions li a{
+background:lightblue;
+padding:7px 15px;
+color:#fff;
+text-decoration:none;
+}
 
+#account_wrapper_++ ul.account_user_actions li a:hover,
+#account_wrapper_++ ul.account_user_actions li a.selected{
+background:orange;
+color:#fff;
+text-decoration:underline;
+}
+/* edit profile */ 
 
+#account_wrapper_++ #edit_profile_wrapper textarea{
+width:100%;
+height:170px;
+}
+#account_wrapper_++ #edit_profile_wrapper div.status{
+background:#ffffcc;
+margin:0 30%;
+padding:5px;
+}
 
 
 

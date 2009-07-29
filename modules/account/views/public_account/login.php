@@ -1,7 +1,9 @@
 
 <a href="<?php echo url::site("$page_name/create")?>">Create Account</a>
 
-<div id="tagline">Welcome Back!</div>
+<?php if(!empty($account->login_title)):?>
+	<div id="tagline"><?php echo $account->login_title?></div>
+<?php endif;?>
 
 <div id="auth_form" class="login_form">
 	

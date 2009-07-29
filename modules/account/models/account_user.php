@@ -163,10 +163,13 @@ class Account_User_Model extends ORM {
 	 * @param   mixed    id to check
 	 * @return  boolean
 	 */
-	public function username_exists($id)
+	public function username_exists($id, $site_id)
 	{
 		return (bool) $this->db
-			->where($this->unique_key($id), $id)
+			->where(array(
+				$this->unique_key($id) => $id,
+				'fk_site' => $site_id
+				))
 			->count_records($this->table_name);
 	}
 

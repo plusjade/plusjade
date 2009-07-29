@@ -2,9 +2,10 @@
 <a href="<?php echo url::site("$page_name")?>">Login</a>
 
 
-<div id="tagline">
-	Join My site! =D
-</div>
+<?php if(!empty($account->create_title)):?>
+	<div id="tagline"><?php echo $account->create_title?></div>
+<?php endif;?>
+
 <div id="url_sample" class="aligncenter">
 	<?php echo url::site("$page_name/profile")?>/<span>...</span>
 </div>

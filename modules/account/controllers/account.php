@@ -57,7 +57,7 @@ class Account_Controller extends Controller {
 				
 			case 'logout':
 				$this->account_user->logout();
-				$primary = new View('public_account/login', array('page_name'=>$page_name));
+				$primary = $this->display_login($page_name);
 				return $this->public_template($primary, 'account', $tool_id, '');
 				break;		
 				
@@ -115,12 +115,12 @@ class Account_Controller extends Controller {
 			}
 			else
 			{
-				$primary = new View('public_account/login');
+				$primary = $this->display_login($page_name);
 				$primary->errors = 'Invalid username or password';
 			}
 		}
 		else
-			$primary = new View('public_account/login');
+			$primary = $this->display_login($page_name);
 
 		$primary->page_name = $page_name;
 		return $primary;
@@ -133,7 +133,7 @@ class Account_Controller extends Controller {
 	{
 		if($this->account_user->logged_in())
 		{
-			#TODO: consider removing this duplication.
+			#TODO: consider removing this duplication (of the dashboard)
 			$wrapper = new View('public_account/dashboard');
 			$wrapper->page_name = $page_name;
 			$wrapper->content = new View('public_account/dashboard_index');
@@ -167,14 +167,9 @@ class Account_Controller extends Controller {
 			$account_user = ORM::factory('account_user');	
 			$site_name = $_POST['username'];
 			
-			# These checks need to be relative to each fk_site batch only.
-			if($account_user->username_exists($site_name))
-				return self::display_create($page_name, $values, 'domain already exists');
+			if($account_user->username_exists($site_name, $this->site_id))
+				return self::display_create($page_name, $values, 'username already exists');
 
-			if($account_user->username_exists($_POST['email']))
-				return self::display_create($page_name, $values, 'email already exists');
-
-				
 			unset($_POST['password2']);
 			$account_user->fk_site = $this->site_id;
 
@@ -187,8 +182,24 @@ class Account_Controller extends Controller {
 				// if(!$account_user->save() OR !$account_user->add(ORM::factory('role', 'login')))
 				// die('There was a problem creating a new user.');
 			
-			if(! $account_user->save() )
+			if(!$account_user->save())
 				return self::display_create($page_name, $values, 'There was a problem creating account.');
+			
+			
+			/*
+			 * HACK 
+			 * duplicate this account to the plusjade users database table.
+			 * if this site is the rootaccount
+			 */
+			if(ROOTACCOUNT === $this->site_name)
+			{
+				$new_user = ORM::factory('user');
+				foreach($_POST as $key => $val)
+					$new_user->$key = $val;
+					
+				$new_user->save();
+			}
+			
 			
 			# Log user in
 			if(! $this->account_user->login($account_user, (int)$this->site_id, $_POST['password']))
@@ -212,12 +223,17 @@ class Account_Controller extends Controller {
  */
 	private function display_create($page_name, $values=NULL, $errors=NULL)
 	{
+		$account = ORM::factory('account')
+			->where('fk_site', $this->site_id)
+			->find();
+		
 		$wrapper = new View('public_account/index');
 		$wrapper->page_name = $page_name;
 		$wrapper->content = new View('public_account/create_account');
 		$wrapper->content->errors = $errors;
 		$wrapper->content->values = $values;
 		$wrapper->content->page_name = $page_name;
+		$wrapper->content->account = $account;
 		return $wrapper;
 	}
 	
@@ -249,13 +265,28 @@ class Account_Controller extends Controller {
 		return $primary;
 	}
 
+	
+/*
+ * allow the logged in user to edit his/her profile.
+ */	
+	private function display_login($page_name)
+	{
+		$account = ORM::factory('account')
+			->where('fk_site', $this->site_id)
+			->find();
+			
+		$view = new View('public_account/login');
+		$view->page_name = $page_name;
+		$view->account = $account;
+		return $view;
+	}
 /*
  * allow the logged in user to edit his/her profile.
  */
 	private function edit_profile($page_name)
 	{
 		if(!$this->account_user->logged_in())
-			return new View('public_account/login', array('page_name'=>$page_name));
+			return $this->display_login($page_name);
 			
 		$primary	= new View('public_account/edit_profile');
 		$db			= new Database;
@@ -302,7 +333,7 @@ class Account_Controller extends Controller {
 	private function change_password($page_name)
 	{
 		if(!$this->account_user->logged_in())
-			return new View('public_account/login', array('page_name'=>$page_name));
+			return $this->display_login($page_name);
 
 		$primary = new View('public_account/change_password');
 		$primary->success = FALSE;

@@ -38,7 +38,7 @@ class Edit_Account_Controller extends Edit_Tool_Controller {
 		die($primary);
 	}
 	
-	function delete_user($user_id=NULL)
+	public function delete_user($user_id=NULL)
 	{
 		valid::id_key($user_id);
 		ORM::factory('account_user')
@@ -46,6 +46,29 @@ class Edit_Account_Controller extends Edit_Tool_Controller {
 		->delete($user_id);
 		die('User deleted');
 	}
+	
+	public function settings($tool_id)
+	{
+		$account = ORM::factory('account')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);
+		if(!$account->loaded)
+			die('invalid account id');
+			
+		if($_POST)
+		{
+			$account->login_title = $_POST['login_title'];
+			$account->create_title = $_POST['create_title'];
+			$account->save();
+			die('account settings saved');
+		}
+		
+		$primary = new View('edit_account/settings');
+		$primary->account = $account;
+		$primary->js_rel_command = "update-account-$account->id";
+		die($primary);
+	}
+	
 	
 	static function _tool_adder($tool_id, $site_id)
 	{
