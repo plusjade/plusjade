@@ -56,11 +56,10 @@
 			},
 			success: function(data) {
 				var data = data.split('|'); 
-				var html = '<li id="item_'+ data[0] +'" class="root_entry"><ul class="row_wrapper"><li class="drag_box"><span class="icon move"> &#160; &#160; </span> DRAG </li><li class="position">0.</li><li class="data"><span>'+ data[1] +'</span></li><li class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/edit_forum/delete/'+ data[0] +'" rel="'+ data[0] +'">delete</a></li></ul></li>';				
-				
-				$('#generic_sortable_list').prepend(html);
-				$('div.save_pane.helper').html(data[2]);
-				setTimeout('$("div.save_pane.helper").remove()', 1200);
+				var html = '<li id="item_'+ data[0] +'" class="root_entry"><ul class="row_wrapper"><li class="drag_box"><span class="icon move"> &#160; &#160; </span> DRAG </li><li class="position">0.</li><li class="data"><span>'+ data[1] +'</span></li><li class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/edit_forum/delete/'+ data[0] +'" rel="'+ data[0] +'">delete</a></li></ul></li>';
+				$('#generic_sortable_list').prepend(html);	
+				$("div.save_pane.helper").remove();
+				$(document).trigger('server_response.plusjade', data[2]);
 			}	
 		});	
 		return false;

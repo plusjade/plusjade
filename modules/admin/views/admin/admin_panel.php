@@ -63,6 +63,8 @@
 			*<u>All updates are saved</u>*, but your website is <b>unclaimed</b> and expires in <b><?php echo $expires['days']?> days, <?php echo $expires['hours']?> hours, <?php echo $expires['mins']?> mins</b>.
 		</div>
 	<?php endif;?>
+
+	<div id="center_response" style="display:none">Server Response</div>
 	
 	<div style="display:none">
 		<span id="global_css_path"><?php echo $global_css_path?></span>
@@ -91,6 +93,6 @@
 <noscript>Editing Your website requires Javascript to be enabled.</noscript>
 
 <div id="hide_link">
-	<a class="toggle_admin_bar" href="#">Show</a>
+	<a href="#">Show</a>
 </div>
 <!-- END admin elements -->	

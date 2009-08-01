@@ -1,112 +1,69 @@
 
 <style type="text/css">
-	.common_main_panel img{
+	#logo_droppable_wrapper{
+		text-align:center;
+		background:#eee;
+		border:1px solid #ccc;
+	}
+	#logo_droppable_wrapper img{
 		display:block;
 		margin:5px;
 		padding:5px;
 		cursor:pointer;
 		cursor:hand;
 	}
-	.common_main_panel img.selected{
-		border:2px solid orange;
-	}
 </style>
-<?php echo form::open('theme/add_logo', array('enctype' => 'multipart/form-data', 'class' => 'custom_ajaxForm1') )?>
+<?php echo form::open('theme/logo')?>
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="upload_logo" class="jade_positive">Upload Logo</button>
-		<div id="common_title">Configure Logo</div>
+		<button type="submit" name="save_logo" class="jade_positive">Save Logo</button>
+		<div id="common_title">Select an image banner for your Website.</div>
 	</div>
 
-	<div id="common_tool_info" style="background:#eee;padding:5px">
-		<b>Add Logo</b> <input type="file" name="image" rel="text_req">
+
+	<div class="common_left_panel" style="text-align:center">
+		<a href="#" class="get_file_browser" rel="albums">Choose new Logo</a>
 	</div>
-</form>
+
+	<div id="logo_droppable_wrapper" class="common_main_panel" style="height:300px">
+	<?php if(!empty($this->banner)):?>
+		<img src="<?php echo "$img_path/$this->banner"?>" alt="activated banner">
+	<?php else:?>
+		Place image here.
+	<?php endif;?>
+	</div>
 
 
-<div class="common_left_panel buttons" style="text-align:center">
-	
-	<button type="submit" name="change_logo" class="jade_positive">Change Logo</button>
-	<br><br>
-	<button type="submit" name="delete_logo" class="jade_negative">
-		<span class="icon cross">&#160; &#160; </span> Delete Logo
-	</button>
 </div>
-
-<div class="common_main_panel" style="height:300px">
-<?php
-	foreach($saved_banners as $key => $image)
-	{	
-		$selected = (($image == $this->banner)) ? 'class="selected"' : '';
-		?>
-		<img src="<?php echo "$img_path/$image"?>" <?php echo $selected?> rel="<?php echo $image?>" alt="">
-		<?php
-		unset($selected);
-	}
-		?>
-</div>
-
 
 <script type="text/javascript">
-	// add selected orange border.
-	$('.common_main_panel').click($.delegate({
-		'img' : function(e){
-			$('.common_main_panel img').removeClass('selected');
-			$(e.target).addClass('selected');
-		}
-	}));
 
-	// upload a new image.
-	$('.facebox .custom_ajaxForm1').ajaxForm({	
-		beforeSubmit: function(){
-			$('.facebox .show_submit').show();
-		},			
-		success: function(data) {
-			var img = new Image();
-			img.src = '<?php echo $img_path?>/'+ data;
+// make space droppable.
+	$("#logo_droppable_wrapper").droppable({
+		activeClass: 'ui-state-highlight',
+		accept: 'img.image_file',
+		drop: function(event, ui) {
+			$(this).empty();
+			$(ui.draggable).addClass('selected');
+			$(ui.draggable).parent('div').addClass('selected');		
 			
-			$('.facebox .show_submit').hide();
-			$('.common_main_panel img').removeClass('selected');
-			html ='<img src="<?php echo $img_path?>/'+ data +'" class="selected" rel="'+ data +'" alt="">';
-			$('.common_main_panel').prepend(html);
-			$('#show_response_beta').html(data);
+			var img_path = $(ui.draggable).attr('rel');
+			var img = new Image();
+			img.src = img_path;
+			var html ='<img src="'+ img_path +'" class="selected" rel="'+ img_path +'" alt="">';
+			$('#logo_droppable_wrapper').prepend(html);
 		}
 	});
 	
-
-/*
- * Change logo functionality
-*/
-	$('button[name="change_logo"]').click(function(){
-		var image = $('.common_main_panel img.selected').attr('rel');
-		if(!image) {
-			alert('Select a banner first.');
-			return false;
-		}
-		
+// Save logo handler
+	$('button[name="save_logo"]').click(function(){
+		var image = $('#logo_droppable_wrapper img').attr('src');
 		$('.facebox .show_submit').show();
-		$.post('/get/theme/change_logo', {banner: image}, function(data){
-			// the images are already loaded via this facebox so we dont need to load them again?
-			$('#BANNER a').html('<img src="<?php echo $img_path?>/' + image +'" id="header_banner" alt="">');
-			$.facebox.close();
-			$('#show_response_beta').html(data);	
+		$.post('/get/theme/logo', {banner: image}, function(data){
+			$('#BANNER a').html('<img src="' + image +'" id="header_banner" alt="">');
+			$(document).trigger('server_response.plusjade', data);
 		});
 		return false;
-	});
+	});	
 	
-// delete a logo
-	$('button[name="delete_logo"]').click(function(){
-		var image = $('.common_main_panel img.selected').attr('rel');
-		if(!image) {
-			alert('Select a banner to delete.');
-			return false;
-		}
-		$('.facebox .show_submit').show();
-		$.post('/get/theme/delete_logo', {banner: image}, function(data){
-			$('.common_main_panel img.selected').remove();
-			$('#show_response_beta').html(data);	
-			$('.facebox .show_submit').hide();
-		});
-		return false;
-	});
 </script>

@@ -1,43 +1,4 @@
 
-
-<style type="text/css">
-.benefit_wrapper{
-width:50%;
-float:left;
-padding:10px;
-}
-.create_wrapper{
-width:44%;
-float:left;
-padding:10px;
-}
-#login_claim_wrapper{
-	padding:10px;
-	margin:15px 0;
-	background:#ffffcc;
-	text-align:center;
-}
-.login_response{
-	text-align:center;
-}
-.login_response div.success{
-	padding:7px;
-	background:lightgreen;
-}
-.login_response div.error{
-	padding:7px;
-	background:lightpink;
-}
-#why_claim{
-	margin-bottom:15px;
-	padding:10px;
-	border:1px dashed #ddd;
-	background:#eee;
-	line-height:1.4em
-}
-
-</style>
-
 <div id="claim_wrapper">
 
 	<div id="common_tool_header" class="buttons">

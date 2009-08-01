@@ -4,7 +4,7 @@
 <form action="/get/edit_calendar/add/<?php echo $tool_id?>" method="POST" class="ajaxForm">
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" class="jade_positive">Add Event</button>
+		<button type="submit" class="jade_positive">Add New Event</button>
 		<div id="common_title">Create New Calendar Entry</div>
 	</div>
 

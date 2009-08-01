@@ -236,7 +236,7 @@ class Page_Controller extends Controller {
 				
 			$new_page->save();
 
-			#add the tool.
+			# add the tool.
 			Tool_Controller::_add_tool($new_page->id, $system_tool_id, $this->site_name, TRUE);
 	
 			# send html to javascript handler
@@ -361,7 +361,7 @@ class Page_Controller extends Controller {
 			# if this page was the homepage, update homepage value
 			if($this->homepage == $_POST['old_page_name'])
 			{
-				$db->update('sites', array('homepage' => $filename), "site_id = '$this->site_id'");
+				$db->update('sites', array('homepage' => $filename), "id = '$this->site_id'");
 				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $filename );
 			}
 			
@@ -523,7 +523,7 @@ class Page_Controller extends Controller {
 	public function save_sort()
 	{
 		$db = new Database;
-		foreach($_GET['page'] as $position => $id)
+		foreach($_GET['item'] as $position => $id)
 			$db->update('pages', array('position' => "$position"), "id = '$id' AND fk_site = '$this->site_id'"); 	
 			
 		die('Page Sort Order Saved'); # success

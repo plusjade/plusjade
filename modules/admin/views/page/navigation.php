@@ -11,21 +11,17 @@
 </div>
 
 <div class="common_main_panel">
-	<ul id="generic_sortable_list" class=" ui-tabs-nav">
-		<?php
-		foreach($pages as $page)
-		{	
-			?>
-			<li id="page_<?php echo $page->id?>">
-				<table id="menu_page_list"><tr>
-					<td width="60px" class="drag_box"> <span class="icon move"> &#160; &#160; </span> DRAG </td>
-					<td width="30px" class="aligncenter"><?php echo $page->position?>. </td>
-					<td class="page_edit"><?php echo $page->label?> - <small><?php echo url::site($page->page_name)?></small></td>
-				</tr></table>
+	<ul id="generic_sortable_list" class=" ui-tabs-nav">		
+		<?php foreach($pages as $page):?>
+			<li id="item_<?php echo $page->id?>"  class="root_entry">
+				<ul class="row_wrapper">
+					<li class="drag_box"><span class="icon move"> &#160; &#160; </span> DRAG </li>
+					<li class="position"><?php echo $page->position?>. </li>
+					<li class="data"><span><?php echo $page->label?></span>  - <small><?php echo url::site($page->page_name)?></small></li>
+					<li class="delete_item"><span class="icon cross">&#160; &#160;</span> <a href="/get/page/delete/<?php echo $page->id?>" rel="<?php echo $page->id?>">delete</a></li>				
+				</ul>
 			</li>		
-			<?php
-		}
-		?>
+		<?php endforeach;?>
 	</ul>
 </div>
 
@@ -33,9 +29,10 @@
 	$('#generic_sortable_list').sortable({ 
 		handle	: '.drag_box',
 		axis	: 'y',
-		containment: '#generic_sortable_list'
+		containment: '.common_main_panel'
 	});	
-	// Save page sort order
+	
+// Save page sort order
 	$("#save_sort").click(function() {
 		var order = $("#generic_sortable_list").sortable("serialize");
 		if(!order){
@@ -44,8 +41,7 @@
 		}
 		$(".facebox .show_submit").show();
 		$.get("/get/page/save_sort?"+order, function(data){
-			$.facebox.close();
-			$('#show_response_beta').html(data);				
+			$(document).trigger('server_response.plusjade', data);
 		})				
 	});
 </script>

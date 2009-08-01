@@ -6,13 +6,22 @@ $(document).ready(function()
  * TOGGLE ADMIN BAR	
  */
 	$(".toggle_admin_bar").click(function(){
-		$('#shadow').toggle();
-		$("#admin_bar_wrapper").slideToggle("slow", function(){
-			$(".jade_toolbar_wrapper").slideToggle("slow");
-			$(".jade_admin_item_edit").slideToggle("slow");
-			$("#hide_link").slideToggle("slow");
+		$('#shadow').slideUp('slow');
+		$("#admin_bar_wrapper").slideUp("slow", function(){
+			$(".jade_toolbar_wrapper").slideUp("slow");
+			$(".jade_admin_item_edit").slideUp("slow");
+			$("#hide_link").slideDown("slow");
 		});
 	});
+	$("#hide_link a").click(function(){
+		$('#shadow').slideDown("slow");
+		$("#admin_bar_wrapper").slideDown("slow", function(){
+			$(".jade_toolbar_wrapper").slideDown("slow");
+			$(".jade_admin_item_edit").slideDown("slow");
+			$("#hide_link").slideUp("slow");
+		});
+	});	
+	
 	$('#shadow div').css({background: '#000', opacity: 0.2});
 
 /*
@@ -78,13 +87,6 @@ $(document).ready(function()
 			$(this).prepend(toolbar);			
 		});
 	};	
-
-
-/* display server response
- * ShowRespose in beta mode only.
-*/
-	$('body').append('<div id="show_response_beta">[Server Response]</div>');
-
 	
 /*
  * updates the tool container #tool_wrapper_<id> 
@@ -202,7 +204,8 @@ $(document).ready(function()
 			$.get(url, function(data) {
 				$.facebox.close();
 				$('#' + el).remove();
-				$('#show_response_beta').html(data);	
+				$('#center_response').html(data).show();
+				setTimeout('$("#center_response").fadeOut(4000)', 1500);	
 			});
 			return false;
 		},
@@ -220,8 +223,9 @@ $(document).ready(function()
 		},		
 		
 	/* Click actions for css styler ----- */
+	/* ------------------------------------------------------------  */
 		
-		// load the styler contents (css)
+	// load the styler contents (css)
 		"a[rel=css_styler]": function(e) {
 			$.facebox.close();
 			$('div.styler_wrapper').show();
@@ -234,7 +238,7 @@ $(document).ready(function()
 			return false;
 		},
 		
-		// hide the styler dialog
+	// hide the styler dialog
 		"div.styler_wrapper a.toggle": function(e) {
 			$('div.dialog_wrapper').toggle('fast');			
 			var state = $(e.target).html();
@@ -250,7 +254,7 @@ $(document).ready(function()
 			return false;
 		},
 		
-		// close the styler dialog
+	// close the styler dialog
 		"div.styler_wrapper a.close": function(e) {
 			$(document).trigger('on_close.execute');
 			$('div.styler_wrapper').hide();
@@ -292,6 +296,7 @@ $('body').keyup($.delegate({
 		<div class="actions"> \
 			<a href="#" class="close">close</a> \
 			<a href="#" class="toggle">hide</a> \
+			<div id="lower_response" class="server_response" style="display:none;">Server Response</div>\
 			<div class="show_submit" style="display:none"><div>...Submitting</div></div> \
 		</div> \
 		<div class="dialog_wrapper"> \
@@ -315,24 +320,29 @@ $('body').keyup($.delegate({
 					.removeClass('jade_positive');
 				
 				$('.admin_reset .show_submit').show();
-				$('#show_response_beta').html('waiting for response...');
 			},
 			success: function(data) {
 				$('.facebox form button')
 				.removeAttr('disabled')
 				.addClass('jade_positive');
+				$(document).trigger('server_response.plusjade', data);
+				
 				
 				// if 2 fbs are active, we assume the form is submitted from 2
 				// so we close only box 2, else close everything.				
-				/* TESTING : disable auto facebox close */
 				//var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
 				//$.facebox.close(whichBox);
-				$('.admin_reset .show_submit').hide();					
-				$('#show_response_beta').html(data);
 			}
 		});
 	});
 	
+$(document).bind('server_response.plusjade', function(e, data){
+	$('.show_submit').hide();
+	//console.log(e);
+	$('.server_response').html(data).show();
+	setTimeout('$(".server_response").fadeOut(4000)', 1500);	
+});
+
 
 /* 
  * Bind functions to after facebox is revealed event.
@@ -343,6 +353,7 @@ $('body').keyup($.delegate({
 	$(document).bind('reveal.facebox', function(){
 		$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
+		$('.facebox .server_response').hide();
 		$('textarea.render_html').wysiwyg();
 		$(document).trigger('ajaxify.form');
 		
@@ -374,7 +385,7 @@ $('body').keyup($.delegate({
 			$('.on_close').html() : $('.on_close.two').html();
 
 		if(null == action) {
-			$('#show_response_beta').html('on_close action is empty');
+			//alert('looking for on_close action, but empty.');
 			return false;
 		} else {
 			action = action.split('-'); 
@@ -440,9 +451,9 @@ $('body').keyup($.delegate({
 		},
 		update: function(event, ui){			
 			var output = '';
-			page_id = $('#click_hook').attr('rel');
+			var page_id = $('#click_hook').attr('rel');
 			
-			$('#show_response_beta').html('Saving tool positions...');
+			$('#center_response').html('Saving tool positions...').show();
 			$(".CONTAINER_WRAPPER").each(function(){
 				var container = $(this).attr("rel");
 				var kids = $(this).children("span.common_tool_wrapper");
@@ -451,8 +462,9 @@ $('body').keyup($.delegate({
 					output += this.id + '|' + container + '|' + i + '#';
 				});
 			});
-			$.post("/get/tool/save_positions/"+page_id, {output: output}, function(data){
-				$('#show_response_beta').html(data);
+			$.post("/get/tool/save_positions/"+ page_id, {output: output}, function(data){
+				$('#center_response').html(data).show();
+				setTimeout('$("#center_response").fadeOut(4000)', 1500);	
 			});
 		}
 		//revert: true
@@ -529,7 +541,8 @@ $('body').keyup($.delegate({
 				$.get(e.target.href, function(data){
 					// remove from container
 					$('#page_wrapper_'+ id).remove();
-					$('#show_response_beta').html(data);	
+					$('#center_response').html(data).show();
+					setTimeout('$("#center_response").fadeOut(4000)', 1500);
 				});
 			}
 			return false;
@@ -622,7 +635,7 @@ $('body').keyup($.delegate({
 					function(data){
 						file = file.replace('.', '_')
 						$('#directory_window #' + file).remove();
-						$('#show_response_beta').html(data);
+						$(document).trigger('server_response.plusjade', data);
 			})};
 			return false;
 		},
@@ -638,7 +651,7 @@ $('body').keyup($.delegate({
 				$.get('/get/files/delete/'+ path,
 					function(data){
 						$('#directory_window #' + folder).remove();
-						$('#show_response_beta').html(data);
+						$(document).trigger('server_response.plusjade', data);
 			})};
 			return false;
 		},
@@ -652,7 +665,9 @@ $('body').keyup($.delegate({
 		}
 
 	}));
+
 	
+
 // doubleclick file browser actions
 	$('body').dblclick($.delegate({
 	
@@ -662,8 +677,8 @@ $('body').keyup($.delegate({
 			$(e.target).parent('div').addClass('selected');
 			$(e.target).clone().prependTo('#images .gallery');
 			return false;
-		},
-
+		}
+/*
 	// add selected image to gallery.
 		'#files_browser_wrapper img.to_album':function(e) {
 			$(e.target).addClass('selected');
@@ -675,6 +690,8 @@ $('body').keyup($.delegate({
 			.prependTo('#sortable_images_wrapper');
 			return false;
 		}
+		
+*/
 	}));
 	
 
@@ -706,8 +723,7 @@ $('body').keyup($.delegate({
 			$.post('/get/edit_'+ tool +'/save_tree/'+tool_id,
 				{output: output},
 				function(data){
-					$('.facebox .show_submit').hide();
-					$('#show_response_beta').html(data);				
+					$(document).trigger('server_response.plusjade', data);				
 				}
 			)	
 		},

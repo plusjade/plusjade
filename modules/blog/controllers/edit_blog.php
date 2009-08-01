@@ -52,7 +52,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 
 
 			self::save_tags($_POST['tags'], $new_post->id, $tool_id);
-			die('Post added'); # success
+			die('New Post added'); # success
 		}
 
 		$primary = new View('edit_blog/add_item');

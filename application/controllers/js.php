@@ -78,12 +78,12 @@ class Js_Controller extends Controller {
 		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");		
 		
 		$db = new Database;
-		$tools_list = $db->query("
+		$system_tools = $db->query("
 			SELECT LOWER(name) as name
-			FROM tools_list
+			FROM system_tools
 		");
 		ob_start();	
-		foreach($tools_list as $tool)
+		foreach($system_tools as $tool)
 		{
 			$admin_js = MODPATH . "$tool->name/views/public_$tool->name/js/all.js";
 			

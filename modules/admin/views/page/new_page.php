@@ -3,8 +3,8 @@
 <?php $slash = (empty($directory)) ? '' : '/'; # add slash if not a root page.?>
 
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" id="add_page_submit" name="add_page" class="jade_positive">Add Page</button>
-		<div id="common_title">Add New Page</div>
+		<button type="submit" id="add_page_submit" class="jade_positive">Add New Page</button>
+		<div id="common_title">Add a New Website Page</div>
 	</div>	
 		
 	<div id="new_page_url">
@@ -76,7 +76,7 @@
 			var directory = '<?php echo $directory?>';
 			var path_for_css = directory.replace(/\//g,'_');
 			$('div.'+path_for_css).append(data);
-			$('#show_response_beta').html(data);				
+			// this outputs html for the pages browswer as data.
 		}
 	});
 	

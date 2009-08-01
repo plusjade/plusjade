@@ -92,7 +92,7 @@
  */
 	$('#actions_list').click($.delegate({
 		
-	// add element
+	// view add element
 		"a#add_node": function(e){
 			var el_id = get_active_node();
 			if(! el_id ){alert('Select an item to add element to.');return false}
@@ -101,7 +101,7 @@
 			return false;			
 		},
 		
-	// edit active element
+	// view edit active element
 		"a#edit_node": function(e){
 			var el_id = get_active_node();
 			if(! el_id ){alert('Select an item to edit.');return false}
@@ -111,7 +111,7 @@
 			return false;
 		},
 		
-	// delete active element
+	// view delete active element
 		"a#delete_node": function(e){		
 			var el_id = get_active_node();
 			if(! el_id ) alert('Select an item to delete.');
@@ -150,8 +150,7 @@
 			// TODO: This does not work in chrome and safari
 			$simpleTreeCollection.get(0).addNode(data, text);
 			$('#add_wrapper').hide();
-			$('.facebox .show_submit').hide();
-			$('#show_response_beta').html(data);	
+			$(document).trigger('server_response.plusjade', data);	
 		}
 	});
 </script>

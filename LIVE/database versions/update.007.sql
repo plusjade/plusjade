@@ -73,8 +73,11 @@ ALTER TABLE `sites` CHANGE `claimed` `claimed` ENUM( 'yes', 'no' ) CHARACTER SET
 
 UPDATE `plusjade`.`themes` SET `enabled` = 'no' WHERE `themes`.`id` =9 LIMIT 1 ;
 
+UPDATE `plusjade`.`themes` SET `enabled` = 'no' WHERE `themes`.`id` =5 LIMIT 1 ;
+
+UPDATE `plusjade`.`themes` SET `image_ext` = 'jpg' WHERE `themes`.`id` =1 LIMIT 1 ;
+
+ALTER TABLE `pages` CHANGE `title` `title` VARCHAR( 100 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
 
 
-
-
-
+UPDATE `plusjade`.`version` SET `at` = '007' WHERE CONVERT( `version`.`at` USING utf8 ) = '004' LIMIT 1 ;

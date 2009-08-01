@@ -96,18 +96,6 @@ span.images{background-position:0px -398px}
 span.image{background-position:0px -420px}
 span.info{background-position:0px -440px}
 
-#show_response_beta{
-	position:fixed;
-	top:40px;
-	left:0;
-	height:15px;
-	padding:5px;
-	background:#ffffcc;
-	font-size:10px;
-	color:#777;
-	overflow:hidden;
-	border:1px solid #777;
-}
 .admin_reset .on_close{display:none}
 
 /* --------------- facebox ---------------*/
@@ -138,6 +126,22 @@ span.info{background-position:0px -440px}
 	overflow:hidden;
 	top:2px;
 }
+.admin_reset .server_response {
+	width:85%;
+	float:left;
+	margin-left:2%;
+	padding:6px;
+	text-align:center;
+	font-weight:bold;
+	background:#ffffcc;
+	border:1px solid #333;
+	border-top:0;
+}
+.admin_reset #lower_response{
+	width:80%;
+	border:1px solid #333;
+}
+
 .admin_reset .show_submit{
 	width:275px;	
 	height:25px;
@@ -338,6 +342,18 @@ ul#admin_bar{
 	float:right;
 	
 }
+
+#center_response{
+	min-width:750px;
+	width:70%;
+	margin:0 auto;
+	padding:6px 10px;
+	background:#ffffcc;
+	color:#444;
+	text-align:center;
+	border:1px solid #000;
+}
+
 #tool_bar_wrapper{
 	min-width:880px;
 	width:80%;
@@ -1099,6 +1115,42 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 /* ----------------------- admin views ----------------------- */
 /* ----------------------- ----------------------- ----------------------- */
 
+/* claim */
+
+.benefit_wrapper{
+width:50%;
+float:left;
+padding:10px;
+}
+.create_wrapper{
+width:44%;
+float:left;
+padding:10px;
+}
+#login_claim_wrapper{
+	padding:10px;
+	margin:15px 0;
+	background:#ffffcc;
+	text-align:center;
+}
+.login_response{
+	text-align:center;
+}
+.login_response div.success{
+	padding:7px;
+	background:lightgreen;
+}
+.login_response div.error{
+	padding:7px;
+	background:lightpink;
+}
+#why_claim{
+	margin-bottom:15px;
+	padding:10px;
+	border:1px dashed #ddd;
+	background:#eee;
+	line-height:1.4em
+}
 
 
 /* @page_settings */
@@ -1123,7 +1175,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 #directory_window div.asset{
 	height:100px;
-	width:110px;
+	width:105px;
 	float:left;
 	margin:3px;
 	padding:2px;

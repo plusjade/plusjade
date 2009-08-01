@@ -13,7 +13,7 @@
 class Auth_Controller extends Controller {
 
 
-	const plusjade_site_id = 1; # TODO this is hardcoded for now.
+	const plusjade_site_id = ROOTSITEID; # TODO this is hardcoded for now.
 	
 	function __construct()
 	{

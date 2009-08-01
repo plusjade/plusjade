@@ -4,7 +4,7 @@
 <form action="/get/edit_blog/add/<?php echo $tool_id?>" method="POST" class="ajaxForm">	
 	
 	<div id="common_tool_header" class="buttons">
-		<button type="submit" name="add_images" class="jade_positive">Add Post</button>
+		<button type="submit" name="add_images" class="jade_positive">Add New Post</button>
 		<div id="common_title">Add New Blog Post</div>
 	</div>	
 	

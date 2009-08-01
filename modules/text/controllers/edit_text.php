@@ -27,7 +27,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 		{
 			$text->body = $_POST['body'];
 			$text->save();
-			die('Changes Saved');
+			die('Text Changes Saved');
 		}
 		
 		$primary = new View("edit_text/add_item");

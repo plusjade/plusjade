@@ -74,9 +74,9 @@
 		});
 	});
 
-	/*
-	 * custom ajax form response needs to populate the nested li list.
-	 */
+/*
+ * custom ajax form response needs to populate the nested li list.
+ */
 	$("#edit_form").ajaxForm({
 		beforeSubmit: function(){
 			if(! $("#edit_form input:enabled").jade_validate() ) return false;
@@ -86,8 +86,7 @@
 			var text = $("#edit_form input[name='item']").val();
 			$('li span.active').html(text);
 			$('#edit_wrapper').hide();
-			$('.facebox .show_submit').hide();
-			$('#show_response_beta').html(data);			
+			$(document).trigger('server_response.plusjade', data);		
 		}
 	});
 </script>

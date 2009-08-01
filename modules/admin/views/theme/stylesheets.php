@@ -156,9 +156,10 @@
 			$('div.save_pane.helper').html('<div class="loading">Saving '+ file +'...</div>');
 			var contents = $('textarea#edit_css').val();
 			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
-				$('div.save_pane.helper').html(data);
+				
+				$(document).trigger('server_response.plusjade', data);
 				$('button#show_save').removeAttr('disabled');
-				setTimeout('$("div.save_pane.helper").remove()', 1000);
+				$("div.save_pane.helper").remove();
 			});
 		
 			return false;
@@ -172,6 +173,7 @@
 			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
 				$('select.files_list').append('<option value="'+ data +'">'+ data +'</option>');
 				$("div.save_pane.helper").remove();
+				$(document).trigger('server_response.plusjade', data);
 				$('button#show_save').removeAttr('disabled');
 			});
 			return false;

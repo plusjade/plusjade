@@ -7,13 +7,13 @@
 <div id="page_browser_wrapper">
 	
 	<div class="common_left_panel">
-		<img src="/_assets/images/admin/file.jpg" alt="" class="new_page_drop">
+		<h3 class="aligncenter">Add Blank Page</h3>
+		<img src="/_assets/images/admin/page_add.gif" alt="" class="new_page_drop">
 		<br>
-		<h3>Add Blank Page &#8594;</h3>
 		<i>Drag</i> +page icon into the desired directory window.
 		
 		<br><br>
-		<h3>Add Page Builders &#8594;</h3>
+		<h3 class="aligncenter">Add Page Builders</h3>
 		<ul class="page_builders">
 			<?php
 			foreach($page_builders as $tool)

@@ -11,12 +11,12 @@ $display_name	= ('10' < strlen($filename)) ? substr($filename, 0, 10).'...' : $f
 	{
 		$type = 'folder';
 		?>
-			<img src="/_assets/images/admin/folder.jpg" rel="<?php echo $full_path?>" class="open_folder"> 
+			<img src="/_assets/images/admin/folder.png" rel="<?php echo $full_path?>" class="open_folder"> 
 			<span class="icon page">&#160; &#160;</span>
 		<?php 
 	}
 	else
-		echo "<img src=\"/_assets/images/admin/file.jpg\" class=\"file_options\">";
+		echo "<img src=\"/_assets/images/admin/file.gif\" class=\"file_options\">";
 	?>
 	<?php if(TRUE == $is_protected) echo '<span class="icon shield" title="'.$page_builder.'">&#160; &#160; </span>'?>
 	<span title="<?php echo $filename?>"><?php echo $display_name?></span>

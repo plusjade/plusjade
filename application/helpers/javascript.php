@@ -26,7 +26,7 @@ class javascript_Core {
 				}
 				$(".facebox .show_submit").show();
 				$.get("/get/'. $url .'/save_sort?"+order, function(data){
-					$(".facebox .show_submit").hide();
+					$(document).trigger("server_response.plusjade", data);
 				})				
 			});
 		';

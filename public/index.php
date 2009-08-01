@@ -3,6 +3,7 @@
 define('ROOTNAME', 'localhost');
 define('ROOTACCOUNT', 'jade');
 define('ROOTDOMAIN', 'localhost.com');
+define('ROOTSITEID', 1);
 
 /**
  * This file acts as the "front controller" to your application. You can

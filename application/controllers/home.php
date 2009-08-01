@@ -42,13 +42,16 @@ class Home_Controller extends Controller {
 	{
 		if(empty($values))
 			$values = array(
-				'site_name'	=> text::random('alpha', 5),
+				'site_name'	=> strtolower(text::random('alpha', 5)),
 				'beta'		=> '',
 				'theme'		=> ''
 			);
 		$view = new View('plusjade_home');
 		$view->errors = $errors;
 		$view->values = $values;
+		$view->themes = ORM::factory('theme')->where('enabled', 'yes')->find_all();
+		$view->add_root_js_files('easing/jquery.easing.1.3.js');										
+		$view->add_root_js_files('cycle_lite/jquery.cycle.all.min.js');
 		return $view;
 	}
 	

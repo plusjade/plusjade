@@ -85,6 +85,7 @@ class Tool_Controller extends Controller {
 			->where('fk_site', $site_id)
 			->find();		
 	
+		# if a page_builder template exists, assign it.
 		$template =
 			(file_exists(DATAPATH . "$site_name/themes/$theme/templates/$toolname.html"))
 			? $toolname : 'master';
@@ -309,7 +310,7 @@ class Tool_Controller extends Controller {
 	
 /*
  * change the scope of a tool from local-to-page or global-site
- *
+ *			
  */	
 	function scope($tool_guid=NULL, $page_id=NULL)
 	{
@@ -317,7 +318,7 @@ class Tool_Controller extends Controller {
 		valid::id_key($page_id);
 		$db = new Database;
 		
-		if(! empty($_POST['page_id']) )
+		if(!empty($_POST['page_id']))
 		{
 			$scope = ('5' >= $_POST['page_id']) ? 'global' : 'local';
 			$db->update(
@@ -342,7 +343,7 @@ class Tool_Controller extends Controller {
 			->find_all();
 		
 		foreach($protected_tools as $tool)
-			if($tool_data->tool == $tool->id)
+			if($tool_data->system_tool_id == $tool->id)
 				die('Page builder tools are limited to one page');
 
 		
@@ -444,13 +445,13 @@ class Tool_Controller extends Controller {
 			->find_all();
 			
 		foreach($protected_tools as $tool)
-			if($tool->id == $tool_data->tool)
+			if($tool->id == $tool_data->system_tool_id)
 				$protected = TRUE;		
 		
 		$data_array = array(
 			'guid'		=> $tool_data->guid,
 			'name'		=> $tool_data->name,
-			'name_id'	=> $tool_data->tool,
+			'name_id'	=> $tool_data->system_tool_id,
 			'tool_id'	=> $tool_data->tool_id,
 			'scope'		=> $scope,
 			'page_id'	=> $tool_data->page_id,

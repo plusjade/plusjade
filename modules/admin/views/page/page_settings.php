@@ -36,7 +36,8 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	
 		<div id="new_page_url">
 			Link to this page
-			<br><b><?php echo url::site(),$directory,$add_slash?><span id="link_example"><?php echo $filename?></span></b>
+			<br>
+			<strong><?php echo url::site(),$directory,$add_slash?><span id="link_example"><?php echo $filename?></span></strong>
 		</div>
 		<b>Label Name</b><br>
 		<input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" size="30" maxlength="50">
@@ -101,8 +102,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		},
 		success: function(data) {
 			// If the page name changes consider a notification or redirect logic?
-			$.facebox.close();
-			$('#show_response_beta').html(data);					
+			$(document).trigger('server_response.plusjade', data);			
 		}		
 	});
 		

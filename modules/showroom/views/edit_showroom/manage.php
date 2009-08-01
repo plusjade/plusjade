@@ -76,9 +76,8 @@ $(document).ready(function()
 			{category : name, url: url, local_parent : el_id}, function(data){
 			// data is the new "id"
 			$simpleTreeCollection.get(0).addNode(data, name);
-			$('.facebox .show_submit').hide();
 			$('button#add_cat').parent('div').hide();
-			$('#show_response_beta').html(data);
+			$(document).trigger('server_response.plusjade', data);
 		});
 		return false;
 	});
@@ -100,9 +99,8 @@ $(document).ready(function()
 			// data is the new "id"
 			$('li span.active b').html(name);
 			$('li span.active b').attr('rel', url);
-			$('.facebox .show_submit').hide();
 			$('button#edit_cat').parent('div').hide();
-			$('#show_response_beta').html(data);
+			$(document).trigger('server_response.plusjade', data);
 		});
 		return false;
 	});

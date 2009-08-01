@@ -18,7 +18,7 @@
 	
 	</div>
 </div>
-<div id="sortable_images_wrapper" class="common_main_panel full_height" style="height:350px; overflow:auto">	
+<div id="sortable_images_wrapper" class="common_main_panel" style="height:350px; overflow:auto">	
 	<?php
 	foreach($images as $data)
 	{
@@ -49,6 +49,23 @@
 		}
 	});
 
+// make space droppable.	
+	$("#sortable_images_wrapper").droppable({
+		activeClass: 'ui-state-highlight',
+		accept: 'img.image_file',
+		drop: function(event, ui) {
+			$(ui.draggable).addClass('selected');
+			$(ui.draggable).parent('div').addClass('selected');		
+			
+			$('<div></div>')
+			.prepend('<span>drag</span>')
+			.append($(ui.draggable ).clone())
+			.prependTo(this);
+			return false;
+		}
+	});
+	
+
 // Save the album
 	$('button#save_album').click(function(){
 		// the order should matter too.
@@ -59,10 +76,8 @@
 		$('.facebox .show_submit').show();
 		$.post('/get/edit_album/manage/<?php echo $album->id?>', {images : output},
 			function(data){
-				$('#show_response_beta').html(data);
-				$('.facebox .show_submit').hide();
+				$(document).trigger('server_response.plusjade', data);
 			});
-		
 		return false;
 	});	
 </script>

@@ -338,89 +338,26 @@ class Theme_Controller extends Controller {
  * View for logo configuration.
  */
 	public function logo()
-	{		
-		$primary = new View("theme/logo");
-		
-		# Get all uploaded Logos
-		$dir_path	= $this->assets->assets_dir('banners');
-		$url_path	= $this->assets->assets_url('banners');	
-		
-		if(is_dir($dir_path))
-		{
-			$saved_banners = array();
-			$dir = opendir($dir_path);
-			while (TRUE == ($file = readdir($dir))) 
-			{
-				$key = explode('.', $file);
-				$key = $key['0'];
-				if (strpos($file, '.gif', 1)||strpos($file, '.jpg', 1)||strpos($file, '.png', 1) ) 
-					$saved_banners[$key] = $file;
-			}
-			$primary->saved_banners = $saved_banners;
-			$primary->img_path = $url_path;
-			die($primary);
-		}
-		die('Banner directory does not exist.');
-	}
-
-/*
- * Add a logo to the asset repo
- */	
-	public function add_logo()
 	{
-		if(empty($_FILES['image']['name']))
-			die('Please select an image to upload.');  #error
-	
-		$files = new Validation($_FILES);
-		$files->add_rules('image', 'upload::valid','upload::type[gif,jpg,jpeg,png]', 'upload::size[1M]');
-			
-		if (! $files->validate() )
-			die('Unable to upload image');  #error
-			
-		# Temporary file name
-		$filename	= upload::save('image');
-		$image		= new Image($filename);			
-		$ext		= $image->__get('ext');
-		$image_name = basename($filename).'.'.$ext;		
-		$image->save( $this->assets->assets_dir("banners/$image_name") );
-
-		unlink($filename);
-		die("$image_name"); # needed to add to DOM via ajax
-	}
-	
-/*
- * Change the logo
- */
-	public function change_logo()
-	{
-		if($_POST)
+		$url_path	= $this->assets->assets_url();
+		
+		if(!empty($_POST['banner']))
 		{
+			$banner = str_replace("$url_path/",'', $_POST['banner']);
+			
 			$site = ORM::factory('site', $this->site_id);
-			$site->banner = $_POST['banner'];
+			$site->banner = $banner;
 			$site->save();
 
-			if(yaml::edit_site_value($this->site_name, 'site_config', 'banner', $_POST['banner']))
-				die('Banner changed.'); # success		
+			if(yaml::edit_site_value($this->site_name, 'site_config', 'banner', $banner))
+				die('Banner changed.'); # success			
 		}
-		die('Nothing sent.');
+		
+		$primary = new View("theme/logo");		
+		$primary->img_path = $url_path;
+		die($primary);
 	}
 	
-/*
- * Delete a logo 
- * NOTE: deleting file repo assets should already having a handler for this.
- */ 
-	public function delete_logo()
-	{
-		if(empty($_POST['banner']))
-			die('nothing sent');
-			
-		$img_path = $this->assets->assets_dir("banners/{$_POST['banner']}");
-		if(file_exists($img_path))
-			if(unlink($img_path))
-				die('Banner deleted.');
-
-		die('Unable to delete banner'); 
-	}
 
 /*
  * Parses the file for theme tokens and saves the result to disk.

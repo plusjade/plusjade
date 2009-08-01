@@ -31,7 +31,7 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 			$new_item->title		= $_POST['title'];
 			$new_item->desc			= $_POST['desc'];
 			$new_item->save();
-			die('Event added'); # success message
+			die("New Event added id:$new_item->id");
 		}
 
 		$primary = new View("edit_calendar/add_item");
