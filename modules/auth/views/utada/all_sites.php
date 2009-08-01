@@ -9,7 +9,7 @@
 	{
 		echo "<li><div><a href=\"/get/utada/get_site/$site->id\">$site->subdomain</a></div>";
 		echo '<ul style="font-size:0.9em">';
-		foreach($site->users as $user)
+		foreach($site->account_users as $user)
 			echo "<li>$user->username</li>";
 		echo '</ul></li>';
 	}

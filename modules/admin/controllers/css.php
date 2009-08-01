@@ -1,17 +1,18 @@
-<?php
-class Css_Controller extends Controller {
+<?php defined('SYSPATH') or die('No direct script access.');
+
 
 /**
  * Compile the tools css for each page
  * edit css files for each tool
  * This controller shoudl be renamed to a more specific "tool" css controller
  */
-	
+ 
+class Css_Controller extends Controller {
+
 	function __construct()
 	{
 		parent::__construct();
 	}
-
 	
 /*
  * get user custom css for all tools on a page

@@ -47,6 +47,7 @@ function get_site()
 	
 	# IMPORTANT: sets the site name & non-sensitive site_data.
 	$_SESSION['site_name']	= $site_row->subdomain;
+	$_SESSION['created']	= $site_row->created;
 	
 	# Make sure site_config file exists
 	$site_config_path = DATAPATH . "$site_row->subdomain/protected/site_config.yml";
@@ -115,16 +116,16 @@ function get_site()
 			}
 			
 			# Grab the page row
-			$page_object = $db->query("
-				SELECT * FROM pages 
-				WHERE fk_site = '$site_row->id' 
-				AND page_name = '$page_name'
-			")->current();
-			
-			if( is_object($page_object) )
+			$page_object = ORM::factory('page')
+				->where(array(
+					'fk_site' => $site_row->id,
+					'page_name' => $page_name
+				))
+				->find();
+			if($page_object->loaded)
 			{
 				$page = new Build_Page_Controller;
-				die( $page->_index($page_object) );
+				die($page->_index($page_object));
 			}
 			Event::run('system.404');
 			die('Page Not Found');

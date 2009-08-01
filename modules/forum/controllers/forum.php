@@ -1,6 +1,6 @@
 <?php
 
-class Forum_Controller extends Controller {
+class Forum_Controller extends Public_Tool_Controller {
 
 	function __construct()
 	{
@@ -142,7 +142,7 @@ class Forum_Controller extends Controller {
 	private function comments_wrapper($page_name, $tool_id, $post_id)
 	{
 		valid::id_key($post_id);
-		if($_POST AND $this->account_user->logged_in())
+		if($_POST AND $this->account_user->logged_in($this->site_id))
 		{
 			if(empty($_POST['body']))
 				die('Reply cannot be empty.');
@@ -158,7 +158,7 @@ class Forum_Controller extends Controller {
 		}
 
 
-		$account_user_id = ($this->account_user->logged_in())
+		$account_user_id = ($this->account_user->logged_in($this->site_id))
 			? $this->account_user->get_user()->id
 			: FALSE;
 			
@@ -184,7 +184,7 @@ class Forum_Controller extends Controller {
 		$primary = new View('public_forum/posts_comments_wrapper');
 		$primary->post			= $post;
 		$primary->page_name 	= $page_name;	
-		$primary->is_logged_in	= $this->account_user->logged_in();	
+		$primary->is_logged_in	= $this->account_user->logged_in($this->site_id);	
 		$primary->account_user	= $account_user_id;
 		$primary->comments_list = self::comments_list($page_name, $post_id);
 		$primary->selected		= self::tab_selected('votes');		
@@ -203,7 +203,7 @@ class Forum_Controller extends Controller {
 		$sort_by = (empty($_GET['sort']) OR 'votes' == $_GET['sort'])
 			? 'vote_count' : 'created';
 
-		$account_user_id = ($this->account_user->logged_in())
+		$account_user_id = ($this->account_user->logged_in($this->site_id))
 			? $this->account_user->get_user()->id
 			: FALSE;
 			
@@ -227,7 +227,7 @@ class Forum_Controller extends Controller {
 			return 'No comments yet';
 
 		$primary = new View('public_forum/comments_list');
-		$primary->is_logged_in	= $this->account_user->logged_in();	
+		$primary->is_logged_in	= $this->account_user->logged_in($this->site_id);	
 		$primary->page_name		= $page_name;
 		$primary->account_user	= $account_user_id;			
 		$primary->comments		= $comments;
@@ -240,7 +240,7 @@ class Forum_Controller extends Controller {
  */
 	private function my($page_name, $tool_id, $type)
 	{
-		if(!$this->account_user->logged_in())
+		if(!$this->account_user->logged_in($this->site_id))
 			return new View('public_forum/login');
 
 		if(empty($type))
@@ -358,7 +358,7 @@ class Forum_Controller extends Controller {
  */
 	private function submit($page_name, $tool_id)
 	{
-		if(!$this->account_user->logged_in())
+		if(!$this->account_user->logged_in($this->site_id))
 			return new View('public_forum/login');
 			
 		if($_POST)
@@ -404,7 +404,7 @@ class Forum_Controller extends Controller {
 	private function vote($page_name, $tool_id, $comment_id, $vote)
 	{
 		valid::id_key($comment_id);
-		if(!$this->account_user->logged_in())
+		if(!$this->account_user->logged_in($this->site_id))
 			die('Please login to vote.');
 			
 		$has_voted = ORM::factory('forum_comment_vote')
@@ -425,7 +425,8 @@ class Forum_Controller extends Controller {
 		# log the vote.
 		$log_vote = ORM::factory('forum_comment_vote');
 		$log_vote->account_user_id = $this->account_user->get_user()->id;
-		$log_vote->forum_cat_post_comment_id = $comment_id; 
+		$log_vote->forum_cat_post_comment_id = $comment_id;
+		$log_vote->fk_site = $this->site_id; # for site garbage collection.
 		$log_vote->save();
 
 		die('Vote has been accepted!');
@@ -438,7 +439,7 @@ class Forum_Controller extends Controller {
 	private function edit($page_name, $tool_id, $type, $id)
 	{
 		valid::id_key($id);
-		if(!$this->account_user->logged_in())
+		if(!$this->account_user->logged_in($this->site_id))
 			die('Please Login');
 			
 		if($_POST)
@@ -545,7 +546,24 @@ class Forum_Controller extends Controller {
 		die('<br>something is wrong with the url');
 	}
 	
-}/*end*/
+	
+/*
+ */	
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
+	{
+		if($sample)
+		{	
+			$new_cat			= ORM::factory('forum_cat');
+			$new_cat->forum_id	= $tool_id;
+			$new_cat->fk_site	= $site_id;
+			$new_cat->name		= 'Feedback';
+			$new_cat->url		= 'feedback';
+			$new_cat->save();
+		}
+		return 'manage';
+	}
+	
+} /*end*/
 
 #echo'<pre>'; print_r($primary->posts);echo'</pre>';die('asdf');
 

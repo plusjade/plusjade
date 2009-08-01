@@ -3,7 +3,7 @@
 	<ul id="admin_bar">
 	
 		<li class="jade">
-			<a href="http://<?php echo ROOTDOMAIN ?>/get/auth" class="block_mode" title="Go to your user account at +Jade">+Jade</a>
+			<a href="http://<?php echo ROOTDOMAIN ?>/users" class="block_mode" title="Go to your user account at +Jade">+Jade</a>
 		</li>
 
 		<li class="dropdown">
@@ -55,6 +55,14 @@
 			<a href="#" class="toggle_admin_bar block_mode">Hide Admin</a>
 		</li>		
 	</ul>
+	
+	
+	<?php if(empty($this->claimed)):?>
+		<div id="unclaimed_panel">
+			<a href="/get/auth/claim" class="block_mode" rel="facebox">Claim My Website</a>
+			*<u>All updates are saved</u>*, but your website is <b>unclaimed</b> and expires in <b><?php echo $expires['days']?> days, <?php echo $expires['hours']?> hours, <?php echo $expires['mins']?> mins</b>.
+		</div>
+	<?php endif;?>
 	
 	<div style="display:none">
 		<span id="global_css_path"><?php echo $global_css_path?></span>

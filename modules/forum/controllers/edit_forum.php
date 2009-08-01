@@ -106,25 +106,10 @@ class Edit_Forum_Controller extends Edit_Tool_Controller {
 	}
 	
 
-/*
- */	
-	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
-	{
-		if($sample)
-		{	
-			$new_cat			= ORM::factory('forum_cat');
-			$new_cat->forum_id	= $tool_id;
-			$new_cat->fk_site	= $site_id;
-			$new_cat->name		= 'Sample Interesting Topic';
-			$new_cat->url		= valid::filter_php_url('Sample Interesting Topic');
-			$new_cat->save();
-		}
-		return 'manage';
-	}
 	
 /*
  */	
-	public function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($tool_id, $site_id)
 	{
 		# delete items_meta (items)
 		return TRUE;	

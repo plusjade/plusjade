@@ -25,46 +25,10 @@ class Auth_ORM_Driver extends Auth_Driver {
 		// Get the user from the session
 		$user = $this->session->get($this->config['session_key']);
 
-		if (is_object($user) AND $user instanceof User_Model AND $user->loaded)
+		if (is_object($user) AND $user instanceof Account_User_Model AND $user->loaded)
 		{
 			// Everything is okay so far
 			$status = TRUE;
-
-			if ( ! empty($role))
-			{
-
-				// If role is an array
-				if (is_array($role))
-				{
-					// Check each role
-					foreach ($role as $role_iteration)
-					{
-						if ( ! is_object($role_iteration))
-						{
-							$role_iteration = ORM::factory('role', $role_iteration);
-						}
-						// If the user doesn't have the role
-						if( ! $user->has($role_iteration))
-						{
-							// Set the status false and get outta here
-							$status = FALSE;
-							break;
-						}
-					}
-				}
-				else
-				{
-				// Else just check the one supplied roles
-					if ( ! is_object($role))
-					{
-						// Load the role
-						$role = ORM::factory('role', $role);
-					}
-
-					// Check that the user has the given role
-					$status = $user->has($role);
-				}
-			}
 		}
 
 		return $status;
@@ -124,7 +88,7 @@ class Auth_ORM_Driver extends Auth_Driver {
 		if ( ! is_object($user))
 		{
 			// Load the user
-			$user = ORM::factory('user', $user);
+			$user = ORM::factory('account_user', $user);
 		}
 
 		// Mark the session as forced, to prevent users from changing account information
@@ -212,17 +176,8 @@ class Auth_ORM_Driver extends Auth_Driver {
 	 * @param   object   user model object
 	 * @return  void
 	 */
-	protected function complete_login(User_Model $user)
+	protected function complete_login(Account_User_Model $user)
 	{
-		// Update the number of logins
-		$user->logins += 1;
-
-		// Set the last login date
-		$user->last_login = time();
-
-		// Save the user
-		$user->save();
-
 		return parent::complete_login($user);
 	}
 

@@ -82,9 +82,9 @@ class Account_Core {
 	 * @param   string   role name
 	 * @return  boolean
 	 */
-	public function logged_in($role = NULL)
+	public function logged_in($site_id, $role = NULL)
 	{
-		return $this->driver->logged_in($role);
+		return $this->driver->logged_in($site_id, $role);
 	}
 
 	
@@ -114,7 +114,7 @@ class Account_Core {
 		if (is_string($password))
 		{
 			// Get the salt from the stored password
-			$salt = $this->find_salt($this->driver->password($username));
+			$salt = $this->find_salt($this->driver->password($fk_site, $username));
 
 			// Create a hashed password using the salt from the stored password
 			$password = $this->hash_password($password, $salt);

@@ -6,7 +6,7 @@
  * you are encouraged to set this option. An empty setting allows the cookie
  * to be read by any website domain.
  */
-$config['domain'] = '';
+$config['domain'] = '.localhost.com';
 
 /**
  * Restrict cookies to a specific path, typically the installation directory.
@@ -17,7 +17,7 @@ $config['path'] = '/';
  * Lifetime of the cookie. A setting of 0 makes the cookie active until the
  * users browser is closed or the cookie is deleted.
  */
-$config['expire'] = 0;
+$config['expire'] = 604800;
 
 /**
  * Enable this option to only allow the cookie to be read when using the a

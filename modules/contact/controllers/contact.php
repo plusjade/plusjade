@@ -1,6 +1,6 @@
 <?php
 
-class Contact_Controller extends Controller {
+class Contact_Controller extends Public_Tool_Controller {
 
 	function __construct()
 	{
@@ -83,4 +83,13 @@ class Contact_Controller extends Controller {
 		$primary->link = $item->value;	
 		die($primary);
 	}
-}
+	
+	
+	public static function _tool_adder($tool_id, $site_id)
+	{
+		return 'add';
+	}
+	
+	
+} # end
+

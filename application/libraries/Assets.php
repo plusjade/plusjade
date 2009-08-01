@@ -1,7 +1,5 @@
 <?php defined('SYSPATH') or die('No direct script access.');
  
-class Assets_Core {
-
 /*
  * Assets scope is relative to a websites static assets folder which is located
  * at /public/_data/<site_name>
@@ -10,6 +8,7 @@ class Assets_Core {
 	## the base directory path is DATAPATH . "$this->site_name";
  */
 
+class Assets_Core {
  
 	public function __construct($site_name, $theme)
 	{

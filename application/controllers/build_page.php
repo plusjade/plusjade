@@ -1,4 +1,6 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
+
 class Build_Page_Controller extends Template_Controller {
 
 	function __construct()
@@ -16,7 +18,7 @@ class Build_Page_Controller extends Template_Controller {
 	function _index($page)
 	{
 		# deny access to disabled pages if not logged in
-		if('no' == $page->enable AND !$this->client->logged_in() )
+		if('no' == $page->enable AND !$this->client->can_edit($this->site_id))
 		{
 			Event::run('system.404');
 			die('Page Not Found');		
@@ -49,14 +51,18 @@ class Build_Page_Controller extends Template_Controller {
 		# _load_admin() is in the template_controller
 		$admin_mode = $this->_load_admin($page->id, $page->page_name);
 		
-		
-		if( $tools->count() > 0 )
+		# plusjade homepage hack.
+		if(ROOTACCOUNT === $this->site_name AND $this->homepage == $page->page_name)
+			$containers_array['1'] = Home_Controller::_index();
+
+
+		if($tools->count() > 0)
 		{	
 			foreach ($tools as $tool)
 			{
 				# If Logged in wrap classes around tools for Javascript
 				# TODO: consider this with javascript
-				if($this->client->logged_in())
+				if($this->client->can_edit($this->site_id))
 				{
 					$scope		= ('5' >= $tool->page_id) ? 'global' : 'local';
 					$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper '.$scope.'">';
@@ -79,9 +85,11 @@ class Build_Page_Controller extends Template_Controller {
 				
 				# Add tools to correct container.
 				# if page_id <= 5, its not a real page_id = global container.
-				(int) $index = (5 <= $tool->page_id ) ? $tool->container : $tool->page_id ;
-				$containers_array[$index] .= $tool_object;		
-			}		
+				(int) $index = (5 <= $tool->page_id)
+					? $tool->container
+					: $tool->page_id ;
+				$containers_array[$index] .= $tool_object;
+			}
 		}
 		
 		# Drop Tool array into admin Panel if logged in

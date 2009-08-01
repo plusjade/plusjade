@@ -128,19 +128,15 @@ class Edit_Faq_Controller extends Edit_Tool_Controller {
 /*
  * Configure faq tool settings
  */ 
-	function settings($tool_id=NULL)
+	public function settings($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
 		die("Faq settings are temporarily disabeled while we update our system. Thanks!");
 	}
 
+
 	
-	static function _tool_adder($tool_id, $site_id)
-	{
-		return 'add';
-	}
-	
-	static function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($tool_id, $site_id)
 	{
 		ORM::factory('faq_item')
 			->where(array(

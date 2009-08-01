@@ -1,23 +1,18 @@
+
+
 <div class="change_password_wrapper">
-	<?php
-	if(TRUE == $success)
-	{
-		?>
+	<?php if(TRUE == $success):?>
 		Your password has been changed!
 		<p>An email has been sent to confirm these changes.</p>
 		Thanks. =D
-		<?php
-	}
-	else
-	{
-		?>
+	<?php else:?>
 		<form id="account_change_password" action="<?php echo url::site("$page_name/change_password")?>" method="POST">
 			
 			<div id="auth_form" class="create_form">
 			
 				<div class="aligncenter">
 					New Password must be 5+ characters.
-					<br><?php echo $error?>
+					<br><b style="color:red"><?php echo $error?></b>
 				</div>
 				
 				<div class="fieldsets">
@@ -42,9 +37,7 @@
 				</div>
 			</div>
 		</form>
-		<?php
-	}
-	?>
+	<?php endif;?>
 </div>
 
 <script type="text/javascript">

@@ -1,11 +1,12 @@
-<?php
-class Admin_Controller extends Controller {
+<?php defined('SYSPATH') or die('No direct script access.');
 
 /**
  * sitewide admin functions for the current site
  * note: not for current user (these are at the root +jade site)
  */
-	
+ 
+class Admin_Controller extends Controller {
+
 	function __construct()
 	{
 		parent::__construct();

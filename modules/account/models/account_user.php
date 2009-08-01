@@ -4,7 +4,7 @@ class Account_User_Model extends ORM {
 
 	// Relationships
 	protected $has_many = array('account_user_tokens');
-	protected $has_and_belongs_to_many = array('account_user_roles', 'forum_comment_votes');
+	protected $has_and_belongs_to_many = array('sites', 'account_user_roles', 'forum_comment_votes');
 
 	// Columns to ignore
 	protected $ignored_columns = array('password_confirm');

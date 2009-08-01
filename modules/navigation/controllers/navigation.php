@@ -1,6 +1,6 @@
 <?php
 
-class Navigation_Controller extends Controller {
+class Navigation_Controller extends Public_Tool_Controller {
 
 	function __construct()
 	{
@@ -30,6 +30,35 @@ class Navigation_Controller extends Controller {
 		$primary->tree = Tree::display_tree('navigation', $navigation->navigation_items);
 		return $this->public_template($primary, 'navigation', $tool_id, $navigation->attributes);
 	}
-  
+ 
+/*
+ * Need to add a root child to items list for every other
+ * child to belong to
+ * Add root child id to parent for easier access.
+ */		 
+	public static function _tool_adder($tool_id, $site_id)
+	{
+		# this can all be done in the overloaded save function for
+		# navigations model - look into it.
+		
+		$new_item = ORM::factory('navigation_item');
+		$new_item->navigation_id	= $tool_id;
+		$new_item->fk_site			= $site_id;
+		$new_item->display_name		= 'ROOT';
+		$new_item->type				= 'none';
+		$new_item->data				= 0;
+		$new_item->local_parent		= 0;
+		$new_item->save();
+			
+		$navigation = ORM::factory('navigation')
+			->where('fk_site', $site_id)
+			->find($tool_id);
+		
+		$navigation->root_id = $new_item->id;
+		$navigation->save();
+		
+		return 'manage';
+	}
+	
 }  /* -- end -- */
 

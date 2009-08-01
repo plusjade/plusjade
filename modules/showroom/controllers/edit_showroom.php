@@ -321,34 +321,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	}
 	
 
-/*
- * Need this to enable nested showroom categories
- * Need to add a root child to items list for every other
- * child to belong to
- * Add root child id to parent for easier access.
- */	
-	function _tool_adder($tool_id)
-	{
-	
-		# this can all be done in the overloaded save function for
-		# navigations model - look into it.	
-		$new_cat = ORM::factory('showroom_cat');
-		$new_cat->showroom_id	= $tool_id;
-		$new_cat->fk_site		= $this->site_id;
-		$new_cat->name			= 'ROOT';
-		$new_cat->local_parent	= 0;
-		$new_cat->position		= 0;
-		$new_cat->save();
-			
-		$showroom = ORM::factory('showroom')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);
-		
-		$showroom->root_id = $new_cat->id;
-		$showroom->save();
 
-		return 'manage';
-	}
 	
 /*
  * TODO: This works but we need to make this ORM.

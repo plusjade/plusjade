@@ -9,7 +9,7 @@ Site Subdomain: <?php echo $site->subdomain?>
 
 <h3>Users with admin access:</h3>
 <?php
-	foreach($users as $user)
+	foreach($site->account_users as $user)
 	{
 		echo "$user->username<br>";
 	}
@@ -23,6 +23,7 @@ Site Subdomain: <?php echo $site->subdomain?>
 	<br>	
 	<form action="/get/utada/grant_access" method="post">
 		Grant Temp Access
+		<input type="hidden" name="site_name" value="<?php echo $site->subdomain?>">
 		<input type="hidden" name="site_id" value="<?php echo $site->id?>">
 		<br>Password: <input type="password" name="password" maxlength="20">
 		<button type="submit">Submit</button>

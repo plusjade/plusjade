@@ -1,6 +1,7 @@
 ﻿
 $(document).ready(function()
 {
+
 /*
  * TOGGLE ADMIN BAR	
  */
@@ -317,10 +318,12 @@ $('body').keyup($.delegate({
 				$('#show_response_beta').html('waiting for response...');
 			},
 			success: function(data) {
+				$('.facebox form button')
+				.removeAttr('disabled')
+				.addClass('jade_positive');
+				
 				// if 2 fbs are active, we assume the form is submitted from 2
-				// so we close only box 2, else close everything.
-				
-				
+				// so we close only box 2, else close everything.				
 				/* TESTING : disable auto facebox close */
 				//var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
 				//$.facebox.close(whichBox);

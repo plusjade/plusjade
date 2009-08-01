@@ -1,6 +1,6 @@
 <?php
 
-class Calendar_Controller extends Controller {
+class Calendar_Controller extends Public_Tool_Controller {
 
 	function __construct()
 	{
@@ -154,5 +154,25 @@ class Calendar_Controller extends Controller {
 		die('something is wrong with the url');
 	}
 	
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
+	{
+		if($sample)
+		{			
+			$new_item = ORM::factory('calendar_item');
+			$new_item->fk_site		= $site_id;
+			$new_item->calendar_id	= $tool_id;
+			$new_item->year			= date("Y");
+			$new_item->month		= date("m");
+			$new_item->day			= date("d");
+			$new_item->title		= 'New Website Launch!';
+			$new_item->desc			= "Pizza party at my house to celebrate my new website launch. Starts at 3pm, bring your buddies!";
+			$new_item->save();		
+		}
+		return 'add';
+	}
 	
-}
+	
+	
+} # end 
+
+

@@ -9,8 +9,14 @@ class Utada_Controller extends Template_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		if(ROOTACCOUNT != $this->site_name OR !$this->client->logged_in(2) )
-			die('invalid credentials');
+		# $this->client->get_user()->id
+		# is the account_user who can_edit this site. 
+		# but checking on this requires that i first enter "can_edit" mode.
+		
+		if(ROOTACCOUNT != $this->site_name
+			OR !$this->account_user->logged_in($this->site_id)
+			OR 'jade' != $this->account_user->get_user()->username)
+				die('invalid credentials');
 		
 		$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-");
 		$this->template->linkCSS('/_assets/css/admin_global.css');
@@ -22,7 +28,7 @@ class Utada_Controller extends Template_Controller {
  */	
 	public function index()
 	{
-		$user = ORM::factory('user', $this->client->get_user()->id);
+		$user = ORM::factory('account_user', $this->account_user->get_user()->id);
 		$primary = new View('utada/index');		
 		$primary->sites = $user->sites;
 		parent::build_output($primary);
@@ -34,7 +40,9 @@ class Utada_Controller extends Template_Controller {
 	public function all_users()
 	{			
 		$primary = new View('utada/all_users');
-		$primary->users = ORM::factory('user')->find_all();
+		$primary->users = ORM::factory('account_user')
+			->where('fk_site', $this->site_id)
+			->find_all();
 		die($primary);
 	}
 
@@ -47,19 +55,6 @@ class Utada_Controller extends Template_Controller {
 		$primary = new View('utada/all_sites');
 		$primary->sites = ORM::factory('site')->find_all();
 		die($primary);
-		
-		$db = new Database;
-		$sites = $db->query("
-			SELECT sites.*,
-			GROUP_CONCAT(users.username) as users_string
-			FROM sites
-			LEFT JOIN sites_users ON sites.id = sites_users.site_id
-			LEFT JOIN users ON sites_users.user_id = users.id
-			GROUP BY sites.subdomain
-			ORDER BY sites.subdomain
-		");
-		$primary->sites = $sites;
-		die($primary);
 	}
 
 /*
@@ -68,20 +63,9 @@ class Utada_Controller extends Template_Controller {
 	public function get_site($site_id=NULL)
 	{
 		valid::id_key($site_id);		
-		
 		$site = ORM::factory('site', $site_id);
-		
-		$db = new Database;
-		$users = $db->query("
-			SELECT sites_users.*, users.username 
-			FROM sites_users
-			JOIN users ON sites_users.user_id = users.id
-			WHERE sites_users.site_id='$site_id'
-		");	
 		$primary = new View('utada/get_site');
 		$primary->site = $site;
-		$primary->users = $users;
-		
 		die($primary);
 	}
 
@@ -107,14 +91,12 @@ class Utada_Controller extends Template_Controller {
 	{
 		if('adjf8w9eu4589ua8a' === $_POST['password'])
 		{
-			# Create a sites_users access row for the master account
-			$user = ORM::factory('user', $this->client->get_user()->id);
+			# Create access row for the master account
+			$user = ORM::factory('account_user', $this->account_user->get_user()->id);
 			$user->add(ORM::factory('site', valid::id_key($_POST['site_id'])));
 			$user->save();
 			
-			$first	= text::random('numeric', 5);
-			$last	= text::random('numeric', 6);
-			$link	= '<a href="http://'. ROOTDOMAIN ."/get/auth/manage?site=$first$site_id$last".'">Go to site</a>';
+			$link	= '<a href="http://'."$_POST[site_name].". ROOTDOMAIN ."/get/auth/manage?tKn=$user->token".'">Go to site</a>';
 			die("access granted: Remember to delete when finished.<br>$link");
 		}
 		die('invalid');
@@ -128,9 +110,9 @@ class Utada_Controller extends Template_Controller {
 	{
 		valid::id_key($site_id);
 		$user_id = ((NULL === $user_id)) ?
-			$this->client->get_user()->id : $user_id;
+			$this->account_user->get_user()->id : $user_id;
 		
-		$user = ORM::factory('user', $user_id);
+		$user = ORM::factory('account_user', $user_id);
 		$user->remove(ORM::factory('site', $site_id));
 		$user->save();
 		die('access removed');
@@ -157,9 +139,12 @@ class Utada_Controller extends Template_Controller {
 
 		# delete site rows.
 		$site = ORM::factory('site', $site_id);
-		$site->remove(ORM::factory('site', $site_id));
+		#$site->remove(ORM::factory('site', $site_id));
 		$site->delete();
 		
+		#hack to remove access privelages to sites that dont exist.
+		$db = new Database;
+		$db->delete('account_users_sites', "site_id = '$site_id'");
 		
 		# NOTE (see the clean_db method in this class)
 
@@ -184,16 +169,12 @@ class Utada_Controller extends Template_Controller {
 		$table_names = array();
 		$protected_tables = array(
 			'account_roles',
-			'account_user_tokens',
+			'account_users_sites',
+			'account_user_tokens', #these will expire after awhile.
 			'contact_types',
-			'roles',
-			'roles_users',
+			'system_tools',
 			'sites',
 			'themes',
-			'tools_list',
-			'users',
-			'user_tokens',
-			'sites_users',
 			'version',
 		);
 		
@@ -211,23 +192,20 @@ class Utada_Controller extends Template_Controller {
 			if(! empty($table_names[$table]) )
 				unset($table_names[$table]);	
 		
-		#troubleshoot
-		echo'<pre>'; print_r($table_names);echo '</pre>'; die();
+
 		
 		# Get all site ids
-		$sites = $db->query("
-			SELECT site_id FROM sites
-		");	
-		foreach($sites as $site)
-			$site_ids[] = $site->site_id;
+		$all_sites = ORM::factory('site')->find_all();
+		foreach($all_sites as $site)
+			$site_ids[] = $site->id;
 
 		$id_string = implode(',', $site_ids);
 		
 		# Id string to view for convenience
 		$primary->site_count = count($site_ids);
 		$primary->id_string = $id_string;
-
 		
+
 		# Find all orphaned assets based on fk_site
 		$results = array();
 		foreach($table_names as $table)
@@ -237,22 +215,29 @@ class Utada_Controller extends Template_Controller {
 
 			$table_object = $db->query("
 				SELECT fk_site 
-				FROM $table WHERE fk_site 
+				FROM $table
+				WHERE fk_site 
 				NOT IN ($id_string)
 			");		
 			
-			if( $table_object->count() > 0 )
+			#If orphans exists, delete all rows having fk_site...
+			if($table_object->count() > 0)
 			{
 				foreach($table_object as $row)
-					$results[$table] .= "$row->$id<br>";
-				
-				# If orphans exists, delete all rows having fk_site...
-				$db->delete($table, array("fk_site" => "$row->fk_site") );
+				{
+					$results["$table"] .= "$row->fk_site<br>";
+					$db->delete($table, array('fk_site' => $row->fk_site));
+				}
 			}
 			else
 				$results[$table] = 'clean';
 		}
-	
+
+		# troubleshoot
+		# echo $id_string;
+		# echo'<pre>'; print_r($table_names);echo '</pre>'; die();
+		#echo'<pre>'; print_r($results);echo '</pre>'; die();
+		
 		$primary->results = $results;
 		die($primary);
 	}

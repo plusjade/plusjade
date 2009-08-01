@@ -18,7 +18,7 @@ class Account_ORM_Driver extends Account_Driver {
 	 * @param   array    collection of role names
 	 * @return  boolean
 	 */
-	public function logged_in($role)
+	public function logged_in($site_id, $role)
 	{
 		$status = FALSE;
 
@@ -27,9 +27,15 @@ class Account_ORM_Driver extends Account_Driver {
 
 		if (is_object($user) AND $user instanceof Account_User_Model AND $user->loaded)
 		{
+			# does the user belong to this site?
+			if($user->fk_site == $site_id)
+				return TRUE;
+				
+			return FALSE;
+				
 			// Everything is okay so far
 			$status = TRUE;
-
+			/*
 			if ( ! empty($role))
 			{
 
@@ -65,6 +71,7 @@ class Account_ORM_Driver extends Account_Driver {
 					$status = $user->has($role);
 				}
 			}
+			*/
 		}
 
 		return $status;
@@ -83,14 +90,12 @@ class Account_ORM_Driver extends Account_Driver {
 		if ( ! is_object($user))
 		{
 			// Load the user
-			$user = ORM::factory('account_user', $user);
+			$user = ORM::factory('account_user')
+				->where('fk_site', $fk_site)
+				->find($user);
 		}
-
-		// If this user belongs to this site AND
 		// the passwords match, perform a login
-			// omit role checks for now.
-			// if ($user->has(ORM::factory('role', 'login')) AND $user->password === $password)
-		if ($user->fk_site === $fk_site AND $user->password === $password)
+		if ($user->password === $password)
 		{
 			if ($remember === TRUE)
 			{
@@ -197,12 +202,14 @@ class Account_ORM_Driver extends Account_Driver {
 	 * @param   mixed   username
 	 * @return  string
 	 */
-	public function password($user)
+	public function password($fk_site, $user)
 	{
 		if ( ! is_object($user))
 		{
 			// Load the user
-			$user = ORM::factory('account_user', $user);
+			$user = ORM::factory('account_user')
+				->where('fk_site', $fk_site)
+				->find($user);
 		}
 
 		return $user->password;

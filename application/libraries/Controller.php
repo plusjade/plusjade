@@ -15,23 +15,25 @@ abstract class Controller_Core {
 	# Allow all controllers to run in production by default
 	const ALLOW_PRODUCTION = TRUE;
 	
-	/**
-	 * Loads URI, and Input into this controller.
-	 *
-	 * @return  void
-	 */
+/**
+ * Loads URI, and Input into this controller.
+ *
+ * @return  void
+ */
 	public function __construct()
 	{
+		#echo '<pre>'; print_r($_SESSION); echo '</pre>'; die();
+		
 		$session	 = Session::instance();
 		$site_config = yaml::parse($_SESSION['site_name'], 'site_config');
 		
 		foreach($site_config as $key => $value)
 			$this->$key = $value ;
 	
-		# Auth Instance
-		$this->client = new Auth;	
+		# Auth Instance for editing site capability
+		$this->client = new Auth($this->claimed);	
 		
-		# account instance Instance
+		# Account Instance for user account tool.
 		$this->account_user = new Account;
 		
 		# assets instance to fetch datapath urls.
@@ -51,13 +53,13 @@ abstract class Controller_Core {
 	}
 
 
-	/**
-	 * Includes a View within the controller scope.
-	 *
-	 * @param   string  view filename
-	 * @param   array   array of view variables
-	 * @return  string
-	 */
+/**
+ * Includes a View within the controller scope.
+ *
+ * @param   string  view filename
+ * @param   array   array of view variables
+ * @return  string
+ */
 	public function _kohana_load_view($kohana_view_filename, $kohana_input_data)
 	{
 		if ($kohana_view_filename == '')
@@ -86,91 +88,13 @@ abstract class Controller_Core {
 		return ob_get_clean();
 	}
 	
-/*
-  Each initial tool view is called view <toolname>::_index()
-  in public view the index displays only html
-  in admin view each tool_output has to be 100% self_contained.
-	so we inject appropriate CSS, html, and javascript =D
-	
-	## rename to "tool_view_template"
- */	
-	function public_template($primary, $toolname, $tool_id, $attributes='')
-	{
-		$template				= new View('public_tool_wrapper');		
-		$template->primary		= $primary;
-		$template->toolname		= $toolname;
-		$template->tool_id		= $tool_id;
-		$template->attributes	= $attributes;
-		$template->readyJS		= '';
-		$template->custom_css	= '';
-		
-		if($this->client->can_edit($this->site_id))
-		{
-			# Get CSS
-			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
-			$contents	= (file_exists($custom_css))
-				? file_get_contents($custom_css)
-				: Tool_Controller::_generate_tool_css($toolname, $tool_id, $this->site_name, $this->theme, TRUE);
-
-			$template->custom_css = "
-				<style type=\"text/css\" id=\"$toolname-$tool_id-style\">
-					$contents
-				</style>
-			";			
-			
-			# Get Javascripts
-			# grab the index javascript and insert it inline.
-			$js_file = MODPATH . "$toolname/views/public_$toolname/js/index.js";
-			if(file_exists($js_file))
-			{
-				$contents = file_get_contents($js_file);			
-				$contents = str_replace('%VAR%', $tool_id , $contents);
-				$template->readyJS = "
-					<script type=\"text/javascript\">
-						$(document).ready(function(){
-							$contents
-						});
-					</script>
-				";
-			}
-		}
-		else
-		{
-			/* # public view:
-			 *	css is handled via /get/css/tools/page_id link
-			 *	js is handled in the same way @ view library
-			 */
-			$template->readyJS($toolname, 'index', $tool_id);
-		}	
-		
-		return $template;
-	}
-
-/*
- * protected pages must maintain their page_name path
- * especially in cases of ajax requests or when on homepage
- # quick hack, optimize later...
- # we can probably do this using pages_config.yaml
+/**
+ * Handles methods that do not exist.
+ *
+ * @param   string  method name
+ * @param   array   arguments
+ * @return  void
  */
-	public function get_page_name($page_name, $toolname, $tool_id)
-	{
-		if(! empty($page_name) )
-			if('get' == $page_name)
-				return yaml::does_value_exist($this->site_name, 'pages_config', "$toolname-$tool_id");
-			else
-				return $page_name;
-		
-		return $this->homepage;
-	}
-	
-	
-	/**
-	 * Handles methods that do not exist.
-	 *
-	 * @param   string  method name
-	 * @param   array   arguments
-	 * @return  void
-	 */
 	public function __call($method, $args)
 	{
 		# Default to showing a 404 page

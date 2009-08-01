@@ -5,7 +5,7 @@
 	Hello, <b><?php echo $account_user->username?>!</b>
 	</p>
 
-	Hello and welcome to the friend Tool =D
+	Welcome to your user account.
 	<br>
 	You are currently logged in
 	<br>

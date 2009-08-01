@@ -38,7 +38,8 @@ class yaml_Core {
 				'theme'			=> '',
 				'banner'		=> '',
 				'homepage'		=> '',
-				'account_page'	=> ''
+				'account_page'	=> '',
+				'claimed'		=> ''
 			);
 
 		if(file_exists($config_path))
@@ -241,6 +242,7 @@ class yaml_Core {
 			'%THEME%',
 			'%BANNER%',
 			'%HOMEPAGE%',
+			'%CLAIMED%',
 		);
 		if(!file_put_contents($site_config_path, str_replace($keys, $replacements , $template)))
 			die('Could not create site_config.yml file.');	

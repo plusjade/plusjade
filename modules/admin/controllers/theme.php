@@ -1,14 +1,16 @@
-<?php
-class Theme_Controller extends Controller {
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
 
 /**
  *	Provides CRUD for theme and theme assets 
  *	
  */	 
+class Theme_Controller extends Controller {
+
 	function __construct()
 	{
 		parent::__construct();
-		if(! $this->client->can_edit($this->site_id) )
+		if(!$this->client->can_edit($this->site_id))
 		{
 			# hack for allowing swfupload to work in authenticated session...
 			if( empty($_POST['PHPSESSID']) )
@@ -20,7 +22,7 @@ class Theme_Controller extends Controller {
  * manage theme assets via file browser
  * 
  */
-	function index()
+	public function index()
 	{		
 		$themes	= Jdirectory::contents($this->assets->themes_dir(), 'root', 'list_dir', 'safe_mode');
 		
@@ -58,7 +60,7 @@ class Theme_Controller extends Controller {
 /*
  * display the view to add files to a theme
  */
-	function add_files($theme=NULL)
+	public function add_files($theme=NULL)
 	{
 		$primary = new View('theme/add_files');
 		$primary->theme = $theme;
@@ -133,7 +135,7 @@ class Theme_Controller extends Controller {
 /*
  * add a new blank theme folder structure to theme repo.
  */
-	function add_theme()
+	public function add_theme()
 	{
 		if(empty($_POST['theme']) OR 'safe_mode' == trim($_POST['theme']))
 			die('No theme sent');
@@ -156,7 +158,7 @@ class Theme_Controller extends Controller {
 /*
  * edit active theme's global templates/stylesheets
  */
-	function edit($type=NULL)
+	public function edit($type=NULL)
 	{
 		if('safe_mode' == $this->theme)
 			die('You are in safe-mode. Cannot edit this theme.');
@@ -194,7 +196,7 @@ class Theme_Controller extends Controller {
  * load a file from theme repo into the textarea editor
  * works with self::stylesheets and self::templates
  */	
-	function load($folder=NULL, $filename=NULL)
+	public function load($folder=NULL, $filename=NULL)
 	{
 		if('templates' != $folder AND 'css' != $folder)
 			die('invalid folder');
@@ -212,7 +214,7 @@ class Theme_Controller extends Controller {
  * save a file to the active theme repo
  * only used @ edit views so should only be active theme.
  */
-	function save($folder=NULL, $file=NULL)
+	public function save($folder=NULL, $file=NULL)
 	{
 		if('templates' != $folder AND 'css' != $folder)
 			die('invalid folder');
@@ -232,7 +234,7 @@ class Theme_Controller extends Controller {
 /*
  * delete a file or folder from the theme repo
  */
-	function delete($path=NULL)
+	public function delete($path=NULL)
 	{
 		if(NULL == $path)
 			die('No path sent');
@@ -273,7 +275,7 @@ class Theme_Controller extends Controller {
 /*
  * Change the site's theme
  */
-	function change()
+	public function change()
 	{
 		if(! empty($_POST['theme']))
 		{
@@ -335,7 +337,7 @@ class Theme_Controller extends Controller {
 /*
  * View for logo configuration.
  */
-	function logo()
+	public function logo()
 	{		
 		$primary = new View("theme/logo");
 		
@@ -364,7 +366,7 @@ class Theme_Controller extends Controller {
 /*
  * Add a logo to the asset repo
  */	
-	function add_logo()
+	public function add_logo()
 	{
 		if(empty($_FILES['image']['name']))
 			die('Please select an image to upload.');  #error
@@ -389,7 +391,7 @@ class Theme_Controller extends Controller {
 /*
  * Change the logo
  */
-	function change_logo()
+	public function change_logo()
 	{
 		if($_POST)
 		{
@@ -407,7 +409,7 @@ class Theme_Controller extends Controller {
  * Delete a logo 
  * NOTE: deleting file repo assets should already having a handler for this.
  */ 
-	function delete_logo()
+	public function delete_logo()
 	{
 		if(empty($_POST['banner']))
 			die('nothing sent');
@@ -495,6 +497,7 @@ class Theme_Controller extends Controller {
 	
 /*
  * Change the site's theme
+ * note: if we call this statically, it does not run the construct
  */
 	public static function _new_website_theme($site_name, $theme)
 	{

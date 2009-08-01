@@ -316,13 +316,27 @@ ul#admin_bar{
 	height:35px;
 	margin:0 auto;
 	padding:0;
-	background-attachment:fixed;
 	background:skyblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -500px !important;	
 	border:1px solid #333;
 	border-top:0;
 	color:#fff;
 	text-align:left;
 	list-style:none;
+}
+#unclaimed_panel{
+	min-width:750px;
+	width:70%;
+	margin:0 auto;
+	padding:6px 10px;
+	background:#ffffcc;
+	color:#444;
+	text-align:left;
+	border:1px solid #000;
+}
+#unclaimed_panel a{
+	display:block;
+	float:right;
+	
 }
 #tool_bar_wrapper{
 	min-width:880px;

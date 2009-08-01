@@ -3,3 +3,4 @@ site_name:%SITE_NAME%
 theme:%THEME%
 banner:%BANNER%
 homepage:%HOMEPAGE%
+claimed:%CLAIMED%

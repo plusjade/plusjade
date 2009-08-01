@@ -38,7 +38,7 @@ abstract class Account_Driver {
 	 * @param   string   role name (not supported)
 	 * @return  boolean
 	 */
-	public function logged_in($role)
+	public function logged_in($site_id, $role)
 	{
 		return isset($_SESSION[$this->config['session_key']]);
 	}
@@ -46,17 +46,14 @@ abstract class Account_Driver {
 	/**
 	 * Gets the currently logged in user from the session.
 	 * Returns FALSE if no user is currently logged in.
+	 
+	 * this breaks either way so lets hack it up.
 	 *
 	 * @return  mixed
 	 */
 	public function get_user()
 	{
-		if ($this->logged_in(NULL))
-		{
-			return $_SESSION[$this->config['session_key']];
-		}
-
-		return FALSE;
+		return $_SESSION[$this->config['session_key']];
 	}
 
 	/**
@@ -111,7 +108,8 @@ abstract class Account_Driver {
 		}
 
 		// Double check
-		return ! $this->logged_in(NULL);
+		return FALSE;
+		#return ! $this->logged_in(NULL);
 	}
 
 	/**
@@ -120,7 +118,7 @@ abstract class Account_Driver {
 	 * @param   mixed   username
 	 * @return  string
 	 */
-	abstract public function password($username);
+	abstract public function password($fk_site, $username);
 
 	/**
 	 * Completes a login by assigning the user to the session key.

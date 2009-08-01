@@ -52,5 +52,29 @@ ALTER TABLE `accounts` ADD UNIQUE (
 );
 
 
+CREATE TABLE `plusjade`.`account_users_sites` (
+`account_user_id` INT( 9 ) UNSIGNED NOT NULL ,
+`site_id` INT( 9 ) UNSIGNED NOT NULL
+) ENGINE = MYISAM ;
+
+
+DROP TABLE `sites_users`;
+DROP TABLE `user_tokens`;
+DROP TABLE `roles_users`;
+DROP TABLE `roles`;
+DROP TABLE `users`;
+
+ALTER TABLE `forum_comment_votes` ADD `fk_site` INT( 7 ) NOT NULL ;
+
+ALTER TABLE `sites` ADD `claimed` ENUM( 'yes', 'no' ) NOT NULL ,
+ADD `created` INT( 10 ) NOT NULL ;
+
+ALTER TABLE `sites` CHANGE `claimed` `claimed` ENUM( 'yes', 'no' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'no'
+
+UPDATE `plusjade`.`themes` SET `enabled` = 'no' WHERE `themes`.`id` =9 LIMIT 1 ;
+
+
+
+
 
 

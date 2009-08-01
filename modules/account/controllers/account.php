@@ -1,13 +1,12 @@
-<?php
-
-class Account_Controller extends Controller {
-
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 /*
  * Public creation, management, and viewing of user accounts in +Jade.
  *
  * $this->account_user is centrally available via the Controller library core.	
 */
-	
+
+class Account_Controller extends Public_Tool_Controller {
+
 	function __construct()
 	{
 		parent::__construct();
@@ -60,13 +59,22 @@ class Account_Controller extends Controller {
 				$primary = $this->display_login($page_name);
 				return $this->public_template($primary, 'account', $tool_id, '');
 				break;		
+
+
+			/* plusjade stuff only */	
+			case 'safe_mode':
+				$content = self::safe_mode($page_name, $username);
+				break;	
+			case 'new_website':
+				$content = self::new_website($page_name);
+				break;
 				
 			default:
 				die("$page_name : $action : trigger 404 not found");
 		}
 		
 		# the logic above will determine whether the user is logged in/out
-		$wrapper = ($this->account_user->logged_in())
+		$wrapper = ($this->account_user->logged_in($this->site_id))
 			? new View('public_account/dashboard')
 			: new View('public_account/index');
 		$wrapper->content = $content;
@@ -92,26 +100,38 @@ class Account_Controller extends Controller {
 	}
 	
 
+
+	
 /*
  * show views based on if user is logged in or not.
  * output raw contents.
  */
 	private function dashboard($page_name)
 	{
-		if($this->account_user->logged_in())
+		if($this->account_user->logged_in($this->site_id))
 		{
-			$primary = new View('public_account/dashboard_index');
-			$primary->account_user = $this->account_user->get_user();	
-		}
-		elseif(! empty($_POST['username']) )
-		{
-			$account_user = ORM::factory('account_user', $_POST['username']);
-			
-			# TRUE means to save token for auto login
-			if($this->account_user->login($account_user, (int)$this->site_id, $_POST['password'], TRUE))
+			if(ROOTACCOUNT === $this->site_name)
+			{
+				$primary = self::plusjade_dashboard($page_name);
+			}
+			else
 			{
 				$primary = new View('public_account/dashboard_index');
 				$primary->account_user = $this->account_user->get_user();
+			}
+		}
+		elseif(! empty($_POST['username']) )
+		{
+			# atttempt to log user in.
+			if($this->account_user->login($_POST['username'], (int)$this->site_id, $_POST['password'], TRUE))
+			{
+				if(ROOTACCOUNT === $this->site_name)
+					$primary = self::plusjade_dashboard($page_name);
+				else
+				{
+					$primary = new View('public_account/dashboard_index');
+					$primary->account_user = $this->account_user->get_user();
+				}
 			}
 			else
 			{
@@ -125,13 +145,50 @@ class Account_Controller extends Controller {
 		$primary->page_name = $page_name;
 		return $primary;
 	}
+
 /*
- * Create a new account for this website.
- * must return a view.
+ * display the login view
+ */	
+	private function display_login($page_name)
+	{
+		$account = ORM::factory('account')
+			->where('fk_site', $this->site_id)
+			->find();
+			
+		$view = new View('public_account/login');
+		$view->page_name = $page_name;
+		$view->account = $account;
+		return $view;
+	}
+	
+
+/*
+ * View for create account
+ * this helps us to attach specific error messages to the view.
+ */
+	private function display_create($page_name, $values=NULL, $errors=NULL)
+	{
+		$account = ORM::factory('account')
+			->where('fk_site', $this->site_id)
+			->find();
+		
+		$wrapper = new View('public_account/index');
+		$wrapper->page_name = $page_name;
+		$wrapper->content = new View('public_account/create_account');
+		$wrapper->content->errors = $errors;
+		$wrapper->content->values = $values;
+		$wrapper->content->page_name = $page_name;
+		$wrapper->content->account = $account;
+		return $wrapper;
+	}
+	
+/*
+ * handler for Create a new account for this website.
+ * returns a view with output message.
  */	 
 	private function create_account($page_name)
 	{
-		if($this->account_user->logged_in())
+		if($this->account_user->logged_in($this->site_id))
 		{
 			#TODO: consider removing this duplication (of the dashboard)
 			$wrapper = new View('public_account/dashboard');
@@ -185,22 +242,7 @@ class Account_Controller extends Controller {
 			if(!$account_user->save())
 				return self::display_create($page_name, $values, 'There was a problem creating account.');
 			
-			
-			/*
-			 * HACK 
-			 * duplicate this account to the plusjade users database table.
-			 * if this site is the rootaccount
-			 */
-			if(ROOTACCOUNT === $this->site_name)
-			{
-				$new_user = ORM::factory('user');
-				foreach($_POST as $key => $val)
-					$new_user->$key = $val;
-					
-				$new_user->save();
-			}
-			
-			
+
 			# Log user in
 			if(! $this->account_user->login($account_user, (int)$this->site_id, $_POST['password']))
 				die('account created but login failed.');
@@ -217,28 +259,10 @@ class Account_Controller extends Controller {
 		return self::display_create($page_name);
 	}	
 
-/*
- * outputs the view for create account view
- * this helps us to attach specific error messages to the view.
- */
-	private function display_create($page_name, $values=NULL, $errors=NULL)
-	{
-		$account = ORM::factory('account')
-			->where('fk_site', $this->site_id)
-			->find();
-		
-		$wrapper = new View('public_account/index');
-		$wrapper->page_name = $page_name;
-		$wrapper->content = new View('public_account/create_account');
-		$wrapper->content->errors = $errors;
-		$wrapper->content->values = $values;
-		$wrapper->content->page_name = $page_name;
-		$wrapper->content->account = $account;
-		return $wrapper;
-	}
+
 	
 /*
- * get a singular profile of a user?
+ * View for singular profile of a user?
  * note: settings should allow public/private profiles.
  */
 	private function profile($username)
@@ -266,26 +290,13 @@ class Account_Controller extends Controller {
 	}
 
 	
+	
 /*
- * allow the logged in user to edit his/her profile.
- */	
-	private function display_login($page_name)
-	{
-		$account = ORM::factory('account')
-			->where('fk_site', $this->site_id)
-			->find();
-			
-		$view = new View('public_account/login');
-		$view->page_name = $page_name;
-		$view->account = $account;
-		return $view;
-	}
-/*
- * allow the logged in user to edit his/her profile.
+ * View to allow the logged in user to edit his/her profile.
  */
 	private function edit_profile($page_name)
 	{
-		if(!$this->account_user->logged_in())
+		if(!$this->account_user->logged_in($this->site_id))
 			return $this->display_login($page_name);
 			
 		$primary	= new View('public_account/edit_profile');
@@ -303,7 +314,7 @@ class Account_Controller extends Controller {
 						'fk_site'			=> $this->site_id,
 						'account_user_id'	=> $account_user->id,
 						'key'				=> 'bio',
-						'value'				=> $_POST['bio']
+						'value'				=> text::auto_p($_POST['bio'])
 					)
 				);
 			else
@@ -328,11 +339,11 @@ class Account_Controller extends Controller {
 	
 
 /*
- * Change the password of the current logged in user
+ * View and handler for password change of the current logged in user
  */
 	private function change_password($page_name)
 	{
-		if(!$this->account_user->logged_in())
+		if(!$this->account_user->logged_in($this->site_id))
 			return $this->display_login($page_name);
 
 		$primary = new View('public_account/change_password');
@@ -395,6 +406,109 @@ class Account_Controller extends Controller {
 		die();
 	}
 
+
+/* ----------------------------------------------------------- */
+/*
+ * Functions used specifically for plusjade user accounts only.
+ */
+
+	private function plusjade_dashboard($page_name, $message=NULL)
+	{
+		$user = ORM::factory('account_user', $this->account_user->get_user()->id);
+		$sites_array = array();
+		
+		foreach($user->sites as $site)
+		{
+			$first	= text::random('numeric', 5);
+			$last	= text::random('numeric', 6);
+			$sites_array["$site->subdomain"] = "$user->token";
+		}
+		
+		$view = new View('public_account/jade/dashboard_wrapper');
+		$view->message = $message;
+		
+		$view->content = new View('public_account/jade/dashboard');
+		$view->content->user = $this->account_user->get_user();	
+		$view->content->sites_array = $sites_array;
+		$view->content->page_name = $page_name;
+		
+		$view->content->is_admin =
+			('jade' === $this->account_user->get_user()->username)
+			? TRUE
+			: FALSE;
+	
+		return $view;
+	}
+
+
+/*
+ * Post handler for creating another website from user panel.
+ */	
+	public function new_website($page_name)
+	{
+		if(ROOTACCOUNT != $this->site_name)
+			die('return a 404 not found');
+		
+		if(!$_POST)
+			return $this->plusjade_dashboard($page_name, 'Nothing Sent.');
+			
+		$site_name = valid::filter_php_url(trim($_POST['site_name']));	
+		$site = ORM::factory('site');
+		if($site->subdomain_exists($site_name))
+			return $this->plusjade_dashboard($page_name, 'site name already exists');
+
+		# attempt to create the website
+		$status = Auth_Controller::_create_website($site_name, 'base', $this->account_user->get_user()->id);
+		return $this->plusjade_dashboard($page_name, $status);
+	}
+	
+	
+	
+/*
+ * Revert a site to a "safe_mode" theme.
+ * Useful when a an active theme is missing or has corrupted files which
+ * locks a user out of editing the website.
+ */
+	private function safe_mode($page_name, $site_name)
+	{
+		if(ROOTACCOUNT != $this->site_name)
+			die('return 404 not found');	
+		
+		$site = ORM::factory('site', $site_name);
+		if(!$site->has(ORM::factory('account_user', $this->account_user->get_user()->id)))
+			return $this->plusjade_dashboard($page_name, 'You cannot edit this site.');
+			
+		$theme_path = DATAPATH . "$site_name/themes/safe_mode";	
+		
+		# delete safe-mode if it exists (might be tainted)
+		if(is_dir($theme_path))
+			Jdirectory::remove($theme_path);
+	
+		# create it from stock.
+		if(!is_dir(DOCROOT . "_assets/themes/safe_mode"))
+			return $this->plusjade_dashboard($page_name, 'Safe_mode theme does not exist. Please contact support@plusjade.com!!');
+
+		if(! Jdirectory::copy(DOCROOT . "_assets/themes/safe_mode", $theme_path) )
+			return $this->plusjade_dashboard($page_name, 'Uh oh, not even this worked. Please contact support@plusjade.com!!');
+
+
+		$site->theme = 'safe_mode';
+		$site->save();
+	
+		if(yaml::edit_site_value($site_name, 'site_config', 'theme', 'safe_mode'))
+			return $this->plusjade_dashboard($page_name, "Safe-mode activated for <b>$site_name</b>");
+
+		return $this->plusjade_dashboard($page_name, 'safe-mode theme could not be activated');
+	}
+
+
+
+
+
+/* 
+ * end plusjade functions
+ * ----------------------------------------------------------- 
+ */
 	
 /*
  * Ajax request handler.
@@ -434,6 +548,14 @@ class Account_Controller extends Controller {
 				die(self::reset_password($page_name));
 				break;	
 				
+			/* plusjade stuff only */	
+			case 'safe_mode':
+				die(self::safe_mode($page_name, $username));
+				break;	
+			case 'new_website':
+				die(self::new_website($page_name));
+				break;	
+			
 			default:
 				die("$page_name : <b>$action</b> : trigger 404 not found");
 		}
@@ -441,6 +563,10 @@ class Account_Controller extends Controller {
 	}
 	
 
+	public static function _tool_adder($tool_id, $site_id)
+	{
+		return 'add';
+	}
 	
 }  # end -- /
 

@@ -31,12 +31,12 @@ class Auth_Core {
 	 *
 	 * @return  object
 	 */
-	public static function instance($config = array())
+	public static function instance($claimed=FALSE, $config = array())
 	{
 		static $instance;
 
 		// Load the Auth instance
-		empty($instance) and $instance = new Auth($config);
+		empty($instance) and $instance = new Auth($claimed, $config);
 
 		return $instance;
 	}
@@ -46,8 +46,11 @@ class Auth_Core {
 	 *
 	 * @return  void
 	 */
-	public function __construct($config = array())
+	public function __construct($claimed=FALSE, $config = array())
 	{
+		# is this website claimed ? has account attached to it.
+		$this->claimed = $claimed;
+		
 		// Append default auth configuration
 		$config += Kohana::config('auth');
 
@@ -89,39 +92,33 @@ class Auth_Core {
 
 	
 	/**
-	 * Check if there is an active session. and that this session
-	 * can edit this site.
-	 *
-	 * @param   string   role name
-	   user = user object
-	 * @return  boolean
-	 
-	  the user_id is useful for passing an id of someone not currently logged in
-	  but need to make sure he has access to a site.
+	 * Check if there there active auth session that can edit this loaded site.
+		this is an authentication class, therefore it should 
+		be used to enable or restrict access to THIS site.
+		other checks belong elsewhere.
 	 */
-	public function can_edit($site_id, $user_id=NULL, $role = NULL)
+	public function can_edit($site_id)
 	{
-		if(NULL == $user_id AND !$this->driver->logged_in($role) )
+		# if site has not been claimed, enable based on cookie.
+		if(empty($this->claimed))
+		{
+			if(sha1("r-A-n_$site_id-D-o:m") == cookie::get("unclaimed_$site_id"))
+				return TRUE;
+
 			return FALSE;
-			
-		$user_id = (NULL == $user_id) ? $this->get_user()->id : $user_id;
+		}
 		
-		# FIX THIS !!!!!!!!!!!!!!!!!1
-		#HACK- fix this later. check if user can edit this site.
-		#$user->has(ORM::factory('role', 1));
-
-		$db = new Database; 
-		$sites = $db->query("
-			SELECT * 
-			FROM sites_users 
-			WHERE user_id = '$user_id'
-			AND site_id = '$site_id'
-		")->current();
-
-		if(empty($sites->site_id))
+		# check if auth session exists (so we dont run a query needlessly);
+		if(!$this->logged_in())
 			return FALSE;
 			
-		return TRUE;
+		
+		$user = ORM::factory('account_user', $this->get_user()->id);
+		if($user->has(ORM::factory('site', $site_id)))
+			return TRUE;
+
+
+		return FALSE;
 	}	
 	
 	/**
@@ -134,30 +131,6 @@ class Auth_Core {
 		return $this->driver->get_user();
 	}
 
-	/**
-	 * Attempt to log in a user by using an ORM object and plain-text password.
-	 *
-	 * @param   string   username to log in
-	 * @param   string   password to check against
-	 * @param   boolean  enable auto-login
-	 * @return  boolean
-	 */
-	public function login($username, $password, $remember = FALSE)
-	{
-		if (empty($password))
-			return FALSE;
-
-		if (is_string($password))
-		{
-			// Get the salt from the stored password
-			$salt = $this->find_salt($this->driver->password($username));
-
-			// Create a hashed password using the salt from the stored password
-			$password = $this->hash_password($password, $salt);
-		}
-
-		return $this->driver->login($username, $password, $remember);
-	}
 
 	/**
 	 * Attempt to automatically log a user in.
@@ -190,81 +163,7 @@ class Auth_Core {
 	{
 		return $this->driver->logout($destroy);
 	}
-
-	/**
-	 * Creates a hashed password from a plaintext password, inserting salt
-	 * based on the configured salt pattern.
-	 *
-	 * @param   string  plaintext password
-	 * @return  string  hashed password string
-	 */
-	public function hash_password($password, $salt = FALSE)
-	{
-		if ($salt === FALSE)
-		{
-			// Create a salt seed, same length as the number of offsets in the pattern
-			$salt = substr($this->hash(uniqid(NULL, TRUE)), 0, count($this->config['salt_pattern']));
-		}
-
-		// Password hash that the salt will be inserted into
-		$hash = $this->hash($salt.$password);
-
-		// Change salt to an array
-		$salt = str_split($salt, 1);
-
-		// Returned password
-		$password = '';
-
-		// Used to calculate the length of splits
-		$last_offset = 0;
-
-		foreach ($this->config['salt_pattern'] as $offset)
-		{
-			// Split a new part of the hash off
-			$part = substr($hash, 0, $offset - $last_offset);
-
-			// Cut the current part out of the hash
-			$hash = substr($hash, $offset - $last_offset);
-
-			// Add the part to the password, appending the salt character
-			$password .= $part.array_shift($salt);
-
-			// Set the last offset to the current offset
-			$last_offset = $offset;
-		}
-
-		// Return the password, with the remaining hash appended
-		return $password.$hash;
-	}
-
-	/**
-	 * Perform a hash, using the configured method.
-	 *
-	 * @param   string  string to hash
-	 * @return  string
-	 */
-	public function hash($str)
-	{
-		return hash($this->config['hash_method'], $str);
-	}
-
-	/**
-	 * Finds the salt from a password, based on the configured salt pattern.
-	 *
-	 * @param   string  hashed password
-	 * @return  string
-	 */
-	public function find_salt($password)
-	{
-		$salt = '';
-
-		foreach ($this->config['salt_pattern'] as $i => $offset)
-		{
-			// Find salt characters, take a good long look...
-			$salt .= substr($password, $offset + $i, 1);
-		}
-
-		return $salt;
-	}
+	
+	
 
 } // End Auth

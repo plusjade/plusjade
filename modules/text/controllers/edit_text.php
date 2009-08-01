@@ -45,18 +45,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 		$this->add($id);
 	}
 	
-	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
-	{
-		if($sample)
-		{
-			$text = ORM::factory('text', $tool_id);
-			$text->body = '<h1>This is My Homepage!</h1><p>Enjoy yourselves yeah!</p>';
-			$text->save();
-		}
 
-		return 'add';
-	}
-	
 	public static function _tool_deleter($tool_id, $site_id)
 	{
 		return true;

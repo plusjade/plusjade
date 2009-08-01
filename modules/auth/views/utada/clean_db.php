@@ -1,5 +1,9 @@
 
 <style type="text/css">
+#results_wrapper{
+	height:400px;
+	overflow:auto;
+}
 .table_box{
 	float:left;
 	width:300px;
@@ -26,21 +30,23 @@
 Running <b><?php echo $site_count?></b> sites!<br><br>
 All site_ids: <?php echo $id_string?>
 
-<?php
-	foreach($results as $table => $result)
-	{
-		$class = 'dirty';
-		if('clean' == $result) $class = 'clean';
-		?>
-		<div class="table_box">
-			<div class="table_name <?php echo $class?>"><?php echo $table?></div>
-			<div class="results">
-				<?php echo $result?>
+<div id="results_wrapper">
+	<?php
+		foreach($results as $table => $result)
+		{
+			$class = 'dirty';
+			if('clean' == $result) $class = 'clean';
+			?>
+			<div class="table_box">
+				<div class="table_name <?php echo $class?>"><?php echo $table?></div>
+				<div class="results">
+					<?php echo $result?>
+				</div>
 			</div>
-		</div>
-		<?php
-	}
-?>
+			<?php
+		}
+	?>
+</div>
 <div class="clearboth"></div>
 <p>
 	Cleaning Done

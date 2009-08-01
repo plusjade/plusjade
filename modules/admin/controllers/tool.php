@@ -110,6 +110,8 @@ class Tool_Controller extends Controller {
  * actually adds the tool to the database and generates assets.
  * this is separate so we can use this modularly in other areas.
  * used here and @ page.php
+ 
+ * this method is static so we can overt the construct logged in check.
  * 
  */
 	public static function _add_tool($page_id, $toolname, $site_name, $allow_protected=FALSE, $sample=FALSE, $javascript=FALSE)
@@ -165,9 +167,9 @@ class Tool_Controller extends Controller {
 		
 		# run _tool_adder
 		$step_2 = 'add';
-		$edit_tool = Load_Tool::edit_factory($system_tool->name);
-		if(is_callable(array($edit_tool, '_tool_adder')))
-			$step2 = $edit_tool->_tool_adder($tool_table->id, $site_config['site_id'], $sample);
+		$public_tool = Load_Tool::factory($system_tool->name);
+		if(is_callable(array($public_tool, '_tool_adder')))
+			$step2 = $public_tool->_tool_adder($tool_table->id, $site_config['site_id'], $sample);
 
 		# Pass output to javascript @tool view "add" 
 		# so it can load the next step page

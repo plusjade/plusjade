@@ -1,5 +1,5 @@
 <?php
-class Slide_Panel_Controller extends Controller {
+class Slide_Panel_Controller extends Public_Tool_Controller {
 	
 	function __construct()
 	{

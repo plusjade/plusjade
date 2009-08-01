@@ -91,18 +91,12 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		die($primary);
 	}
 
-/*
- * which function to go after album is created?
- */	
-	static function _tool_adder($tool_id, $site_id)
-	{
-		return 'manage';
-	}
+
 	
 /*
  * nothing
  */
-	function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($tool_id, $site_id)
 	{
 		return TRUE;
 	}	

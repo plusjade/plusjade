@@ -1,13 +1,13 @@
 <?php
 
-class Text_Controller extends Controller {
+class Text_Controller extends Public_Tool_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
 	}
 
-	function _index($tool_id)
+	public function _index($tool_id)
 	{		
 		$text = ORM::factory('text')
 			->where('fk_site', $this->site_id)
@@ -23,7 +23,19 @@ class Text_Controller extends Controller {
 		$primary->item = $text;
 		return $this->public_template($primary, 'text', $tool_id, $text->attributes);
 	}
-	
+
+
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
+	{
+		if($sample)
+		{
+			$text = ORM::factory('text', $tool_id);
+			$text->body = '<h1>This is My Homepage!</h1><p>Enjoy yourselves yeah!</p>';
+			$text->save();
+		}
+
+		return 'add';
+	}	
 }
 
 /* -- end -- */

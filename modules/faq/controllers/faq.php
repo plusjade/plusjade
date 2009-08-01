@@ -1,5 +1,5 @@
 <?php
-class Faq_Controller extends Controller {
+class Faq_Controller extends Public_Tool_Controller {
 
 	function __construct()
 	{
@@ -18,4 +18,11 @@ class Faq_Controller extends Controller {
 		$primary->faq = $faq;	
 		return $this->public_template($primary, 'faq', $tool_id);
 	}
+	
+	
+	public static function _tool_adder($tool_id, $site_id)
+	{
+		return 'add';
+	}
+	
 } # end

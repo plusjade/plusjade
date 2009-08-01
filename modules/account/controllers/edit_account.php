@@ -69,13 +69,8 @@ class Edit_Account_Controller extends Edit_Tool_Controller {
 		die($primary);
 	}
 	
-	
-	static function _tool_adder($tool_id, $site_id)
-	{
-		return 'add';
-	}
-	
-	static function _tool_deleter($tool_id, $site_id)
+
+	public static function _tool_deleter($tool_id, $site_id)
 	{
 		return true;
 	}

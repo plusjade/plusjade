@@ -1,6 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 abstract class Template_Controller extends Controller {
 
+/*
+ * Template is in charge of creating the complete wrapper view of a website.
+ * Various pieces and views are being output from controller methods,
+ * but the template controller is where they are all bundled up into a web page.
+ */
 	public $auto_render = TRUE;
 
 	public function __construct()
@@ -11,7 +16,7 @@ abstract class Template_Controller extends Controller {
 
 		
 		# Global CSS			
-		if(! $this->client->can_edit($this->site_id) )
+		if(!$this->client->can_edit($this->site_id))
 			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
 		
 		/*
@@ -28,7 +33,7 @@ abstract class Template_Controller extends Controller {
 /*
  * Load Assets for Admin edit mode
  */ 
-	function _load_admin($page_id, $page_name)
+	public function _load_admin($page_id, $page_name)
 	{	
 		if($this->client->can_edit($this->site_id))
 		{
@@ -52,7 +57,29 @@ abstract class Template_Controller extends Controller {
 			$protected_array = array();
 			foreach($protected_tools as $tool)
 				$protected_array[] = $tool->id;
-				
+
+			# is this website claimed?
+			$days	= 0;
+			$hours	= 0;
+			$mins	= 0;
+			if(empty($this->claimed) AND !empty($_SESSION['created']))
+			{
+				$expires = $_SESSION['created'] + (86400*7);
+				$diff = $expires - time();
+				if($diff > 0)
+				{
+					$days = floor($diff/86400);
+					$diff = $diff - ($days*86400);
+					if($diff > 0)
+					{
+						$hours = floor($diff/3600);
+						$diff = $diff - ($hours*3600);
+						if($diff > 0)
+							$mins = floor($diff/60);
+					}
+				}
+			}
+
 			$this->template->admin_panel =
 				view::factory(
 					'admin/admin_panel',
@@ -60,7 +87,8 @@ abstract class Template_Controller extends Controller {
 						'protected_array'	=> $protected_array,
 						'page_id'			=> $page_id,
 						'page_name'			=> $page_name,
-						'global_css_path'	=> "/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-"
+						'global_css_path'	=> "/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-",
+						'expires'			=> array('days' => $days, 'hours' => $hours, 'mins' => $mins)
 					)
 				);
 			return TRUE;

@@ -254,31 +254,11 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		die($primary);
 	}
 
-/*
- * logic executed after this blog tool is added to site.
- */
-	function _tool_adder($tool_id, $site_id, $sample=FALSE)
-	{
-		if($sample)
-		{
-			$new_post = ORM::factory('blog_post');
-			$new_post->fk_site	= $site_id;
-			$new_post->blog_id	= $tool_id;
-			$new_post->url		= 'sample-blog-post';
-			$new_post->title	= 'A Sample Blog Post indeed!';
-			$new_post->body		= '<p>All sorts of interesting content...</p> And then some more content <p>Looking good!</p>';
-			$new_post->created	= strftime("%Y-%m-%d %H:%M:%S");
-			$new_post->status	= 'publish';
-			$new_post->save();
-		}
-		
-		return 'add';
-	}
 
 /*
  * logic executed after this blog tool is deleted from site.
  */	
-	function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($tool_id, $site_id)
 	{
 		ORM::factory('blog_post')
 			->where(array(

@@ -1,5 +1,5 @@
 <?php
-class Album_Controller extends Controller {
+class Album_Controller extends Public_Tool_Controller {
 	
 	function __construct()
 	{
@@ -151,5 +151,15 @@ class Album_Controller extends Controller {
 			});
 		');	
 	}
+	
+/*
+ * which function to go after album is created?
+ */	
+	public static function _tool_adder($tool_id, $site_id)
+	{
+		return 'manage';
+	}
+	
+	
 	
 } /* -- end -- */

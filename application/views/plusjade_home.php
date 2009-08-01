@@ -2,7 +2,6 @@
 <style type="text/css">
 #sentence{
 	padding:10px;
-	background:#fff;
 	text-align:center;
 	font-size:2.35em;
 	margin-bottom:10px;
@@ -48,9 +47,7 @@
 	font-size:1.6em;
 	font-weight:bold;
 	background:#ffffcc;   /* #e2f3fd; */
-	margin-bottom:10px;
 	color:#000;
-	/*background:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important; */ /*purple*/
 }
 #domain_name b{
 	float:left;
@@ -58,10 +55,16 @@
 #domain_name span{
 	color:#4fad2e;
 }
-
+#errors{
+	padding:9px;
+	text-align:center;
+	font-weight:bold;
+	background:#d52020 url('/_assets/images/admin/gradients.jpg') repeat-x 0px -465px; /*red*/
+	color:#fff;
+}
 
 #create_website{
-	margin:30px 0;
+	margin:20px 0;
 	overflow:auto;
 	background:skyblue url('/ _assets/images/admin/create.png') repeat-x 0 0;
 	-moz-border-radius: 15px;
@@ -136,30 +139,23 @@
 
 </style>
 
-
-<?php
-if(empty($values['site_name'])) $values['site_name'] = text::random('alpha', 5);
-if(empty($values['beta'])) $values['beta'] = '';
-?>
-
-<div id="sentence">
-	<span class="text_logo"><b>+</b></span> Powerful, Customizable Websites, <em>instantly</em>.
-</div>
-
-
 <div id="create_website">
 
 	<div id="domain_name">
-		<b>Try it &#8594; &#160;</b> http://beta-<span id="link_example"><?php echo $values['site_name']?></span>.plusjade.com
+		<b>Start Now &#8594;</b> http://beta-<span id="link_example"><?php echo $values['site_name']?></span>.plusjade.com
 	</div>
-
+	
 	<div id="choose_theme">
 		<img src="/_assets/images/themes/nonzero.gif" alt="">
 		<br><b>Choose a Theme</b>
 	</div>
 	
 	<div id="auth_form" class="create_form">
-		<form action="/get/auth/new_beta_website" method="POST">
+		<?php if(!empty($errors)):?>
+			<div id="errors"><?php echo $errors?></div>
+		<?php endif;?>
+	
+		<form action="" method="POST">
 			<div class="fieldsets" style="background:transparent">
 				<b>Website Name</b><br>
 				<input type="text" name="site_name" value="<?php echo $values['site_name']?>" class="full auto_filename" rel="text_req" size="20" maxlength="25">
@@ -189,9 +185,14 @@ if(empty($values['beta'])) $values['beta'] = '';
 	<div id="message">
 		+Jade is an in-browser website publishing and management system.
 		<br>We provide hosted, full-featured, websites as a service.
-		<br><br>
+		<p>
 		No advanced coding or web knowledge necessary.
 		<br>No installs, setup manuals, configuration, headaches or lost time.
+		
+		</p>
+		+Jade is a more powerful approach to "online website builders".
+		<br>We focus on productivity, clarity, and convenience for the user.
+
 	</div>
 	
 	<div id="features">
@@ -219,8 +220,6 @@ if(empty($values['beta'])) $values['beta'] = '';
 		<br>and cannot be password protected.
 		<p>
 			Unclaimed websites expire after 7 days.
-			<br>Other account holders may claim your website,
-			<br>if they know your website name.
 		</p>
 		Creating an account allows you to:
 		<ul>
@@ -235,9 +234,6 @@ if(empty($values['beta'])) $values['beta'] = '';
 		Create your account any time at http://plusjade.com
 		<br><b>Or</b> within your website admin bar labeled "claim website".
 	</div>	
-
-
-
 
 
 <script type="text/javascript">
@@ -266,13 +262,9 @@ $(document).ready(function()
 		return false;
 	});
 
-	$('form').ajaxForm({
-		beforeSubmit: function(fields, form){
-			if(! $("input", form[0]).jade_validate() ) return false;
-			$('button').attr('disabled', 'disabled').html('Submitting...');
-		},
-		success: function(data) {
-		}
+	$('form').submit(function(){
+		if(! $("form input").jade_validate() ) return false;
+		$('button').attr('disabled', 'disabled').html('Submitting...');
 	});
 });
 
