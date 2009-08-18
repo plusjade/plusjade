@@ -19,7 +19,7 @@
 			</div>
 			<div>
 				<a href="#" class="preview" rel="<?php echo $post->id?>">preview</a>
-				created by <a href="/users/profile/<?php echo $post->forum_cat_post_comment->account_user->username?>"><?php echo $post->forum_cat_post_comment->account_user->username?></a>
+				created by <a href="/<?php echo $this->account_page?>/profile/<?php echo $post->forum_cat_post_comment->account_user->username?>"><?php echo $post->forum_cat_post_comment->account_user->username?></a>
 				in <a href="<?php echo url::site("$page_name/category/$post->url")?>" class="forum_load_main"><?php echo $post->name?></a>
 				 <abbr class="timeago" title="<?php echo date("c", $post->forum_cat_post_comment->created)?>"><?php echo date("M d y @ g:i a", $post->forum_cat_post_comment->created)?></abbr>
 				<span>

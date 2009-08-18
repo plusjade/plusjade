@@ -42,7 +42,7 @@ $(document).ready(function()
  */
 	$('body:not(.jade_toolbar_wrapper)').click(function(){
 		$('li.dropdown ul').hide();
-		$('.actions_wrapper ul').hide();
+		$('.actions_wrapper .toolkit_wrapper').hide();
 		$('#admin_bar li.dropdown div').removeClass('dropdown_selected');
 	});
 
@@ -62,7 +62,7 @@ $(document).ready(function()
 /* ADD blue tool-item toolkits
  * selector format: .tool_wrapper .tool_item
  */
-	var tools = ['contact', 'showroom', 'slide_panel', 'faq', 'blog'];
+	var tools = ['showroom', 'format', 'blog'];
 	$.each(tools, function(){	
 		var tool = this;
 		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
@@ -95,15 +95,18 @@ $(document).ready(function()
 	jQuery.fn.jade_update_tool_html = function(action, toolname, tool_id, guid){
 
 	// Set loading status...
+		var include_js = 'yes';
+		
 		if('add' == action) {
 			// default add to container_1
 			$('div.container_1').prepend('<div id="new_tool_placeholder" class="load_tool_html">Adding Tool...</div>');
 		} else if('update' == action){
+			include_js = 'no';
 			$('#'+ toolname +'_wrapper_'+ tool_id).html('<div class="load_tool_html">Updating...</div>');
 		}
 
 		// Get the tool html output...
-		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, function(data){
+		$.get('/get/tool/html/'+ toolname +'/'+ tool_id,{js: include_js}, function(data){
 			if('add' == action) {
 				// get the toolkit to insert red toolbar via ajax
 				$.get('/get/tool/toolkit/'+ guid, function(toolkit){
@@ -200,7 +203,7 @@ $(document).ready(function()
 		"a.jade_confirm_delete_common": function(e) {
 			var url	= $(e.target).attr("href");
 			var el	= $(e.target).attr('rel');
-			$('.facebox .show_submit').show();
+			$(document).trigger('show_submit.plusjade');
 			$.get(url, function(data) {
 				$.facebox.close();
 				$('#' + el).remove();
@@ -212,15 +215,27 @@ $(document).ready(function()
 	
 		// ACTIVATE action Tool toolkit menus	
 		".actions_link": function(e) {
-			$(e.target).next('ul').toggle();
+			$(e.target).next('div').toggle();
 			return false;
 		},
 
 		// ACTIVATE action Tool toolkit menus for span icons	
 		".actions_link span.icon": function(e) {
-			$(e.target).parent('a').next('ul').toggle();
+			$(e.target).parent('a').next('div').toggle();
 			return false;
 		},		
+
+
+
+		// toggle edit tool view panes
+		"#common_view_toggle li a": function(e){
+			$('.common_main_panel div.toggle').hide();
+			$('#common_view_toggle li a').removeClass('selected');
+			var div = $(e.target).addClass('selected').attr('href');
+			$('.common_main_panel div#'+ div).show();
+			return false;
+		},	
+
 		
 	/* Click actions for css styler ----- */
 	/* ------------------------------------------------------------  */
@@ -275,13 +290,13 @@ $(document).ready(function()
 $('body').keyup($.delegate({
 
 	"input.send_input": function(e){
-		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '-');
+		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '-').toLowerCase();
 		$(e.target).siblings('input.receive_input').val(input);
 		$('span#link_example').html(input);
 	},
 	
 	"input.auto_filename": function(e){
-		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '');
+		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '').toLowerCase();
 		$(e.target).val(input);
 		$('span#link_example').html(input);
 	}
@@ -319,7 +334,7 @@ $('body').keyup($.delegate({
 					.attr('disabled','disabled')
 					.removeClass('jade_positive');
 				
-				$('.admin_reset .show_submit').show();
+				$(document).trigger('show_submit.plusjade');
 			},
 			success: function(data) {
 				$('.facebox form button')
@@ -335,12 +350,29 @@ $('body').keyup($.delegate({
 			}
 		});
 	});
+
 	
+/*
+ * show the resultant server data
+ */
+$(document).bind('show_submit.plusjade', function(){
+	$('.facebox_response.active').remove();
+	$('.admin_reset .show_submit').show();
+});
+
+/*
+ * show the resultant server data
+ */
 $(document).bind('server_response.plusjade', function(e, data){
 	$('.show_submit').hide();
-	//console.log(e);
-	$('.server_response').html(data).show();
-	setTimeout('$(".server_response").fadeOut(4000)', 1500);	
+	$('.facebox_response.active').remove();
+	$('.facebox_response')
+		.clone()
+		.addClass('active')
+		.html(data)
+		.show()
+		.insertAfter('.facebox_response');
+	setTimeout('$(".facebox_response.active").fadeOut(4000)', 1500);	
 });
 
 
@@ -719,7 +751,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			});
 			if(!output){alert('Nothing to save.'); return false;}
 			// alert (output); return false;
-			$('.facebox .show_submit').show();
+			$(document).trigger('show_submit.plusjade');
 			$.post('/get/edit_'+ tool +'/save_tree/'+tool_id,
 				{output: output},
 				function(data){
@@ -745,7 +777,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			alert("No items to sort");
 			return false;
 		}
-		$(".facebox .show_submit").show();
+		$(document).trigger('show_submit.plusjade');
 		$.get('/get/'+ url +'/save_sort?'+order, function(data){
 			$(".facebox .show_submit").hide();
 		})				
@@ -773,6 +805,40 @@ $(document).bind('server_response.plusjade', function(e, data){
 	// $(window).scroll(function(){});	
 
 
+	
+	
+// Album Management Functions:
+
+	// delegate editing image caption
+	$('body').click($.delegate({
+	// show save caption pane
+		'.facebox #sortable_images_wrapper b': function(e){
+			$('.save_pane').clone().addClass('helper').show().insertBefore('.common_left_panel');		
+			var caption = $(e.target)
+				.parent('span')
+				.next('img')
+				.addClass('editing')
+				.attr('title');
+			$('.save_pane input[name="caption"]').val(caption);
+			return false;
+		},
+	// save the caption
+		'.facebox .save_pane button':function(e){
+			var caption = $('.save_pane input[name="caption"]').val(caption);
+			$('#sortable_images_wrapper img.editing').attr('title', caption);
+			$('.save_pane.helper').remove();
+			$('#sortable_images_wrapper img').removeClass('editing');
+			$(document).trigger('server_response.plusjade', 'Caption Saved');			
+		},
+	// close the save pane
+		'.facebox .save_pane .icon.cross':function(e){
+			$('.save_pane.helper').remove();
+			$('#sortable_images_wrapper img').removeClass('editing');
+		}
+	}));
+	
+	
+	
 // --- misc funcitons ---
  
 /*

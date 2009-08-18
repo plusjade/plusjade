@@ -58,6 +58,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 				die('adding items to invalid navigation list.');
 			
 			$_POST['data'] = (empty($_POST['data'])) ? '' : $_POST['data'];			
+			
 			# if for any reason local_parent is null, just add to root.
 			$_POST['local_parent'] = (empty($_POST['local_parent'])) ?
 				$navigation->root_id : $_POST['local_parent'];

@@ -321,7 +321,9 @@ class Input_Core {
 
 				// Set configuration
 				$config = HTMLPurifier_Config::createDefault();
-				$config->set('HTML', 'TidyLevel', 'none'); // Only XSS cleaning now
+				$config->set('HTML.TidyLevel', 'none'); // Only XSS cleaning now
+				$config->set('Filter.YouTube', true);
+
 
 				// Run HTMLPurifier
 				$data = HTMLPurifier($data, $config);

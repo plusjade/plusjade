@@ -12,17 +12,11 @@ class Load_Tool_Core {
 		$tool = ucwords($tool);
 		switch ($tool)
 		{
-			case 'Slide_panel':
-				$tool = new Slide_Panel_Controller(); 			
+			case 'Format':
+				$tool = new Format_Controller(); 			
 				break;				
 			case 'About':
-				$tool = new About_Controller(); 			
-				break;					
-			case 'Faq':
-				$tool = new Faq_Controller(); 
-				break;
-			case 'Contact':
-				$tool = new Contact_Controller(); 
+				$tool = new About_Controller();
 				break;
 			case 'Album':
 				$tool = new Album_Controller(); 			
@@ -65,17 +59,11 @@ class Load_Tool_Core {
 		$tool = ucwords($tool);
 		switch ($tool)
 		{
-			case 'Slide_panel':
-				$tool = new Edit_Slide_Panel_Controller(); 			
+			case 'Format':
+				$tool = new Edit_Format_Controller(); 			
 				break;				
 			case 'About':
 				$tool = new Edit_About_Controller(); 			
-				break;					
-			case 'Faq':
-				$tool = new Edit_Faq_Controller(); 
-				break;
-			case 'Contact':
-				$tool = new Edit_Contact_Controller(); 
 				break;
 			case 'Album':
 				$tool = new Edit_Album_Controller(); 			

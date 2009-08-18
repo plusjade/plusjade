@@ -36,7 +36,7 @@ class Navigation_Controller extends Public_Tool_Controller {
  * child to belong to
  * Add root child id to parent for easier access.
  */		 
-	public static function _tool_adder($tool_id, $site_id)
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
 		# this can all be done in the overloaded save function for
 		# navigations model - look into it.
@@ -56,6 +56,46 @@ class Navigation_Controller extends Public_Tool_Controller {
 		
 		$navigation->root_id = $new_item->id;
 		$navigation->save();
+
+
+		
+		if($sample)
+		{
+			$new_item->clear();		
+			$new_item->navigation_id	= $tool_id;
+			$new_item->fk_site			= $site_id;
+			$new_item->display_name		= 'Sample list item';
+			$new_item->type				= 'none';
+			$new_item->data				= '';
+			$new_item->local_parent		= $navigation->root_id;
+			$new_item->save();
+
+			$new_item->clear();		
+			$new_item->navigation_id	= $tool_id;
+			$new_item->fk_site			= $site_id;
+			$new_item->display_name		= 'Link to Home';
+			$new_item->type				= 'page';
+			$new_item->data				= 'home';
+			$new_item->local_parent		= $navigation->root_id;
+			$new_item->save();
+
+			$new_item->clear();		
+			$new_item->navigation_id	= $tool_id;
+			$new_item->fk_site			= $site_id;
+			$new_item->display_name		= 'External Google Link';
+			$new_item->type				= 'url';
+			$new_item->data				= 'google.com';
+			$new_item->local_parent		= $navigation->root_id;
+			$new_item->save();
+
+
+			
+			# Update left and right values
+			Tree::rebuild_tree('navigation_item', $navigation->root_id, $site_id, '1');
+			
+		}	
+			
+
 		
 		return 'manage';
 	}

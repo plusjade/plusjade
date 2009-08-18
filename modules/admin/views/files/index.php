@@ -6,7 +6,11 @@
 	</div>
 
 	<div class="common_left_panel" style="width:150px">
-		<?php if($mode) echo '<div class="editor_info"><b><i>Double Click</i></b> the file you want to place into the editor.</div>';?>
+		<?php if('editor' == $mode):?>
+			<div class="editor_info"><b>Double Click</b> the file you want to place into the editor.</div>
+		<?php elseif('albums' == $mode):?>
+			<div class="editor_info"><b>DRAG</b> images into the gray photo album area.</div>
+		<?php endif;?>
 		
 		<br><br>
 		<span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/files/add_files" class="add_asset">Add Files</a>

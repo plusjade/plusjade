@@ -401,7 +401,7 @@
 			.append('<div id="show_files" class="editor_pane"></div>')
 			.before('<ul class="ui-tabs-nav generic_tabs"> \
 					<div class="field_title">'+ name +'</div> \
-					<li><a href="#" class="show_edit">Edit</a><li>\
+					<li><a href="#" class="show_edit">Preview</a><li>\
 					<li><a href="#" class="get_file_browser" rel="editor">Add Media</a><li>\
 					<li><a href="#" class="show_html">HTML</a><li>\
 					<li><a href="#" class="reset">Reset</a><li>\

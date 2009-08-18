@@ -72,7 +72,7 @@ abstract class Account_Driver {
 	 * @param   mixed    username
 	 * @return  boolean
 	 */
-	abstract public function force_login($username);
+	abstract public function force_login($username, $site_id);
 
 	/**
 	 * Logs a user in, based on stored credentials, typically cookies.

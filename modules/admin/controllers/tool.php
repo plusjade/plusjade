@@ -38,7 +38,6 @@ class Tool_Controller extends Controller {
 
 /*
  *	ADD single tool to specific page.
- *  No tool can start out as an orphan.
  */
 	function add($page_id=NULL)
 	{		
@@ -46,10 +45,13 @@ class Tool_Controller extends Controller {
 
 		if($_POST)
 		{
-			#stupid ie sends button contents rather than value.
-			$field = (is_numeric($_POST['tool'])) ? 'id' : 'name';
-			# all tools passed her should be non-protected
-			die(self::_add_tool($page_id, $_POST['tool'], $this->site_name, FALSE, FALSE, TRUE));
+			# is a type sent?
+			$type = (empty($_POST['type']))
+				? NULL
+				: $_POST['type'];
+			
+			# all tools passed here should be non-protected
+			die(self::_add_tool($page_id, $_POST['tool'], $this->site_name, $type, FALSE, FALSE, TRUE));
 		}	
 		
 		$tools = ORM::factory('system_tool')
@@ -99,8 +101,11 @@ class Tool_Controller extends Controller {
 		$new_page->menu			= 'yes';
 		$new_page->save();
 		
+		# TODO: this has not been updated sitewide.
+		$type = NULL; # the type lets you specify a specific view for the tool.
+		
 		# attempt to add the tool.
-		if(TRUE !== self::_add_tool($new_page->id, $toolname, $site_name, TRUE, TRUE))
+		if(TRUE !== self::_add_tool($new_page->id, $toolname, $site_name, $type, TRUE, TRUE))
 			die("Could not add $toolname");
 		
 		return TRUE;
@@ -115,13 +120,12 @@ class Tool_Controller extends Controller {
  * this method is static so we can overt the construct logged in check.
  * 
  */
-	public static function _add_tool($page_id, $toolname, $site_name, $allow_protected=FALSE, $sample=FALSE, $javascript=FALSE)
+	public static function _add_tool($page_id, $tool_id, $site_name, $type=NULL, $allow_protected=FALSE, $sample=FALSE, $javascript=FALSE)
 	{
 		$system_tool = ORM::factory('system_tool')
 			->select('*, LOWER(name) AS name')
 			->where('enabled','yes')
-			->find($toolname);
-			
+			->find($tool_id);
 		if(!$system_tool->loaded)
 			die('invalid system_tool');
 		
@@ -134,6 +138,9 @@ class Tool_Controller extends Controller {
 		# INSERT row in system_tool parent table
 		$tool_table = ORM::factory($system_tool->name);
 		$tool_table->fk_site = $site_config['site_id'];
+		# set the type if sent.
+		if(NULL !== $type)
+			$tool_table->type = $type;
 		$tool_table->save();
 		
 		$db = new Database;
@@ -164,6 +171,7 @@ class Tool_Controller extends Controller {
 		}
 		
 		# generate tool_css file
+			# possibly choose a view-specific css file.
 		self::_generate_tool_css($system_tool->name, $tool_table->id, $site_name, $site_config['theme']);
 		
 		# run _tool_adder
@@ -474,7 +482,11 @@ class Tool_Controller extends Controller {
 		$theme_file		= "$tool_path/css/stock.css";
 		$stock_file		= MODPATH . "$toolname/views/public_$toolname/stock.css";
 		$return			= FALSE;
-		
+
+		# make sure the theme has a tools folder
+		if(! is_dir(DATAPATH . "$site_name/themes/$theme/tools") )
+			mkdir(DATAPATH . "$site_name/themes/$theme/tools");
+			
 		# make sure the folders exist.
 		if(! is_dir($tool_path) )
 			mkdir($tool_path);

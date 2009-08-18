@@ -10,11 +10,18 @@
 	<a href="<?php echo url::site("$page_name/submit")?>" id="submit_new">Submit New</a>	
 	
 	<h3>My Stuff</h3>
+	<?php if($this->account_user->logged_in($this->site_id)):?>
 	<ul>
 		<li><a href="<?php echo url::site("$page_name/my/posts")?>">Posts</a></li>
 		<li><a href="<?php echo url::site("$page_name/my/comments")?>">Comments</a></li>
 		<!--<li><a href="<?php echo url::site("$page_name/my/starred")?>">Starred</a></li> -->
 	</ul>
+	<?php else:?>
+		<div style="margin:0 0 10px 10px">
+			<a href="<?php echo url::site("$this->account_page")?>">Login/Sign up</a>
+			<br> to manage your posts/comments.	
+		</div>
+	<?php endif;?>
 
 	<h3>Categories</h3>	
 	<ul id="forum_categories">

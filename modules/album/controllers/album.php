@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
 class Album_Controller extends Public_Tool_Controller {
 	
 	function __construct()
@@ -9,7 +10,7 @@ class Album_Controller extends Public_Tool_Controller {
 /*
  * Display an album instance
  */	
-	function _index($tool_id)
+	function _index($tool_id, $sub_tool=FALSE)
 	{
 		$album = ORM::factory('album')
 			->where('fk_site', $this->site_id)
@@ -17,28 +18,26 @@ class Album_Controller extends Public_Tool_Controller {
 		if(FALSE === $album->loaded)
 			return $this->public_template('album error, please contact support', 'album', $tool_id);
 
-		# images 
-		$image_array = explode('|', $album->images);
-		$images = array();
-		foreach($image_array as $image)
-		{
-			if(0 < substr_count($image, '/'))
-			{
-				$filename = strrchr($image, '/');
-				$small = str_replace($filename, "/_sm$filename", $image);
-			}
-			else
-				$small = "/_sm/$image";
+		# images
+		$images = json_decode($album->images);
+		if(NULL === $images)
+			return $this->public_template('no images.', 'album', $tool_id, $album->attributes);
 			
-			$images[] = "$small|$image";
-		}
+		foreach($images as $image)
+			$image->thumb = image::thumb($image->path);
+
+		#echo'<pre>';var_dump($images);echo '</pre>';die();
+		
 		
 		$primary = new View('public_album/index');
 		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
 		$primary->display_view = $this->$display_view($images);
 		$primary->view_name = $display_view;
-		$primary->add_root_js_files("$display_view/$display_view.js");
-		return $this->public_template($primary, 'album', $tool_id, $album->attributes);
+		
+		# add custom javascript;
+		$primary->global_readyJS(self::javascripts($album));
+		
+		return $this->public_template($primary, 'album', $tool_id, $album->attributes, $sub_tool);
 	}
 
 /*
@@ -46,12 +45,80 @@ class Album_Controller extends Public_Tool_Controller {
  */
 	private function lightbox($images)
 	{
-		$primary = new View('public_album/lightbox');
-		$primary->images = $images;
-		$primary->img_path = $this->assets->assets_url();
-		return $primary;
+		$view = new View('public_album/lightbox');
+		$view->images = $images;
+		$view->img_path = $this->assets->assets_url();
+		
+		# request javascript file
+		$view->request_js_files('lightbox/lightbox.js');
+		
+		return $view;
 	}
 
+	
+/*
+ * a view for gallery functionality
+ */
+	private function gallery($images)
+	{
+		$view = new View('public_album/gallery');
+		$view->images = $images;
+		$view->img_path = $this->assets->assets_url();
+
+		# request javascript file
+		$view->request_js_files('gallery/gallery.js');
+		
+		return $view;
+	}
+
+/*
+ * output the appropriate javascript based on the album view.
+ */	
+	private function javascripts($album)
+	{
+		# prepare the javascript
+		switch($album->view)
+		{
+			case 'lightbox':
+					$js = "$('.album_wrapper div.album_lightbox_wrapper a').lightBox();";
+				break;
+				
+			case 'gallery':
+					$js =  "
+					$('#photos').galleryView({
+						panel_width: 800,
+						panel_height: 400,
+						frame_width: 75,
+						frame_height: 75,
+						filmstrip_size: 3,
+						overlay_height: 50,
+						overlay_font_size: '1em',
+						transition_speed: 400,
+						transition_interval: 3000,
+						overlay_opacity: 0.6,
+						overlay_color: 'black',
+						background_color: 'black',
+						overlay_text_color: 'white',
+						caption_text_color: 'white',
+						border: '1px solid black',
+						nav_theme: 'light',
+						easing: 'swing',
+						filmstrip_position: 'bottom',
+						overlay_position: 'bottom',
+						show_captions: false,
+						fade_panels: true,
+						pause_on_hover: true
+					});
+				";
+				break;
+				
+			default:
+				$js = '';
+		}
+		
+		# place the javascript.
+		return $this->place_javascript($js, TRUE);
+	}
 
 /* 
  * doesnt work need to update
@@ -61,8 +128,8 @@ class Album_Controller extends Public_Tool_Controller {
 		die('offline');
 		$primary = new View('public_album/cycle');
 		# Javascript
-		$primary->add_root_js_files('easing/jquery.easing.1.3.js');										
-		$primary->add_root_js_files('cycle_lite/jquery.cycle.all.min.js');								
+		$primary->request_js_files('easing/jquery.easing.1.3.js');										
+		$primary->request_js_files('cycle_lite/jquery.cycle.all.min.js');								
 
 		$options = array(
 			'fx'		=> '"scrollDown"',
@@ -135,7 +202,7 @@ class Album_Controller extends Public_Tool_Controller {
 	{
 		die('offline');
 		$primary = new View('public_album/galleria');
-		$primary->add_root_js_files('galleria/galleria.js');
+		$primary->request_js_files('galleria/galleria.js');
 		$primary->global_readyJS('									
 			// $("#galleria_'.$album->id .'").addClass("gallery_demo"); // adds new class name to maintain degradability
 			// $(".nav").css("display","none"); // hides the nav initially
@@ -151,12 +218,46 @@ class Album_Controller extends Public_Tool_Controller {
 			});
 		');	
 	}
+
+
 	
 /*
  * which function to go after album is created?
  */	
-	public static function _tool_adder($tool_id, $site_id)
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
+		if($sample)
+		{
+			$album = ORM::factory('album', $tool_id);
+			$album->fk_site	= $site_id;
+			$album->name	= 'My Photo Album';
+			$album->view	= 'lightbox';
+			# as JSON
+			$album->images	= '[
+				{
+					"path": "images/sunflower.jpg",
+					"caption": "a sunflower"
+				},
+				{
+					"path": "images/sun.jpg",
+					"caption": "a very cool looking sun"
+				},
+				{
+					"path": "images/goose.jpg",
+					"caption": "a goose"
+				},
+				{
+					"path": "images/lens.jpg",
+					"caption": "a techy camera lens"
+				},
+				{
+					"path": "images/sand-castle.jpg",
+					"caption": "a tall sand castle"
+				}
+			]';
+			$album->save();
+		}
+		
 		return 'manage';
 	}
 	

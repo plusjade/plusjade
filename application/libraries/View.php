@@ -296,13 +296,12 @@ class View_Core {
 # JADES EXTRA STUFF #
 /*
  * Add request for javascript file to be loaded in the root document
- * Send both public and admin requests here
- * fiters for duplicates and collisions
- * 
+ * filters for duplicates and collisions
+ * This is used for live pages only. Admin pages pre-load everything at runtime.
  */
-	static public function add_root_js_files($files)
+	static public function request_js_files($files)
 	{			
-		if( is_array($files) )
+		if(is_array($files))
 		{
 			foreach($files as $file)
 			{
@@ -321,7 +320,7 @@ class View_Core {
 
 /*
  * actually adds javascript files to the root document
- * should only be called after add_root_js_files() filters requests
+ * should only be called after request_js_files() filters requests
  * strings or array
  */	
 	public function admin_linkJS($href, $var = 'load_js') 
@@ -329,12 +328,12 @@ class View_Core {
 		if (! isset($this->$var) )  
 			$this->$var = '';
 		
-		$this->$var .= '<script type="text/javascript" src="http://' . ROOTDOMAIN .'/'. $href . '" charset="utf-8"></script>'."\n\t";
+		$this->$var .= '<script type="text/javascript" src="' . url::site($href) . '" charset="utf-8"></script>'."\n\t";
 	}
 	
 /*
  * actually adds javascript files to the root document
- * should only be called after add_root_js_files() filters requests
+ * should only be called after request_js_files() filters requests
  * strings or array
  */	
 	public function linkJS($href, $var = 'load_js') 
@@ -347,12 +346,12 @@ class View_Core {
 			foreach ($href as $value)
 			{
 				if(!in_array($value, $this->js_array))
-					$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/_assets/js/'.$value.'" charset="utf-8"></script>'."\n\t";
+					$this->$var .= '<script type="text/javascript" src="' . url::site("_assets/js/$value") . '" charset="utf-8"></script>' . "\n\t";
 			}
 		}
 		else
 			if(!in_array($href, $this->js_array))
-				$this->$var .= '<script type="text/javascript" src="http://'.ROOTDOMAIN.'/_assets/js/'.$href.'" charset="utf-8"></script>'."\n\t";
+				$this->$var .= '<script type="text/javascript" src="' . url::site("_assets/js/$href") . '" charset="utf-8"></script>' . "\n\t";
 
 
 		if (is_array($href)) 
@@ -367,7 +366,7 @@ class View_Core {
  * Adds to the initial root page
  * Takes only strings
  */
-	public function global_readyJS($script, $var = 'readyJS')
+	public function global_readyJS($script, $var = 'public_javascript')
 	{
 		if (! isset(self::$kohana_global_data[$var]) )  
 			self::$kohana_global_data[$var] = '';
@@ -377,6 +376,7 @@ class View_Core {
 
 
 /*
+ * adds a javascript file to the document ready function at the end of the page.
  * strings only
  */
 	public function readyJS($toolname, $filename, $variable=NULL, $edit=FALSE)
@@ -405,17 +405,12 @@ class View_Core {
 	{
 		if (!isset($this->$var))  
 			$this->$var = '';
-		
-		$url = 'http://' . ROOTDOMAIN;
-		
-		if ( FALSE !== $path )
-			$url = $path;
-			
+	
 		if (is_array($href)) 
 			foreach ($href as $value)
-				$this->$var .= '<link type="text/css" rel="stylesheet" href="' . $url . $value . '" media="screen" />'."\n\t";
+				$this->$var .= '<link type="text/css" rel="stylesheet" href="' . url::site($value) . '" media="screen" />'."\n\t";
 		else
-			$this->$var .= '<link type="text/css" rel="stylesheet" href="' . $url . $href . '" media="screen" />'."\n\t";
+			$this->$var .= '<link type="text/css" rel="stylesheet" href="' . url::site($href) . '" media="screen" />'."\n\t";
 	}
 
 /*

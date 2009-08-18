@@ -1,129 +1,164 @@
 
-
-<div id="alpha_message" rel="august 1st 09 !">
-	<a href="#" class="show_alpha">What is private alpha?</a>
-	<strong>Welcome to +Jade Private Alpha!</strong>
-	<div id="show_alpha" style="display:none">
-	This means users are helping me test the core system framework.
-	Please do rip apart +Jade, just remember that feedback is very crucial to development!
-	You can post in the forum, blog, or email me directly.
-	Also, your data may be lost! +Jade cannot guarantee anything during alpha.
-	If you want to be an alpha tester, please email me! Anyone is welcome, the alpha key is only meant
-	as a throttle, in case something really goes wrong. 
-	<br>-  Thank you! - (this domain name) at gmail dot com
+<!--
+<div id="shadow-container">
+		<div class="shadow1">
+			<div class="shadow2">
+				<div class="shadow3">
+					<div class="container">
+						Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-</div>
+ -->
 
+ 
+ 
+<div id="left_home">
 
-<form action="" method="POST">
-	<div id="create_website">
+	<div id="start_now">Start Now &#8594;</div>
 
-		<div id="domain_name">
-			<b>Start Now &#8594;</b> http://beta-<span id="link_example"><?php echo $values['site_name']?></span>.plusjade.com
-		</div>
-		
-		<div id="choose_theme">
-			<table style="width:100%"><tr>
-				<td><a href="#" id="prev"><img src="/_assets/images/admin/prev_sm.png" alt="prev"></a></td>
-				<td><b>Choose a Theme</b></td>
-				<td><a href="#" id="next"><img src="/_assets/images/admin/next_sm.png" alt="next"></a></td>
-			</tr></table>
-			<div class="gallery">
-			<?php foreach($themes as $theme):?>
-				<img src="/_assets/images/themes/<?php echo "$theme->name.$theme->image_ext"?>" alt="<?php echo $theme->name?>">
-			<?php endforeach;?>
-			</div>
-			
-			<div id="title">base</div>
-			<input type="hidden" name="theme" value="base">	
-		</div>
-		
-		<div id="auth_form" class="create_form">
-			<?php if(!empty($errors)):?>
-				<div id="errors"><?php echo $errors?></div>
-			<?php endif;?>
-		
-			
-			<div class="fieldsets" style="background:transparent">
-				<b>Website Name</b><br>
-				<input type="text" name="site_name" value="<?php echo $values['site_name']?>" class="full auto_filename" rel="text_req" size="20" maxlength="25">
-			</div>
-
-			<div class="fieldsets" style="background:transparent">
-				<b>Alpha Code</b><br>
-				<input type="text" name="beta" value="<?php echo $values['beta']?>" class="full" rel="text_req" maxlength="50">
-			</div>
-			
-			<div class="buttons">
-				<button type="submit" class="jade_positive">Create My Website</button>
-			</div>
-			
-			<div style="margin-top:10px; font-size:0.9em; text-align:center">
-				<b>This is your real website!</b>
-				<br>Any changes you make will be saved.
-				<br><br><a href="#explain_more" class="explain_more">explain this ...</a>
-			</div>
-			
-			<div id="explain_more" style="display:none">
-				+Jade does not require registration,
-				<br>but your website starts as <b>unclaimed</b>
-				<p>
-					Unclaimed websites expire after 7 days.
-				</p>
-				Creating an account allows you to:
+	<div class="pitch">
+		<div id="message">
+			+Jade is a website publishing and management system,
+			that runs completely in your web browser.
+			<br>We provide fully hosted, full-featured, 100% brandable websites as a service.
+			<p>
+				<h3>Convenient</h3>
 				<ul>
-					<li>Officially claim your website.</li>
-					<li>Change your subdomain name.</li>
-					<li>Password protect your website.</li>
-					<li>Manage multiple websites.</li>
-					<li>Upgrade.</li>
-					<li>Become a part of our fantastic community!</li>
+					<li>No Coding</li>
+					<li>No Configuration</li>
+					<li>No Installation</li>
+					<li>No Setup Manuals</li>
+					<li>No Headaches</li>
+					<li>No Wasted Time</li>
 				</ul>
-				
-				Create your account any time at <a href="/users/create">http://plusjade.com/users/create</a>
-				<br><b>Or</b> within your website admin bar labeled "claim website".
-			</div>	
-	
-	
-		</div>
-	</div>
-</form>
-
-
-<div class="pitch">
-	<div id="message">
-		+Jade is an in-browser website publishing and management system.
-		<br>We provide hosted, full-featured, websites as a service.
-		<p>
-		No advanced coding or web knowledge necessary.
-		<br>No installs, setup manuals, configuration, headaches or lost time.
+			</p>
+			
+			<h3>Powerful Functionality</h3>
+			<ul>
+				<li>Ajax enabled</li>
+				<li>blogs</li>
+				<li>forums</li>
+				<li>user accounts</li>
+				<li>event calendars</li>
+				<li>product galleries</li>
+				<li>image galleries</li>
+			 </ul>
 		
+			+Jade is specifically for professionals and project leads
+			who need a professional, fully branded, web presence,
+			with powerful functionality to help you get actual results from
+			your website.
+			<br><br>
+			
+			<h3>+Jade is in private Beta</h3>
+			Feedback allows us to build our service to specifcally meet <em>your</em> needs.
+			<br>
+			<br><b>Easy ways to leave feedback:</b>
+			
+			<ul>
+				<li>Post in the forum</li>
+				<li>Comment on the blog</li>
+				<li>email me: plusjade at gmail dot com</li>
+				<li>Post in: <a href="https://plusjade.fogbugz.com">PlusJade Fogbugz</a>.</li>
+			</ul>
+
+			<p>
+				<b>Disclaimer:</b>
+				<br>Plusjade offers no warranties, guarantees, or promises of any kind.
+				Please use at your own risk.
+			</p>
+			The beta code is <b>DOTHEDEW</b>.
+			
+		
+		</div>
+
+	</div>
+
+</div>
+
+<div id="right_home">
+
+	<div id="domain_name">
+		http://beta-<span id="link_example"><?php echo $values['site_name']?></span>.plusjade.com
+	</div>
+			
+	<form action="" method="POST">
+		<div id="create_website" class="fieldsets">
+		
+			<div id="auth_form" class="create_form">
+				<?php if(!empty($errors)):?>
+					<div id="errors"><?php echo $errors?></div>
+				<?php endif;?>
+			
+				
+				<div style="margin:5px 10px">
+					<b>Website Name</b><br>
+					<input type="text" name="site_name" value="<?php echo $values['site_name']?>" class="full auto_filename" rel="text_req" size="20" maxlength="25">
+				</div>
+				
+				<div style="margin:5px 10px">
+					<b>Beta Code</b><br>
+					<input type="text" name="beta" value="<?php echo $values['beta']?>" class="full" rel="text_req" maxlength="50">
+				</div>
+
+
+				<div id="choose_theme">
+					<b>Choose a Theme</b>
+					<div class="gallery">
+					<?php foreach($themes as $theme):?>
+						<img src="/_assets/images/themes/<?php echo "$theme->name.$theme->image_ext"?>" alt="<?php echo $theme->name?>">
+					<?php endforeach;?>
+					</div>
+					
+					<input type="hidden" name="theme" value="base">	
+					
+					<table style="width:100%"><tr>
+						<td width="45px"><a href="#" id="prev"><img src="/_assets/images/admin/prev_sm.png" alt="prev"></a></td>
+						<td><div id="title">base</div></td>
+						<td width="45px"><a href="#" id="next"><img src="/_assets/images/admin/next_sm.png" alt="next"></a></td>
+					</tr></table>
+				</div>
+
+			
+				<div class="buttons">
+					<button type="submit" class="jade_positive">Create My Website</button>
+				</div>
+				
+				<div style="margin-top:10px; font-size:0.9em; text-align:center">
+					<b>This is your real website!</b>
+					<br>Any changes you make will be saved.
+					<br><br><a href="#explain_more" class="explain_more">explain this ...</a>
+				</div>	
+			</div>			
+		</div>
+	</form>
+	
+	<div id="explain_more" style="display:none">
+		+Jade does not require registration,
+		<br>but your website starts as <b>unclaimed</b>
+		<p>
+			Unclaimed websites expire after 7 days.
 		</p>
-		+Jade is a more powerful approach to "online website builders".
-		<br>We focus on productivity, clarity, and convenience for the user.
-
-	</div>
-	
-	<div id="features">
-		<h3>Powerful Functionality</h3>
+		Creating an account allows you to:
 		<ul>
-			<li>Ajax enabled</li>
-			<li>blogs</li>
-			<li>forums</li>
-			<li>user accounts</li>
-			<li>event calendars</li>
-			<li>product galleries</li>
-			<li>image galleries</li>
-		 </ul>
-	</div>
-	
-	<div style="clear:both;"></div>
-	
+			<li>Officially claim your website.</li>
+			<li>Change your subdomain name.</li>
+			<li>Password protect your website.</li>
+			<li>Manage multiple websites.</li>
+			<li>Upgrade.</li>
+			<li>Become a part of our fantastic community!</li>
+		</ul>
+		
+		Create your account any time at
+		<br><a href="/users/create">http://plusjade.com/users/create</a>
+		<br><b>Or</b> within your website admin bar labeled "claim website".
+	</div>	
+			
 </div>
-
-<div style="text-align:center">
-<h1>plusjade.com runs on +Jade =)</h1>
-</div>
+<div style="clear:both;margin-top:10px"></div>
 
 
 <script type="text/javascript">
@@ -161,11 +196,6 @@ $(document).ready(function()
 		$('#explain_more').slideToggle('fast');
 		return false;
 	});
-
-	$('a.show_alpha').click(function(){
-		$('#show_alpha').slideToggle('fast');
-		return false;
-	});
 	
 	
 	$('form').submit(function(){
@@ -173,7 +203,6 @@ $(document).ready(function()
 		$('button').attr('disabled', 'disabled').html('Submitting...');
 	});
 });
-
 </script>
 
 

@@ -139,9 +139,9 @@ class Account_Core {
 	 * @param   mixed    username
 	 * @return  boolean
 	 */
-	public function force_login($username)
+	public function force_login($username, $site_id)
 	{
-		return $this->driver->force_login($username);
+		return $this->driver->force_login($username, $site_id);
 	}
 
 	/**

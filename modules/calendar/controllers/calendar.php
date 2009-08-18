@@ -7,7 +7,8 @@ class Calendar_Controller extends Public_Tool_Controller {
 		parent::__construct();
 	}
 
-	function _index($tool_id)
+	
+	public function _index($tool_id)
 	{
 		$url_array	= Uri::url_array();
 		$page_name	= $this->get_page_name($url_array['0'], 'calendar', $tool_id);
@@ -29,23 +30,51 @@ class Calendar_Controller extends Public_Tool_Controller {
 				$month	= date('m');
 				break;
 		}
+		$primary->calendar = $this->month($page_name, $tool_id, $year, $month);
 		
-		# Javascript
-		if($this->client->logged_in())
-			$primary->global_readyJS('
-				$("#click_hook").click(function(){
-					$().add_toolkit_items("calendar");
-				});			
-			');
-
-		$primary->calendar = $this->month($page_name, $tool_id, $year, $month);	
+		# get the custom javascript;
+		$primary->global_readyJS(self::javascripts());
+		
 		return $this->public_template($primary, 'calendar', $tool_id);
 	}
+	
+/*
+ * output the appropriate javascript based on the calendar view.
+ * currently we just have one though
+ */	
+	private function javascripts()
+	{
+		$js = '
+		
+			$("body").click($.delegate({
+				".phpajaxcalendar_wrapper a[rel=ajax]": function(e){
+					$("a[rel*=ajax]").removeClass("selected");
+					$(this).addClass("selected");
+					
+					$("#calendar_event_details").html("<div class=\"ajax_loading\">Loading...</div>");
+					$("#calendar_event_details").load(e.target.href,{}, function(){
+						$("#click_hook").click();
+					});
+					return false;	
+				},
+				
+				".phpajaxcalendar_wrapper a.monthnav": function(e){
+					$(".phpajaxcalendar_wrapper").html("<div class=\"ajax_loading\">Loading...</div>");
+					$(".phpajaxcalendar_wrapper").load(e.target.href);
+					return false;	
+				}
+			}));	
+		';
+		# place the javascript.
+		return $this->place_javascript($js, FALSE);
+	}
+	
+	
 
 /*
  * Ajax query for month (last and next buttons)
  */
-	function month($page_name, $tool_id, $year=NULL, $month=NULL)
+	public function month($page_name, $tool_id, $year=NULL, $month=NULL)
 	{
 		valid::id_key($tool_id);
 		valid::year($year);
@@ -93,10 +122,12 @@ class Calendar_Controller extends Public_Tool_Controller {
 				'day'			=> $day,
 			))
 			->find_all();	
-	
+
+		
 		$primary = new View('public_calendar/day');
 		$primary->events = $events;
 		$primary->date = "$year $month $day";
+		$primary->logged_in = ($this->client->can_edit($this->site_id)) ? TRUE : FALSE;
 		return $primary;
 	}
 
@@ -133,11 +164,12 @@ class Calendar_Controller extends Public_Tool_Controller {
 			echo $view;
 		}
 	}
+
 	
 /*
  * ajax handler.
  */ 	
-	function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $tool_id)
 	{		
 		/*
 		$page_name = @$url_array['0'];
@@ -153,7 +185,10 @@ class Calendar_Controller extends Public_Tool_Controller {
 	
 		die('something is wrong with the url');
 	}
-	
+
+/*
+ * add the calendar and some sample content
+ */
 	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
 		if($sample)

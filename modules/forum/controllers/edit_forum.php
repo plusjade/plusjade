@@ -20,8 +20,8 @@ class Edit_Forum_Controller extends Edit_Tool_Controller {
 		$categories = ORM::factory('forum_cat')
 			->where(array('forum_id' => $tool_id, 'fk_site' => $this->site_id))
 			->find_all();
-		if(0 == $categories->count())
-			die('no categories');
+		#if(0 == $categories->count())
+		#	die('no categories');
 			
 		$primary = new View('edit_forum/manage');
 		$primary->tool_id = $tool_id;

@@ -37,6 +37,7 @@ class Blog_Controller extends Public_Tool_Controller {
 		switch($action)
 		{
 			case 'entry':
+				
 				$content = self::single_post($page_name, $value);
 				break;
 			
@@ -110,7 +111,8 @@ class Blog_Controller extends Public_Tool_Controller {
 		if(! is_object($item) )
 			return 'This post does not exist';
 		
-		$content->item = $item;	
+		$content->item = $item;
+		$content->set_global('title', $item->title);
 		$content->comments = $this->get_comments($page_name, $item->id, $item->blog_id);
 		$content->blog_page_name = $page_name;
 		return $content;
@@ -220,11 +222,11 @@ class Blog_Controller extends Public_Tool_Controller {
 		$content->blog_post_id = $post_id;
 		$content->tool_id = $tool_id;
 		$content->blog_page_name = $page_name;
-		
+		$content->admin_js = '';
 		# Javascript 
 		# TODO: this is being duplicated on all posts,
 		# make this into a function and call the function instead.
-		if($this->client->logged_in())
+		if($this->client->can_edit($this->site_id))
 			$content->admin_js = '
 				$("#post_comments_'.$post_id.' .comment_item").each(function(i){
 					var toolname = "blog";
@@ -275,7 +277,7 @@ class Blog_Controller extends Public_Tool_Controller {
 /*
  * get all tags from this blog.
  */	
-	function _get_tags($tool_id)
+	public function _get_tags($tool_id)
 	{
 		$tags = $this->db->query("
 			SELECT id, value,
@@ -302,6 +304,7 @@ class Blog_Controller extends Public_Tool_Controller {
 			FROM blog_posts
 			WHERE id IN ($id_string)
 			AND fk_site = '$this->site_id'
+			AND status = 'publish'
 			LIMIT 0,5
 		");
 		return $item;	
@@ -372,14 +375,24 @@ class Blog_Controller extends Public_Tool_Controller {
 			$new_post = ORM::factory('blog_post');
 			$new_post->fk_site	= $site_id;
 			$new_post->blog_id	= $tool_id;
-			$new_post->url		= 'sample-blog-post';
-			$new_post->title	= 'A Sample Blog Post indeed!';
+			$new_post->url		= 'my-first-blog-post';
+			$new_post->title	= 'My First Blog Post';
 			$new_post->body		= '<p>All sorts of interesting content...</p> And then some more content <p>Looking good!</p>';
 			$new_post->created	= strftime("%Y-%m-%d %H:%M:%S");
 			$new_post->status	= 'publish';
 			$new_post->save();
-		}
+			
+			$db = new Database;
+			$data = array(
+			   'fk_site'		=> $site_id,
+			   'blog_post_id'	=> $new_post->id,
+			   'blog_id'		=> $tool_id,
+			   'value'			=> 'general',					
+			);
+			$db->insert('blog_post_tags', $data);
 		
+		
+		}
 		return 'add';
 	}
 

@@ -11,11 +11,9 @@
 	</div>	
 
 	<div class="common_left_panel">	
-		<ul id="showroom_toggle" class="ui-tabs-nav">
-			<li><a href="#" rel="params" class="selected"><b>Attributes</b></span></a><li>
-			<li><a href="#" rel="images"><b>Images</b></span></a><li>
-			<li><a href="#" rel="intro"><b>Introduction</b></span></a><li>
-			<li><a href="#" rel="desc"><b>Main Description</b></span></a><li>
+		<ul id="blog_toggle" class="ui-tabs-nav">
+			<li><a href="#blog_body" class="selected"><b>Body</b></span></a><li>
+			<li><a href="#blog_params"><b>Title & Attributes</b></span></a><li>
 		</ul>
 	</div>
 

@@ -8,15 +8,14 @@
 	So custom menus can be implemented safely.	
 */
 
-$db		= new Database;	
-$pages	= $db->query("
-	SELECT id, page_name, label
-	FROM pages 
-	WHERE fk_site = '$this->site_id' 
-	AND menu = 'yes' 
-	AND enable = 'yes'
-	ORDER BY position
-");
+$pages = ORM::factory('page')
+	->where(array(
+		'fk_site'	=> $this->site_id,
+		'menu'		=> 'yes',
+		'enable'	=> 'yes'
+	))
+	->orderby('position')
+	->find_all();
 
 # pages not built via build_page controller will not have $this_page_id set.
 $this_page_id = (empty($this_page_id)) ? '' : $this_page_id;

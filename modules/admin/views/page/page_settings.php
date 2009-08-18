@@ -97,8 +97,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 				$("input[name='page_name']").addClass('input_error');
 				return false;
 			}
-			$('.facebox .show_submit').show();
-			$('#show_response_beta').html('waiting for response...');			
+			$(document).trigger('show_submit.plusjade');		
 		},
 		success: function(data) {
 			// If the page name changes consider a notification or redirect logic?

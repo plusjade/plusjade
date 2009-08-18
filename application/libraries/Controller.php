@@ -22,11 +22,9 @@ abstract class Controller_Core {
  */
 	public function __construct()
 	{
-		#echo '<pre>'; print_r($_SESSION); echo '</pre>'; die();
-		
 		$session	 = Session::instance();
 		$site_config = yaml::parse($_SESSION['site_name'], 'site_config');
-		
+
 		foreach($site_config as $key => $value)
 			$this->$key = $value ;
 	
@@ -98,7 +96,7 @@ abstract class Controller_Core {
 	public function __call($method, $args)
 	{
 		# Default to showing a 404 page
-		#Event::run('system.404');
+		Event::run('system.404');
 		die('root controller method not found');
 	}
 	

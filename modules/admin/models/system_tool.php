@@ -2,7 +2,7 @@
 
 class System_Tool_Model extends ORM {
 	
-	#protected $has_many = array('pages_tools');
+	protected $has_many = array('system_tool_types');
 	#protected $sorting = array('page_name' => 'asc');
 	
 	/**

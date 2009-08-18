@@ -237,7 +237,7 @@ class Page_Controller extends Controller {
 			$new_page->save();
 
 			# add the tool.
-			Tool_Controller::_add_tool($new_page->id, $system_tool_id, $this->site_name, TRUE);
+			Tool_Controller::_add_tool($new_page->id, $system_tool_id, $this->site_name, NULL, TRUE);
 	
 			# send html to javascript handler
 			$visibility	= ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
@@ -339,10 +339,10 @@ class Page_Controller extends Controller {
 		if($_POST)
 		{
 			# Validate page_name & duplicate check
-			$directory = ( empty($_POST['directory']) ) ? NULL : $_POST['directory']; 
+			$directory = (empty($_POST['directory'])) ? NULL : $_POST['directory']; 
 			$full_path = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory, $_POST['page_name']);
 
-			if(! empty($directory) )
+			if(!empty($directory))
 				$full_path = "$directory/$filename";
 			
 			$page->page_name	= $full_path;
@@ -369,7 +369,8 @@ class Page_Controller extends Controller {
 			if($this->account_page == $_POST['old_page_name'])
 				yaml::edit_site_value($this->site_name, 'site_config', 'account_page', $filename);
 
-
+			# if the page has sub-pages, update the sub-page names.
+			
 			
 			die('Page Settings Saved'); # success				
 		}
@@ -511,9 +512,15 @@ class Page_Controller extends Controller {
 			))
 			->orderby('position')
 			->find_all();
-		
+
+		$all_pages = ORM::factory('page')
+			->where(array('fk_site' => $this->site_id))
+			->orderby('page_name')
+			->find_all();
+			
 		$primary = new View('page/navigation');
 		$primary->pages = $pages;
+		$primary->all_pages = $all_pages;
 		die($primary);
 	}
 
@@ -528,6 +535,21 @@ class Page_Controller extends Controller {
 			
 		die('Page Sort Order Saved'); # success
 	}
+
+
+/*
+ * set a pages menu display to hidden.
+ */		
+	public function hide($page_id=NULL)
+	{
+		valid::id_key($page_id);
+		
+		$page = ORM::factory('page')->where('fk_site', $this->site_id)->find($page_id);
+		$page->menu = 'no';
+		$page->save();
+		die('Page is hidden'); # success
+	}
+	
 	
 /*
  * this may not belong here. 

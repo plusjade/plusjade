@@ -190,7 +190,7 @@ class Account_Controller extends Public_Tool_Controller {
 	{
 		if($this->account_user->logged_in($this->site_id))
 		{
-			#TODO: consider removing this duplication (of the dashboard)
+			# TODO: consider removing this duplication (of the dashboard)
 			$wrapper = new View('public_account/dashboard');
 			$wrapper->page_name = $page_name;
 			$wrapper->content = new View('public_account/dashboard_index');
@@ -221,10 +221,9 @@ class Account_Controller extends Public_Tool_Controller {
 				return self::display_create($page_name, $values, $errors);
 			}
 			# Create new user
-			$account_user = ORM::factory('account_user');	
-			$site_name = $_POST['username'];
+			$account_user = ORM::factory('account_user');
 			
-			if($account_user->username_exists($site_name, $this->site_id))
+			if($account_user->username_exists($_POST['username'], $this->site_id))
 				return self::display_create($page_name, $values, 'username already exists');
 
 			unset($_POST['password2']);
@@ -406,12 +405,11 @@ class Account_Controller extends Public_Tool_Controller {
 		die();
 	}
 
-
-/* ----------------------------------------------------------- */
 /*
+ * -----------------------------------------------------------
  * Functions used specifically for plusjade user accounts only.
+ * -----------------------------------------------------------
  */
-
 	private function plusjade_dashboard($page_name, $message=NULL)
 	{
 		$user = ORM::factory('account_user', $this->account_user->get_user()->id);
@@ -562,13 +560,26 @@ class Account_Controller extends Public_Tool_Controller {
 		die('<br>something is wrong with the url');
 	}
 	
-
-	public static function _tool_adder($tool_id, $site_id)
+/*
+ *
+ */
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
+		# other tools may depend on this admin user being logged in at site creation!
+		if($sample)
+		{
+			# add an admin user.
+			$account_user = ORM::factory('account_user');
+			$account_user->fk_site	= $site_id;
+			$account_user->email	= 'change_this@sample.com';
+			$account_user->username = 'admin';
+			$account_user->password = 'change_this_password';
+			$account_user->save();
+		}
 		return 'add';
 	}
 	
-}  # end -- /
+}  # end
 
 
 

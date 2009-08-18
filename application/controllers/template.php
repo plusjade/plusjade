@@ -13,11 +13,10 @@ abstract class Template_Controller extends Controller {
 		parent::__construct();	
 		#$this->profiler = new Profiler;		
 		$this->template = new View('shell');	
-
 		
 		# Global CSS			
 		if(!$this->client->can_edit($this->site_id))
-			$this->template->linkCSS("/_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
+			$this->template->linkCSS("_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
 		
 		/*
 		$theme_js_path = DOCROOT . "_assets/themes/$this->theme/js/stock.js"
@@ -40,14 +39,14 @@ abstract class Template_Controller extends Controller {
 			# inline modular global css
 			$css_path = $this->assets->themes_dir("$this->theme/css/global.css");
 
-			$css = (file_exists($css_path)) ?
-				file_get_contents($css_path) : '/* global.css file does not exist. Please create it.*/';
+			$css = (file_exists($css_path))
+				? file_get_contents($css_path)
+				: '/* global.css file does not exist. Please create it.*/';
 
 			$this->template->inline_global_css = "<style type=\"text/css\" id=\"global-style\">\n$css\n</style>\n";
 	
-			$this->template->linkCSS('get/css/admin', url::site() );
+			$this->template->linkCSS('get/tool_css/admin');
 			$this->template->admin_linkJS('get/js/admin?v=1.1');
-			$this->template->admin_linkJS('get/js/tools');
 
 			# determine if tool is protected so we can omit scope link			
 			$protected_tools = ORM::factory('system_tool')
@@ -58,6 +57,11 @@ abstract class Template_Controller extends Controller {
 			foreach($protected_tools as $tool)
 				$protected_array[] = $tool->id;
 
+			# Log in the $account_user admin account.
+			if(!$this->account_user->logged_in($this->site_id))
+				$this->account_user->force_login('admin', (int)$this->site_id);
+			
+			
 			# is this website claimed?
 			$days	= 0;
 			$hours	= 0;
@@ -103,6 +107,8 @@ abstract class Template_Controller extends Controller {
  */	
 	public function build_output($containers_array, $template=NULL)
 	{
+		#echo '<pre>'; print_r($_SESSION); echo '</pre>'; die();
+		
 		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');
 		$template 	= ((NULL == $template)) ? 'master' : $template;

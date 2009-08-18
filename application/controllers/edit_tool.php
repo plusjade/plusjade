@@ -1,10 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-abstract class Edit_Tool_Controller extends Controller {
 
 /*
  * All edit_tool controllers extend this class.
  */
  
+abstract class Edit_Tool_Controller extends Controller {
+
 	public function __construct()
 	{
 		parent::__construct();

@@ -30,7 +30,7 @@ class Text_Controller extends Public_Tool_Controller {
 		if($sample)
 		{
 			$text = ORM::factory('text', $tool_id);
-			$text->body = '<h1>This is My Homepage!</h1><p>Enjoy yourselves yeah!</p>';
+			$text->body = View::factory('public_text/sample')->render();
 			$text->save();
 		}
 

@@ -38,7 +38,7 @@ $config['lifetime'] = 1209600;
 /**
  * Set the session key that will be used to store the current user.
  */
-$config['session_key'] = 'FriEnD';
+$config['session_key'] = 'aCcOuNt';
 
 /**
  * Usernames (keys) and hashed passwords (values) used by the File driver.

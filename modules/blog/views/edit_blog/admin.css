@@ -1,14 +1,22 @@
 /* add item */
 /* edit item */
-div.inputs{
-	width:500px;
-	margin:0 auto;
-	text-align:right;
-	margin-bottom:5px;
+ul.common_tag_list{
+	line-height:1.3em
 }
-div.inputs input{
-	width:400px;
+ul.common_tag_list li{
+	padding:4px;
 }
-div.inputs b{
+
+ul.common_tag_list li span{
+	padding:3px;
+	background:#e5f2fe;
+	border:1px solid lightblue;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+}
+.blog_post_tag_pane{
+	width:47%;
 	float:left;
+	margin-top:10px;
+	padding:5px;
 }

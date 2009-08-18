@@ -1,7 +1,32 @@
 #album_wrapper_++{
 
 }
-/* --- lightbox --- */
+
+	/* --- gallery --- */
+
+#album_wrapper_++ .galleryview{
+	margin:0 auto;
+}
+.nav-next,
+.nav-prev,
+.nav-overlay,
+.pointer_img{
+	width:20px;
+	height:20px;
+}
+.nav-next{
+	background: url(/_assets/tools/album/light/next.png) no-repeat 0 0;
+}
+.nav-prev{
+	background: url(/_assets/tools/album/light/prev.png) no-repeat 0 0;
+}
+
+.pointer_img{
+	background: url(/_assets/tools/album/light/pointer.png) no-repeat 0 0;
+}
+
+
+	/* --- lightbox --- */
 
 #album_wrapper_++{
 	margin:5px;
@@ -17,7 +42,7 @@
 	margin:5px;
 }
 #album_wrapper_++ ul.album_lightbox img {
-
+/*img_helper*/
 }
 #album_wrapper_++ ul.album_lightbox a:hover img {
 

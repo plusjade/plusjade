@@ -49,12 +49,12 @@
 	
 // submit button to change theme	
 	$('button#change_theme').click(function(){
-		$(this).removeClass().attr('disabled','disabled');
 		var theme = $('div.common_left_panel li a.selected').html();
 		if('<?php echo $this->theme?>' == theme) {
 			alert('Theme already active.');
 			return false;
 		}
+		$(this).removeClass().attr('disabled','disabled');
 		$('.facebox .show_submit').show();
 		$.post('/get/theme/change', {theme: theme}, function(data){
 			if('TRUE' == data)

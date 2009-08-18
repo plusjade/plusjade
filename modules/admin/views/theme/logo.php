@@ -22,7 +22,7 @@
 
 
 	<div class="common_left_panel" style="text-align:center">
-		<a href="#" class="get_file_browser" rel="albums">Choose new Logo</a>
+		<a href="#" class="get_file_browser images" rel="albums">Choose new Logo</a>
 	</div>
 
 	<div id="logo_droppable_wrapper" class="common_main_panel" style="height:300px">

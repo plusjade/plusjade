@@ -1,7 +1,7 @@
 
-<div id="post_comments_<?php echo $item_id?>" class="posts_comments">
+<div id="post_comments_<?php echo $blog_post_id?>" class="posts_comments">
 
-	<form action="<?php echo url::site("$blog_page_name/comment/$item_id")?>" method="POST" class="public_ajaxForm">
+	<form action="<?php echo url::site("$blog_page_name/comment/$blog_post_id")?>" method="POST" class="public_ajaxForm">
 		<input type="hidden" name="tool_id" value="<?php echo $tool_id?>">
 		
 		<div class="comment_wrapper_title">Comments</div>
@@ -58,6 +58,9 @@
 	</form>
 </div>
 
-<script type="text/javascript">
-	<?php if(! empty($admin_js) ) echo $admin_js?>
-</script>
+<?php if($admin_js):?>
+	<script type="text/javascript">
+		<?php echo $admin_js?>
+	</script>
+<?php endif;?>
+

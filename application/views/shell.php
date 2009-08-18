@@ -28,7 +28,7 @@
 	  //<![CDATA[
 		$(document).ready(function(){				
 			<?php if(! empty($javascript) ) echo $javascript?>
-			<?php if(! empty($readyJS) ) echo $readyJS?>
+			<?php if(! empty($public_javascript) ) echo $public_javascript?>
 		});
 	  //]]>
 	</script> 

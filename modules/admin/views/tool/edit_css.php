@@ -23,12 +23,33 @@
 
 	<div class="common_main_panel" style="margin:0;padding:0;width:78%">
 		<ul class="generic_tabs ui-tabs_nav">
+			<li><a href="#" class="show_options">Options</a></li>
+			<li><a href="#" class="show_css">CSS</a></li>
 			<li><a href="#" class="update">Update</a></li>
 			<li><a href="#" class="show_orig">Reset</a></li>
-			<?php if(NULL != $template) echo '<li><a href="#" class="show_template">Theme Template</a></li>'?>
+			<?php if(NULL != $template):?>
+				<li><a href="#" class="show_template">Theme Template</a></li>
+			<?php endif;?>
 			<li><a href="#" class="show_stock">+Jade Stock</a></li>
 		</ul>
-		<textarea id="edit_css" name="contents" class="blah" style="height:260px"><?php echo $contents?></textarea>
+		
+		<div id="main_options" class="toggle">
+			
+			Each Image:
+			<br><br>
+			<div id="slider"></div>
+			Border:<a href="#" class="do_option"> Red Border</a>
+			<br>Background:
+			<br>Padding:
+			<br>Margin:
+		</div>
+
+		
+		<div id="main_css" class="toggle">
+			<textarea id="edit_css" name="contents" class="blah" style="height:260px"><?php echo $contents?></textarea>
+		</div>
+		
+
 	</div>
 	
 	<div id="stock_contents" style="display:none"><?php echo $stock?></div>
@@ -37,7 +58,41 @@
 
 <script type="text/javascript">
 
-	$('a.update').click(function(){
+	$('.toggle').hide();
+	$('#main_options').show();
+	
+	$("#slider").slider();
+
+	
+	
+	$('a.show_options').click(function(){
+		$('.toggle').hide();
+		$('#main_options').show();
+		return false;
+	});
+	$('a.show_css').click(function(){
+		$('.toggle').hide();
+		$('#main_css').show();
+		return false;
+	});
+
+	/* testing */
+	$('a.do_option').click(function(){
+		$('.toggle').hide();
+		$('#main_css').show();
+		
+		var css_output = 'border:2px solid red;';
+		
+		var new_content = $('#stock_contents').html().replace('/*img_helper*/','/*img_helper*/' + css_output);
+		
+		$('textarea#edit_css').val(new_content);
+		$('a.update').click();
+		return false;
+	});
+
+	
+	
+	$('a.update').click(function(){		
 		var value	= $('textarea#edit_css').val();
 		var css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
 		$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);

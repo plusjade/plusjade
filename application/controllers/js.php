@@ -1,22 +1,23 @@
-<?php
-class Js_Controller extends Controller {
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Compile and manage javascript files for admin session.
+ * Compile and manage javascript files for both live and admin sessions.
+ * The javascripts scope apply to all site functionality.
  */
-	
+ 
+class Js_Controller extends Controller {
+
 	function __construct()
 	{
 		parent::__construct();
 	}
 
-
 /*
- * build singular js file for websites when in live mode.
+ * Package a singular js file for websites when in live mode.
  * This is good because we can keep each file modular,
  * but also optimize and minimize http requests.
  */
-	function live()
+	public function live()
 	{
 		header('Content-type: text/javascript');
 		header("Expires: Sat, 26 Jul 2010 05:00:00 GMT");	
@@ -25,23 +26,25 @@ class Js_Controller extends Controller {
 			'jquery_latest.js',
 			'ajax_form/ajax_form.js',
 			'timeago/jquery.timeago.js',
+			#'gallery/jquery.galleryview-1.1.js', # this should not be here.
+			#'slide/slide_4.js' # testing
 		);
+		
 		ob_start();
 		foreach($files as $file)
-		{
-			$admin_js = DOCROOT . "_assets/js/$file";
-			if(file_exists($admin_js))
-				readfile($admin_js);
-		}
-		die( ob_get_clean() );
+			if(file_exists(DOCROOT . "_assets/js/$file"))
+				readfile(DOCROOT . "_assets/js/$file");
+
+		die();
 	}
+
 	
 /*
- * build singular js file with all needed admin functionality.
- * This is good because we can keep each file modular,
- * but also optimize and minimize http requests.
+ * Package a singular js file with all needed admin functionality.
+ * Admin mode should load every global js dependency as well as
+ * all available tool js dependencies, since any tool can be loaded via ajax at any time.
  */
-	function admin()
+	public function admin()
 	{
 		header('Content-type: text/javascript');
 		header("Expires: Sat, 26 Jul 2010 05:00:00 GMT");	
@@ -53,44 +56,21 @@ class Js_Controller extends Controller {
 			'ajax_form/ajax_form.js',
 			'jw/jwysiwyg.js',
 			'swfupload/swfupload.js',
+			'gallery/gallery.js', # album tool
+			'lightbox/lightbox.js', # album tool
 			'timeago/jquery.timeago.js',
 			'simple_tree/jquery.simple.tree.js',
 			'admin/init.js',
 		);
+
 		ob_start();
 		foreach($files as $file)
-		{
-			$admin_js = DOCROOT . "_assets/js/$file";
-			if(file_exists($admin_js))
-				readfile($admin_js);
-		}
-		die( ob_get_clean() );
+			if(file_exists(DOCROOT . "_assets/js/$file"))
+				readfile(DOCROOT . "_assets/js/$file");
+
+		die();
 	}
 	
-/*
- * load all backend tool javascript as one file.
- */
-	function tools()
-	{
-		header('Content-type: text/javascript');
-		header("Pragma: public");
-		header("Cache-Control: no-cache, must-revalidate");
-		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");		
-		
-		$db = new Database;
-		$system_tools = $db->query("
-			SELECT LOWER(name) as name
-			FROM system_tools
-		");
-		ob_start();	
-		foreach($system_tools as $tool)
-		{
-			$admin_js = MODPATH . "$tool->name/views/public_$tool->name/js/all.js";
-			
-			if(file_exists($admin_js))
-				readfile($admin_js);
-		}				
-		die( ob_get_clean() );
-	}
+
 	
 } /* End  */

@@ -553,12 +553,66 @@ class Forum_Controller extends Public_Tool_Controller {
 	{
 		if($sample)
 		{	
+			# sample category
 			$new_cat			= ORM::factory('forum_cat');
 			$new_cat->forum_id	= $tool_id;
 			$new_cat->fk_site	= $site_id;
 			$new_cat->name		= 'Feedback';
 			$new_cat->url		= 'feedback';
 			$new_cat->save();
+			
+			// Load the admin user
+			$account_user = ORM::factory('account_user')
+				->where('fk_site', $site_id)
+				->find('admin');
+
+				
+			# sample post
+			$new_post = ORM::Factory('forum_cat_post');
+			$new_post->fk_site		= $site_id;
+			$new_post->forum_cat_id	= $new_cat->id;
+			$new_post->title		= 'Add pictures to your homepage.';
+			$new_post->save();
+
+	
+			# add the child comment.
+			$new_comment = ORM::Factory('forum_cat_post_comment');
+			$new_comment->fk_site			= $site_id;
+			$new_comment->forum_cat_post_id	= $new_post->id;
+			$new_comment->account_user_id	= $account_user->id;
+			$new_comment->body				= 'First impressions matter! Having nice, visually appealing pictures on your homepage, makes your website more attractive. Just my two cents. =D';
+			$new_comment->created			= time();
+			$new_comment->is_post			= '1';
+			$new_comment->save();
+			
+			# update post with comment_id.
+			$new_post->forum_cat_post_comment_id = $new_comment->id;
+			$new_post->save();
+			
+			
+			# another sample post
+			$new_post->clear();
+			$new_post->fk_site		= $site_id;
+			$new_post->forum_cat_id	= $new_cat->id;
+			$new_post->title		= 'I like this forum!';
+			$new_post->save();
+
+	
+			# add the child comment.
+			$new_comment->clear();
+			$new_comment->fk_site			= $site_id;
+			$new_comment->forum_cat_post_id	= $new_post->id;
+			$new_comment->account_user_id	= $account_user->id;
+			$new_comment->body				= 'This forum is very user friendly!<br> I like the ability to sort by newest, most active, and vote.<br>Pretty good!';
+			$new_comment->created			= time()-60;
+			$new_comment->is_post			= '1';
+			$new_comment->save();
+			
+			# update post with comment_id.
+			$new_post->forum_cat_post_comment_id = $new_comment->id;
+			$new_post->save();
+			
+			
 		}
 		return 'manage';
 	}

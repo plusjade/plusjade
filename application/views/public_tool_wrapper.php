@@ -4,7 +4,6 @@
 	<?php
 	echo $custom_css;
 	echo $primary;
-	echo $readyJS;
 	 ?>
 </div>
-
+<?php if(!empty($readyJS)) echo $readyJS;?>

@@ -1,0 +1,16 @@
+
+
+/*manage*/
+
+#image_trash{
+	width:100px;
+	height:115px;
+	margin: 0 auto;
+	margin-top:50px;
+	padding:5px;
+	background:url('/_assets/images/admin/trash.jpg') no-repeat 5px 5px;
+}
+#image_trash.ui-state-highlight{
+	background:url('/_assets/images/admin/trash_over.jpg') no-repeat 5px 5px !important;
+	border:1px dashed green !important;
+}

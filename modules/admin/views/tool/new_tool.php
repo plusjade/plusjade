@@ -1,34 +1,66 @@
 
+<style type="text/css">
+.droppable_tool{
+	width:120px;
+	height:120px;
+	float:left;
+	margin:5px;
+	padding:5px;
+	border:1px solid #ccc;
+	background:#fff;
+	text-align:center;
+	cursor:move;
+}
+.each_tool .desc{
+	background:#ffffcc;
+}
+#tool_droppable_wrapper{
+	background:lightblue;
+	border:1px solid #ccc;
+	height:200px;
+}
+</style>	
 
-<?php echo form::open("tool/add/$page_id", array('class' => 'custom_ajaxForm') )?>
-		
-	<div id="common_tool_header" class="buttons">
-		<div id="common_title">Add New Content Tool to this Page</div>
-	</div>
-		
-	<div id="tool_list_wrapper" class="common_left_panel">
-		<h3>Content Tools</h3>
-		<ul>
-		<?php 
-			foreach($tools_list as $key => $tool)
-				echo "<li><a href='#' rel='$tool->id'>$tool->name</a></li>";
-		?>
-		</ul>	
-	</div>
+<div id="common_tool_header" class="buttons">
+	<div id="common_title">Add New Content Tool to this Page</div>
+</div>
 	
-	<div id="tool_view_wrapper" class="common_main_panel">		
-		<?php foreach($tools_list as $key => $tool):?>
-			<div id="tool_<?php echo $tool->id?>" class="each_tool">
-				<button type="submit" name="tool" value="<?php echo $tool->id?>" class="jade_positive">
-					<?php echo $tool->name?>
-				</button>
-				<div class="desc"><?php echo $tool->desc?></div>
-			</div>
-		<?php endforeach;?>
+<div id="tool_list_wrapper" class="common_left_panel">
+	<h3>Content Tools</h3>
+	<ul>
+	<?php 
+		foreach($tools_list as $key => $tool)
+			echo "<li><a href='#' rel='$tool->id'>$tool->name</a></li>";
+	?>
+	</ul>
 
+	<div id="tool_droppable_wrapper">
+		
 	</div>
+</div>
 
-</form>
+<div id="tool_view_wrapper" class="common_main_panel">		
+	<?php foreach($tools_list as $tool):?>
+		<div id="tool_<?php echo $tool->id?>" class="each_tool">
+			<div class="desc"><?php echo $tool->desc?></div>
+			
+			<?php foreach($tool->system_tool_types as $type):?>
+				<div class="droppable_tool" rel="<?php echo $tool->id?>" title="<?php echo $type->type?>">
+					<?php echo $type->type?>
+					<!-- <?php echo $type->desc?> -->
+				</div>
+			<?php endforeach;?>
+			
+			<?php if(0 === $tool->system_tool_types->count()):?>
+				<div class="droppable_tool" rel="<?php echo $tool->id?>" title="0">
+					<?php echo $tool->name?>
+				</div>			
+			<?php endif;?>
+		</div>
+	<?php endforeach;?>
+
+</div>
+
 
 <script type="text/javascript">
 $(document).ready(function()
@@ -40,29 +72,42 @@ $(document).ready(function()
 		$('#tool_'+id).show();
 		return false;
 	});
-	
-/*
- * ACTIVATE custom ajax form
- * tool_data = post output from this method (above)
- * receives the custom url of where the next 'add' page is for the particular tool
- */
-	$('.facebox .custom_ajaxForm').ajaxForm({	
-		beforeSubmit: function(){
-			$('.facebox .custom_ajaxForm button')
-			.attr('disabled','disabled')
-			.removeClass('jade_positive');
-			$('.facebox .show_submit').show();
-		},			
-		success: function(tool_data) {
-			//tool_data format: toolname:load_method:tool_id:tool_guid
-			var tool_data = tool_data.split(':');
-			$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);	
-			
-			// load the 'load_method' tool::method
-			$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
-				function(data){$.facebox(data, false, 'facebox_base')}
+
+// make tools draggable
+	$("div.droppable_tool").draggable({ revert: true });
+
+// make space droppable.
+	$("#tool_droppable_wrapper").droppable({
+		activeClass: 'ui-state-highlight',
+		accept: 'div.droppable_tool',
+		drop: function(event, ui) {
+		/*
+		 * tool_data = post output from this method (above)
+		 * receives the custom url of where the next 'add' page is for the particular tool
+		 */
+			var tool = $(ui.draggable).attr('rel');
+			var type = $(ui.draggable).attr('title');
+
+			$(document).trigger('show_submit.plusjade');
+			$('.common_main_panel').hide().before('<div class="plusjade_ajax floatleft" style="width:600px;"><b>Adding Tool: May take a few seconds...</b></div>');
+			$.post('/get/tool/add/<?php echo $page_id?>',
+				{tool:tool, type:type},
+				function(tool_data){
+					//tool_data format: toolname:load_method:tool_id:tool_guid
+					var tool_data = tool_data.split(':');
+					$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);	
+					
+					// load the 'load_method' tool::method
+					$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
+						function(data){$.facebox(data, false, 'facebox_base')}
+					);			
+				}
 			);
 		}
 	});
+	
 });
+
+
+
 </script>

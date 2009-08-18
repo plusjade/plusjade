@@ -95,8 +95,18 @@ class Auth_Controller extends Controller {
 		$new_page->menu			= 'yes';
 		$new_page->save();
 		
-		# add a text tool with welcome message.
-		Tool_Controller::_add_tool($new_page->id, 'Text', $site_name, FALSE, TRUE);
+		
+		# add sample tools to homepage.
+		$sample_tools = array(
+			'Faq',
+			'Navigation',
+			'Album',
+			'Text'
+		);
+		
+		foreach($sample_tools as $name)
+			Tool_Controller::_add_tool($new_page->id, $name, $site_name, FALSE, TRUE);
+		
 		
 		# install page builders.
 		$install = array(
@@ -147,9 +157,10 @@ class Auth_Controller extends Controller {
 				# setup credentials via the auth library
 				$this->client->force_login($plusjade_user);
 			}
+
 			url::redirect();
 		}
-		die();
+		die('no token');
 	}
 	
 

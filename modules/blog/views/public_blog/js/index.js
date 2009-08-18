@@ -1,13 +1,13 @@
 
 $('body').click($.delegate({
-	'#blog_wrapper_%VAR% a[rel*=blog_ajax]': function(e){
-		url = $(e.target).attr('href');
+	'.blog_wrapper a[rel*=blog_ajax]': function(e){
+		var url = $(e.target).attr('href');
 		$('.blog_content').html('<div class="ajax_loading">Loading...</div>');
 		$('.blog_content').load(url);
 		return false;
 	},
-	'#blog_wrapper_%VAR% a.get_comments':function(e){
-		url			= $(e.target).attr('rel');
+	'.blog_wrapper a.get_comments':function(e){
+		var url		= $(e.target).attr('rel');
 		$container	= $(e.target).parent();
 		
 		$container.html('<div class="ajax_loading">Loading...</div>');
@@ -20,7 +20,7 @@ $('body').click($.delegate({
 
 $('body').submit($.delegate({
 	'#blog_wrapper_%VAR% form.public_ajaxForm': function(e){
-		form = $(e.target);
+		var form = $(e.target);
 		$(form).ajaxSubmit({
 			beforeSubmit: function(){
 				if( $('input[type=text]', form).jade_validate() )

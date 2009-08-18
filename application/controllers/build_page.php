@@ -32,7 +32,8 @@ class Build_Page_Controller extends Template_Controller {
 		$prepend				= '';
 		$append					= '';
 		
-		$this->template->title 	= $page->title;
+
+		$this->template->set_global('title', $page->title);
 		$this->template->meta_tags('description', $page->meta);
 		$this->template->set_global('this_page_id', $page->id);	
 		
@@ -99,11 +100,12 @@ class Build_Page_Controller extends Template_Controller {
 		}
 		else
 		{
-			$this->template->linkCSS("get/css/tools/$page->id", url::site() );
+			# load tool css.
+			$this->template->linkCSS("get/tool_css/live/$page->id");
 			$this->template->admin_linkJS('get/js/live?v=1.0');
 			
-			# Load Javascript files if they exist.
-			if (! empty($_SESSION['js_files']) )
+			# Add requested javascript files if any are valid.
+			if(!empty($_SESSION['js_files']))
 			{
 				# Load Javascript
 				$this->template->linkJS($_SESSION['js_files']);

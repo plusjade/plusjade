@@ -183,7 +183,7 @@ class Tree_Core {
 				
 				# validate the data so corrupt data does not break the tree.
 				foreach($element_data as $data)
-					if(empty($data) OR !ctype_digit($data))
+					if(!ctype_digit($data))
 						continue 2;
 				
 				list($id, $parent, $position) = $element_data;

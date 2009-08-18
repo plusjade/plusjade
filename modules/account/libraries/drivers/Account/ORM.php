@@ -127,12 +127,14 @@ class Account_ORM_Driver extends Account_Driver {
 	 * @param   mixed    username
 	 * @return  boolean
 	 */
-	public function force_login($user)
+	public function force_login($user, $site_id)
 	{
 		if ( ! is_object($user))
 		{
 			// Load the user
-			$user = ORM::factory('account_user', $user);
+			$user = ORM::factory('account_user')
+				->where('fk_site', $site_id)
+				->find($user);
 		}
 
 		// Mark the session as forced, to prevent users from changing account information

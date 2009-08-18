@@ -45,7 +45,7 @@ $config['output_compression'] = FALSE;
  * Enable or disable global XSS filtering of GET, POST, and SERVER data. This
  * option also accepts a string to specify a specific XSS filtering tool.
  */
-$config['global_xss_filtering'] = TRUE;
+$config['global_xss_filtering'] = 'htmlpurifier';
 
 /**
  * Enable or disable hooks. Setting this option to TRUE will enable
@@ -99,15 +99,12 @@ $config['modules'] = array
 	MODPATH.'auth',
 	MODPATH.'admin',
 	MODPATH.'text',
+	MODPATH.'album',
+	MODPATH.'format',
 	MODPATH.'navigation',	
 	MODPATH.'showroom',
 	MODPATH.'calendar',	
 	MODPATH.'reviews',
-	MODPATH.'slide_panel',   
-	MODPATH.'contact',
-	MODPATH.'about',
-	MODPATH.'faq',
-	MODPATH.'album',
 	MODPATH.'blog',
 	MODPATH.'account',
 	MODPATH.'forum'

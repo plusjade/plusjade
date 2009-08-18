@@ -17,3 +17,9 @@
 	}
 	?>
 </div>
+
+<?php if($logged_in):?>
+	<script type="text/javascript">
+		$().add_toolkit_items("calendar");
+	</script>
+<?php endif;?>

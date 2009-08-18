@@ -94,6 +94,7 @@ class Auth_ORM_Driver extends Auth_Driver {
 		// Mark the session as forced, to prevent users from changing account information
 		$_SESSION['auth_forced'] = TRUE;
 
+
 		// Run the standard completion
 		$this->complete_login($user);
 	}

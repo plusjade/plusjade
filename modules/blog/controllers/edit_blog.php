@@ -45,13 +45,37 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			$new_post->fk_site	= $this->site_id;
 			$new_post->blog_id	= $tool_id;
 			$new_post->url		= $_POST['url'];
+			$new_post->status	= $_POST['status'];
 			$new_post->title	= $_POST['title'];
 			$new_post->body		= $_POST['body'];
 			$new_post->created	= strftime("%Y-%m-%d %H:%M:%S");
 			$new_post->save();
 
-
+			# save tags
 			self::save_tags($_POST['tags'], $new_post->id, $tool_id);
+			
+			# update sticky post
+			if(isset($_POST['sticky']))
+			{
+				$blog = ORM::factory('blog')
+					->where('fk_site', $this->site_id)
+					->find($tool_id);
+				if(FALSE === $blog->loaded)
+					die('invalid blog id');
+					
+				$sticky_posts = '';
+				
+				if('stick' == $_POST['sticky'])
+				{
+					if(empty($blog->sticky_posts))
+						$sticky_posts = $new_post->id;
+					else
+						$sticky_posts = "$blog->sticky_posts,$new_post->id";
+				}	
+				$blog->sticky_posts = $sticky_posts;	
+				$blog->save();
+			}
+			
 			die('New Post added'); # success
 		}
 
@@ -74,7 +98,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			$post = ORM::factory('blog_post')
 				->where('fk_site', $this->site_id)
 				->find($id);
-			if(FALSE === $post->loaded)
+			if(!$post->loaded)
 				die('invalid post id');
 			
 			$post->url		= $_POST['url'];
@@ -83,29 +107,40 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 			$post->status	= $_POST['status'];
 			$post->save();
 			
+			# save the tags
 			self::save_tags($_POST['tags'], $id, $_POST['blog_id']);
 			
+			# update sticky post
 			if(isset($_POST['sticky']))
 			{
-				$sticky_posts = '';
-				
-				if('stick' == $_POST['sticky'])
-					$sticky_posts = $_POST['sticky_posts'] . ",$id";
-				elseif('unstick' == $_POST['sticky'])
-				{
-					$sticky_posts = explode(',', $_POST['sticky_posts']);
-					#print_r($sticky_posts);die();
-					if($key = array_search($id, $sticky_posts))
-						unset($sticky_posts[$key]);
-						
-					$sticky_posts = implode(',', $sticky_posts);
-				}
-	
 				$blog = ORM::factory('blog')
 					->where('fk_site', $this->site_id)
 					->find($_POST['blog_id']);
 				if(FALSE === $blog->loaded)
 					die('invalid blog id');
+					
+				$sticky_posts = '';
+				
+				if('stick' == $_POST['sticky'])
+				{
+					if(empty($blog->sticky_posts))
+						$sticky_posts = $id;
+					else
+						$sticky_posts = "$blog->sticky_posts,$id";
+				}
+				elseif('unstick' == $_POST['sticky'])
+				{
+					$sticky_posts = explode(',', $blog->sticky_posts);
+					
+					# this will return false if the value is found but key happens to be zero... stupid!
+					$key = array_search($id, $sticky_posts);
+					
+					if(FALSE !== $key)
+						unset($sticky_posts[$key]);
+
+					$sticky_posts = implode(',', $sticky_posts);
+				}
+
 					
 				$blog->sticky_posts = $sticky_posts;	
 				$blog->save();
@@ -126,7 +161,7 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 		$blog = ORM::factory('blog')
 			->where('fk_site', $this->site_id)
 			->find($post->blog_id);
-		if(FALSE === $blog->loaded)
+		if(!$blog->loaded)
 			die('invalid blog id');
 
 	
@@ -134,7 +169,6 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	
 		$primary = new View("edit_blog/edit_item");
 		$primary->item			 = $post;
-		$primary->sticky_posts	 = $blog->sticky_posts;
 		$primary->is_sticky		 = (in_array($id, $sticky_posts)) ? TRUE : FALSE ;
 		$primary->js_rel_command = "update-blog-$post->blog_id";
 		die($primary);
@@ -147,21 +181,22 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
 	private function save_tags($tags, $blog_post_id, $blog_id)
 	{
 		$tags = trim($tags);
-		if (empty($tags))
+		if(empty($tags))
 			return FALSE;
 			
 		$db = new Database;
-		$tags = explode(',', $tags);
+		
+		# sort by space.
+		$tags = explode(' ', $tags);
 		
 		foreach($tags as $tag)
 		{
-			$tag = trim($tag);
-			$tag = preg_replace("(/W)", '_', $tag);
+			$tag = trim($tag); 
 			$data = array(
-			   'fk_site'	=> $this->site_id,
+			   'fk_site'		=> $this->site_id,
 			   'blog_post_id'	=> $blog_post_id,
-			   'blog_id'	=> $blog_id,
-			   'value'		=> $tag,					
+			   'blog_id'		=> $blog_id,
+			   'value'			=> valid::filter_php_url($tag),					
 			);
 			$db->insert('blog_post_tags', $data);
 		}

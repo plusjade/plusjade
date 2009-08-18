@@ -19,7 +19,7 @@
 		
 		<div class="comment_meta">
 			<div class="meta">
-				 by:<a href="/users/profile/<?php echo $comment->account_user->username?>"><?php echo $comment->account_user->username?></a>
+				 by:<a href="/<?php echo $this->account_page?>/profile/<?php echo $comment->account_user->username?>"><?php echo $comment->account_user->username?></a>
 				 - <abbr class="timeago" title="<?php echo date("c", $comment->created)?>"><?php echo date("M d y @ g:i a", $comment->created)?></abbr>
 			</div>
 			<?if($account_user == $comment->account_user->id):?>
