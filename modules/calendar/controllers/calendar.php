@@ -16,8 +16,16 @@ class Calendar_Controller extends Public_Tool_Controller {
 		$year		= $url_array['2'];
 		$month		= $url_array['3'];
 		$day		= $url_array['4'];
-		$primary	= new View('public_calendar/index');
-		
+		$primary	= new View('public_calendar/small/index');
+
+
+		$calendar = ORM::factory('calendar')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $calendar->loaded)
+			return $this->public_template('calendar not found', 'calendar', $calendar);
+
+			
 		switch($action)
 		{
 			case 'month':
@@ -35,7 +43,7 @@ class Calendar_Controller extends Public_Tool_Controller {
 		# get the custom javascript;
 		$primary->global_readyJS(self::javascripts());
 		
-		return $this->public_template($primary, 'calendar', $tool_id);
+		return $this->public_template($primary, 'calendar', $calendar);
 	}
 	
 /*
@@ -124,7 +132,7 @@ class Calendar_Controller extends Public_Tool_Controller {
 			->find_all();	
 
 		
-		$primary = new View('public_calendar/day');
+		$primary = new View('public_calendar/small/day');
 		$primary->events = $events;
 		$primary->date = "$year $month $day";
 		$primary->logged_in = ($this->client->can_edit($this->site_id)) ? TRUE : FALSE;
@@ -148,7 +156,7 @@ class Calendar_Controller extends Public_Tool_Controller {
 		
 		if( isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']=="XMLHttpRequest")
 		{
-			$primary = new View('public_calendar/event');
+			$primary = new View('public_calendar/small/event');
 			$primary->event = $event;
 			echo $primary;
 		}
@@ -158,7 +166,7 @@ class Calendar_Controller extends Public_Tool_Controller {
 			die();
 			
 			$view = new View('shell');
-			$primary = new View('public_calendar/event');
+			$primary = new View('public_calendar/small/event');
 			$primary->event = $event;
 			
 			echo $view;

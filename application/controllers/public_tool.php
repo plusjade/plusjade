@@ -29,24 +29,26 @@ abstract class Public_Tool_Controller extends Controller {
 	
 		## rename to "tool_view_template"
  */	
-	public function public_template($primary, $toolname, $tool_id, $attributes='', $sub_tool=FALSE)
+	public function public_template($primary, $toolname, $tool_ob=NULL, $sub_tool=FALSE)
 	{
 		$this->template->primary		= $primary;
 		$this->template->toolname		= $toolname;
-		$this->template->tool_id		= $tool_id;
-		$this->template->attributes		= $attributes;
+		$this->template->tool_id		= (empty($tool_ob)) ? '' : $tool_ob->id;
+		$this->template->attributes		= (empty($tool_ob)) ? '' : $tool_ob->attributes;
 		$this->template->custom_css		= '';
 		
 		# should we modularize the CSS ?
 		if($this->client->can_edit($this->site_id) OR TRUE === $sub_tool)
 		{
-			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/css/$tool_id.css");
+			# if we switch themes while still in admin mode, the tool_css file
+			# will not exist relative to the new theme. We have to create it.
+			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/_created/$tool_ob->id/{$tool_ob->type}_$tool_ob->view.css");
 			$css = (file_exists($custom_css))
 				? file_get_contents($custom_css)
-				: Tool_Controller::_generate_tool_css($toolname, $tool_id, $this->site_name, $this->theme, TRUE);
+				: Tool_Controller::_generate_tool_css($toolname, $tool_ob->id, $tool_ob->type, $tool_ob->view, $this->site_name, $this->theme, TRUE);
 
 			$this->template->custom_css = "
-				<style type=\"text/css\" id=\"$toolname-$tool_id-style\">
+				<style type=\"text/css\" id=\"$toolname-$tool_ob->id-style\">
 					$css
 				</style>
 			";

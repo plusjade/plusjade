@@ -20,8 +20,17 @@ class Forum_Controller extends Public_Tool_Controller {
 		$action		= (empty($url_array['1']) OR 'tool' == $url_array['1'])
 			? 'index'
 			: $url_array['1'];
-		
-		$wrapper = new View('public_forum/index');
+
+
+		$forum = ORM::factory('forum')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);	
+		if(FALSE === $album->loaded)
+			return $this->public_template('forum not found', 'forum', $forum);
+
+
+			
+		$wrapper = new View('public_forum/forums/index');
 		
 		switch($action)
 		{					
@@ -51,7 +60,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		}
 		$wrapper->page_name		= $page_name;
 		$wrapper->categories	= self::categories($tool_id);
-		return $this->public_template($wrapper, 'forum', $tool_id, '');
+		return $this->public_template($wrapper, 'forum', $forum);
 	}
 
 /*
@@ -92,7 +101,7 @@ class Forum_Controller extends Public_Tool_Controller {
  */
 	private function posts_wrapper($page_name, $tool_id, $category)
 	{
-		$primary			 = new View('public_forum/posts_wrapper');
+		$primary			 = new View('public_forum/forums/posts_wrapper');
 		$primary->category	 = (empty($category)) ? 'all' : $category;
 		$primary->page_name	 = $page_name;	
 		$primary->posts_list = self::posts_list($page_name, $primary->category);
@@ -128,7 +137,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(0 == $posts->count())
 			return 'No posts in this category';
 		
-		$primary = new View('public_forum/posts_list');		
+		$primary = new View('public_forum/forums/posts_list');		
 		$primary->posts = $posts;
 		$primary->page_name	= $page_name;
 		return $primary;
@@ -181,7 +190,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(TRUE != $post->loaded)
 			die('render 404 not found');
 
-		$primary = new View('public_forum/posts_comments_wrapper');
+		$primary = new View('public_forum/forums/posts_comments_wrapper');
 		$primary->post			= $post;
 		$primary->page_name 	= $page_name;	
 		$primary->is_logged_in	= $this->account_user->logged_in($this->site_id);	
@@ -226,7 +235,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(0 == $comments->count())
 			return 'No comments yet';
 
-		$primary = new View('public_forum/comments_list');
+		$primary = new View('public_forum/forums/comments_list');
 		$primary->is_logged_in	= $this->account_user->logged_in($this->site_id);	
 		$primary->page_name		= $page_name;
 		$primary->account_user	= $account_user_id;			
@@ -241,14 +250,14 @@ class Forum_Controller extends Public_Tool_Controller {
 	private function my($page_name, $tool_id, $type)
 	{
 		if(!$this->account_user->logged_in($this->site_id))
-			return new View('public_forum/login');
+			return new View('public_forum/forums/login');
 
 		if(empty($type))
 			$type = 'posts';
 		$allowed = array('posts', 'comments', 'starred');
 		if(in_array($type, $allowed))
 		{
-			$wrapper = new View('public_forum/my_index');
+			$wrapper = new View('public_forum/forums/my_index');
 			$wrapper->page_name = $page_name;
 			$wrapper->type = $type;
 
@@ -285,7 +294,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(0 == $posts->count())
 			return 'No posts created yet.';
 
-		$primary			= new View('public_forum/posts_list');	
+		$primary			= new View('public_forum/forums/posts_list');	
 		$primary->posts 	= $posts;
 		$primary->page_name = $page_name;
 		return $primary;
@@ -313,7 +322,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(0 == $comments->count())
 			return 'No comments added yet.';
 			
-		$view = new View('public_forum/my_comments_list');
+		$view = new View('public_forum/forums/my_comments_list');
 		$view->comments = $comments;
 		$view->page_name = $page_name;
 		return $view;
@@ -344,7 +353,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(0 == $posts->count())
 			return 'No posts have been starred yet.';
 
-		$primary = new View('public_forum/posts_list');	
+		$primary = new View('public_forum/forums/posts_list');	
 		$primary->posts = $posts;
 		$primary->page_name = $page_name;
 		return $primary;
@@ -359,7 +368,7 @@ class Forum_Controller extends Public_Tool_Controller {
 	private function submit($page_name, $tool_id)
 	{
 		if(!$this->account_user->logged_in($this->site_id))
-			return new View('public_forum/login');
+			return new View('public_forum/forums/login');
 			
 		if($_POST)
 		{
@@ -389,7 +398,7 @@ class Forum_Controller extends Public_Tool_Controller {
 			#TODO: output a success message.
 		}
 		
-		$primary = new View('public_forum/submit');
+		$primary = new View('public_forum/forums/submit');
 		$primary->page_name = $page_name;
 		$primary->categories = self::categories($tool_id);
 		return $primary;
@@ -460,7 +469,7 @@ class Forum_Controller extends Public_Tool_Controller {
 			die('Changes Saved'); # send data to javascript if enabled.
 		}
 
-		$primary = new View('public_forum/edit');
+		$primary = new View('public_forum/forums/edit');
 		$primary->page_name = $page_name;
 		
 		switch($type)

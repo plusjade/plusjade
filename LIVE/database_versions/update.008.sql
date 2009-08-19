@@ -46,3 +46,20 @@ ALTER TABLE `system_tool_views` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 RENAME TABLE system_tool_views TO system_tool_types;
 
 ALTER TABLE `system_tool_types` CHANGE `view` `type` VARCHAR( 55 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
+
+
+
+ALTER TABLE `accounts` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name` ;
+ALTER TABLE `albums` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name`; 
+ALTER TABLE `blogs` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name`; 
+ALTER TABLE `calendars` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name`; 
+ALTER TABLE `forums` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name`; 
+ALTER TABLE `navigations` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `title` ;
+ALTER TABLE `showrooms` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name`; 
+
+ALTER TABLE `navigations` CHANGE `title` `name` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL 
+
+ALTER TABLE `system_tools` ADD `type` VARCHAR( 30 ) NOT NULL COMMENT 'default' AFTER `visible` ;
+
+
+ALTER TABLE `texts` ADD `view` VARCHAR( 55 ) NOT NULL AFTER `type` ;

@@ -50,12 +50,6 @@
 					<!-- <?php echo $type->desc?> -->
 				</div>
 			<?php endforeach;?>
-			
-			<?php if(0 === $tool->system_tool_types->count()):?>
-				<div class="droppable_tool" rel="<?php echo $tool->id?>" title="0">
-					<?php echo $tool->name?>
-				</div>			
-			<?php endif;?>
 		</div>
 	<?php endforeach;?>
 

@@ -3,15 +3,15 @@
 <?php extract($data)?>
 <span class="on_close two"><?php echo $js_rel_command?></span>
 
-<?php echo form::open_multipart("tool/css/$name_id/$tool_id", array('class' => 'ajaxForm', 'rel' => 'no_disable'))?>
+<?php echo form::open_multipart("tool/css/$name_id/$tool->id", array('class' => 'ajaxForm', 'rel' => 'no_disable'))?>
 
 	<div id="common_tool_header" class="buttons">
-		<div id="common_title"><?php echo $toolname?> - <?php echo $tool_id?> CSS.</div>
+		<div id="common_title">Tool: <em><?php echo $toolname?></em> - Type: <em><?php echo $tool->type?></em> - View: <em><?php echo $tool->view?></em></small></div>
 	</div>
 
 	<div class="common_left_panel"  style="width:18%">	
 		<b>Add container class:</b>
-		<br><input type="text" name="attributes" value="<?php echo $attributes?>">
+		<br><input type="text" name="attributes" value="<?php echo $tool->attributes?>">
 		<p>
 		<button type="submit" name="save_css" class="jade_positive">Save Changes</button>
 		</p>
@@ -59,7 +59,7 @@
 <script type="text/javascript">
 
 	$('.toggle').hide();
-	$('#main_options').show();
+	$('#main_css').show();
 	
 	$("#slider").slider();
 
@@ -94,8 +94,8 @@
 	
 	$('a.update').click(function(){		
 		var value	= $('textarea#edit_css').val();
-		var css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
-		$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
+		var css		= '<style id="<?php echo "$toolname-$tool->id-style"?>" type="text/css">'+ value +'</style>';
+		$('#<?php echo "$toolname-$tool->id-style"?>').replaceWith(css);
 		return false;
 	});
 
@@ -103,8 +103,8 @@
 	// 16 = SHIFT, 9 = tab
 	  if (e.keyCode == 9) {		
 			var value	= $('textarea#edit_css').val();
-			var css		= '<style id="<?php echo "$toolname-$tool_id-style"?>" type="text/css">'+ value +'</style>';
-			$('#<?php echo "$toolname-$tool_id-style"?>').replaceWith(css);
+			var css		= '<style id="<?php echo "$toolname-$tool->id-style"?>" type="text/css">'+ value +'</style>';
+			$('#<?php echo "$toolname-$tool->id-style"?>').replaceWith(css);
 			return false;
 		}	
 	});

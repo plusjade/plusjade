@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
 
 class Navigation_Controller extends Public_Tool_Controller {
 
@@ -10,7 +11,7 @@ class Navigation_Controller extends Public_Tool_Controller {
 /*
  * Displays a nestable navigation element menu
  */	 
-	function _index($tool_id)
+	public function _index($tool_id)
 	{
 		valid::id_key($tool_id);
 		
@@ -18,18 +19,19 @@ class Navigation_Controller extends Public_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find($tool_id);	
 		if(FALSE === $navigation->loaded)
-			return $this->public_template('this navigation id not found.', 'navigation', $tool_id, '');
+			return $this->public_template('this navigation id not found.', 'navigation', $navigation);
 	
 		# There will always be a root_holder so no items is actually =1
 		if('1' == $navigation->navigation_items->count())
-			return $this->public_template('(no items)', 'navigation', $tool_id);
+			return $this->public_template('(no items)', 'navigation', $navigation);
 		
-		$primary = new View('public_navigation/index');	
+		$primary = new View('public_navigation/lists/stock');	
 		$primary->navigation = $navigation;
 		# public node_generation function is contained in the tree class...
 		$primary->tree = Tree::display_tree('navigation', $navigation->navigation_items);
-		return $this->public_template($primary, 'navigation', $tool_id, $navigation->attributes);
+		return $this->public_template($primary, 'navigation', $navigation);
 	}
+ 
  
 /*
  * Need to add a root child to items list for every other
@@ -94,9 +96,6 @@ class Navigation_Controller extends Public_Tool_Controller {
 			Tree::rebuild_tree('navigation_item', $navigation->root_id, $site_id, '1');
 			
 		}	
-			
-
-		
 		return 'manage';
 	}
 	

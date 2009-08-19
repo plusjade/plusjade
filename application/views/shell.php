@@ -4,21 +4,21 @@
 <head>
 	<?php
 	#$this->profiler = new Profiler;
-	if(! empty($title) ) echo "<title>$title</title>\n\t";
-	if(! empty($meta_tags) ) echo $meta_tags;
-	if(! empty($inline_global_css) ) echo $inline_global_css;
-	if(! empty($load_css) ) echo $load_css;
-	if(! empty($load_js) ) echo $load_js;
+	if(!empty($title)) echo "<title>$title</title>\n\t";
+	if(!empty($meta_tags)) echo $meta_tags;
+	if(!empty($inline_global_css)) echo $inline_global_css;
+	if(!empty($load_css)) echo $load_css;
+	if(!empty($load_js)) echo $load_js;
 	?>
 </head>
 
 <body>
 	<?php
-	if(! empty($admin_panel) ) echo $admin_panel;
-	if(! empty($error) ) echo $error;
+	if(!empty($admin_panel)) echo $admin_panel;
+	if(!empty($error)) echo $error;
 	
 	# Required for all controllers passing with primary...	
-	if(! empty($output) )
+	if(!empty($output))
 		echo $output;
 	else
 		echo $primary;
@@ -27,13 +27,13 @@
 	<script type="text/javascript"> 
 	  //<![CDATA[
 		$(document).ready(function(){				
-			<?php if(! empty($javascript) ) echo $javascript?>
-			<?php if(! empty($public_javascript) ) echo $public_javascript?>
+			<?php if(!empty($javascript)) echo $javascript?>
+			<?php if(!empty($public_javascript)) echo $public_javascript?>
 		});
 	  //]]>
-	</script> 
+	</script>
 	<?php
-	if(! empty($end_body) ) echo $end_body;
+	if(!empty($end_body)) echo $end_body;
 		
 	#<script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>	
 	?>

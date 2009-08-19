@@ -11,9 +11,8 @@ class Showroom_Controller extends Public_Tool_Controller {
  * The index displays various showroom views based on the url and routes as necessary
  * This is for non-ajax requests. _ajax handles ajax routing.
  */ 
-	function _index($tool_id)
+	public function _index($tool_id)
 	{
-		$db			= new Database;
 		$url_array	= uri::url_array();
 		$page_name	= $this->get_page_name($url_array['0'], 'showroom', $tool_id);		
 		$category	= $url_array['1'];
@@ -24,9 +23,9 @@ class Showroom_Controller extends Public_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find($tool_id);	
 		if(FALSE === $showroom->loaded)
-			return $this->public_template('this showroom id not found.', 'showroom', $tool_id, '');
+			return $this->public_template('this showroom id not found.', 'showroom', $showroom);
 	
-		$primary = new View("public_showroom/index");
+		$primary = new View("public_showroom/display/index");
 		
 		# show the categories list.
 		function render_node_showroom($item, $page_name)
@@ -54,7 +53,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 				});
 			');
 			
-		return $this->public_template($primary, 'showroom', $tool_id, $showroom->attributes);	
+		return $this->public_template($primary, 'showroom', $showroom);	
 	}
 
 	
@@ -84,7 +83,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 		if(0 == $items->count())
 			return 'No items. Check back soon!';
 
-		$item_view = new View("public_showroom/items_$view");
+		$item_view = new View("public_showroom/display/items_$view");
 		$item_view->category	= $category;
 		$item_view->page_name	= $page_name;
 		$item_view->items		= $items;
@@ -122,7 +121,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 			$images[] = "$small|$image";
 		}
 
-		$primary = new View('public_showroom/single_item');
+		$primary = new View('public_showroom/display/single_item');
 		$primary->item		= $item_object;
 		$primary->images	= $images;	
 		$primary->category	= $category;
@@ -135,7 +134,7 @@ class Showroom_Controller extends Public_Tool_Controller {
  * ajax handler
  *
  */
-	function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $tool_id)
 	{		
 		list($page_name, $category, $item) = $url_array;
 
@@ -154,14 +153,14 @@ class Showroom_Controller extends Public_Tool_Controller {
  * child to belong to
  * Add root child id to parent for easier access.
  */	
-	function _tool_adder($tool_id)
+	public static function _tool_adder($tool_id, $site_id)
 	{
 	
 		# this can all be done in the overloaded save function for
 		# navigations model - look into it.	
 		$new_cat = ORM::factory('showroom_cat');
 		$new_cat->showroom_id	= $tool_id;
-		$new_cat->fk_site		= $this->site_id;
+		$new_cat->fk_site		= $site_id;
 		$new_cat->name			= 'ROOT';
 		$new_cat->local_parent	= 0;
 		$new_cat->position		= 0;

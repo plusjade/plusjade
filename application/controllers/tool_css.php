@@ -47,16 +47,55 @@ class Tool_Css_Controller extends Controller {
 		if (file_exists($static_helpers))
 			readfile($static_helpers);
 
-		$tool_types = array();
+		# $tool_types = array();
 		foreach($tool_data as $tool)
-		{	
-			$theme_tool_css = $this->assets->themes_dir("$this->theme/tools/$tool->name/css/$tool->tool_id.css");
-			if(file_exists($theme_tool_css))
-				readfile($theme_tool_css);
-			else # this should only happen when changing themes initially.
-				echo Tool_Controller::_generate_tool_css($tool->name, $tool->tool_id, $this->site_name, $this->theme, TRUE);
+		{
+			# get the type and the view from the system.
+			# TODO: try and optimize this later.
+			$table = ORM::factory($tool->name)
+				->where('fk_site', $this->site_id)
+				->find($tool->tool_id);
+
+
+
 				
-			$tool_types[$tool->name] = $tool->name;
+			// ------------------- start legacy support -------------------
+			if(empty($table->type) OR empty($table->view))
+			{
+				$system_tool = ORM::factory('system_tool')
+					->select('*, LOWER(name) AS name')
+					->find($tool->name);
+				
+				# legacy support for no type:
+				if(empty($type))
+					$table->type = $system_tool->type;
+				
+				# legacy support for no view
+				if(empty($table->view))
+				{
+					$system_tool_type = ORM::factory('system_tool_type')
+						->where(array(
+							'system_tool_id' => $system_tool->id,
+							'type'			 => $table->type
+						))
+						->find();
+					$table->view = $system_tool_type->view;
+				}
+				
+				$table->save();
+			}	
+			// ------------------- end legacy support -------------------
+		
+		
+		
+			$custom_file = $this->assets->themes_dir("$this->theme/tools/$tool->name/_created/$tool->tool_id/{$table->type}_$table->view.css");
+			if(file_exists($custom_file))
+				readfile($custom_file);
+			else # this should only happen when changing themes initially.
+				echo Tool_Controller::_generate_tool_css($tool->name, $tool->tool_id, $table->type, $table->view, $this->site_name, $this->theme, TRUE);
+				
+			# get a list of all unique tooltypes:	
+				# $tool_types["$tool->name"] = $tool->name;
 		}
 		
 		# Load any tool-css needed for javascript functionality.

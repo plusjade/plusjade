@@ -50,8 +50,8 @@ class Home_Controller extends Controller {
 		$view->errors = $errors;
 		$view->values = $values;
 		$view->themes = ORM::factory('theme')->where('enabled', 'yes')->find_all();
-		$view->add_root_js_files('easing/jquery.easing.1.3.js');										
-		$view->add_root_js_files('cycle_lite/jquery.cycle.all.min.js');
+		$view->request_js_files('easing/jquery.easing.1.3.js');										
+		$view->request_js_files('cycle_lite/jquery.cycle.all.min.js');
 		return $view;
 	}
 	

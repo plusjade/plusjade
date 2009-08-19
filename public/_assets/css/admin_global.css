@@ -962,6 +962,9 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	padding-bottom:10px;
 	border-bottom:1px dashed #999;
 }
+#common_tool_header em{
+	color:green;
+}
 #common_tool_header button{
 	float:right;
 }

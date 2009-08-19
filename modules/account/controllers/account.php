@@ -1,4 +1,5 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
+
 /*
  * Public creation, management, and viewing of user accounts in +Jade.
  *
@@ -75,8 +76,8 @@ class Account_Controller extends Public_Tool_Controller {
 		
 		# the logic above will determine whether the user is logged in/out
 		$wrapper = ($this->account_user->logged_in($this->site_id))
-			? new View('public_account/dashboard')
-			: new View('public_account/index');
+			? new View('public_account/accounts/dashboard')
+			: new View('public_account/accounts/index');
 		$wrapper->content = $content;
 		$wrapper->page_name = $page_name;
 		return $this->public_template($wrapper, 'account', $tool_id, '');
@@ -90,7 +91,7 @@ class Account_Controller extends Public_Tool_Controller {
  */
 	private function all_users($page_name)
 	{
-		$primary = new View('public_account/all_users');
+		$primary = new View('public_account/accounts/all_users');
 		$primary->page_name = $page_name;
 		$primary->users =
 			ORM::factory('account_user')
@@ -116,7 +117,7 @@ class Account_Controller extends Public_Tool_Controller {
 			}
 			else
 			{
-				$primary = new View('public_account/dashboard_index');
+				$primary = new View('public_account/accounts/dashboard_index');
 				$primary->account_user = $this->account_user->get_user();
 			}
 		}
@@ -129,7 +130,7 @@ class Account_Controller extends Public_Tool_Controller {
 					$primary = self::plusjade_dashboard($page_name);
 				else
 				{
-					$primary = new View('public_account/dashboard_index');
+					$primary = new View('public_account/accounts/dashboard_index');
 					$primary->account_user = $this->account_user->get_user();
 				}
 			}
@@ -155,7 +156,7 @@ class Account_Controller extends Public_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find();
 			
-		$view = new View('public_account/login');
+		$view = new View('public_account/accounts/login');
 		$view->page_name = $page_name;
 		$view->account = $account;
 		return $view;
@@ -172,9 +173,9 @@ class Account_Controller extends Public_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find();
 		
-		$wrapper = new View('public_account/index');
+		$wrapper = new View('public_account/accounts/index');
 		$wrapper->page_name = $page_name;
-		$wrapper->content = new View('public_account/create_account');
+		$wrapper->content = new View('public_account/accounts/create_account');
 		$wrapper->content->errors = $errors;
 		$wrapper->content->values = $values;
 		$wrapper->content->page_name = $page_name;
@@ -191,9 +192,9 @@ class Account_Controller extends Public_Tool_Controller {
 		if($this->account_user->logged_in($this->site_id))
 		{
 			# TODO: consider removing this duplication (of the dashboard)
-			$wrapper = new View('public_account/dashboard');
+			$wrapper = new View('public_account/accounts/dashboard');
 			$wrapper->page_name = $page_name;
-			$wrapper->content = new View('public_account/dashboard_index');
+			$wrapper->content = new View('public_account/accounts/dashboard_index');
 			$wrapper->content->account_user = $this->account_user->get_user();
 			$wrapper->content->page_name = $page_name;
 			return $wrapper;
@@ -247,9 +248,9 @@ class Account_Controller extends Public_Tool_Controller {
 				die('account created but login failed.');
 			
 			# return the user dashboard.
-			$wrapper = new View('public_account/dashboard');
+			$wrapper = new View('public_account/accounts/dashboard');
 			$wrapper->page_name = $page_name;
-			$wrapper->content = new View('public_account/dashboard_index');
+			$wrapper->content = new View('public_account/accounts/dashboard_index');
 			$wrapper->content->account_user = $this->account_user->get_user();
 			$wrapper->content->page_name = $page_name;
 			return $wrapper; # login success
@@ -266,7 +267,7 @@ class Account_Controller extends Public_Tool_Controller {
  */
 	private function profile($username)
 	{
-		$primary = new View('public_account/profile');
+		$primary = new View('public_account/accounts/profile');
 		$account_user = ORM::factory('account_user', $username);
 
 		if(FALSE == $account_user->loaded)
@@ -298,7 +299,7 @@ class Account_Controller extends Public_Tool_Controller {
 		if(!$this->account_user->logged_in($this->site_id))
 			return $this->display_login($page_name);
 			
-		$primary	= new View('public_account/edit_profile');
+		$primary	= new View('public_account/accounts/edit_profile');
 		$db			= new Database;
 		$account_user		= $this->account_user->get_user();
 		$primary->account_user = $account_user;	
@@ -345,7 +346,7 @@ class Account_Controller extends Public_Tool_Controller {
 		if(!$this->account_user->logged_in($this->site_id))
 			return $this->display_login($page_name);
 
-		$primary = new View('public_account/change_password');
+		$primary = new View('public_account/accounts/change_password');
 		$primary->success = FALSE;
 		$primary->error = '';
 		$primary->page_name = $page_name;

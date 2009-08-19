@@ -15,13 +15,13 @@ class Format_Controller extends Public_Tool_Controller {
 /*
  * index handler
  */ 
-	function _index($tool_id)
+	public function _index($tool_id)
 	{		
 		$format = ORM::factory('format')
 			->where('fk_site',$this->site_id)
 			->find($tool_id);
 		if(!$format->loaded)
-			return $this->public_template('invalid format id', 'format', $tool_id);
+			return $this->public_template('invalid format id', 'format', $format);
 		
 		# determine the correct type.
 		$which_type = (empty($format->type)) ? 'people' :  $format->type;
@@ -31,7 +31,7 @@ class Format_Controller extends Public_Tool_Controller {
 		# add custom javascript;
 		$view->global_readyJS(self::javascripts($format));
 
-		return $this->public_template($view, 'format', $tool_id, $format->attributes);
+		return $this->public_template($view, 'format', $format);
 	}
 
 /*
@@ -60,7 +60,7 @@ class Format_Controller extends Public_Tool_Controller {
  */
 	private static function faqs($format)
 	{
-		$view = new View("public_format/faqs/faqs");
+		$view = new View("public_format/faqs/simple");
 		return $view;
 	}
 

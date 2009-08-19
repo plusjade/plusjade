@@ -24,9 +24,9 @@ class Blog_Controller extends Public_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find($tool_id);	
 		if(FALSE === $blog->loaded)
-			return $this->public_template('blog error, please contact support', 'blog', $tool_id);
+			return $this->public_template('blog not found', 'blog', $blog);
 		
-		$primary = new View("public_blog/index");
+		$primary = new View("public_blog/blogs/index");
 		$primary->tool_id = $tool_id;
 		$primary->set_global('blog_page_name', $page_name);
 		$primary->tags = $this->_get_tags($tool_id);
@@ -73,13 +73,13 @@ class Blog_Controller extends Public_Tool_Controller {
 					GROUP BY blog_posts.id 
 					ORDER BY created DESC
 				");
-				$content = new View('public_blog/multiple_posts');	
+				$content = new View('public_blog/blogs/multiple_posts');	
 				$content->items = $items;	
 				break;
 		}
 		$primary->content = $content;
 		
-		return $this->public_template($primary, 'blog', $tool_id);
+		return $this->public_template($primary, 'blog', $blog);
 	}
 	
 	
@@ -89,7 +89,7 @@ class Blog_Controller extends Public_Tool_Controller {
  */
 	private function single_post($page_name, $url=NULL, $id=NULL)
 	{
-		$content = new View("public_blog/single");
+		$content = new View("public_blog/blogs/single");
 		$field = 'url';
 		
 		if(NULL !== $id)
@@ -124,7 +124,7 @@ class Blog_Controller extends Public_Tool_Controller {
  */
 	private function tag_search($tool_id, $tag)
 	{
-		$content = new View('public_blog/multiple_posts');
+		$content = new View('public_blog/blogs/multiple_posts');
 		$items = $this->db->query("
 			SELECT blog_posts.*,					
 			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, blog_post_tags.value,
@@ -152,7 +152,7 @@ class Blog_Controller extends Public_Tool_Controller {
  */	
 	private function show_archive($tool_id, $value, $value2)
 	{
-		$content = new View("public_blog/archive");
+		$content = new View("public_blog/blogs/archive");
 		$date_search = false;
 		
 		# year search
@@ -199,7 +199,7 @@ class Blog_Controller extends Public_Tool_Controller {
  */		
 	private function get_comments($page_name, $post_id=NULL, $tool_id = NULL)
 	{
-		$content = new View('public_blog/comments');
+		$content = new View('public_blog/blogs/comments');
 		
 		if(NULL == $tool_id)
 		{
