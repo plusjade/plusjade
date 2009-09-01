@@ -38,20 +38,17 @@ class Build_Page_Controller extends Template_Controller {
 		$this->template->meta_tags('description', $page->meta);
 		$this->template->set_global('this_page_id', $page->id);	
 		
-		# Grab tools for this page referencing the pivot table: "pages_tools"
+		# Grab tools for this page in pages_tools table
 		# 0-10 are reserved for global tools. we only use 1-5 
 		$tools = $db->query("
-			SELECT *, LOWER(system_tools.name) AS name, tools.id AS guid
+			SELECT *, LOWER(system_tools.name) AS name
 			FROM pages_tools 
-			JOIN tools ON pages_tools.tool_id = tools.id
-			JOIN system_tools ON tools.system_tool_id = system_tools.id
+			JOIN system_tools ON system_tools.id = pages_tools.system_tool_id
 			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page->id')
-			AND pages_tools.fk_site = '$this->site_id'
-			ORDER BY pages_tools.container, pages_tools.position
+			AND fk_site = '$this->site_id'
+			ORDER BY container, position
 		");
 
-		# echo kohana::debug($tools);	die();
-		
 		# Load Admin CSS and Javascript (if logged in)
 		# _load_admin() is in the template_controller
 		$admin_mode = $this->_load_admin($page->id, $page->page_name);
@@ -64,43 +61,31 @@ class Build_Page_Controller extends Template_Controller {
 		if($tools->count() > 0)
 		{	
 			foreach ($tools as $tool)
-			{				
-				# load the tool parent
-				$parent = ORM::factory($tool->name)
-					->where('fk_site', $this->site_id)
-					->find($tool->tool_id);	
-				if($parent->loaded)
+			{
+				# If Logged in wrap classes around tools for Javascript
+				# TODO: consider this with javascript
+				if($this->client->can_edit($this->site_id))
 				{
-					# If Logged in wrap classes around tools for Javascript
-					# TODO: consider this with javascript
-					if($this->client->can_edit($this->site_id))
-					{
-						$scope		= ('5' >= $tool->page_id) ? 'global' : 'local';
-						$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper '.$scope.'">';
-						$append		= '</span>';
+					$scope		= ('5' >= $tool->page_id) ? 'global' : 'local';
+					$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper '.$scope.'">';
+					$append		= '</span>';
 
-						# Throw tool into admin panel array
-						$tools_array[$tool->guid] = array(
-							'guid'		=> $tool->guid,
-							'name'		=> $tool->name,
-							'name_id'	=> $tool->system_tool_id,
-							'tool_id'	=> $tool->tool_id,
-							'scope'		=> $scope,
-						);
-					}
-				
-					# build tool output
-					$tool_object  = $prepend;				
-					$tool_object .= Load_Tool::factory($tool->name)->_index($parent);
-					$tool_object .= $append;
+					# Throw tool into admin panel array
+					$tools_array[$tool->guid] = array(
+						'guid'		=> $tool->guid,
+						'name'		=> $tool->name,
+						'name_id'	=> $tool->system_tool_id,
+						'tool_id'	=> $tool->tool_id,
+						'scope'		=> $scope,
+					);
 				}
-				elseif($this->client->can_edit($this->site_id))
-				{
-					# show the tool error when logged in.
-					$tool_object = "$tool->name with id: $this->tool_id could not be loaded.";
-				}
+
+				# Create Tool object
+				$tool_object  = $prepend;				
+				$tool_object .= Load_Tool::factory($tool->name)->_index($tool->tool_id);
+				$tool_object .= $append;
 				
-				# Add output to correct container.
+				# Add tools to correct container.
 				# if page_id <= 5, its not a real page_id = global container.
 				(int) $index = (5 <= $tool->page_id)
 					? $tool->container

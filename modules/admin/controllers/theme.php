@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-
 /**
  *	Provides CRUD for theme and theme assets 
  *	
- */	 
+ */	
+ 
 class Theme_Controller extends Controller {
 
 	function __construct()

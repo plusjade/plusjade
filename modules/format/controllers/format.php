@@ -14,15 +14,10 @@ class Format_Controller extends Public_Tool_Controller {
 	
 /*
  * index handler
+ * expects the parent format table object
  */ 
-	public function _index($tool_id)
+	public function _index($format)
 	{		
-		$format = ORM::factory('format')
-			->where('fk_site',$this->site_id)
-			->find($tool_id);
-		if(!$format->loaded)
-			return $this->public_template('invalid format id', 'format', $format);
-		
 		# determine the correct type.
 		$which_type = (empty($format->type)) ? 'people' :  $format->type;
 		$view = $this->$which_type($format);
@@ -70,7 +65,16 @@ class Format_Controller extends Public_Tool_Controller {
  */
 	private static function contacts($format)
 	{
-		$view = new View("public_format/contacts/contacts");
+		$view = new View("public_format/contacts/list");
+		return $view;
+	}
+
+/*
+ * Formats the view to list frequently asked questions
+ */
+	private static function tabs($format)
+	{
+		$view = new View("public_format/tabs/stock");
 		return $view;
 	}
 	
@@ -111,6 +115,56 @@ class Format_Controller extends Public_Tool_Controller {
 					});		
 				';					
 				break;
+			case 'contacts':
+				$js = '
+					$("#format_wrapper_'.$format->id.' .email_form_wrapper").hide();
+						
+					$("#format_wrapper_'.$format->id.' .inline_form").click(function(){
+						$("#format_wrapper_'.$format->id.' .email_form_wrapper").slideToggle("slow");
+						return false;
+					});
+
+					//email form
+					$("#format_wrapper_'.$format->id.' form.public_ajaxForm").ajaxForm({
+						target: "#format_wrapper_'.$format->id.' form.public_ajaxForm",
+						beforeSubmit: function(){
+							if( $("#format_wrapper_'.$format->id.' form.public_ajaxForm input[type=text]").jade_validate() )
+								return true;
+							else
+								return false;
+						}
+					});	
+
+					//newsletter form
+					$("#format_wrapper_'.$format->id.' #newsletter_form").ajaxForm({
+						target: "#format_wrapper_'.$format->id.' #newsletter_form",
+						beforeSubmit: function(){
+							if( $("#format_wrapper_'.$format->id.' #newsletter_form input[type=text]").jade_validate() )
+								return true;
+							else
+								return false;
+						},
+						success: function(data) {
+							$.facebox(data, "status_reload", "facebox_2");
+							return false;		
+						}			
+					});
+				';					
+				break;
+			
+			case 'tabs':
+				$js = '
+					$(".tabs_tab_list li a").click(function(){
+						$("#format_wrapper_' . $format->id . ' .format_item").hide();
+						$(".tabs_tab_list li a").removeClass("active");
+						var id = $(this).addClass("active").attr("href");
+						$(id).show();
+						return false;
+					});
+					$(".tabs_tab_list li a:first").click();
+				';
+				break;
+				
 			default: # people
 			
 				switch($format->view)

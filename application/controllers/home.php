@@ -1,8 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
  * 
  * control the main home page stuff for plusjade only.
  */
+ 
 class Home_Controller extends Controller {
 
 	function __construct()
@@ -55,4 +57,4 @@ class Home_Controller extends Controller {
 		return $view;
 	}
 	
-} # End Auth Controller
+} # End home Controller

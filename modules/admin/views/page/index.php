@@ -27,6 +27,9 @@
 			<br><b style="color:#ccc">Gray:</b> Public - Not in menu.
 			<br><b style="color:red">Red:</b> Private - No public access.
 		</small>
+		<p>
+			Page Count: <?php echo $page_count?>
+		</p>
 	</div>
 	
 	<div class="breadcrumb_wrapper" style="width:590px">

@@ -15,16 +15,17 @@ class Account_Controller extends Public_Tool_Controller {
 
 /* 
  * route the url
+ * expects parent account table object
 */	
-	function _index($tool_id)
+	public function _index($account)
 	{
 		$url_array	= Uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'account', $tool_id);
+		$page_name	= $this->get_page_name($url_array['0'], 'account', $account->id);
 		$username	= $url_array['2'];
 		$action		= (empty($url_array['1']) OR 'tool' == $url_array['1'])
 			? 'index'
 			: $url_array['1'];
-		
+
 		switch($action)
 		{					
 			case 'index':
@@ -32,15 +33,15 @@ class Account_Controller extends Public_Tool_Controller {
 				break;
 				
 			case 'create':
-				return $this->public_template(self::create_account($page_name), 'account', $tool_id);
+				return $this->public_template(self::create_account($page_name), 'account', $account);
 				break;
 				
 			case 'profile':
-				return $this->public_template(self::profile($username), 'account', $tool_id);
+				return $this->public_template(self::profile($username), 'account', $account);
 				break;
 
 			case 'all':
-				return $this->public_template(self::all_users($page_name), 'account', $tool_id);
+				return $this->public_template(self::all_users($page_name), 'account', $account);
 				break;
 				
 			case 'edit_profile':
@@ -58,7 +59,7 @@ class Account_Controller extends Public_Tool_Controller {
 			case 'logout':
 				$this->account_user->logout();
 				$primary = $this->display_login($page_name);
-				return $this->public_template($primary, 'account', $tool_id, '');
+				return $this->public_template($primary, 'account', $account);
 				break;		
 
 
@@ -80,7 +81,7 @@ class Account_Controller extends Public_Tool_Controller {
 			: new View('public_account/accounts/index');
 		$wrapper->content = $content;
 		$wrapper->page_name = $page_name;
-		return $this->public_template($wrapper, 'account', $tool_id, '');
+		return $this->public_template($wrapper, 'account', $account);
 	}
 
 	

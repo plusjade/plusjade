@@ -1,4 +1,6 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
+
 class Blog_Controller extends Public_Tool_Controller {
 
 	
@@ -11,27 +13,21 @@ class Blog_Controller extends Public_Tool_Controller {
 /*
 * The _index controller is only called when building full pages.
 * This therefore assumes no ajax calls.
+* expects parent blog table object
 */
-	function _index($tool_id)
+	public function _index($blog)
 	{
 		date_default_timezone_set('America/Los_Angeles');# just for now
-		$url_array	= Uri::url_array();
-		list($page_name, $action, $value, $value2) = $url_array;
-		$page_name	= $this->get_page_name($page_name, 'blog', $tool_id);
+		list($page_name, $action, $value, $value2) = Uri::url_array();
+		$page_name	= $this->get_page_name($page_name, 'blog', $blog->id);
 		$action		= (empty($action)) ? 'SomethingRandom' : $action ;
-		
-		$blog = ORM::factory('blog')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $blog->loaded)
-			return $this->public_template('blog not found', 'blog', $blog);
-		
+
 		$primary = new View("public_blog/blogs/index");
-		$primary->tool_id = $tool_id;
+		$primary->tool_id = $blog->id;
 		$primary->set_global('blog_page_name', $page_name);
-		$primary->tags = $this->_get_tags($tool_id);
+		$primary->tags = $this->get_tags($blog->id);
 		$primary->sticky_posts = $this->get_sticky_posts($blog->sticky_posts);
-		$primary->recent_comments = $this->get_recent_comments($tool_id);
+		$primary->recent_comments = $this->get_recent_comments($blog->id);
 
 		
 		switch($action)
@@ -42,11 +38,11 @@ class Blog_Controller extends Public_Tool_Controller {
 				break;
 			
 			case 'tag':
-				$content = self::tag_search($tool_id, $value);
+				$content = self::tag_search($blog->id, $value);
 				break;
 				
 			case 'archive':
-				$content = self::show_archive($tool_id, $value, $value2);
+				$content = self::show_archive($blog->id, $value, $value2);
 				break;
 
 			case 'comment':
@@ -67,7 +63,7 @@ class Blog_Controller extends Public_Tool_Controller {
 					FROM blog_posts
 					LEFT JOIN blog_post_tags ON blog_posts.id = blog_post_tags.blog_post_id
 					LEFT JOIN blog_post_comments ON blog_posts.id = blog_post_comments.blog_post_id
-					WHERE blog_posts.blog_id = '$tool_id'
+					WHERE blog_posts.blog_id = '$blog->id'
 					AND blog_posts.fk_site = '$this->site_id'					
 					AND blog_posts.status = 'publish'
 					GROUP BY blog_posts.id 
@@ -78,8 +74,62 @@ class Blog_Controller extends Public_Tool_Controller {
 				break;
 		}
 		$primary->content = $content;
+		# get the custom javascript;
+		$primary->global_readyJS(self::javascripts());
 		
 		return $this->public_template($primary, 'blog', $blog);
+	}
+	
+
+/*
+ * output the appropriate javascript based on the calendar view.
+ * currently we just have one though
+ */	
+	private function javascripts()
+	{
+		$js = '
+			$("body").click($.delegate({
+				".blog_wrapper a[rel*=blog_ajax]": function(e){
+					$(".blog_content").html("<div class=\"ajax_loading\">Loading...</div>");
+					$(".blog_content").load(e.target.href);
+					return false;
+				},
+				".blog_wrapper a.get_comments":function(e){
+					var url		= $(e.target).attr("rel");
+					$container	= $(e.target).parent();
+					
+					$container.html("<div class=\"ajax_loading\">Loading...</div>");
+					$.get(url, function(data){
+						$container.replaceWith(data);
+					});
+					return false;
+				}
+			}));
+
+			$("body").submit($.delegate({
+				".blog_wrapper form.public_ajaxForm": function(e){
+					var form = $(e.target);
+					$(form).ajaxSubmit({
+						beforeSubmit: function(){
+							if( $("input[type=text]", form).jade_validate() )
+								return true;
+							
+							return false;
+						},
+						success: function(data) {
+							$(".comments_wrapper", form).append(data);
+							$(".add_comment", form).replaceWith("<div class=\"blog_response\">Comment Added!</div>");
+							e.stopPropagation();
+						}
+					});
+					e.stopPropagation();		
+					return false;
+				}
+			}));		
+		
+		';
+		# place the javascript.
+		return $this->place_javascript($js, FALSE);
 	}
 	
 	
@@ -277,7 +327,7 @@ class Blog_Controller extends Public_Tool_Controller {
 /*
  * get all tags from this blog.
  */	
-	public function _get_tags($tool_id)
+	private function get_tags($tool_id)
 	{
 		$tags = $this->db->query("
 			SELECT id, value,
@@ -332,7 +382,7 @@ class Blog_Controller extends Public_Tool_Controller {
 /*
  * ajax handler.
  */ 
-	function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $tool_id)
 	{
 		list($page_name, $action, $value) = $url_array;
 		
@@ -368,7 +418,7 @@ class Blog_Controller extends Public_Tool_Controller {
 /*
  * logic executed after this blog tool is added to site.
  */
-	function _tool_adder($tool_id, $site_id, $sample=FALSE)
+	public function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
 		if($sample)
 		{

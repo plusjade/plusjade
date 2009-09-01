@@ -10,59 +10,123 @@ class Forum_Controller extends Public_Tool_Controller {
 /*
  * forum index.
  * routes the url in no-ajax mode.
+ * expects parent forum table object
  */ 
-	function _index($tool_id)
+	function _index($forum)
 	{
 		$url_array	= Uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'forum', $tool_id);
+		$page_name	= $this->get_page_name($url_array['0'], 'forum', $forum->id);
 		$data		= $url_array['2'];
 		$data2		= $url_array['3'];
 		$action		= (empty($url_array['1']) OR 'tool' == $url_array['1'])
 			? 'index'
 			: $url_array['1'];
-
-
-		$forum = ORM::factory('forum')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $album->loaded)
-			return $this->public_template('forum not found', 'forum', $forum);
-
-
 			
 		$wrapper = new View('public_forum/forums/index');
 		
 		switch($action)
 		{					
 			case 'index':
-				$wrapper->content = self::posts_wrapper($page_name, $tool_id, 'all');
+				$wrapper->content = self::posts_wrapper($page_name, $forum->id, 'all');
 				break;
 			case 'category':
-				$wrapper->content = self::posts_wrapper($page_name, $tool_id, $data);
+				$wrapper->content = self::posts_wrapper($page_name, $forum->id, $data);
 				break;
 			case 'view':
-				$wrapper->content = self::comments_wrapper($page_name, $tool_id, $data, $data2);
+				$wrapper->content = self::comments_wrapper($page_name, $forum->id, $data, $data2);
 				break;
 			case 'vote':
-				$wrapper->content = self::vote($page_name, $tool_id, $data, $data2);
+				$wrapper->content = self::vote($page_name, $forum->id, $data, $data2);
 				break;
 			case 'submit':
-				$wrapper->content = self::submit($page_name, $tool_id);
+				$wrapper->content = self::submit($page_name, $forum->id);
 				break;
 			case 'edit':
-				$wrapper->content = self::edit($page_name, $tool_id, $data, $data2);
+				$wrapper->content = self::edit($page_name, $forum->id, $data, $data2);
 				break;
 			case 'my':
-				$wrapper->content = self::my($page_name, $tool_id, $data, $data2);
+				$wrapper->content = self::my($page_name, $forum->id, $data, $data2);
 				break;				
 			default:
 				die("$page_name : $action : trigger 404 not found");
 		}
 		$wrapper->page_name		= $page_name;
-		$wrapper->categories	= self::categories($tool_id);
+		$wrapper->categories	= self::categories($forum->id);
+		# get the custom javascript;
+		$wrapper->global_readyJS(self::javascripts());
 		return $this->public_template($wrapper, 'forum', $forum);
 	}
 
+	
+/*
+ * output the appropriate javascript based on the calendar view.
+ * currently we just have one though
+ */	
+	private function javascripts()
+	{
+		$js = '
+			// the main left panel links
+			$("#forum_navigation_wrapper").click($.delegate({
+				"a": function(e){
+					$("#forum_content_wrapper")
+					.html("<div class=\"ajax_loading\">Loading...</div>")
+					.load(e.target.href);
+					return false;				
+				}
+			}));
+				
+			$("#forum_content_wrapper").click($.delegate({
+				
+				// load links into main panel.
+				"a.forum_load_main" : function(e){
+					$("#forum_content_wrapper")
+					.html("<div class=\"ajax_loading\">Loading...</div>")
+					.load(e.target.href);
+					return false;	
+				},
+				
+				// post preview toggle
+				"a.preview": function(e){
+					var id = $(e.target).attr("rel");
+					$("div#preview_"+ id).slideToggle("fast");
+					return false;
+				},
+				
+				// sort tab actions
+				"ul.sort_list a" : function(e){
+					$("ul.sort_list a").removeClass("selected");
+					var url = $(e.target).addClass("selected").attr("href");
+					$("#list_wrapper")
+					.html("<div class=\"ajax_loading\">Loading...</div>")
+					.load(url);
+					return false;
+				},
+				
+				// vote links.
+				".cast_vote" : function(e){
+					var count = $(e.target).siblings("span").html();
+					if(1 == $(e.target).attr("rel"))
+						$(e.target).siblings("span").html(++count);
+					else
+						$(e.target).siblings("span").html(--count);
+					
+					$(e.target).parent("div").children("a").remove();
+					
+					$.get(e.target.href, function(data){});
+					return false;
+				}
+				
+			}));
+
+			// add friendly time.
+			$("abbr[class*=timeago]").timeago();
+
+		';
+		# place the javascript.
+		return $this->place_javascript($js, FALSE);
+	}
+	
+	
 /*
  * get categories object from this forum
  */

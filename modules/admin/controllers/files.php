@@ -244,7 +244,7 @@ class Files_Controller extends Controller {
 	
 	To change url and directory paths always use ASSETS library.
  */
-	function _output($url_array)
+	public function _output($url_array)
 	{
 		$filename = array_pop($url_array);
 		if(empty($filename) OR 'files' == $filename)

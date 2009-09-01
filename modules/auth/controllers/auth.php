@@ -98,12 +98,13 @@ class Auth_Controller extends Controller {
 		
 		# add sample tools to homepage.
 		$sample_tools = array(
-			'Faq',
+			'Format',
 			'Navigation',
 			'Album',
 			'Text'
 		);
 		
+		#TODO establish types of tools, with views, etc.
 		foreach($sample_tools as $name)
 			Tool_Controller::_add_tool($new_page->id, $name, $site_name, FALSE, TRUE);
 		
@@ -292,4 +293,5 @@ class Auth_Controller extends Controller {
 		$this->client->logout();
 		url::redirect();
 	}
+	
 } # End Auth Controller

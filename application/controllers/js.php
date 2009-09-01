@@ -56,11 +56,11 @@ class Js_Controller extends Controller {
 			'ajax_form/ajax_form.js',
 			'jw/jwysiwyg.js',
 			'swfupload/swfupload.js',
-			'gallery/gallery.js', # album tool
 			'lightbox/lightbox.js', # album tool
+			'gallery/gallery.js', # album tool
 			'timeago/jquery.timeago.js',
 			'simple_tree/jquery.simple.tree.js',
-			'admin/init.js',
+			'admin/init.js'
 		);
 
 		ob_start();

@@ -106,10 +106,12 @@ $(document).ready(function()
 		}
 
 		// Get the tool html output...
-		$.get('/get/tool/html/'+ toolname +'/'+ tool_id,{js: include_js}, function(data){
+		$.get('/get/tool/html/'+ toolname +'/'+ tool_id, {js: include_js}, function(data){
 			if('add' == action) {
+				// TODO: finalize a proper way to get the page_id
+				var page_id = $('#click_hook').attr('rel');
 				// get the toolkit to insert red toolbar via ajax
-				$.get('/get/tool/toolkit/'+ guid, function(toolkit){
+				$.get('/get/tool/toolkit/'+ guid +'/' + page_id, function(toolkit){
 					var toolbar = '<div id="toolbar_'+ guid +'" class="jade_toolbar_wrapper">' + toolkit + '</div>';
 					// replace the placeholder with toolbar + html output
 					$('div.container_1 #new_tool_placeholder')
@@ -385,7 +387,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 	$(document).bind('reveal.facebox', function(){
 		$('body').addClass('disable_body').attr('scroll','no');
 		$('.facebox .show_submit').hide();
-		$('.facebox .server_response').hide();
+		$('.facebox_response.active').remove();
 		$('textarea.render_html').wysiwyg();
 		$(document).trigger('ajaxify.form');
 		
@@ -413,8 +415,9 @@ $(document).bind('server_response.plusjade', function(e, data){
  * execute an on_close command
  */
 	$(document).bind('on_close.execute', function() {
-		var action = ((1 == $('.on_close').length)) ?
-			$('.on_close').html() : $('.on_close.two').html();
+		var action = ((1 == $('.on_close').length))
+		? $('.on_close').html()
+		: $('.on_close.two').html();
 
 		if(null == action) {
 			//alert('looking for on_close action, but empty.');
@@ -472,9 +475,10 @@ $(document).bind('server_response.plusjade', function(e, data){
 		scrollSensitivity: 40,
 		tolerance: 'pointer',
 		helper: 'original',
+		appendTo: 'body',
 
 		start: function(event, ui) {
-			$('.CONTAINER_WRAPPER').toggleClass('highlight_containers');
+			$('.CONTAINER_WRAPPER').css({zIndex:9999}).toggleClass('highlight_containers');
 			$(ui.item).toggleClass('sort_active').children('div:last').hide();
 		},
 		stop: function(event, ui) {

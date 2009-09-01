@@ -22,19 +22,26 @@ class Tool_Controller extends Controller {
  */
 	function index()
 	{
+		$db = new Database;
+
 		$system_tools = ORM::factory('system_tool')
 			->orderby(array(
 				'protected'	=>'desc',
 				'name'		=>'asc'
 			))
 			->find_all();
-			
-		# Get all tool references from pages_tools owned by this site.
-		$tools = ORM::factory('tool')
-			->where('fk_site', $this->site_id)
-			->orderby(array('system_tool_id'=>'asc', 'id'=>'asc'))
-			->find_all();
-	
+		
+		
+		# Get all tool references in pages_tools owned by this site.
+		$tools = $db->query("
+			SELECT pages_tools.guid, pages_tools.page_id, pages_tools.tool_id, pages.page_name, system_tools.name 
+			FROM pages_tools 
+			LEFT JOIN system_tools ON pages_tools.system_tool_id = system_tools.id
+			LEFT JOIN pages ON pages_tools.page_id = pages.id
+			WHERE pages_tools.fk_site = '$this->site_id' 
+			ORDER BY system_tools.name ASC, pages.page_name
+		");
+		
 		$primary = new View('tool/manage');
 		$primary->system_tools	= $system_tools;
 		$primary->tools			= $tools;
@@ -135,7 +142,7 @@ class Tool_Controller extends Controller {
 			->where('enabled','yes')
 			->find($system_tool_id);
 		if(!$system_tool->loaded)
-			die("invalid system_tool: $system_tool_id ");
+			die('invalid system_tool');
 
 		# are protected tools allowed on this page?
 		if('yes' == $system_tool->protected AND !$allow_protected)
@@ -158,22 +165,13 @@ class Tool_Controller extends Controller {
 		$site_config = yaml::parse($site_name, 'site_config');
 
 		# add row to the tools parent table.
-		$parent = ORM::factory($system_tool->name);
-		$parent->fk_site = $site_config['site_id'];
-		$parent->type = $type;
-		$parent->save();
-		
-		# add new global tool record
-		$tool = ORM::factory('tool');
-		$tool->fk_site = $site_config['site_id'];
-		$tool->system_tool_id = $system_tool->id;
-		$tool->tool_id = $parent->id;
-		$tool->save();
+		$tool_table = ORM::factory($system_tool->name);
+		$tool_table->fk_site = $site_config['site_id'];
+		$tool_table->type = $type;
+		$tool_table->save();
 		
 		
-		# add tool to specified page.
-		
-		# get min position of tools on page
+		# GET MIN position of tools on page
 		$db = new Database;	
 		$lowest = $db->query("
 			SELECT MIN(position) as lowest
@@ -181,64 +179,45 @@ class Tool_Controller extends Controller {
 			WHERE page_id ='$page_id'
 		")->current()->lowest;
 		
+		# INSERT pages_tools row inserting tool parent id
 		$data = array(
-			'tool_id'	=> $tool->id,
-			'page_id'	=> $page_id,
-			'fk_site'	=> $site_config['site_id'],
-			'position'	=> ($lowest-1)
+			'page_id'		 => $page_id,
+			'fk_site'		 => $site_config['site_id'],
+			'system_tool_id' => $system_tool->id,
+			'tool_id'		 => $tool_table->id,
+			'position'		 => ($lowest-1)
 		);
-		$db->insert('pages_tools', $data)->insert_id();
+		$tool_guid = $db->insert('pages_tools', $data)->insert_id();
 		
 		# if tool is protected, add page to pages_config file.
 		if('yes' == $system_tool->protected)
 		{
 			$page = ORM::factory('page', $page_id);
 		
-			$newline = "\n$page->page_name:$system_tool->name-$parent->id";
+			$newline = "\n$page->page_name:$system_tool->name-$tool_table->id";
 			yaml::add_value($site_name, 'pages_config', $newline);
 		}
 		
 		# generate tool_css file
-		self::_generate_tool_css($system_tool->name, $parent->id, $type, $view, $site_name, $site_config['theme']);
+		self::_generate_tool_css($system_tool->name, $tool_table->id, $type, $view, $site_name, $site_config['theme']);
 		
 		# run _tool_adder
 		$step_2 = 'add';
 		$public_tool = Load_Tool::factory($system_tool->name);
 		if(is_callable(array($public_tool, '_tool_adder')))
-			$step2 = $public_tool->_tool_adder($parent->id, $site_config['site_id'], $sample);
+			$step2 = $public_tool->_tool_adder($tool_table->id, $site_config['site_id'], $sample);
 
 		# Pass output to javascript @tool view "add" 
 		# so it can load the next step page
 		# data Format-> toolname:next_step:tool_id:tool_guid
 		if($javascript)
-			return "$system_tool->name:$step2:$parent->id:$tool->id";
+			return "$system_tool->name:$step2:$tool_table->id:$tool_guid";
 			
 		return TRUE;
 	}
 
 
-/*
- * Remove a tool reference from the specified page.
- * Does not delete the tool.
- */
-	public function remove($tool_guid=NULL, $page_id=NULL)
-	{
-		valid::id_key($tool_guid);	
-		valid::id_key($page_id);		
-		
-		# delete all page references to this tool.
-		$db = new Database;	
-		$db->delete('pages_tools', 
-			array(
-				'tool_id' => $tool_guid,
-				'page_id' => $page_id,
-				'fk_site' => $this->site_id
-			)
-		);		
 
-	}
- 
- 
 /*
  *	Delete single tool references : parent table & in pages_tools as well.
  *  Comes from the tools js red toolbar
@@ -248,46 +227,80 @@ class Tool_Controller extends Controller {
 	public function delete($tool_guid=NULL)
 	{
 		valid::id_key($tool_guid);		
-		
-		# delete all page references to this tool.
 		$db = new Database;	
-		$db->delete('pages_tools', array('tool_id' => $tool_guid, 'fk_site' => $this->site_id));		
+	
+		$tool_data = $db->query("
+			SELECT pages_tools.*, LOWER(system_tools.name) as name, system_tools.protected, pages.page_name
+			FROM pages_tools
+			JOIN system_tools ON pages_tools.system_tool_id = system_tools.id
+			LEFT JOIN pages ON pages_tools.page_id = pages.id
+			WHERE guid = '$tool_guid' 
+			AND pages_tools.fk_site = '$this->site_id'
+		")->current();	
 		
-		# get the tool.
-		$tool = ORM::factory('tool')
-			->where('fk_site', $this->site_id)
-			->find($tool_guid);
-		if(!$tool->loaded)
+		if(!is_object($tool_data))
 			die('Tool does not exist');
-
-		# Protect account tool.
-		if('account' == $tool->system_tool->name)
-			die('Account tool cannot be deleted, since other tools depend on it!');
 		
-		# delete the parent table row.
-		$parent = ORM::factory($tool->system_tool->name)
-			->where('fk_site', $this->site_id)
-			->delete($tool->tool_id);
 
-		# is tool protected?
-		if('yes' == $tool->system_tool->protected)
-			yaml::delete_value($this->site_name, 'pages_config', $tool->pages->current()->page_name);
+		# Protect the account tool.
+		if('account' == $tool_data->name)
+			die('Account tool cannot be deleted, since other tools depend on it!');
 			
+			
+		$table_parent = $tool_data->name.'s';
+
+		# DELETE pages_tools reference.
+		$db->delete('pages_tools', array('guid' => $tool_guid));		
+
+		# DELETE tool parent table row ('tool's table) 
+		$db->delete($table_parent, array('id' => $tool_data->tool_id, 'fk_site' => $this->site_id));	
+		
+		# is tool protected?
+		if('yes' == $tool_data->protected)
+			yaml::delete_value($this->site_name, 'pages_config', $tool_data->page_name);
 		
 		# DELETE the custom folder for this tool. (houses custom css files)
-		$custom_folder = $this->assets->themes_dir("$this->theme/tools/$tool->system_tool->name/_created/$tool->tool_id");
+		$custom_folder = $this->assets->themes_dir("$this->theme/tools/$tool_data->name/_created/$tool_data->tool_id");
 		if(is_dir($custom_folder))
 			Jdirectory::remove($custom_folder);
 		
 		# run tool_deleter
-		$edit_tool	= Load_Tool::edit_factory($tool->system_tool->name);
+		$edit_tool	= Load_Tool::edit_factory($tool_data->name);
 		if( is_callable(array($edit_tool,'_tool_deleter')) )
-			$edit_tool->_tool_deleter($tool->tool_id, $this->site_id);
-		
-		# finally, delete the tool 
-		$tool->delete();
-		
+			$edit_tool->_tool_deleter($tool_data->tool_id, $this->site_id);
+			
 		die('Tool Deleted');
+	}
+
+/*
+ * Moves a tool from one page to another
+ * Moves orphaned tools to a page.
+ *
+ */ 
+	public function move($tool_guid=NULL)
+	{
+		valid::id_key($tool_guid);
+		$db = new Database;
+		
+		if($_POST)
+		{
+			$data = array(
+				'page_id'	=> $_POST['new_page']
+			);
+			$db->update('pages_tools', $data, array( 'guid' => "$tool_guid", 'fk_site' => "$this->site_id" ) );			
+			die('Tool moved!!');
+		}
+
+		$pages = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->orderby('page_name')
+			->find_all();
+			
+		$primary = new View('tool/move');
+		$primary->pages = $pages;
+		$primary->tool_guid = $tool_guid;
+		die($primary);	
+
 	}
 
 	
@@ -323,15 +336,7 @@ class Tool_Controller extends Controller {
 					'container'	=> $container,
 					'position'	=> $position+2,
 				);
-				$db->update(
-					'pages_tools',
-					$data,
-					array(
-						'tool_id' => $guid,
-						'page_id' => $page_id,
-						'fk_site' => $this->site_id
-					)
-				);								
+				$db->update('pages_tools', $data, "guid = '$guid' AND fk_site = '$this->site_id'");								
 			}	
 			die('Order Updated!');
 		}
@@ -404,13 +409,8 @@ class Tool_Controller extends Controller {
 		valid::id_key($tool_id);
 		# TODO: probably should query this in the db...
 		
-		$parent = ORM::factory($toolname)
-			->where('fk_site', $this->site_id)
-			->find($tool_id);
-		if(!$parent->loaded)
-			die('Tool does not exist');
-			
-		die(Load_Tool::factory($toolname)->_index($parent));
+		echo Load_Tool::factory($toolname)->_index($tool_id);
+		die();
 	}
 
 
@@ -419,38 +419,44 @@ class Tool_Controller extends Controller {
  * used in view(admin/admin_panel)
  * also when when adding a <new> tool html into the DOM
  */		
-	public function toolkit($tool_guid=NULL, $page_id=NULL)
+	public function toolkit($tool_guid=NULL)
 	{
 		valid::id_key($tool_guid);
-		valid::id_key($page_id);
 		
-		# get the tool.
-		$tool = ORM::factory('tool')
-			->where('fk_site', $this->site_id)
-			->find($tool_guid);
-
-		# echo kohana::debug($tool->pages);die();		
+		$primary = new View('tool/toolkit_html');
+		$db = new Database;
 		
-		$scope = ('5' >= $page_id) ? 'global' : 'local';
+		$tool_data = $db->query("
+			SELECT pages_tools.*, LOWER(system_tools.name) as name
+			FROM pages_tools
+			JOIN system_tools ON system_tools.id = pages_tools.system_tool_id
+			WHERE pages_tools.guid = '$tool_guid'
+			AND pages_tools.fk_site = '$this->site_id'
+		")->current();
+		
+		$scope = ('5' >= $tool_data->page_id) ? 'global' : 'local';
 		
 		# determine if tool is protected so we can omit scope link
-		$protected = ('yes' == $tool->system_tool->protected)
-			? TRUE
-			: FALSE;
+		$protected = FALSE;
+		$protected_tools = ORM::factory('system_tool')
+			->where('protected', 'yes')
+			->find_all();
+			
+		foreach($protected_tools as $tool)
+			if($tool->id == $tool_data->system_tool_id)
+				$protected = TRUE;		
 		
 		$data_array = array(
-			'guid'		=> $tool->id,
-			'name'		=> strtolower($tool->system_tool->name),
-			'name_id'	=> $tool->system_tool->id,
-			'tool_id'	=> $tool->tool_id,
+			'guid'		=> $tool_data->guid,
+			'name'		=> $tool_data->name,
+			'name_id'	=> $tool_data->system_tool_id,
+			'tool_id'	=> $tool_data->tool_id,
 			'scope'		=> $scope,
-			'page_id'	=> $page_id,
+			'page_id'	=> $tool_data->page_id,
 			'protected'	=> $protected,	
-		);
-		
-		$view = new View('tool/toolkit_html');
-		$view->data_array = $data_array;
-		die($view);
+		);	
+		$primary->data_array = $data_array;
+		die($primary);
 	}
 	
 

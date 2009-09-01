@@ -13,7 +13,7 @@
 				<br>
 				<?php
 					if(!empty($item->album))
-						echo Load_Tool::factory('album')->_index($item->album);
+						echo Load_Tool::factory('album')->_index($item->album, TRUE);
 				?>
 			</div>
 		</div>

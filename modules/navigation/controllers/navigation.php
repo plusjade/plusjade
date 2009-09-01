@@ -10,17 +10,10 @@ class Navigation_Controller extends Public_Tool_Controller {
 
 /*
  * Displays a nestable navigation element menu
+ * now expects the parent table object.
  */	 
-	public function _index($tool_id)
+	public function _index($navigation)
 	{
-		valid::id_key($tool_id);
-		
-		$navigation = ORM::factory('navigation')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $navigation->loaded)
-			return $this->public_template('this navigation id not found.', 'navigation', $navigation);
-	
 		# There will always be a root_holder so no items is actually =1
 		if('1' == $navigation->navigation_items->count())
 			return $this->public_template('(no items)', 'navigation', $navigation);

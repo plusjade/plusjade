@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 
 class Calendar_Controller extends Public_Tool_Controller {
 
@@ -8,37 +8,29 @@ class Calendar_Controller extends Public_Tool_Controller {
 	}
 
 	
-	public function _index($tool_id)
+	public function _index($calendar)
 	{
 		$url_array	= Uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'calendar', $tool_id);
+		$page_name	= $this->get_page_name($url_array['0'], 'calendar', $calendar->id);
 		$action		= (empty($action)) ? 'nonsense' : $url_array['1'];
 		$year		= $url_array['2'];
 		$month		= $url_array['3'];
 		$day		= $url_array['4'];
 		$primary	= new View('public_calendar/small/index');
-
-
-		$calendar = ORM::factory('calendar')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $calendar->loaded)
-			return $this->public_template('calendar not found', 'calendar', $calendar);
-
 			
 		switch($action)
 		{
 			case 'month':
 				break;				
 			case 'day':
-				$primary->events = $this->day($tool_id, $year, $month, $day);
+				$primary->events = $this->day($calendar->id, $year, $month, $day);
 				break;			
 			default:
 				$year	= date('Y');
 				$month	= date('m');
 				break;
 		}
-		$primary->calendar = $this->month($page_name, $tool_id, $year, $month);
+		$primary->calendar = $this->month($page_name, $calendar->id, $year, $month);
 		
 		# get the custom javascript;
 		$primary->global_readyJS(self::javascripts());

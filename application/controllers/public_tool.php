@@ -11,7 +11,8 @@ abstract class Public_Tool_Controller extends Controller {
 		parent::__construct();
 		$this->template = new View('public_tool_wrapper');
 	}
-
+	
+	
 /*
   Builds a wrapper for each tool instance,
   adding toolname, tool_id, and attributes to the wrapper.
@@ -43,6 +44,13 @@ abstract class Public_Tool_Controller extends Controller {
 			# if we switch themes while still in admin mode, the tool_css file
 			# will not exist relative to the new theme. We have to create it.
 			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/_created/$tool_ob->id/{$tool_ob->type}_$tool_ob->view.css");
+			
+			// ---- legacy cleanup: delete the old "css" folders
+			$old_folder	= $this->assets->themes_dir("$this->theme/tools/$toolname/css");
+			if(is_dir($old_folder))
+				Jdirectory::remove($old_folder);
+			// ---- end cleanup
+
 			$css = (file_exists($custom_css))
 				? file_get_contents($custom_css)
 				: Tool_Controller::_generate_tool_css($toolname, $tool_ob->id, $tool_ob->type, $tool_ob->view, $this->site_name, $this->theme, TRUE);

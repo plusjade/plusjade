@@ -9,15 +9,20 @@ class Album_Controller extends Public_Tool_Controller {
 
 /*
  * Display an album instance
+ * expects parent album table object
  */	
-	public function _index($tool_id, $sub_tool=FALSE)
+	public function _index($album, $sub_tool=FALSE)
 	{
-		$album = ORM::factory('album')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $album->loaded)
-			return $this->public_template('album error, please contact support', 'album', $album);
-
+		# this is a hack for allowed sub_tools only.
+		if(!is_object($album))
+		{
+			$album = ORM::factory('album')
+				->where('fk_site', $this->site_id)
+				->find($album);	
+			if(FALSE === $album->loaded)
+				return $this->public_template('album error, please contact support', 'album', $album);	
+		}
+		
 		# images
 		$images = json_decode($album->images);
 		if(NULL === $images)
@@ -40,7 +45,7 @@ class Album_Controller extends Public_Tool_Controller {
  */
 	private function lightbox($images)
 	{
-		$view = new View('public_album/albums/lightbox');
+		$view = new View('public_album/images/lightbox');
 		$view->images = $images;
 		$view->img_path = $this->assets->assets_url();
 		
@@ -56,7 +61,7 @@ class Album_Controller extends Public_Tool_Controller {
  */
 	private function gallery($images)
 	{
-		$view = new View('public_album/albums/gallery');
+		$view = new View('public_album/images/gallery');
 		$view->images = $images;
 		$view->img_path = $this->assets->assets_url();
 
@@ -80,7 +85,6 @@ class Album_Controller extends Public_Tool_Controller {
 				
 			case 'gallery':
 					$js =  '
-
 					$("#format_gallery_wrapper").galleryView({
 						panel_width: 800,
 						panel_height: 400,
@@ -105,7 +109,6 @@ class Album_Controller extends Public_Tool_Controller {
 						fade_panels: true,
 						pause_on_hover: true
 					});
-					
 				';
 				break;
 				
@@ -123,7 +126,7 @@ class Album_Controller extends Public_Tool_Controller {
 	private function cycle($images, $img_path)
 	{
 		die('offline');
-		$primary = new View('public_album/albums/cycle');
+		$primary = new View('public_album/images/cycle');
 		# Javascript
 		$primary->request_js_files('easing/jquery.easing.1.3.js');										
 		$primary->request_js_files('cycle_lite/jquery.cycle.all.min.js');								

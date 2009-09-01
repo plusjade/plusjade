@@ -42,16 +42,13 @@
 			<a href="/get/files" rel="facebox" class="block_mode"><span class="icon local">&#160; &#160; </span>Files</a>
 		</li>
 		
-		<li class="this_page">
-			<div><b>This Page:</b></div>
-		</li>
-		
-		<li class="this_page" style="width:100px">
-			<a href="/get/page/settings/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a>
+
+		<li class="this_page" style="width:135px">
+			<a href="/get/page/settings/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Page Settings</a>
 		</li>
 
-		<li class="this_page" style="width:129px">
-			<a href="/get/tool/add/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD CONTENT</a>
+		<li class="this_page" style="width:175px">
+			<a href="/get/tool/add/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD PAGE CONTENT</a>
 		</li>
 		
 		<li class="floatright" style="width:65px !important;">

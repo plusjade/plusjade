@@ -644,7 +644,7 @@
 
         appendMenuSeparator : function()
         {
-            $('<li class="separator"></li>').appendTo( this.panel );
+            $('<li class="wysiwyg_separator"></li>').appendTo( this.panel );
         },
 
         appendControls : function()

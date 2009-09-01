@@ -2,8 +2,6 @@
 
 class Page_Model extends ORM {
 	
-	protected $has_and_belongs_to_many = array('tools');
-
 	#protected $has_many = array('pages_tools');
 	protected $sorting = array('page_name' => 'asc');
 	

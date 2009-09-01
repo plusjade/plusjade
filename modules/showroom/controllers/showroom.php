@@ -10,21 +10,15 @@ class Showroom_Controller extends Public_Tool_Controller {
 /*
  * The index displays various showroom views based on the url and routes as necessary
  * This is for non-ajax requests. _ajax handles ajax routing.
+ * expects parent showroom table object
  */ 
-	public function _index($tool_id)
+	public function _index($showroom)
 	{
 		$url_array	= uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'showroom', $tool_id);		
+		$page_name	= $this->get_page_name($url_array['0'], 'showroom', $showroom->id);		
 		$category	= $url_array['1'];
 		$item		= $url_array['2'];
-		
-		
-		$showroom = ORM::factory('showroom')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $showroom->loaded)
-			return $this->public_template('this showroom id not found.', 'showroom', $showroom);
-	
+
 		$primary = new View("public_showroom/display/index");
 		
 		# show the categories list.
@@ -38,10 +32,10 @@ class Showroom_Controller extends Public_Tool_Controller {
 		if('get' == $url_array['0'] OR (empty($category) AND empty($item)))
 		{
 			$primary->items = (empty($showroom->home_cat)) ?
-				'Home Category not set' : self::items_category($page_name, $tool_id, $showroom->home_cat);
+				'Home Category not set' : self::items_category($page_name, $showroom->id, $showroom->home_cat);
 		}
 		elseif(empty($item))
-			$primary->items = self::items_category($page_name, $tool_id, $category, $showroom->view);
+			$primary->items = self::items_category($page_name, $showroom->id, $category, $showroom->view);
 		else
 			$primary->item = self::item($page_name, $category, $item);
 

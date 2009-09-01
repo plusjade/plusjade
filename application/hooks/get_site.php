@@ -102,7 +102,7 @@ function get_site()
 			$tool = Load_Tool::factory($toolname);
 			
 			$url_array['0'] = $page_name; # make sure the page_name is correct.
-			die( $tool->_ajax($url_array, $tool_id) );
+			die($tool->_ajax($url_array, $tool_id));
 		}
 		else
 		{
@@ -116,16 +116,16 @@ function get_site()
 			}
 			
 			# Grab the page row
-			$page_object = ORM::factory('page')
+			$page_ob = ORM::factory('page')
 				->where(array(
-					'fk_site' => $site_row->id,
-					'page_name' => $page_name
+					'fk_site'	=> $site_row->id,
+					'page_name'	=> $page_name
 				))
 				->find();
-			if($page_object->loaded)
+			if($page_ob->loaded)
 			{
 				$page = new Build_Page_Controller;
-				die($page->_index($page_object));
+				die($page->_index($page_ob));
 			}
 			Event::run('system.404');
 			die('Page Not Found');

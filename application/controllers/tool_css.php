@@ -31,13 +31,15 @@ class Tool_Css_Controller extends Controller {
 		valid::id_key($page_id);
 		
 		$db = new Database;
+		# get all tools that are added to this page.
 		$tool_data = $db->query("
-			SELECT pages_tools.*, LOWER(system_tools.name) as name
-			FROM pages_tools
-			JOIN system_tools ON system_tools.id = pages_tools.system_tool_id
-			WHERE (pages_tools.page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
-			AND fk_site = '$this->site_id'
-			ORDER BY container, position
+			SELECT *, LOWER(system_tools.name) AS name, tools.id AS guid
+			FROM pages_tools 
+			JOIN tools ON pages_tools.tool_id = tools.id
+			JOIN system_tools ON tools.system_tool_id = system_tools.id
+			WHERE (page_id BETWEEN 1 AND 5 OR page_id = '$page_id')
+			AND pages_tools.fk_site = '$this->site_id'
+			ORDER BY pages_tools.container, pages_tools.position
 		");
 		
 		# load custom tool css files

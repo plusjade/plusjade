@@ -16,16 +16,18 @@
 		<br><input type="text" name="name" value="<?php echo $format->name?>" style="width:300px">
 	
 		<br><br>
-		
 		<b>Format Type</b>
-		<br><select name="type">
+			<input type="text" value="<?php echo $format->type?>" READONLY>
+			
+		<br><br>
+		<b>Format <?php echo $format->type?> View</b>
+		<br><select name="view">
 			<?php
-				$types = array('people','faqs', 'contacts');
-				foreach($types as $type)
-					if($type == $format->type)
-						echo "<option selected=\"selected\">$type</option>";
+				foreach($type_views as $view)
+					if($view == $format->view)
+						echo "<option selected=\"selected\">$view</option>";
 					else
-						echo "<option>$type</option>";
+						echo "<option>$view</option>";
 			?>
 		</select>
 	</div>

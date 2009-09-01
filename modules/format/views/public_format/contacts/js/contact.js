@@ -1,7 +1,7 @@
 	
-$('#contact_wrapper_%VAR% .email_form_wrapper').hide();
+$("#contact_wrapper_%VAR% .email_form_wrapper").hide();
 	
-$('#contact_wrapper_%VAR% .inline_form').click(function(){
+$("#contact_wrapper_%VAR% .inline_form").click(function(){
 	$("#contact_wrapper_%VAR% .email_form_wrapper").slideToggle("slow");
 	return false;
 });
@@ -18,7 +18,7 @@ $("#contact_wrapper_%VAR% form.public_ajaxForm").ajaxForm({
 });	
 
 //newsletter form
-$('#contact_wrapper_%VAR% #newsletter_form').ajaxForm({
+$("#contact_wrapper_%VAR% #newsletter_form").ajaxForm({
 	target: "#contact_wrapper_%VAR% #newsletter_form",
 	beforeSubmit: function(){
 		if( $("#contact_wrapper_%VAR% #newsletter_form input[type=text]").jade_validate() )
@@ -27,7 +27,7 @@ $('#contact_wrapper_%VAR% #newsletter_form').ajaxForm({
 			return false;
 	},
 	success: function(data) {
-		$.facebox(data, 'status_reload', 'facebox_2');
+		$.facebox(data, "status_reload", "facebox_2");
 		return false;		
 	}			
 });	

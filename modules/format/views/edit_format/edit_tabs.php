@@ -5,23 +5,15 @@
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive">Save Changes</button>
-		<div id="common_title">Edit Contact</div>
+		<div id="common_title">Edit Tab</div>
 	</div>	
 
 	<div class="common_left_panel fieldsets">
-		<b>Title</b>
+		<b>Tab Label</b>
 		<br><input type="text" name="title" value="<?php echo $item->title?>" rel="text_req">	
 	</div>
 	
-	<div class="common_main_panel">
-		<div id="blog_body" class="toggle fieldsets">
-			<textarea name="body" class="render_html"></textarea>
-		</div>
-
-		<div id="blog_body" class="toggle fieldsets">
-			<textarea name="body" class="render_html"></textarea>
-		</div>
-		
+	<div class="common_main_panel">	
 		<textarea name="body" class="render_html"><?php echo $item->body?></textarea>
 	</div>
 

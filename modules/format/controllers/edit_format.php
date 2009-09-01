@@ -17,7 +17,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 /*
  *	rearrange format-item positions
  */
-	function manage($tool_id=NULL)
+	public function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
 		
@@ -36,7 +36,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 /*
  * add a format item
  */	
-	function add($tool_id=NULL)
+	public function add($tool_id=NULL)
 	{
 		valid::id_key($tool_id);	
 		if($_POST)
@@ -73,7 +73,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 /*
  * edit a format item
  */
-	function edit($id=NULL)
+	public function edit($id=NULL)
 	{
 		valid::id_key($id);		
 
@@ -108,7 +108,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 /*
  * delete a format item
  */
-	function delete($id=NULL)
+	public function delete($id=NULL)
 	{
 		valid::id_key($id);
 		
@@ -122,7 +122,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
  * save the positions of the format questions
  * the ids are passed directly from the DOM so we don't need a tool_id
  */
-	function save_sort()
+	public function save_sort()
 	{
 		if(empty($_GET['item']))
 			die('No items to sort');
@@ -150,15 +150,36 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			$format->name = $_POST['name'];
-			$format->type = $_POST['type'];
+			$format->view = $_POST['view'];
 			#$format->params = $_POST['params'];
 			$format->save();
 			die('Format Settings Saved.');
 		}
 
+		switch($format->type)
+		{
+			case 'people':
+				$type_views = array('list','filmstrip');
+				break;
+			case 'contacts':
+				$type_views = array('list');
+				break;
+				
+			case 'faqs':
+				$type_views = array('simple');
+				break;
+			case 'tabs':
+				$type_views = array('stock');
+				break;
+			default:
+				$type_views = array();
+				break;
+		}
+		
 		$view = new View('edit_format/settings');
-		$view->format = $format;
-		$view->js_rel_command = "update-format-$tool_id";			
+		$view->format			= $format;
+		$view->type_views		= $type_views;
+		$view->js_rel_command	= "update-format-$tool_id";			
 		die($view);
 	}
 
