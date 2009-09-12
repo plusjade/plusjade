@@ -18,7 +18,9 @@ div.plusjade_ajax{
 	width:100%;
 	height:90px;
 }
-
+.admin_reset {
+	
+}
 .admin_reset img{border:0}
 .admin_reset h1,.admin_reset h2, .admin_reset h3,.admin_reset h4,.admin_reset h5,.admin_reset h6{
 	font-size:1em !important; padding:0 !important; margin:0 !important; margin-bottom:10px !important; background:none !important;
@@ -569,13 +571,7 @@ a.block_mode:hover,
 }
 
 /*scope toggle*/
-/*
-div.CONTAINER_WRAPPER > span.local > div.jade_toolbar_wrapper > table{
-	ackground: #d52020 url(/_assets/images/admin/red_bg.png) repeat-x bottom left !important;
-}
-*/
-div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper > table{
-	background-attachment:fixed;
+div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper  > div.bar {
 	background:orange url(/_assets/images/admin/gradients.jpg) repeat-x 0px -310px;
 	border:1px solid #cc6600 !important;
 }

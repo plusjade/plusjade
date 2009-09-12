@@ -41,7 +41,7 @@ class Build_Page_Controller extends Template_Controller {
 		# Grab tools for this page referencing the pivot table: "pages_tools"
 		# 0-10 are reserved for global tools. we only use 1-5 
 		$tools = $db->query("
-			SELECT *, LOWER(system_tools.name) AS name, tools.id AS guid
+			SELECT *, LOWER(system_tools.name) AS name, pages_tools.id AS instance_id
 			FROM pages_tools 
 			JOIN tools ON pages_tools.tool_id = tools.id
 			JOIN system_tools ON tools.system_tool_id = system_tools.id
@@ -64,11 +64,11 @@ class Build_Page_Controller extends Template_Controller {
 		if($tools->count() > 0)
 		{	
 			foreach ($tools as $tool)
-			{				
+			{		
 				# load the tool parent
 				$parent = ORM::factory($tool->name)
 					->where('fk_site', $this->site_id)
-					->find($tool->tool_id);	
+					->find($tool->parent_id);	
 				if($parent->loaded)
 				{
 					# If Logged in wrap classes around tools for Javascript
@@ -76,15 +76,16 @@ class Build_Page_Controller extends Template_Controller {
 					if($this->client->can_edit($this->site_id))
 					{
 						$scope		= ('5' >= $tool->page_id) ? 'global' : 'local';
-						$prepend	= '<span id="guid_' . $tool->guid . '" class="common_tool_wrapper '.$scope.'">';
+						$prepend	= '<span id="instance_' . $tool->instance_id . '" class="common_tool_wrapper '.$scope.'" rel="tool_'. $tool->tool_id .'">';
 						$append		= '</span>';
 
 						# Throw tool into admin panel array
-						$tools_array[$tool->guid] = array(
-							'guid'		=> $tool->guid,
+						$tools_array[$tool->instance_id] = array(
+							'instance'	=> $tool->instance_id,
+							'tool_id'	=> $tool->tool_id,
+							'parent_id'	=> $tool->parent_id,
 							'name'		=> $tool->name,
 							'name_id'	=> $tool->system_tool_id,
-							'tool_id'	=> $tool->tool_id,
 							'scope'		=> $scope,
 						);
 					}
@@ -97,7 +98,7 @@ class Build_Page_Controller extends Template_Controller {
 				elseif($this->client->can_edit($this->site_id))
 				{
 					# show the tool error when logged in.
-					$tool_object = "$tool->name with id: $this->tool_id could not be loaded.";
+					$tool_object = "$tool->name with id: $tool->parent_id could not be loaded.";
 				}
 				
 				# Add output to correct container.

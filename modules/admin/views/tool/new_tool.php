@@ -75,24 +75,20 @@ $(document).ready(function()
 		activeClass: 'ui-state-highlight',
 		accept: 'div.droppable_tool',
 		drop: function(event, ui) {
-		/*
-		 * tool_data = post output from this method (above)
-		 * receives the custom url of where the next 'add' page is for the particular tool
-		 */
 			var tool = $(ui.draggable).attr('rel');
 			var type = $(ui.draggable).attr('title');
 
 			$(document).trigger('show_submit.plusjade');
 			$('.common_main_panel').hide().before('<div class="plusjade_ajax floatleft" style="width:600px;"><b>Adding Tool: May take a few seconds...</b></div>');
-			$.post('/get/tool/add/<?php echo $page_id?>',
+			$.post('/get/tool/create/<?php echo $page_id?>',
 				{tool:tool, type:type},
-				function(tool_data){
-					//tool_data format: toolname:load_method:tool_id:tool_guid
-					var tool_data = tool_data.split(':');
-					$().jade_update_tool_html('add', tool_data[0], tool_data[2], tool_data[3]);	
+				function(data){
+					// contains toolname,method,tool_id, parent_id, instance.
+					var newTool = $.evalJSON(data); // console.log(newTool);
+					$().jade_inject_tool('add', newTool);	
 					
-					// load the 'load_method' tool::method
-					$.get('/get/edit_'+ tool_data[0] +'/'+ tool_data[1] +'/'+ tool_data[2], 
+					// load the next tool method.
+					$.get('/get/edit_'+ newTool.toolname +'/'+ newTool.method +'/'+ newTool.parent_id, 
 						function(data){$.facebox(data, false, 'facebox_base')}
 					);			
 				}

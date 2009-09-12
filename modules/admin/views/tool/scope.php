@@ -1,5 +1,5 @@
 
-<?php echo form::open("tool/scope/$tool_data->guid/$page_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command) )?>
+<?php echo form::open("tool/scope/$page_id/$instance->instance_id", array('class' => 'ajaxForm', 'rel' => $js_rel_command) )?>
 	
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_tool" class="jade_positive">Save Changes</button>
@@ -7,7 +7,7 @@
 	</div>
 	
 	<?php
-	$scope = ('5' >= $tool_data->page_id) ? 'global' : 'local';
+	$scope = ('5' >= $instance->page_id) ? 'global' : 'local';
 	$selected = array('local'=>'', 'global'=>'');
 	$selected[$scope] = 'selected="selected"';
 	?>
@@ -19,7 +19,7 @@
 	<div class="common_main_panel">
 		Scope: <select name="page_id">
 			<option value="<?php echo $page_id?>" <?php echo $selected['local']?>>Local</option>
-			<option value="<?php echo $tool_data->container?>" <?php echo $selected['global']?>>Global</option>
+			<option value="<?php echo $instance->container?>" <?php echo $selected['global']?>>Global</option>
 		</select>
 		
 		<p>

@@ -3,7 +3,15 @@ $page_enable = array('yes' => '', 'no' => '');
 $menu_enable = array('yes' => '', 'no' => '');
 $page_enable['no'] = (('no' == $page->enable)) ?  'SELECTED' : '';
 $menu_enable['no'] = (('no' == $page->menu)) ?  'SELECTED' : '';
-$is_homepage = ($page->page_name == $this->homepage) ? '<p>This is your homepage</p>' : '';
+$homepage_msg = '';
+$readonly = '';
+if($page->page_name == $this->homepage)
+{
+	$homepage_msg = '<p>This is your homepage.<br>Must be enabled.</p>';
+	$page_enable['yes'] = 'SELECTED';
+	$readonly = 'DISABLED';
+}
+
 $add_slash = (empty($directory)) ? '' : '/';
 
 echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') );
@@ -16,9 +24,9 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	</div>
 	
 	<div class="common_left_panel fieldsets">
-		<?php echo $is_homepage?>
+		<?php echo $homepage_msg?>
 		<b>Page Access</b>
-		<br><select name="enable" class="enabled_<?php echo $page->enable?>">
+		<br><select name="enable" class="enabled_<?php echo $page->enable?>" <?php echo $readonly?>>
 			<option value="yes" <?php echo $page_enable['yes']?>>Allow Access</option>
 			<option value="no" <?php echo $page_enable['no']?>>No Access</option>
 		</select>

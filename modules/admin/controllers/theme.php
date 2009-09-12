@@ -131,6 +131,7 @@ class Theme_Controller extends Controller {
 	
 		die('Error: File not uploaded.');
 	}
+
 	
 /*
  * add a new blank theme folder structure to theme repo.

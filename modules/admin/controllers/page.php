@@ -125,7 +125,7 @@ class Page_Controller extends Controller {
 /*
  * add a new page to site
  */
-	function add()
+	public function add()
 	{
 		if($_POST)
 		{
@@ -201,7 +201,7 @@ class Page_Controller extends Controller {
  * add a new page with a page_builder pre-installed.
  * possibly unecessry to pass toolname since we have the id.
  */
-	function add_builder($system_tool_id=NULL)
+	public function add_builder($system_tool_id=NULL)
 	{
 		valid::id_key($system_tool_id);
 		
@@ -242,8 +242,8 @@ class Page_Controller extends Controller {
 				
 			$new_page->save();
 
-			# add the tool.
-			Tool_Controller::_add_tool($new_page->id, $system_tool_id, $this->site_name, NULL, TRUE);
+			# create the tool.
+			Tool_Controller::_create_tool($new_page->id, $system_tool_id, $this->site_name, NULL, TRUE);
 	
 			# send html to javascript handler
 			$visibility	= ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
@@ -277,7 +277,7 @@ class Page_Controller extends Controller {
  * Note: does not delete any tools owned by this page.
  * Deleting pages with children is currently set to False;
  */
-	function delete($page_id=NULL)
+	public function delete($page_id=NULL)
 	{
 		valid::id_key($page_id);
 
@@ -285,6 +285,13 @@ class Page_Controller extends Controller {
 		if(!$page->loaded)
 			die('invalid page');
 		
+		# is this page set as homepage?
+		$site_config = yaml::parse($this->site_name, 'site_config');
+		if($page->page_name == $site_config['homepage'])
+			die('Cannot delete the current home page. Specify a new home page first.');
+		
+		echo kohana::debug($site_config);
+		die('testing');
 		# Get all pages to look for children.
 		$pages_data = ORM::factory('page')
 			->where('fk_site', $this->site_id)
@@ -294,7 +301,7 @@ class Page_Controller extends Controller {
 		$page_name_array = array();
 		$folders_array = array();
 		
-		# build page array
+		# create the page array
 		foreach($pages_data as $each_page)
 			$page_name_array[$each_page->page_name] = $each_page->id;
 	
@@ -331,7 +338,7 @@ class Page_Controller extends Controller {
 /*
  * Configure page settings	
  */ 
-	function settings($page_id=NULL)
+	public function settings($page_id=NULL)
 	{
 		valid::id_key($page_id);
 		$db = new Database;
@@ -350,27 +357,29 @@ class Page_Controller extends Controller {
 
 			if(!empty($directory))
 				$full_path = "$directory/$filename";
-			
-			$page->page_name	= $full_path;
-			$page->title		= $_POST['title'];
-			$page->meta			= $_POST['meta'];
-			$page->label		= $_POST['label'];
-			$page->template		= $_POST['template'];
-			$page->menu			= $_POST['menu'];
-			$page->enable		= $_POST['enable'];
-			$page->save();
-			
-			# if new page name & page is protected update the page_config file.
-			if($filename != $_POST['old_page_name'])
-				yaml::edit_key($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
 
 			# if this page was the homepage, update homepage value
 			if($this->homepage == $_POST['old_page_name'])
 			{
 				$db->update('sites', array('homepage' => $filename), "id = '$this->site_id'");
 				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $filename );
+				$_POST['enable'] = 'yes'; # force homepage to be enabled.
 			}
+				
+			$page->page_name	= $full_path;
+			$page->title		= $_POST['title'];
+			$page->meta			= $_POST['meta'];
+			$page->label		= $_POST['label'];
+			$page->template		= $_POST['template'];
+			$page->menu			= $_POST['menu'];
+			$page->enable		= (isset($_POST['enable']))? $_POST['enable'] : 'yes';
+			$page->save();
 			
+			# if new page name & page is protected update the page_config file.
+			if($filename != $_POST['old_page_name'])
+				yaml::edit_key($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
+
+
 			# if the page was the account page, update site_config
 			if($this->account_page == $_POST['old_page_name'])
 				yaml::edit_site_value($this->site_name, 'site_config', 'account_page', $filename);
@@ -509,7 +518,7 @@ class Page_Controller extends Controller {
 /*
  * Sort the Main Menu links
  */
-	function navigation()
+	public function navigation()
 	{			
 		$pages = ORM::factory('page')
 			->where(array(
@@ -568,5 +577,4 @@ class Page_Controller extends Controller {
 
 	
 	
-}
-/* End of file page.php */
+}  /* End of file page.php */

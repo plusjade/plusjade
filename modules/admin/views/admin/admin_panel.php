@@ -35,7 +35,7 @@
 		</li>
 		
 		<li class="direct">
-			<a href="/get/tool" rel="facebox" class="block_mode"><span class="icon tools">&#160; &#160; </span>Tools</a>
+			<a href="/get/tool?page_id=<?php echo $page_id?>" rel="css_styler" class="block_mode"><span class="icon tools">&#160; &#160; </span>Tools</a>
 		</li>
 		
 		<li class="direct">
@@ -48,7 +48,7 @@
 		</li>
 
 		<li class="this_page" style="width:175px">
-			<a href="/get/tool/add/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD PAGE CONTENT</a>
+			<a href="/get/tool/create/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD PAGE CONTENT</a>
 		</li>
 		
 		<li class="floatright" style="width:65px !important;">
@@ -70,13 +70,13 @@
 		<span id="global_css_path"><?php echo $global_css_path?></span>
 		<span id="click_hook" rel="<?php echo $page_id?>" style="display:none"></span>
 		<?php						
-		if( '0' < count($tools_array) )
+		if('0' < count($tools_array))
 		{
 			/*
 			 * THIS IS HIDDEN: Exists so JS can grab html.
-			 * $tool_array = array(guid, name, name_id, tool_id, scope);
+			 * $tools_array is sent from build_page controller.
 			 */	
-			foreach($tools_array as $guid => $data_array)
+			foreach($tools_array as $data_array)
 			{
 				$data_array['page_id']		= $page_id;
 				$data_array['protected']	=

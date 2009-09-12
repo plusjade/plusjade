@@ -56,11 +56,9 @@ class Tool_Css_Controller extends Controller {
 			# TODO: try and optimize this later.
 			$table = ORM::factory($tool->name)
 				->where('fk_site', $this->site_id)
-				->find($tool->tool_id);
+				->find($tool->parent_id);
 
 
-
-				
 			// ------------------- start legacy support -------------------
 			if(empty($table->type) OR empty($table->view))
 			{
@@ -90,11 +88,11 @@ class Tool_Css_Controller extends Controller {
 		
 		
 		
-			$custom_file = $this->assets->themes_dir("$this->theme/tools/$tool->name/_created/$tool->tool_id/{$table->type}_$table->view.css");
+			$custom_file = $this->assets->themes_dir("$this->theme/tools/$tool->name/_created/$tool->parent_id/{$table->type}_$table->view.css");
 			if(file_exists($custom_file))
 				readfile($custom_file);
 			else # this should only happen when changing themes initially.
-				echo Tool_Controller::_generate_tool_css($tool->name, $tool->tool_id, $table->type, $table->view, $this->site_name, $this->theme, TRUE);
+				echo Tool_Controller::_generate_tool_css($tool->name, $tool->parent_id, $table->type, $table->view, $this->site_name, $this->theme, TRUE);
 				
 			# get a list of all unique tooltypes:	
 				# $tool_types["$tool->name"] = $tool->name;

@@ -161,11 +161,33 @@
 <div style="clear:both;margin-top:10px"></div>
 
 
+<div id="yelp">
+
+</div>
+
+
 <script type="text/javascript">
 
 $(document).ready(function()
 {
 
+	/*
+	function loadYelp() 
+	{ 
+		$('#yelp').html('<span>yahboi</span>'); 
+		$.ajax({ 
+			type:'GET', 
+			url:"http://api.yelp.com/phone_search?phone=9497279900&ywsid=BVx1xyAjyEGPDL6XQIVcKQ", 
+			success:function(feed) { 
+				alert(feed);
+			}, 
+			dataType:'jsonp' 
+		}); 
+	}
+	loadYelp();
+	*/
+	
+	
 	$('#choose_theme .gallery').cycle({ 
 		prev:   '#prev', 
 		next:   '#next', 

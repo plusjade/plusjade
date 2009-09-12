@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
+/*
+ * Display an album instance
+ */	
+ 
 class Album_Controller extends Public_Tool_Controller {
 	
 	function __construct()
@@ -8,7 +12,6 @@ class Album_Controller extends Public_Tool_Controller {
 	}
 
 /*
- * Display an album instance
  * expects parent album table object
  */	
 	public function _index($album, $sub_tool=FALSE)
@@ -24,8 +27,9 @@ class Album_Controller extends Public_Tool_Controller {
 		}
 		
 		# images
-		$images = json_decode($album->images);
-		if(NULL === $images)
+		$images = json_decode($album->images);	
+		
+		if(NULL === $images OR !is_array($images))
 			return $this->public_template('no images.', 'album', $album);
 			
 		foreach($images as $image)
@@ -198,7 +202,7 @@ class Album_Controller extends Public_Tool_Controller {
 
 	
 /*
- * which function to go after album is created?
+ * execute stuff after new album is created.
  */	
 	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{

@@ -22,12 +22,12 @@
 				<?php
 				foreach($pages as $page)
 					if($this->homepage == $page->page_name)
-						echo "<option selected=\"selected\">$page->page_name</option>";
+						echo "<option value=\"$page->page_name:$page->id\" selected=\"selected\">$page->page_name</option>";
 					else
-						echo "<option>$page->page_name</option>";
+						echo "<option value=\"$page->page_name:$page->id\">$page->page_name</option>";
 				?>
 			</select>
-			
+			<br>Defining a home page automatically enables viewing of that page.
 		<br><br>
 		
 		<b>Set Timezone</b>

@@ -17,7 +17,7 @@ class Admin_Controller extends Controller {
 /**
  * set some sitewide settings
  */	
-	function index()
+	public function index()
 	{
 		$site = ORM::factory('site', $this->site_id);
 		if(!$site->loaded)
@@ -25,14 +25,21 @@ class Admin_Controller extends Controller {
 			
 		if($_POST)
 		{
+			$homepage = explode(':', $_POST['homepage']);
+			
 			$site->custom_domain = $_POST['custom_domain'];
-			$site->homepage		 = $_POST['homepage'];
+			$site->homepage		 = $homepage[0];
 			$site->save();
 			
 			# update site_config.yml if new homepage
-			if($this->homepage != $_POST['homepage'])
+			# and force page to be enabled.
+			if($this->homepage != $homepage[0])
+			{
 				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $_POST['homepage']);
-			
+				$page = ORM::factory('page', $homepage[1]);
+				$page->enable = 'yes';
+				$page->save();
+			}
 			die('Sitewide settings saved.');
 		}
 		

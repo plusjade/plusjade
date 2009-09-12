@@ -26,24 +26,37 @@ DELETE FROM system_tools WHERE id in (5,6);
 
 -- add the new system_tool_types logic.
 
-CREATE TABLE IF NOT EXISTS `system_tool_views` (
+--
+-- Table structure for table `system_tool_types`
+--
+
+CREATE TABLE IF NOT EXISTS `system_tool_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `system_tool_id` int(3) NOT NULL,
-  `view` varchar(55) NOT NULL,
-  `desc` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `type` varchar(55) NOT NULL,
+  `view` varchar(50) NOT NULL COMMENT 'default',
+  `desc` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=14 ;
 
 --
--- Dumping data for table `system_tool_views`
+-- Dumping data for table `system_tool_types`
 --
-INSERT INTO `system_tool_views` (`system_tool_id`, `view`, `desc`) VALUES
-(4, 'people', 'Organize people using this format.'),
-(4, 'faqs', 'Create a list of frequently asked questions'),
-(4, 'contacts', 'Create a list of common methods used to contact you or your business.');
 
-ALTER TABLE `system_tool_views` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST ;
-RENAME TABLE system_tool_views TO system_tool_types;
-ALTER TABLE `system_tool_types` CHANGE `view` `type` VARCHAR( 55 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
-
+INSERT INTO `system_tool_types` (`id`, `system_tool_id`, `type`, `view`, `desc`) VALUES
+(1, 4, 'people', 'filmstrip', 'Organize people using this format.'),
+(2, 4, 'faqs', 'simple', 'Create a list of frequently asked questions'),
+(3, 4, 'contacts', 'list', 'Create a list of common methods used to contact you or your business.'),
+(4, 1, 'basic', 'stock', 'Insert basic textual content into your page.'),
+(5, 2, 'images', 'lightbox', 'Create photo albums.'),
+(6, 3, 'display', 'list', 'This showroom displays products or items but does not have any shopping cart or ecommerce support. It is meant to catalogue and display items only.'),
+(7, 7, 'small', 'list', 'This smaller calendar shows which dates have events on them with a click to display those events.'),
+(8, 8, 'lists', 'stock', 'Create nestable lists. Lists can include text, page links, email links, or external links.'),
+(9, 8, 'menus', 'stock', 'Menus automatically create a site map of all your sites pages.'),
+(10, 9, 'blogs', 'stock', 'a basic blog'),
+(11, 10, 'accounts', 'stock', 'the default basic accounts tool.'),
+(12, 11, 'forums', 'stock', 'a basic forum with voting functionality.'),
+(13, 4, 'tabs', 'stock', 'Organize content into a tab interface.');
 
 
 -- alter tables to include type and view fields.
@@ -57,13 +70,14 @@ ALTER TABLE `navigations` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `title` ;
 ALTER TABLE `showrooms` ADD `type` VARCHAR( 25 ) NOT NULL AFTER `name`; 
 ALTER TABLE `navigations` CHANGE `title` `name` VARCHAR( 80 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
 ALTER TABLE `system_tools` ADD `type` VARCHAR( 30 ) NOT NULL COMMENT 'default' AFTER `visible` ;
-ALTER TABLE `texts` ADD `view` VARCHAR( 55 ) NOT NULL AFTER `type` ;
+ALTER TABLE `texts` ADD `type` VARCHAR( 55 ) NOT NULL AFTER `name` ;
+-- ALTER TABLE `texts` ADD `view` VARCHAR( 55 ) NOT NULL AFTER `type` ;
 
 
 -- drop uneeded tables.
 
-DROP TABLE `menu_items`;
-DROP TABLE `menus`;
+-- DROP TABLE `menu_items`;
+-- DROP TABLE `menus`;
 
 
 
@@ -108,40 +122,24 @@ CREATE TABLE IF NOT EXISTS `format_items` (
 -- this centralizes the tool instances and places them in pages by reference only
 -- this way one tool can be on multiple pages, it has no physical attachment to a page.
 
---
--- Table structure for table `tools`
---
+-- clone pages_tools to tools
+CREATE TABLE tools LIKE pages_tools;
+INSERT tools SELECT * FROM pages_tools;
 
-CREATE TABLE IF NOT EXISTS `tools` (
-  `id` int(7) unsigned NOT NULL AUTO_INCREMENT,
-  `fk_site` int(7) unsigned NOT NULL,
-  `system_tool_id` int(2) unsigned NOT NULL,
-  `tool_id` int(7) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+-- update tools table
+ALTER TABLE `tools` 
+CHANGE `guid` `id` INT( 7 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+  DROP `page_id`,
+  DROP `container`,
+  DROP `position`;
+  
+-- update the pages_tools table
 
-
--- backup our data.
-RENAME TABLE pages_tools TO pages_tools_bak;
-
-
---
--- Table structure for table `pages_tools`
---
-
-CREATE TABLE IF NOT EXISTS `pages_tools` (
-  `tool_id` int(7) unsigned NOT NULL,
-  `page_id` int(7) unsigned NOT NULL,
-  `fk_site` int(7) unsigned NOT NULL,
-  `container` int(1) unsigned NOT NULL DEFAULT '1',
-  `position` int(3) NOT NULL COMMENT 'can be neg.',
-  KEY `page_id` (`page_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
-
-
--- REMEMBER:: I need to manually transfer over the old pages_tools data
--- to tools, and the new pages_tools.
-
+ALTER TABLE `pages_tools`
+ CHANGE `guid` `tool_id` INT( 7 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+  DROP `system_tool_id`,
+  DROP `tool_id`;
+  
 
 
 -- update the version

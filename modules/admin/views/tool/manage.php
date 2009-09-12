@@ -1,22 +1,18 @@
 
 
 <div id="common_tool_header">
-	<div id="common_title">All Site Tools</div>
+	<div id="common_title">All Site Tools <?php echo $page_id?></div>
 </div>
 
 <div id="tools_browser_wrapper">
 
 	<div class="common_left_panel">
-		All tools on this site.
-		<br><br>
 		<h2>Key</h2>
 		<b style="color:blue">Blue:</b> on local page.
 		<br><b style="color:orange">Orange:</b> on all pages.
 		<br><b style="color:red">Red:</b> Orphans.
-		<br><br>
-		Move orphans to an existing page or delete it to tidy up your site!
 		
-		<ul id="tool_list_wrapper" style="line-height:1.6em">
+		<ul id="tool_list_wrapper" style="line-height:1.1em">
 			<?php foreach($system_tools as $system_tool):?>
 				<li><a href="#window_<?php echo $system_tool->name?>"><?php echo $system_tool->name?></a></li>
 			<?php endforeach;?>
@@ -26,12 +22,12 @@
 	<div class="breadcrumb_wrapper" style="width:590px">
 		<span id="breadcrumb" rel="">Album</span>
 	</div>	
-	<div id="directory_window" class="common_main_panel">
+	<div id="directory_window" style="overflow:visible" class="common_main_panel">
 
 			<?php 
 			$names = array('');
 			$start = 1;
-			foreach($tools as $key => $tool)
+			foreach($tools as $tool)
 			{
 				$names[$start] = $tool->system_tool->name;
 				$last = $start-1;
@@ -49,19 +45,19 @@
 						</div>
 				<?php endif;?>
 						<div id="icon_<?php echo $tool->id?>" class="asset <?php echo $class?>">
-							Guid:<?php echo $tool->id?>
-							<br>Tool id: <?php echo $tool->tool_id?>
-							<br>Pages: 
-							
+							Pages: 
 							<?php foreach($tool->pages as $page) :?>
 								<br><a href="<?php echo url::site($page->page_name)?>"><?php echo $page->page_name?></a>
 							<?php endforeach;?>
 							
-							<p>
-								<a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->tool_id"?>" class="show_view">View</a>
+							<br><br>
+							<a href="/get/tool/add/<?php echo "$tool->id/$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add to Page</a>
+							<br>
+							<a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->parent_id"?>" class="show_view">quick view</a>
 								
-								<br><br><a href="/get/tool/delete/<?php echo $tool->id?>" class="jade_delete_tool" rel="<?php echo $tool->id?>">delete!</a>
-							</p>
+							<br>
+							<a href="/get/tool/delete/<?php echo $tool->id?>" class="jade_delete_tool" rel="<?php echo $tool->id?>">delete!</a>
+							
 						</div>
 				<?php		
 				++$start;
@@ -84,7 +80,7 @@
 
 
 <script type="text/javascript">
-
+	
 	$('#tool_list_wrapper a').click(function(){
 		$('#tool_list_wrapper a').removeClass('active');
 		var pane = $(this).addClass('active').attr('href');	
@@ -122,5 +118,20 @@
 		return false;
 	});
 	
+	// add tool to the current page:
+		$('a.to_page').click(function(){
+			var args = $(this).attr('rel').split(':');
+			var tool = {
+				"toolname" : args[0],
+				"parent_id" : args[1],
+				"tool_id" : args[2],
+			};		
+			$.get(this.href, function(data){
+				// sends the resulting insert_id from the pages_tools table.
+				tool.instance = data;
+				$().jade_inject_tool('add', tool);
+			});
+			return false;
+		});
 	
 </script>

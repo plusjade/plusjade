@@ -152,7 +152,8 @@ class Auth_Controller extends Controller {
 			if(!$plusjade_user->loaded)
 				url::redirect();
 			
-			# can this user edit this site?
+
+			# can this user edit the site?
 			if($plusjade_user->has(ORM::factory('site', $this->site_id)))
 			{
 				# setup credentials via the auth library
