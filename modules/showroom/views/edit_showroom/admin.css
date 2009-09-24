@@ -5,3 +5,28 @@ border:1px solid #ccc;
 margin:3px;
 padding:3px;
 }
+
+#category_wrapper {
+	height:300px;
+	overflow:auto;
+}
+#category_wrapper ul{
+	list-style:none;
+	margin:0;
+	padding:0;
+	margin-left:10px;
+}
+#category_wrapper ul li{
+	padding:3px 0;
+}
+#category_wrapper ul li a{
+	padding:4px 5px;
+	background:#e7f7fd;
+	text-decoration:none;
+}
+#category_wrapper ul li a:hover,
+#category_wrapper ul li a.active{
+	color:#fff;
+	text-decoration:underline;
+	background:orange;
+}

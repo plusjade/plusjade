@@ -1,19 +1,21 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
+
 /* 
  * Tree traversal to build nested lists
  * used to build navigation lists for navigation tool
  * used to build nested categories in showroom tool
  * 
 */
+
 class Tree_Core {
 
 /*
  * display node data for public navigation tool since
  * more multiple navigations can be on same page.
  */
-	static function render_node_navigation($item)
+	public static function render_node_navigation($item)
 	{
-		$type = ( empty($item->type) ) ? 'none' : $item->type;
+		$type = (empty($item->type)) ? 'none' : $item->type;
 
 		switch($type)
 		{
@@ -37,7 +39,7 @@ class Tree_Core {
  * Uses Tree traversal method to display neat nested ul/li list.
  * $items (object) are required to have lft/rgt values
 */
-	static function display_tree($toolname, $items, $page_name=null, $admin=FALSE)
+	public static function display_tree($toolname, $items, $page_name=null, $admin=FALSE)
 	{	  
 		# start with an empty $right stack
 		$right		= array();	

@@ -4,46 +4,43 @@
 
 .multi_website_message,
 .own_domain{
-padding:10px;
-margin:10px;
-background:#eee;
+	padding:10px;
+	margin:10px;
+	background:#eee;
 }
 .own_domain{
-background:#ffffcc;
+	background:#ffffcc;
+}
+#site_button_wrapper{
+	margin:10px;
+	padding:10px;
+	min-height:100px;
+	order:1px dashed #ddd;
 }
 </style>
 <div style="margin:10px 20px;">
 
 
 	<h2>Hello there, <?php echo ucfirst($user->username)?>!</h2>
-
+	<?php
+	if($is_admin)
+		echo '<a href="/utada">Go to Master</a>';
+	?>	
 	<h3>Your Websites</h3>
-	<div id="site_button_wrapper" style="margin:10px; padding:10px; min-height:100px; border:1px dashed #ddd;">
-		<?php
-		foreach($sites_array as $name => $token)
-		{
-			?>
+	<div id="site_button_wrapper">
+		<?php foreach($sites_array as $name => $token):?>
 			<p>
-				<b><?php echo $name?></b> &#8594; <a href="<?php echo "http://$name.". ROOTDOMAIN ."/get/auth/manage?tKn=$token"?>">Edit Website</a>  -- 
+				<b><?php echo $name?></b> &#8594; <a href="<?php echo "http://$name.". ROOTDOMAIN ."/get/site/login?tKn=$token"?>">Edit Website</a>  -- 
 				<a href="<?php echo url::site("$page_name/safe_mode/$name")?>" class="ajaxify">Activate safe-mode</a>
 			</p>
-			<?php
-		}
-		
-		
-		if($is_admin)
-			echo '<p><b>Admin</b> &#8594; <a href="/get/utada">Go to Master</a></p>';
-		?>	
-	</div>
-		
-	<h3>I want my own domain address!</h3>
-	<div class="own_domain">
-		+Jade allows full domain-name mapping. 
-		<br>This means your site can run @ http://mysite.com
-		<br>Unfortunately, this will not be enabled during our beta period.
+		<?php endforeach;?>
 	</div>
 	
+
 	
+		*** THIS IS TO ALLOW NEW WEBSITES TO BE CREATED BY EXISTING USERS***
+		***OFF FOR NOW***
+
 	<h3>Add New Website</h3>
 	<div class="multi_website_message">
 		You can add up to 3 websites to this account.
@@ -61,6 +58,7 @@ background:#ffffcc;
 	<?php else:?>
 		You already have 3 websites =D.
 	<?php endif;?>
+	
 
 </div>
 

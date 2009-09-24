@@ -77,7 +77,7 @@ class Blog_Controller extends Public_Tool_Controller {
 		# get the custom javascript;
 		$primary->global_readyJS(self::javascripts());
 		
-		return $this->public_template($primary, 'blog', $blog);
+		return $this->wrap_tool($primary, 'blog', $blog);
 	}
 	
 
@@ -192,7 +192,7 @@ class Blog_Controller extends Public_Tool_Controller {
 		");
 		$content->items = $items;
 		#Javascript
-		$content->add_root_js_files('expander/expander.js');		
+		$content->request_js_files('expander/expander.js');		
 		return $content;		
 	}
 	
@@ -418,7 +418,7 @@ class Blog_Controller extends Public_Tool_Controller {
 /*
  * logic executed after this blog tool is added to site.
  */
-	public function _tool_adder($tool_id, $site_id, $sample=FALSE)
+	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
 		if($sample)
 		{

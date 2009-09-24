@@ -1,0 +1,70 @@
+
+body{
+	background:#111;
+	color:#fff;
+}
+h1,h2,h3{
+	color:#fff;
+}	
+.fieldsets{
+	padding-bottom:10px;
+	margin-bottom:10px;
+	overflow:hidden;
+}
+.fieldsets div{
+	font-size:1.2em;
+	color:blue;
+	font-weight:bold;
+	font-family: 'Lucida Console', Monaco, monospace;
+	text-align:left;
+}
+.fieldsets input, .fieldsets select{
+	padding:5px;
+	font-weight:normal;
+}
+form{
+	width:300px;
+	padding:15px 20px;
+	margin:5px auto;
+	background:#fff;
+	text-align:center;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+}
+form input{
+	width:280px;
+}
+form button{
+	padding:5px;
+	color:blue;
+	border:1px solid blue;
+	background:#ffffcc;
+}
+form button:hover{
+	color:white;
+	cursor:cursor;
+	cursor:pointer;
+	background:green;
+	border:1px solid #fff;
+}
+#main_content_wrapper{
+	width:600px;
+	padding:10px;
+	margin:10px auto;
+}
+.form-box{
+	ackground:#fff;
+}
+span.msg{
+	color:red;
+}
+.error{
+	padding:5px;
+	background:pink;
+	border:1px solid red;
+	color:black;
+	
+}
+.indent{
+	margin-left:20px;
+}

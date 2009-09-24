@@ -11,18 +11,18 @@
 
 	<div class="common_left_panel"  style="width:18%">	
 		<b>Add container class:</b>
-		<br><input type="text" name="attributes" value="<?php echo $tool->attributes?>">
+		<br/><input type="text" name="attributes" value="<?php echo $tool->attributes?>">
 		<p>
 		<button type="submit" name="save_css" class="jade_positive">Save Changes</button>
 		</p>
 		<button type="submit" name="save_template" class="jade_positive" value="true">Save as template</button>
-		<br><br>
+		<br/><br/>
 		<b>Press TAB</b> while in the textarea to update the tool view.
 	</div>
 	
 
 	<div class="common_main_panel" style="margin:0;padding:0;width:78%">
-		<ul class="generic_tabs ui-tabs_nav">
+		<ul class="common_tabs_x ui-tabs_nav">
 			<li><a href="#" class="show_options">Options</a></li>
 			<li><a href="#" class="show_css">CSS</a></li>
 			<li><a href="#" class="update">Update</a></li>
@@ -36,12 +36,12 @@
 		<div id="main_options" class="toggle">
 			
 			Each Image:
-			<br><br>
+			<br/><br/>
 			<div id="slider"></div>
 			Border:<a href="#" class="do_option"> Red Border</a>
-			<br>Background:
-			<br>Padding:
-			<br>Margin:
+			<br/>Background:
+			<br/>Padding:
+			<br/>Margin:
 		</div>
 
 		

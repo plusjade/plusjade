@@ -29,7 +29,7 @@ class Tool_Controller extends Controller {
 /*	
  * List ALL TOOLS for this site.
  */
-	function index()
+	public function index()
 	{
 		$system_tools = ORM::factory('system_tool')
 			->orderby(array(
@@ -60,13 +60,11 @@ class Tool_Controller extends Controller {
 
 		if($_POST)
 		{
-			# is a type sent?
-			$type = (empty($_POST['type']))
-				? NULL
-				: $_POST['type'];
-			
+			if(empty($_POST['type']) OR empty($_POST['tool']))
+				die('nothing posted.');
+				
 			# all tools passed here should be non-protected
-			die(self::_create_tool($page_id, $_POST['tool'], $this->site_name, $type, FALSE, FALSE, TRUE));
+			die(self::_create_tool($page_id, $_POST['tool'], $this->site_name, $_POST['type'], FALSE, FALSE, TRUE));
 		}	
 		
 		$tools = ORM::factory('system_tool')

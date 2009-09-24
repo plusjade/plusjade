@@ -14,3 +14,14 @@ a img{border:0}
 	background:#ffffcc;
 	border:2px solid orange;
 }
+/* inline form error messages */
+b.error{
+	color:red;
+}
+
+div.ajax_loading{
+	text-align:center;
+	background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%;
+	width:100%;
+	height:90px;
+}

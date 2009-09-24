@@ -35,7 +35,7 @@ class Calendar_Controller extends Public_Tool_Controller {
 		# get the custom javascript;
 		$primary->global_readyJS(self::javascripts());
 		
-		return $this->public_template($primary, 'calendar', $calendar);
+		return $this->wrap_tool($primary, 'calendar', $calendar);
 	}
 	
 /*

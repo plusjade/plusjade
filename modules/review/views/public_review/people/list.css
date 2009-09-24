@@ -1,0 +1,35 @@
+
+
+#format_wrapper_++{
+
+}
+
+	/*  --- format people list  --- */
+	
+#format_people_wrapper{
+	
+}
+#format_people_wrapper .person{
+	margin-bottom:5px;
+	overflow:auto;
+}
+#format_people_wrapper .portrait{
+	width:30%;
+	float:left;
+	height:250px;
+	padding:10px;
+	text-align:center;
+}
+#format_people_wrapper .portrait img{
+	padding:5px;
+	background:#eee;
+	border:1px solid #ccc;
+}
+#format_people_wrapper .body{
+	width:62%;
+	float:right;
+	height:250px;
+	padding:10px;
+	margin:10px;
+	border-top:1px dashed #ccc;
+}

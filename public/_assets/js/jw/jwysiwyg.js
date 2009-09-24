@@ -399,7 +399,7 @@
 			$('#editable_wrapper')
 			.prepend(this.element)
 			.append('<div id="show_files" class="editor_pane"></div>')
-			.before('<ul class="ui-tabs-nav generic_tabs"> \
+			.before('<ul class="ui-tabs-nav common_tabs_x"> \
 					<div class="field_title">'+ name +'</div> \
 					<li><a href="#" class="show_edit">Preview</a><li>\
 					<li><a href="#" class="get_file_browser" rel="editor">Add Media</a><li>\

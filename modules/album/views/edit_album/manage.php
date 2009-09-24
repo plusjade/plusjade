@@ -38,38 +38,13 @@
 
 <script type="text/javascript">
 
-	$("#sortable_images_wrapper").sortable({items:'div', handle:'span.handle'});
-	$("#sortable_images_wrapper").selectable({filter:'img'});
-
-// make space droppable for images in files browser	
-	$("#sortable_images_wrapper").droppable({
-		activeClass: 'ui-state-highlight',
-		accept: 'img.image_file',
-		drop: function(event, ui) {
-			$(ui.draggable).addClass('selected');
-			$(ui.draggable).parent('div').addClass('selected');		
-			
-			$('<div></div>')
-			.addClass('album_images')
-			.prepend('<span class="handle"><b>edit</b> <em>drag</em></span>')
-			.append($(ui.draggable ).clone())
-			.appendTo(this);
-			return false;
-		}
-	});
-	
-// make trash droppable
-	$("#image_trash").droppable({
-		activeClass: 'ui-state-highlight',
-		accept: '.album_images',
-		drop: function(event, ui) {
-			$(ui.draggable).remove();
-		}
-	});
+// Load image album user interface functions.	
+<?php include Kohana::find_file('views', 'javascripts/image_album_ux', FALSE, 'js');?>
 	
 
 // Save the album
 	$('button#save_album').click(function(){
+		// JSONize image selections
 		var data = new Array();
 		$('#sortable_images_wrapper img').each(function(){
 			var img = new Object();
@@ -77,7 +52,6 @@
 			img.caption = $(this).attr('title');
 			data.push(img);
 		});
-		
 		var dataString = $.toJSON(data); // alert(dataString);
 		
 		$(document).trigger('show_submit.plusjade');		

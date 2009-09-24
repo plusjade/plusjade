@@ -269,7 +269,7 @@ div.styler_wrapper .actions{
 	overflow:hidden;
 	top:2px;
 }
-div.styler_wrapper a.toggle,
+div.styler_wrapper a.hide,
 div.styler_wrapper a.close{
 	display:block;
 	height:28px;
@@ -845,24 +845,17 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	padding:0;	
 }
 
-.generic_tabs{
-	padding:6px 0 !important;
+
+ul.common_tabs_x{
+	padding:5px 0 !important;
 	margin:0;
 }
-.generic_tabs div.field_title{
-	float:right;
-	font-size:1.2em;
-	font-weight:bold;
-	color:blue;
-	font-family: 'Lucida Console', Monaco, monospace;
-	text-transform : capitalize;
-	padding-right:10px;
-}
-.generic_tabs li{
-	display:inline;
+
+.common_tabs_x li{
+	display:inline !important;
 	margin-right:2px;
 }
-.generic_tabs li a{
+.common_tabs_x li a{
 	text-decoration:none;
 	padding:7px 15px;
 	background:lightblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -110px;
@@ -871,10 +864,23 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 	font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 	font-weight:bold;
 }
-.generic_tabs li a:hover,
-.generic_tabs li.ui-tabs-selected a{
+
+
+.common_tabs_x li a:hover,
+.common_tabs_x li a.active {
+	position:relative;
+	top:1px;
 	color:#fff !important;
 	background:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important; /*purple*/
+}
+.common_tabs_x div.field_title{
+	float:right;
+	font-size:1.2em;
+	font-weight:bold;
+	color:blue;
+	font-family: 'Lucida Console', Monaco, monospace;
+	text-transform : capitalize;
+	padding-right:10px;
 }
 
 	
@@ -1011,6 +1017,12 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 }
 .common_main_panel ul li{
 	color:#333 !important;
+}
+.common_full_panel{
+	width:99%;
+	margin:0 auto;
+	padding:15px 0;
+	border-top:1px solid #0099cc;
 }
 
 #common_view_toggle li{margin-bottom:5px;}

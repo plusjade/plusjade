@@ -1,11 +1,14 @@
 <?php defined('SYSPATH') or die('No direct script access.');
  
+/*
+ * Dynamically loads a tool object instance
+ *
+ */
+ 
 class Load_Tool_Core {
 
 /*
- * Dynamically loads a tool object instance
- * Used @ /application/controllers/build_page.php
- *
+ * load an available public tool controller
  */
 	public static function factory($tool)
 	{
@@ -21,8 +24,8 @@ class Load_Tool_Core {
 			case 'Album':
 				$tool = new Album_Controller(); 			
 				break;
-			case 'Reviews':
-				$tool = new Reviews_Controller(); 			
+			case 'Review':
+				$tool = new Review_Controller(); 			
 				break;	
 			case 'Showroom':
 				$tool = new Showroom_Controller(); 			
@@ -44,6 +47,9 @@ class Load_Tool_Core {
 				break;
 			case 'Forum':
 				$tool = new Forum_Controller(); 			
+				break;
+			case 'Newsletter':
+				$tool = new Newsletter_Controller(); 			
 				break;					
 			default:
 				die("<b>error:</b> '$tool' tool does not exist (Load_Tool::factory)");
@@ -51,9 +57,9 @@ class Load_Tool_Core {
 		return $tool;
 	}
 
-/* 
- * Loads a tool instance, but for admin/edit controllers.
-*/
+/*
+ * load an available edit tool controller
+ */
 	public static function edit_factory($tool)
 	{
 		$tool = ucwords($tool);
@@ -68,8 +74,8 @@ class Load_Tool_Core {
 			case 'Album':
 				$tool = new Edit_Album_Controller(); 			
 				break;
-			case 'Reviews':
-				$tool = new Edit_Reviews_Controller(); 			
+			case 'Review':
+				$tool = new Edit_Review_Controller(); 			
 				break;	
 			case 'Showroom':
 				$tool = new Edit_Showroom_Controller(); 			
@@ -91,6 +97,9 @@ class Load_Tool_Core {
 				break;
 			case 'Forum':
 				$tool = new Edit_Forum_Controller();
+				break;
+			case 'Newsletter':
+				$tool = new Edit_Newsletter_Controller();
 				break;
 			default:
 				die("<b>error:</b> '$tool' edit_tool does not exist (Load_Tool::edit_factory)");

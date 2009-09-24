@@ -3,7 +3,7 @@ class Files_Controller extends Controller {
 
 /* 
  * Files refer to a repository for misc. assets uploaded by the user.
- * Assets other than themes or tool specific assets.
+ * Main Gatekeeper for Assets other than themes.
  * Location: @ /public/_data/$this->site_name/assets.
  * This class basically does CRUD relative to this folder.
  */	 
@@ -162,7 +162,7 @@ class Files_Controller extends Controller {
 /*
  * delete a folder or file from the asset repository.
  */
-	function delete($path=NULL)
+	public function delete($path=NULL)
 	{
 		if(NULL == $path)
 			die('No path sent');

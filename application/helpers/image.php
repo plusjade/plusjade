@@ -15,7 +15,7 @@ class image_Core {
 			return str_replace($filename, "/_sm$filename", $path);
 		}
 
-		return "/_sm/$path";
+		return "_sm/$path";
 	}
 
 	

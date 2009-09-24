@@ -21,7 +21,7 @@ class Tool_Css_Controller extends Controller {
  * tool-css files are saved relative to the installed theme.
  * ex: /_data/<site_name>/themes/<theme_name>/tools/<toolname>/<tool_id>.css 
  */
-	function live($page_id=NULL)
+	public function live($page_id=NULL)
 	{
 		header("Content-type: text/css");
 		header("Pragma: public");
@@ -85,7 +85,7 @@ class Tool_Css_Controller extends Controller {
 				$table->save();
 			}	
 			// ------------------- end legacy support -------------------
-		
+			
 		
 		
 			$custom_file = $this->assets->themes_dir("$this->theme/tools/$tool->name/_created/$tool->parent_id/{$table->type}_$table->view.css");
@@ -112,7 +112,7 @@ class Tool_Css_Controller extends Controller {
  * load admin_global.css & all admin css from all tools. 
  * and load it as one file. useful when in admin mode
  */
-	function admin()
+	public function admin()
 	{
 		if(!$this->client->can_edit($this->site_id))
 			die('Please login');

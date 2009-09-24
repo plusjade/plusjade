@@ -12,8 +12,7 @@
 		<li><a href="#" id="add_node">Add child category</a></li>
 		<li><a href="#" id="edit_node">Edit category</a></li>
 		<li><a href="#" id="delete_node">Delete category</a></li>
-		<br>
-		<li><a href="/get/edit_showroom/add_item/<?php echo $tool_id?>" id="add_item">Add item</a></li>
+		<br/>
 		<li><a href="/get/edit_showroom/items/<?php echo $tool_id?>/" id="show_items">List items</a></li>
 	</ul>
 </div>
@@ -141,21 +140,6 @@ $(document).ready(function()
 			else if( confirm("Remove node and all children? \n NOTE: Elements are not deleted until you click \"Save Changes\"") )
 				$simpleTreeCollection.get(0).delNode();		
 			return false;
-		},
-
-
-		// add item button
-		"a#add_item": function(e){
-			var el_id = get_active_node();
-			if(!el_id){alert('Select category to add item to.');return false;}
-			
-			url = $(e.target).attr('href');
-			$.facebox(function() {
-				$.get(url, {category: el_id}, 
-					function(data){$.facebox(data, false, "facebox_2");}
-				)
-			}, false, 'facebox_2');
-			return false;			
 		},
 		
 		// show items from category

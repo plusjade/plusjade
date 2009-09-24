@@ -18,8 +18,9 @@ class Home_Controller extends Controller {
 /*
  * View for Create a new website.
  */	 
-	public static function _index()
-	{	
+	public static function index()
+	{
+		echo 'hippo';
 		if($_POST)
 		{
 			# beta code
@@ -30,7 +31,7 @@ class Home_Controller extends Controller {
 			$theme = (empty($_POST['theme'])) ? 'base' : $_POST['theme'];
 			
 			# will redirect on success, else show error.
-			$show_error = Auth_Controller::_create_website($site_name, $theme);
+			$show_error = Site_Controller::_create_website($site_name, $theme);
 			return self::display_create($show_error, $_POST);
 		}
 		else
@@ -42,6 +43,33 @@ class Home_Controller extends Controller {
  */	
 	private static function display_create($errors=NULL, $values=NULL)
 	{
+		/*
+		// TESTING
+		include Kohana::find_file('vendor','CMBase');
+		$apikey = '298b597d3b08736948706029b4300aaa';
+		$client_id = 'f8ae20928188efa9b99b7be44c5bf4f4';
+		$cm = new CampaignMonitor($apikey);
+	
+		//This is the actual call to the method
+		$result = $cm->clientGetDetail($client_id);
+		echo kohana::debug($result);
+		die();
+		*/
+		/*
+				include Kohana::find_file('vendor','CMBase');
+				$company	= 'get it right';		
+				$name		= 'yahboi';
+				$email		= 'superbob@gmail.com';
+				$country	= 'United States of America';
+				$timezone	= '(GMT-08:00) Pacific Time (US & Canada)';
+
+				$cm = new CampaignMonitor;
+				$result = $cm->clientCreate($company, $name, $email, $country, $timezone);
+				
+				echo kohana::debug($result);
+				die();				
+		*/
+		
 		if(empty($values))
 			$values = array(
 				'site_name'	=> strtolower(text::random('alpha', 5)),

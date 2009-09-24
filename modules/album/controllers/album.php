@@ -23,14 +23,14 @@ class Album_Controller extends Public_Tool_Controller {
 				->where('fk_site', $this->site_id)
 				->find($album);	
 			if(FALSE === $album->loaded)
-				return $this->public_template('album error, please contact support', 'album', $album);	
+				return $this->wrap_tool('album error, please contact support', 'album', $album);	
 		}
 		
 		# images
 		$images = json_decode($album->images);	
 		
 		if(NULL === $images OR !is_array($images))
-			return $this->public_template('no images.', 'album', $album);
+			return $this->wrap_tool('no images.', 'album', $album);
 			
 		foreach($images as $image)
 			$image->thumb = image::thumb($image->path);
@@ -41,7 +41,7 @@ class Album_Controller extends Public_Tool_Controller {
 		# add custom javascript;
 		$primary->global_readyJS(self::javascripts($album));
 		
-		return $this->public_template($primary, 'album', $album, $sub_tool);
+		return $this->wrap_tool($primary, 'album', $album, $sub_tool);
 	}
 
 /*

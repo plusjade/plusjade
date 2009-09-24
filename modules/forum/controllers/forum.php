@@ -54,12 +54,12 @@ class Forum_Controller extends Public_Tool_Controller {
 		$wrapper->categories	= self::categories($forum->id);
 		# get the custom javascript;
 		$wrapper->global_readyJS(self::javascripts());
-		return $this->public_template($wrapper, 'forum', $forum);
+		return $this->wrap_tool($wrapper, 'forum', $forum);
 	}
 
 	
 /*
- * output the appropriate javascript based on the calendar view.
+ * output the appropriate javascript based on the forum view.
  * currently we just have one though
  */	
 	private function javascripts()

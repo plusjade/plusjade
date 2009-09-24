@@ -56,27 +56,12 @@ $(document).ready(function()
 		$(this).prepend(toolbar);
 	 });
 
-
-/* ADD blue tool-item toolkits
- * selector format: .tool_wrapper .tool_item
+	 
+/* 
+ * add blue tool-item toolkits to DOM ajax requests
  */
-	var tools = ['showroom', 'format', 'blog'];
-	$.each(tools, function(){	
-		var tool = this;
-		$("." + tool + "_wrapper ." + tool + "_item").each(function(i){					
-			var id		= $(this).attr("rel");
-			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + tool + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + tool + '/delete/' + id + '" class="js_admin_delete" rel="'+tool+'_item_'+id+'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ tool +' item</span>'+ edit +' ' + del + '</div>';
-			$(this).prepend(toolbar);			
-		});
-	});
-
-/* add blue tool-item toolkits to DOM ajax requests
- * enabled for calendar, showroom, (blog)
-*/
 	jQuery.fn.add_toolkit_items = function(toolname){
-		toolname = toolname.toLowerCase();
+		var toolname = toolname.toLowerCase();
 		$('.'+ toolname +'_item', this).each(function(i){		
 			var id		= $(this).attr('rel');
 			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
@@ -86,6 +71,15 @@ $(document).ready(function()
 		});
 	};	
 	
+/* 
+ * ADD blue tool-item toolkits
+ * selector format: .tool_wrapper .tool_item
+ */	
+	var tools = ['showroom', 'format', 'blog', 'reviews'];
+	$.each(tools, function(){
+		$().add_toolkit_items(this);
+	});
+	
 /*
  * injects tool output into the DOM.
  * can add tool output Into DOM or update tools already in DOM via #tool_wrapper_<id>
@@ -93,9 +87,8 @@ $(document).ready(function()
 	tool	= (object)
 */
 	jQuery.fn.jade_inject_tool = function(action, tool){
-
-	// Set loading status...
-		var include_js = 'yes';
+	
+		var include_js = 'yes'; // Set loading status...
 		
 		if('add' == action) {
 			// default add to container_1
@@ -262,9 +255,11 @@ $(document).ready(function()
 			$('.common_main_panel div.toggle').hide();
 			$('#common_view_toggle li a').removeClass('selected');
 			var div = $(e.target).addClass('selected').attr('href');
-			$('.common_main_panel div#'+ div).show();
+			$('.common_main_panel div'+ div).show();
 			return false;
 		},	
+
+
 
 		
 	/* Click actions for css styler ----- */
@@ -284,7 +279,7 @@ $(document).ready(function()
 		},
 		
 	  // hide the styler dialog
-		"div.styler_wrapper a.toggle": function(e) {
+		"div.styler_wrapper a.hide": function(e) {
 			$('div.dialog_wrapper').toggle('fast');			
 			var state = $(e.target).html();
 			
@@ -340,7 +335,7 @@ $('body').keyup($.delegate({
 	.append('<div class="styler_wrapper admin_reset" style="display:none"> \
 		<div class="actions"> \
 			<a href="#" class="close">close</a> \
-			<a href="#" class="toggle">hide</a> \
+			<a href="#" class="hide">hide</a> \
 			<div id="lower_response" class="server_response" style="display:none;">Server Response</div>\
 			<div class="show_submit" style="display:none"><div>...Submitting</div></div> \
 		</div> \
@@ -383,7 +378,7 @@ $('body').keyup($.delegate({
 
 	
 /*
- * show the resultant server data
+ * show the submit ajax loading graphic.
  */
 $(document).bind('show_submit.plusjade', function(){
 	$('.facebox_response.active').remove();
@@ -448,7 +443,6 @@ $(document).bind('server_response.plusjade', function(e, data){
 		: $('.on_close.two').html();
 
 		if(null == action) {
-			//alert('looking for on_close action, but empty.');
 			return false;
 		} else {
 			action = action.split('-'); 
@@ -746,28 +740,13 @@ $(document).bind('server_response.plusjade', function(e, data){
 
 // doubleclick file browser actions
 	$('body').dblclick($.delegate({
-	
-	// add selected image to gallery.
+	  // add selected image to gallery.
 		'#files_browser_wrapper img.to_showroom':function(e) {
 			$(e.target).addClass('selected');
 			$(e.target).parent('div').addClass('selected');
 			$(e.target).clone().prependTo('#images .gallery');
 			return false;
 		}
-/*
-	// add selected image to gallery.
-		'#files_browser_wrapper img.to_album':function(e) {
-			$(e.target).addClass('selected');
-			$(e.target).parent('div').addClass('selected');		
-			
-			$('<div></div>')
-			.prepend('<span>drag</span>')
-			.append($(e.target).clone())
-			.prependTo('#sortable_images_wrapper');
-			return false;
-		}
-		
-*/
 	}));
 	
 
@@ -881,7 +860,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 		}
 	}));
 	
-	
+
 	
 // --- misc funcitons ---
  

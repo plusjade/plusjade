@@ -25,7 +25,7 @@ class Assets_Core {
 	{
 		static $instance;
 
-		if ($instance == NULL)
+		if($instance == NULL)
 		{
 			// Initialize the assets instance
 			$instance = new Assets($site_name, $theme);
@@ -33,11 +33,17 @@ class Assets_Core {
 
 		return $instance;
 	}
- 
+
+	
+// -------------------------------------------------------------	
+// --------------------- directory paths -----------------------
+// -------------------------------------------------------------
+
+
 /*
  * returns the full root path to this site's  _data folder.
  */	
-	function root_dir($directory=NULL)
+	public function root_dir($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
@@ -47,7 +53,7 @@ class Assets_Core {
 /*
  * returns the full root path to this site's assets folder folder.
  */		
-	function assets_dir($directory=NULL)
+	public function assets_dir($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
@@ -57,7 +63,7 @@ class Assets_Core {
 /*
  * returns the full root path to this site's themes folder.
  */		
-	function themes_dir($directory=NULL)
+	public function themes_dir($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
@@ -67,15 +73,19 @@ class Assets_Core {
 /*
  * returns the full root path to this site's protected folder.
  */		
-	function protected_dir($directory=NULL)
+	public function protected_dir($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
 		return  DATAPATH . "$this->site_name/protected$directory";	
 	}	
 	
+
 	
+// -------------------------------------------------------------	
 // -------------------------- urls -----------------------------
+// -------------------------------------------------------------
+
 
 /*
  * root_url probably will not be needed, but lets keep a note here just in case.
@@ -86,7 +96,7 @@ class Assets_Core {
  * returns the url to site _data assets folder.
  * $use_file will use the files controller in the url to handle displaying the asset.
  */	
-	function assets_url($directory=NULL, $use_file=FALSE)
+	public function assets_url($directory=NULL, $use_file=FALSE)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
@@ -94,14 +104,13 @@ class Assets_Core {
 			return url::site("files$directory");
 		else
 			return url::site("_data/$this->site_name/assets$directory");		
-		
 	}
 	
 
 /*
  * returns the url to the activated theme folder
  */	
-	function theme_url($directory=NULL)
+	public function theme_url($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		
@@ -111,7 +120,7 @@ class Assets_Core {
 /*
  * returns the url to the base theme folder
  */		
-	function themes_url($directory=NULL)
+	public function themes_url($directory=NULL)
 	{
 		$directory = ((NULL === $directory)) ? '' : "/$directory";
 		

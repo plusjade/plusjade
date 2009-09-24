@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * help
+ * sitewide help controller outputs help views.
  */
  
 class Help_Controller extends Controller {
@@ -14,7 +14,7 @@ class Help_Controller extends Controller {
 	}
 
 /**
- * set some sitewide settings
+ * output the basic help view.
  */	
 	function index()
 	{
@@ -27,5 +27,4 @@ class Help_Controller extends Controller {
 		die($view);
 	}
 	
-}
-/* End of file admin.php */
+}  /* End of help.php */

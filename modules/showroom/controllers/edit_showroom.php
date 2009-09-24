@@ -14,7 +14,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  * Display the categories drilldown
  * UPDATE category positions
  */
-	function manage($tool_id=NULL)
+	public function manage($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
 		
@@ -55,7 +55,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  
  * Gets output positions from this::manage
  */ 
-	function save_tree($tool_id)
+	public function save_tree($tool_id)
 	{
 		if($_POST)
 		{
@@ -68,7 +68,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * Add categories
  */ 
-	public function add($tool_id=NULL)
+	public public function add($tool_id=NULL)
 	{
 		valid::id_key($tool_id);
 		if($_POST)
@@ -143,7 +143,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * manage items view for a particular category
  */ 
-	function items($tool_id=NULL, $cat_id=NULL)
+	public function items($tool_id=NULL, $cat_id=NULL)
 	{
 		valid::id_key($tool_id);
 		valid::id_key($cat_id);
@@ -166,9 +166,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * Add Item(s)
  */ 
-	public function add_item($tool_id=NULL)
+	public function add_item($parent_id=NULL)
 	{	
-		valid::id_key($tool_id);
+		valid::id_key($parent_id);
 
 		if($_POST)
 		{
@@ -183,27 +183,35 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			# sanitize url
 			$url = trim($_POST['url']);
 			$url = (empty($url)) ? $_POST['name'] : $url;
-			
+
+			# verify image JSON
+			if(NULL === json_decode($_POST['images']))
+				$_POST['images'] = '';
+				
 			$new_item = ORM::factory('showroom_cat_item');
 			$new_item->fk_site			= $this->site_id;
 			$new_item->url				= valid::filter_php_url($url);
 			$new_item->showroom_cat_id	= $_POST['category_id'];
 			$new_item->name				= $_POST['name'];
 			$new_item->intro			= $_POST['body'];
-			$new_item->images			= trim($_POST['images'], '|');
+			$new_item->images			= $_POST['images'];
 			$new_item->position			= ++$max->highest;
 			$new_item->save();
 			die('Showroom item added');
 		}
-		elseif(! empty($_GET['category']))
+
+		
+		# Get list of categories
+		$showroom = ORM::factory('showroom', $parent_id);
+		function render_node_showroom($item)
 		{
-			$_GET['category'] = valid::id_key($_GET['category']);
-			$primary = new View("edit_showroom/add_item");
-			$primary->tool_id = $tool_id;
-			$primary->category = $_GET['category'];
-			die($primary);			
+			return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
 		}
-		die();
+		
+		$view = new View("edit_showroom/add_item");
+		$view->parent_id	= $parent_id;
+		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats);	
+		die($view);
 	}
 	
 	
@@ -228,50 +236,46 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			# sanitze url
 			$url = trim($_POST['url']);
 			$url = (empty($url)) ? $_POST['name'] : $url;
-			
+
+			# verify image JSON
+			if(NULL === json_decode($_POST['images']))
+				$_POST['images'] = '';
+
+				
 			$item->url				= valid::filter_php_url($url);
-			$item->showroom_cat_id	= $_POST['category'];
+			$item->showroom_cat_id	= $_POST['category_id'];
 			$item->name				= $_POST['name'];
 			$item->intro			= $_POST['body'];
-			$item->images			= trim($_POST['images'], '|');
+			$item->images			= $_POST['images'];
 			$item->save();
 			die('Showroom item saved');
 		}
 
 		// TODO: this seems apsurdly slow...  1.5 seconds.
 
-		# Get list of categories 
-		# TODO: could probably join these no?
+		# which category does this item belong to?
 		$category = ORM::factory('showroom_cat')
 			->where('fk_site', $this->site_id)
 			->find($item->showroom_cat_id);
 		
-		$categories = ORM::factory('showroom_cat')
-			->where(array(
-				'fk_site'			=> $this->site_id,
-				'showroom_id'		=> $category->showroom_id,
-				'local_parent !='	=> 0,
-			))
-			->find_all();
-
-		# images 
-		$image_array = explode('|', $item->images);
-		$images = array();
-		foreach($image_array as $image)
+		# Get list of categories
+		$showroom = ORM::factory('showroom', $category->showroom_id);
+		function render_node_showroom($item)
 		{
-			if(0 < substr_count($image, '/'))
-			{
-				$filename = strrchr($image, '/');
-				$small = str_replace($filename, "/_sm$filename", $image);
-			}
-			else
-				$small = "/_sm/$image";
-			
-			$images[] = "$small|$image";
+			return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
 		}
+			
+		# parse images	
+		$images = json_decode($item->images);
+		if(NULL === $images)
+			$images = array();
+		foreach($images as $image)
+			$image->thumb = image::thumb($image->path);
+			
 		
 		$primary = new View("edit_showroom/edit_item");
-		$primary->categories	= $categories;	
+		$primary->categories	= Tree::display_tree('showroom', $showroom->showroom_cats);	
+		$primary->category_id	= $category->id;
 		$primary->item			= $item;
 		$primary->images		= $images;
 		$primary->img_path		= $this->assets->assets_url();	
@@ -313,11 +317,15 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  * Success Response via Facebox_response tier 2
  * [see root JS in this::manage() ]
  */
-	public function settings($tool_id=NULL)
+	public function settings($parent_id=NULL)
 	{
 		die('Showroom settings are currently disabled while we update our code. Thanks!');
-		valid::id_key($tool_id);
-
+		valid::id_key($parent_id);
+		
+		if($_POST)
+		{
+		
+		}
 	}
 	
 
@@ -326,7 +334,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * TODO: This works but we need to make this ORM.
  */	
-	function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($tool_id, $site_id)
 	{
 		$db = new Database;
 		$db->query("

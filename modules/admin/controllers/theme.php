@@ -69,6 +69,8 @@ class Theme_Controller extends Controller {
 	
 /*
  * Upload files to a specific theme. Swf uploader uses this.
+ * This method only accepts .html, image, and .css files.
+ * automatically adds to correct folder depending on type.
  */	
 	public function upload($theme=NULL)
 	{ 
@@ -219,6 +221,10 @@ class Theme_Controller extends Controller {
 	{
 		if('templates' != $folder AND 'css' != $folder)
 			die('invalid folder');
+		
+		$file = trim($file);
+		if(empty($file))
+			die('filename is required');
 			
 		$ext	= ('templates' == $folder) ? '.html' : '.css';
 		$file	= valid::filter_php_filename($file) . '%';

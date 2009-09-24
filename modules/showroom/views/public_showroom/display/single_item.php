@@ -20,10 +20,20 @@
 
 	<div class="single_image">
 		<?php
-		foreach($images as $data)
+		
+		# images
+		$images = json_decode($item->images);
+		if(!empty($images) AND is_array($images))
 		{
-			$data = explode('|', $data);
-			echo "<a href=\"$img_path/$data[1]\"><img src=\"$img_path/$data[0]\" alt=\"\"></a><br>";
+			foreach($images as $image)
+			{
+				$path = image::thumb($image->path);
+				$image = "<img src=\"$img_path/$path\" alt=\"$image->caption\">";
+			
+				echo $image;
+			
+			}
+		
 		}
 		?>
 	</div>

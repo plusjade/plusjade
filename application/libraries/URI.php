@@ -71,9 +71,12 @@ class URI_Core extends Router {
 		$url_array = array();
 		
 		foreach($parts as $part)
-			if(! empty($part) )
-			$url_array[] = $part;
-
+			if(!empty($part))
+			{
+				$filter = explode('?', $part);
+				$url_array[] = $filter[0];
+			}
+			
 		$url_array = array_pad($url_array, 5, 0);
 		return $url_array;
 	}

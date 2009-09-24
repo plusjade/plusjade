@@ -1,0 +1,98 @@
+	/*  --- Main Wrapper --- */	
+#format_wrapper_++{
+
+}
+#format_wrapper_++ div.contact_item{
+	clear:both;
+	overflow:hidden;
+}
+#format_wrapper_++ div.contact_item div.contact_icon{
+	width:12%;
+	height:80px;
+	float:left;
+	text-align:center;
+	padding:0 10px;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.phone{
+	background:transparent url('/_assets/tools/contact/images/phone.png') no-repeat 50% 50%;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.email{
+	background:transparent url('/_assets/tools/contact/images/email.png') no-repeat 50% 50%;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.aim{
+	background:transparent url('/_assets/tools/contact/images/aim.png') no-repeat 50% 50%;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.address{
+	background:transparent url('/_assets/tools/contact/images/address.png') no-repeat 50% 50%;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.map{
+	background:transparent url('/_assets/tools/contact/images/map.png') no-repeat 50% 50%;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.newsletter{
+	background:transparent url('/_assets/tools/contact/images/newsletter.png') no-repeat 50% 50%;
+}
+#format_wrapper_++ div.contact_item div.contact_icon.hours{
+	background:transparent url('/_assets/tools/contact/images/hours.png') no-repeat 50% 50%;
+}
+
+#format_wrapper_++ div.contact_item div.contact_view{
+	float:left;
+	width:85%;
+}
+#format_wrapper_++ div.contact_item div.contact_name{
+	font-weight:bold;
+}
+
+#format_wrapper_++ div.contact_item .contact_value{
+
+}	
+
+
+/* --- map  --- */
+
+
+
+/* --- email --- */
+#format_wrapper_++ .email_form_link{
+
+}
+#format_wrapper_++ .email_form_link a{
+
+}	
+#format_wrapper_++ .email_form_link a:hover{
+
+}
+
+	/*  --- email form --- */	
+	
+#format_wrapper_++ .email_form_wrapper{
+
+}
+#format_wrapper_++ .email_form_wrapper table{
+	width:650px;
+}
+#format_wrapper_++ .email_form_wrapper table th{	
+	font-weight:bold;
+	padding:5px;
+	background:#fffcc;
+}
+#format_wrapper_++  .email_form_wrapper table td{
+	vertical-align:top;
+	padding:5px;
+	width:50%;
+}
+#format_wrapper_++  .email_form_wrapper div{
+
+}
+#format_wrapper_++  .email_form_wrapper b{
+	color:blue;
+	font-weight:bold;
+}
+#format_wrapper_++  .email_form_wrapper input{
+	font-size:1.4em;
+	margin-bottom:6px;
+}
+#format_wrapper_++  .email_form_wrapper textarea{
+	width:300px;
+	height:200px;
+}

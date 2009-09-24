@@ -26,7 +26,7 @@ class Format_Controller extends Public_Tool_Controller {
 		# add custom javascript;
 		$view->global_readyJS(self::javascripts($format));
 
-		return $this->public_template($view, 'format', $format);
+		return $this->wrap_tool($view, 'format', $format);
 	}
 
 /*

@@ -1,19 +1,18 @@
 <?php
 /*
+ * This is the Main GateKeeper to Plusjade.
+ * It routes all logic to appropriate controllers.
+ 
  * 1. Fetches appropriate site from URL.
- * 2. Routes URL to appropriate controller.
+ * 2. Routes URL to appropriate controller based on config for site name.
  * 	Cases:
 		a. is ajax request:		Fetch raw data.
-		b. is page_name:		Build page, grab tools, display shell.
-		c. is get/controller:	Admin, go directly to controller.
-		
-	NOTES: reserved names so far:
-		get, showroom, blog, calendar
+		b. is page_name:		grab tools, Build page, render the page.
+		c. is get/controller:	Admin, map to appropriate controller.
  */
 function get_site()
 {
 	$session = Session::instance();
-	$db = new Database;
 	$domain_array = explode('.', $_SERVER['HTTP_HOST']);	
 	
 	# if the url = [subdomain].plusjade.com
@@ -23,7 +22,7 @@ function get_site()
 		$site_name	= $domain_array['0'];
 		
 		# if no subdomain, set the site_name to the admin account 
-		if( '2' == count($domain_array) )
+		if('2' == count($domain_array))
 			$site_name = ROOTACCOUNT;
 	}
 	else
@@ -36,77 +35,78 @@ function get_site()
 		$site_name	= $_SERVER['HTTP_HOST'];
 	}
 	
-	$site_row = $db->query("
-		SELECT * 
-		FROM sites 
-		WHERE $field_name = '$site_name'
-	")->current();
-	
-	if (! is_object($site_row) ) 
+	$site = ORM::factory('site')
+		->where(array($field_name => $site_name))
+		->find();
+	if (!$site->loaded) 
 		die('site does not exist');
 	
 	# IMPORTANT: sets the site name & non-sensitive site_data.
-	$_SESSION['site_name']	= $site_row->subdomain;
-	$_SESSION['created']	= $site_row->created;
+	$_SESSION['site_name']	= $site->subdomain;
+	$_SESSION['created']	= $site->created;
 	
 	# Make sure site_config file exists
-	$site_config_path = DATAPATH . "$site_row->subdomain/protected/site_config.yml";
-	
-	if(! file_exists($site_config_path) )
+	# the site_config file is parsed in the root Controller_Core library file.
+	$site_config_path = DATAPATH . "$site->subdomain/protected/site_config.yml";
+
+	if(!file_exists($site_config_path))
 	{
 		$replacements = array(
-			$site_row->id,
-			$site_row->subdomain,
-			$site_row->theme,
-			$site_row->banner,
-			$site_row->homepage
+			$site->id,
+			$site->subdomain,
+			$site->theme,
+			$site->banner,
+			$site->homepage
 		);
 		yaml::new_site_config($site_name, $replacements);
 	}
-	# the site_config file is parsed in the root Controller_Core library file.
-	
 
-	## --- Route the URL --- ##
 	/*
+	 --- Route the URL ---
+	 ---------------------
 	 * The URL will tell us how to build the page.
-	 * 		a. is ajax request
-	 *		b. is page_name
+	  		a. is ajax request
+	 		b. is page_name
 				is protected page?
 			c. is file request
-	 * 		d. is get/
+	  		d. is /get/
 	 */
 
 	# Get page_name
 	$url_array = Uri::url_array();
-	$page_name = ( empty($url_array['0']) ) ? $site_row->homepage : $url_array['0'];
+	$page_name = (empty($url_array['0'])) 
+		? $site->homepage
+		: $url_array['0'];
 	
 
 	if('files' == $page_name)
 	{
 		$file = new Files_Controller;
-		die( $file->_output($url_array) );	
+		die($file->_output($url_array));	
 	}
+	
 	if('get' != $page_name)
 	{
-		# Is page_name protected? (contains a builder)
-		$page_config_value = yaml::does_key_exist($site_row->subdomain, 'pages_config', $page_name);
+		# Is page_name protected?
+		$page_config_value = yaml::does_key_exist($site->subdomain, 'pages_config', $page_name);
 		
 		# Is public ajax request?
-		# Only builder tools should use ajax so we get info from pages_config.yaml
-		if($page_config_value AND 'XMLHttpRequest' == @$_SERVER['HTTP_X_REQUESTED_WITH'])
+		# Only protected pages can use ajax so we get info from pages_config.yaml
+		if($page_config_value AND request::is_ajax())
 		{
-			# extract toolname and tool_id from pages_config.yaml
+			# extract toolname and parent_id from pages_config.yaml
 			$page_data = explode('-', $page_config_value);
-			list($toolname, $tool_id) = $page_data;
+			list($toolname, $parent_id) = $page_data;
 			
-			$tool = Load_Tool::factory($toolname);
+			# make sure the page_name is correct.
+			$url_array['0'] = $page_name; 
 			
-			$url_array['0'] = $page_name; # make sure the page_name is correct.
-			die($tool->_ajax($url_array, $tool_id));
+			# send to tool _ajax handler. we expect raw data output.
+			die(Load_Tool::factory($toolname)->_ajax($url_array, $parent_id));
 		}
 		else
 		{
-			# Non-protected page_names can be a subdirectory names.
+			# Non-protected page_names can be a subdirectory name.
 			# do this only if an actual url string is being sent.
 			# so we need to get the full url string.
 			if(! empty($url_array['1']) AND !$page_config_value)
@@ -116,19 +116,24 @@ function get_site()
 			}
 			
 			# Grab the page row
-			$page_ob = ORM::factory('page')
+			$page = ORM::factory('page')
 				->where(array(
-					'fk_site'	=> $site_row->id,
+					'fk_site'	=> $site->id,
 					'page_name'	=> $page_name
 				))
 				->find();
-			if($page_ob->loaded)
-			{
-				$page = new Build_Page_Controller;
-				die($page->_index($page_ob));
-			}
-			Event::run('system.404');
-			die('Page Not Found');
+				
+			# does the page exist?
+			if(!$page->loaded)
+				Event::run('system.404');
+
+			# is the page public?
+			if('no' == $page->enable AND !$this->client->can_edit($this->site_id))
+				Event::run('system.404');
+			
+			# Load the page!
+			$build_page = new Build_Page_Controller;
+			die($build_page->_index($page));
 		}
 	}
 	/*

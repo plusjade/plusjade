@@ -10,13 +10,13 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 /*
  * manage an image album
  */
-	function manage($tool_id=NULL)
+	public function manage($parent_id=NULL)
 	{
-		valid::id_key($tool_id);
+		valid::id_key($parent_id);
 		
 		$album = ORM::factory('album')
 			->where('fk_site', $this->site_id)
-			->find($tool_id);	
+			->find($parent_id);	
 		if(FALSE === $album->loaded)
 			die('invalid album');
 			
@@ -85,13 +85,5 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 	}
 
 
-	
-/*
- * nothing
- */
-	public static function _tool_deleter($tool_id, $site_id)
-	{
-		return TRUE;
-	}	
 }
 /* -- end of application/controllers/home.php -- */

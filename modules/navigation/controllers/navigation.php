@@ -16,13 +16,13 @@ class Navigation_Controller extends Public_Tool_Controller {
 	{
 		# There will always be a root_holder so no items is actually =1
 		if('1' == $navigation->navigation_items->count())
-			return $this->public_template('(no items)', 'navigation', $navigation);
+			return $this->wrap_tool('(no items)', 'navigation', $navigation);
 		
 		$primary = new View('public_navigation/lists/stock');	
 		$primary->navigation = $navigation;
 		# public node_generation function is contained in the tree class...
 		$primary->tree = Tree::display_tree('navigation', $navigation->navigation_items);
-		return $this->public_template($primary, 'navigation', $navigation);
+		return $this->wrap_tool($primary, 'navigation', $navigation);
 	}
  
  

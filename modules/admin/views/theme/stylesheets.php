@@ -139,52 +139,40 @@
 
 /* ------------------ SAVE COMMANDS  ------------------ */ 	
 
-
-
 // show save_pane
 	$('#show_save').click(function(){
-		$(this).attr('disabled','disabled');
+		$('.save_pane.helper').remove();
 		$('.save_pane').clone().addClass('helper').show().prependTo('.common_main_panel');
 		return false;
 	});
 
 // delegation for save_pane
 	$('.common_main_panel').click($.delegate({
-
-		// update a file
+	  // update a file
 		'button.update_file': function(){
 			var file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
-			$('div.save_pane.helper').html('<div class="loading">Saving '+ file +'...</div>');
+			$('div.save_pane.helper .contents').html('Saving '+ file +'...');
 			var contents = $('textarea#edit_css').val();
+			
 			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
-				
-				$(document).trigger('server_response.plusjade', data);
-				$('button#show_save').removeAttr('disabled');
-				$("div.save_pane.helper").remove();
+				$('div.save_pane.helper .contents').html(data + ' saved!!');
+				setTimeout('$("div.save_pane.helper").remove()', 1000);
 			});
-		
 			return false;
 		},	
 		
-		// save as new
+	  // save as new
 		'button.new_file': function(){
 			var file = $("div.save_pane.helper input[name='new_file']").val() + '.css';	
-			$('div.save_pane.helper').html('Creating ...'+ file);
+			$('div.save_pane.helper .contents').html('Creating ...'+ file);
 			var contents = $('textarea#edit_css').val();
+			
 			$.post('/get/theme/save/css/'+ file, {contents: contents }, function(data){
 				$('select.files_list').append('<option value="'+ data +'">'+ data +'</option>');
-				$("div.save_pane.helper").remove();
-				$(document).trigger('server_response.plusjade', data);
-				$('button#show_save').removeAttr('disabled');
+				$('div.save_pane.helper .contents').html(data + ' saved!!');
+				setTimeout('$("div.save_pane.helper").remove()', 1000);
 			});
 			return false;
-		},
-		
-		// close the save pane
-		'div.save_pane .icon.cross':function(e){
-			$('div.save_pane.helper').remove();
-			$('button#show_save').removeAttr('disabled');
-			return false;	
-		}		
+		}	
 	}));	
 </script>

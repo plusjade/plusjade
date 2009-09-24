@@ -28,6 +28,9 @@ abstract class Controller_Core {
 		foreach($site_config as $key => $value)
 			$this->$key = $value ;
 	
+		// --- Setup our required library instances ---
+		// --------------------------------------------
+		
 		# Auth Instance for editing site capability
 		$this->client = new Auth($this->claimed);	
 		
@@ -37,17 +40,17 @@ abstract class Controller_Core {
 		# assets instance to fetch datapath urls.
 		$this->assets = Assets::instance($this->site_name, $this->theme);
 		
-		if (Kohana::$instance == NULL)
-		{
-			# Set the instance to the first controller loaded
-			Kohana::$instance = $this;
-		}
-
 		# URI should always be available
 		$this->uri = URI::instance();
 
 		# Input should always be available
 		$this->input = Input::instance();
+		
+		if (Kohana::$instance == NULL)
+		{
+			# Set the instance to the first controller loaded
+			Kohana::$instance = $this;
+		}
 	}
 
 
@@ -95,9 +98,9 @@ abstract class Controller_Core {
  */
 	public function __call($method, $args)
 	{
-		# Default to showing a 404 page
-		Event::run('system.404');
-		die('root controller method not found');
+		kohana::log('error', "$page -- $method does not exist. Called by: {$_SERVER['REQUEST_URI']}");
+		header('HTTP', true, 500);
+		die('bad controller method call. This is an internal error and has been reported.');
 	}
 	
 } # End Controller Class

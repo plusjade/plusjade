@@ -292,8 +292,13 @@ class View_Core {
 		return $output;
 	}
 	
+// -----------------------------------------------------
+// -----------------------------------------------------
+				# JADES EXTRA STUFF #
+// -----------------------------------------------------
+// -----------------------------------------------------
 
-# JADES EXTRA STUFF #
+
 /*
  * Add request for javascript file to be loaded in the root document
  * filters for duplicates and collisions

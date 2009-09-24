@@ -1,7 +1,7 @@
 
 
 <div id="common_tool_header" class="buttons">
-	<button type="submit" id="show_save" class="jade_positive">Save as ...</button>
+	<button type="submit" id="show_save" class="jade_positive">Save Template As..</button>
 	<div id="common_title">Theme &#8594; <u><?php echo ucfirst($this->theme)?></u> : Template &#8594; <u><span class="current_file">master.html</span></u></div>
 </div>
 
@@ -24,24 +24,28 @@
 </div>
 
 <div class="common_main_panel">
+
+
 	<div class="save_pane" style="display:none">
-		<span class="icon cross floatright">&#160; &#160;</span>
-		
-		<h2><b>Save File</b></h2>
-		
-		<div style="margin-bottom:10px">
-			<h3><button class="update_file jade_positive floatright">Update</button> As Update</h3>
-			<select name="update_file" class="files_list">
-				<?php foreach($templates as $template) echo "<option value=\"$template\">$template</option>";?>
-			</select>
+		<div class="contents">
+			<span class="icon cross floatright">&#160; &#160;</span>
+			
+			<h2><b>Save File</b></h2>
+			
+			<div style="margin-bottom:10px">
+				<h3><button class="update_file jade_positive floatright">Update</button> As Update</h3>
+				<select name="update_file" class="files_list">
+					<?php foreach($templates as $template) echo "<option value=\"$template\">$template</option>";?>
+				</select>
+			</div>
+			
+			<div>	
+				<h3><button class="new_file jade_positive floatright">Save as New</button> As New</h3>
+				filename: <input type="text" name="new_file" class="auto_filename" rel="text_req">.html
+			</div>
 		</div>
-		
-		<div>	
-			<h3><button class="new_file jade_positive floatright">Save as New</button> As New</h3>
-			filename: <input type="text" name="new_file" class="auto_filename">.html
-		</div>	
 	</div>
-	
+
 	<textarea id="edit_html" class="full_height" style="height:300px"><?php echo $contents?></textarea>
 </div>
 	
@@ -72,7 +76,7 @@
 	
 // show the save pane
 	$('#show_save').click(function(){
-		$(this).attr('disabled','disabled');
+		$('.save_pane.helper').remove();
 		$('.save_pane').clone().addClass('helper').show().prependTo('.common_main_panel');
 		return false;
 	});
@@ -80,27 +84,27 @@
 // delegation for save_pane
 	$('.common_main_panel').click($.delegate({
 
-		// save as update
+	  // save as update
 		'button.update_file': function(){
 			var file = $("div.save_pane.helper select[name='update_file'] option:selected").text();
-			$('div.save_pane.helper span.replacer').html('<div class="loading">Saving '+ file +'...</div>');
+			$('div.save_pane.helper .contents').html('Saving '+ file +'...');
 			var contents = $('textarea#edit_html').val();
-			$('.facebox .show_submit').show();
 			$.post('/get/theme/save/templates/'+ file, {contents: contents }, function(data){
 				$('button#show_save').removeAttr('disabled');
-				$('div.save_pane.helper span.replacer').html(data);
+				$('div.save_pane.helper .contents').html(data + ' saved!!');
 				setTimeout('$("div.save_pane.helper").remove()', 1000);
-				$('.facebox .show_submit').hide();
 			});
 			
 			return false;
 		},	
 		
-	// save as new
+	  // save as new
 		'button.new_file': function(){
+			if(! $("div.save_pane.helper input[name='new_file']").jade_validate()) return false;
 			var file = $("div.save_pane.helper input[name='new_file']").val() + '.html';	
-			$('div.save_pane.helper span.replacer').html('Creating ...'+ file);
+			$('div.save_pane.helper .contents').html('Creating ... '+ file);
 			var contents = $('textarea#edit_html').val();
+			
 			$('.facebox .show_submit').show();
 			$.post('/get/theme/save/templates/'+ file, {contents: contents }, function(data){
 				$('select.files_list').append('<option value="'+ data +'">'+ data +'</option>');
@@ -109,12 +113,6 @@
 				$('.facebox .show_submit').hide();
 			});
 			return false;
-		},
-		
-	// close the save pane
-		'div.save_pane .icon.cross':function(e){
-			$('div.save_pane.helper').remove();
-			return false;	
-		}		
+		}	
 	}));	
 </script>

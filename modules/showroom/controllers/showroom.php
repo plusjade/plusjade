@@ -1,5 +1,6 @@
 <?php
 
+
 class Showroom_Controller extends Public_Tool_Controller {
 
 	function __construct()
@@ -14,6 +15,7 @@ class Showroom_Controller extends Public_Tool_Controller {
  */ 
 	public function _index($showroom)
 	{
+		
 		$url_array	= uri::url_array();
 		$page_name	= $this->get_page_name($url_array['0'], 'showroom', $showroom->id);		
 		$category	= $url_array['1'];
@@ -28,18 +30,24 @@ class Showroom_Controller extends Public_Tool_Controller {
 		}
 		$primary->categories = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name);
 	
-
+	
+		# which category do we show on the front page?
 		if('get' == $url_array['0'] OR (empty($category) AND empty($item)))
 		{
-			$primary->items = (empty($showroom->home_cat)) ?
-				'Home Category not set' : self::items_category($page_name, $showroom->id, $showroom->home_cat);
+			$primary->items = (empty($showroom->home_cat))
+				? 'Home Category not set'
+				: self::items_category($page_name, $showroom->id, $showroom->home_cat);
 		}
 		elseif(empty($item))
 			$primary->items = self::items_category($page_name, $showroom->id, $category, $showroom->view);
 		else
 			$primary->item = self::item($page_name, $category, $item);
 
-		# Javascript
+
+
+		# add custom javascript;
+		$primary->global_readyJS(self::javascripts($showroom));
+		# admin hack.
 		if($this->client->logged_in())
 			$primary->global_readyJS('
 				$("#click_hook").click(function(){
@@ -47,7 +55,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 				});
 			');
 			
-		return $this->public_template($primary, 'showroom', $showroom);	
+		return $this->wrap_tool($primary, 'showroom', $showroom);	
 	}
 
 	
@@ -68,21 +76,20 @@ class Showroom_Controller extends Public_Tool_Controller {
 			return 'invalid category';
 
 		$items = ORM::factory('showroom_cat_item')
-			->select(array('*', "SUBSTRING_INDEX(images, '|', 1) AS images"))
 			->where(array(
 				'fk_site'			=> $this->site_id,
 				'showroom_cat_id'	=> $category_ob->id
 			))
-			->find_all();		
+			->find_all();
 		if(0 == $items->count())
 			return 'No items. Check back soon!';
-
-		$item_view = new View("public_showroom/display/items_$view");
-		$item_view->category	= $category;
-		$item_view->page_name	= $page_name;
-		$item_view->items		= $items;
-		$item_view->img_path	= $this->assets->assets_url();
-		return $item_view;
+			
+		$view = new View("public_showroom/display/items_$view");
+		$view->category		= $category;
+		$view->page_name	= $page_name;
+		$view->items		= $items;
+		$view->img_path		= $this->assets->assets_url();
+		return $view;
 	}
 
 /*
@@ -124,6 +131,49 @@ class Showroom_Controller extends Public_Tool_Controller {
 		return $primary;
 	}
 
+	
+	
+	
+/*
+ * output the appropriate javascript based on the format view.
+ */	
+	private function javascripts($showroom)
+	{
+		$js = '';
+		# prepare the javascript
+		switch($showroom->type)
+		{				
+			default: # base
+				$js = '
+					var target_div = "div.showroom_items";
+					var loading = "<div class=\"ajax_loading\">Loading...</div>";
+
+					$(".showroom_wrapper").click($.delegate({		
+						"a.loader": function(e){
+								$(target_div).html(loading);
+								$(target_div).load(e.target.href, function(){
+									$("#click_hook").click();
+								});
+								return false;
+						},
+						
+						"a img.loader": function(e){
+								$(target_div).html(loading);
+								var url = $(e.target).parent("a").attr("href");
+								$(target_div).load(url, function(){
+									$("#click_hook").click();
+								});
+								return false;
+						}
+					}));				
+				';
+				break;
+		}
+		# place the javascript.
+		return $this->place_javascript($js, TRUE);
+	}
+	
+	
 /*
  * ajax handler
  *
@@ -147,7 +197,7 @@ class Showroom_Controller extends Public_Tool_Controller {
  * child to belong to
  * Add root child id to parent for easier access.
  */	
-	public static function _tool_adder($tool_id, $site_id)
+	public static function _tool_adder($parent_id, $site_id, $sample=FALSE)
 	{
 	
 		# this can all be done in the overloaded save function for
@@ -169,7 +219,6 @@ class Showroom_Controller extends Public_Tool_Controller {
 
 		return 'manage';
 	}
-	
 	
 }  /*end*/
 

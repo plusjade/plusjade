@@ -2,21 +2,17 @@
 <div id="admin_bar_wrapper" class="admin_reset">
 	<ul id="admin_bar">
 	
-		<li class="jade" style="width:60px !important">
-			<a href="http://<?php echo ROOTDOMAIN ?>/users" class="block_mode" title="Go to your user account at +Jade">+Jade</a>
-		</li>
-		
-		<li class="direct" style="width:70px !important">
+		<li class="jade" style="width:70px !important">
 			<a href="/get/help" rel="facebox" class="block_mode"><span class="icon help">&#160; &#160;</span> Help</a>
 		</li>
 		
 		<li class="dropdown">
 			<div><span class="icon global">&#160; &#160; </span> Site</div>
 			<ul>
-				<li><a href="/get/admin" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a></li>
+				<li><a href="/get/admin/settings" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a></li>
 				<li><a href="/get/page/navigation" rel="facebox"><span class="icon sitemap">&#160; &#160; </span>Navigation</a></li>
 				<li><a href="/get/theme/logo" rel="facebox"><span class="icon asterisk">&#160; &#160; </span>Logo</a></li>				
-				<li><a href="/get/auth/logout"><span class="icon cross">&#160; &#160; </span> Logout</a></li>
+				<li><a href="/get/admin/logout"><span class="icon cross">&#160; &#160; </span> Logout</a></li>
 			</ul>		
 		</li>	
 		
@@ -42,7 +38,6 @@
 			<a href="/get/files" rel="facebox" class="block_mode"><span class="icon local">&#160; &#160; </span>Files</a>
 		</li>
 		
-
 		<li class="this_page" style="width:135px">
 			<a href="/get/page/settings/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Page Settings</a>
 		</li>
@@ -72,10 +67,8 @@
 		<?php						
 		if('0' < count($tools_array))
 		{
-			/*
-			 * THIS IS HIDDEN: Exists so JS can grab html.
-			 * $tools_array is sent from build_page controller.
-			 */	
+			// THIS IS HIDDEN: Exists so JS can grab html.
+			// $tools_array is sent from build_page controller.
 			foreach($tools_array as $data_array)
 			{
 				$data_array['page_id']		= $page_id;

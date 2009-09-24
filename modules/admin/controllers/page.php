@@ -129,7 +129,7 @@ class Page_Controller extends Controller {
 	{
 		if($_POST)
 		{
-			$directory = ( empty($_POST['directory']) ) ? 'ROOT' : $_POST['directory']; 
+			$directory = (empty($_POST['directory'])) ? 'ROOT' : $_POST['directory']; 
 			
 			# Validate page_name & duplicate check
 			$full_path = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory);
@@ -154,7 +154,7 @@ class Page_Controller extends Controller {
 			$new_page->save();
 
 			# setup vars...
-			$visibility = ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
+			$visibility = (empty($_POST['menu'])) ? 'hidden' : 'enabled';		
 			$vars = array(
 				'id'			=> $new_page->id,
 				'visibility'	=> $visibility,
@@ -164,7 +164,7 @@ class Page_Controller extends Controller {
 				'filename'		=> $filename,
 			);
 
-			# send html to javascript handler
+			# send success html to javascript handler
 			die(View::factory('page/page_wrapper_html', array('vars' => $vars)));
 		}
 
@@ -189,17 +189,13 @@ class Page_Controller extends Controller {
 		$filter_array	= self::get_filename_filter($directory);
 		$filter_string	= implode("','",$filter_array);
 		$filter_string	= "'$filter_string'";
-
-		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
-		#echo $filter_string;die();
 		$primary->filter = $filter_string;
 		die($primary);
 	}
 
 
 /*
- * add a new page with a page_builder pre-installed.
- * possibly unecessry to pass toolname since we have the id.
+ * View and handler for adding a new page with a page_builder pre-installed.
  */
 	public function add_builder($system_tool_id=NULL)
 	{
@@ -246,7 +242,7 @@ class Page_Controller extends Controller {
 			Tool_Controller::_create_tool($new_page->id, $system_tool_id, $this->site_name, NULL, TRUE);
 	
 			# send html to javascript handler
-			$visibility	= ( empty($_POST['menu']) ) ? 'hidden' : 'enabled';		
+			$visibility	= (empty($_POST['menu'])) ? 'hidden' : 'enabled';		
 			$vars		= array(
 				'id'			=> $new_page->id,
 				'visibility'	=> $visibility,
@@ -256,7 +252,7 @@ class Page_Controller extends Controller {
 				'filename'		=> $filename,
 				'page_builder'	=> "$toolname-$system_tool_id"
 			);
-			die( View::factory('page/page_wrapper_html', array('vars' => $vars)) );
+			die(View::factory('page/page_wrapper_html', array('vars' => $vars)));
 		}
 
 		# Javascript duplicatate_page name filter Validation
@@ -290,8 +286,6 @@ class Page_Controller extends Controller {
 		if($page->page_name == $site_config['homepage'])
 			die('Cannot delete the current home page. Specify a new home page first.');
 		
-		echo kohana::debug($site_config);
-		die('testing');
 		# Get all pages to look for children.
 		$pages_data = ORM::factory('page')
 			->where('fk_site', $this->site_id)
@@ -384,8 +378,8 @@ class Page_Controller extends Controller {
 			if($this->account_page == $_POST['old_page_name'])
 				yaml::edit_site_value($this->site_name, 'site_config', 'account_page', $filename);
 
+			# TODO:  i have no idea how to do this. ->
 			# if the page has sub-pages, update the sub-page names.
-			
 			
 			die('Page Settings Saved'); # success				
 		}
@@ -507,8 +501,7 @@ class Page_Controller extends Controller {
 				if($page_name == $omit)
 					unset($filter_array[$key]);
 
-		return $filter_array;			
-		#echo'<pre>';print_r($filter_array);echo'</pre>';die();
+		return $filter_array;
 	}
 
 	
@@ -577,4 +570,4 @@ class Page_Controller extends Controller {
 
 	
 	
-}  /* End of file page.php */
+}  /* End of page.php */

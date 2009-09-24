@@ -33,15 +33,15 @@ class Account_Controller extends Public_Tool_Controller {
 				break;
 				
 			case 'create':
-				return $this->public_template(self::create_account($page_name), 'account', $account);
+				return $this->wrap_tool(self::create_account($page_name), 'account', $account);
 				break;
 				
 			case 'profile':
-				return $this->public_template(self::profile($username), 'account', $account);
+				return $this->wrap_tool(self::profile($username), 'account', $account);
 				break;
 
 			case 'all':
-				return $this->public_template(self::all_users($page_name), 'account', $account);
+				return $this->wrap_tool(self::all_users($page_name), 'account', $account);
 				break;
 				
 			case 'edit_profile':
@@ -59,7 +59,7 @@ class Account_Controller extends Public_Tool_Controller {
 			case 'logout':
 				$this->account_user->logout();
 				$primary = $this->display_login($page_name);
-				return $this->public_template($primary, 'account', $account);
+				return $this->wrap_tool($primary, 'account', $account);
 				break;		
 
 
@@ -81,7 +81,7 @@ class Account_Controller extends Public_Tool_Controller {
 			: new View('public_account/accounts/index');
 		$wrapper->content = $content;
 		$wrapper->page_name = $page_name;
-		return $this->public_template($wrapper, 'account', $account);
+		return $this->wrap_tool($wrapper, 'account', $account);
 	}
 
 	
@@ -215,7 +215,7 @@ class Account_Controller extends Public_Tool_Controller {
 				'password2'	=> '',
 			);
 			$values	= arr::overwrite($values, $post->as_array()); 			
-			if(! $post->validate() )
+			if(!$post->validate())
 			{
 				$errors = $values;
 				$errors	= arr::overwrite($errors, $post->errors('form_error_messages'));
@@ -234,19 +234,67 @@ class Account_Controller extends Public_Tool_Controller {
 			# load vars to user table
 			foreach($_POST as $key => $val)
 					$account_user->$key = $val;
-		
-			# create new user with appropriate roles
-				# omit roles for now.
-				// if(!$account_user->save() OR !$account_user->add(ORM::factory('role', 'login')))
-				// die('There was a problem creating a new user.');
-			
+
+			# save the user 
 			if(!$account_user->save())
 				return self::display_create($page_name, $values, 'There was a problem creating account.');
 			
-
 			# Log user in
 			if(! $this->account_user->login($account_user, (int)$this->site_id, $_POST['password']))
 				die('account created but login failed.');
+			
+			## create new campaign monitor instance for plusjade accounts ##
+			if(ROOTACCOUNT === $this->site_name)
+			{
+				$user = $this->account_user->get_user();
+				
+				include Kohana::find_file('vendor','CMBase');
+				
+				# Create new account.
+				$company	= $user->username;		
+				$name		= $user->username;
+				$email		= $user->email;
+				$country	= 'United States of America';
+				$timezone	= '(GMT-08:00) Pacific Time (US & Canada)';
+
+				$cm = new CampaignMonitor;
+				$result = $cm->clientCreate($company, $name, $email, $country, $timezone);
+				
+				if(is_string($result['anyType']))
+				{
+					$user->cm_id = $result['anyType'];
+					$user->save();
+					
+					/*
+					$accessLevel = '63';
+					$username = 'apiusername';
+					$password = 'apiPassword';
+					$billingType = 'ClientPaysWithMarkup';
+					$currency = 'USD';
+					$deliveryFee = '7';
+					$costPerRecipient = '3';
+					$designAndSpamTestFee = '10';
+
+					$result = $cm->clientUpdateAccessAndBilling(
+						$result['anyType'],
+						$accessLevel, 
+						$user->username, 
+						$password, 
+						$billingType, 
+						$currency, 
+						$deliveryFee, 
+						$costPerRecipient, 
+						$designAndSpamTestFee
+					);
+					*/
+				}
+				else
+				{
+					kohana::log('error', "{$result['anyType']['message']} : CM client $user->username");
+					#echo kohana::debug($result);
+				}
+			}
+			
 			
 			# return the user dashboard.
 			$wrapper = new View('public_account/accounts/dashboard');
@@ -407,11 +455,13 @@ class Account_Controller extends Public_Tool_Controller {
 		die();
 	}
 
+	
 /*
  * -----------------------------------------------------------
  * Functions used specifically for plusjade user accounts only.
  * -----------------------------------------------------------
  */
+ 
 	private function plusjade_dashboard($page_name, $message=NULL)
 	{
 		$user = ORM::factory('account_user', $this->account_user->get_user()->id);
@@ -458,7 +508,7 @@ class Account_Controller extends Public_Tool_Controller {
 			return $this->plusjade_dashboard($page_name, 'site name already exists');
 
 		# attempt to create the website
-		$status = Auth_Controller::_create_website($site_name, 'base', $this->account_user->get_user()->id);
+		$status = Site_Controller::_create_website($site_name, 'base', $this->account_user->get_user()->id);
 		return $this->plusjade_dashboard($page_name, $status);
 	}
 	
@@ -500,22 +550,19 @@ class Account_Controller extends Public_Tool_Controller {
 
 		return $this->plusjade_dashboard($page_name, 'safe-mode theme could not be activated');
 	}
-
-
-
-
-
 /* 
  * end plusjade functions
  * ----------------------------------------------------------- 
  */
-	
+
+
+ 
 /*
  * Ajax request handler.
  * param $url_array = (array) an array of url signifiers
  * param $tool_id 	= (int) the tool id of the tool.
  */ 	
-	function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $tool_id)
 	{
 		list($page_name, $action, $username) = $url_array;
 		$action = (empty($action) OR 'tool' == $action)
