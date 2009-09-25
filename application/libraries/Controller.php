@@ -98,7 +98,7 @@ abstract class Controller_Core {
  */
 	public function __call($method, $args)
 	{
-		kohana::log('error', "$page -- $method does not exist. Called by: {$_SERVER['REQUEST_URI']}");
+		kohana::log('error', "-- $method does not exist. Called by: {$_SERVER['REQUEST_URI']}");
 		header('HTTP', true, 500);
 		die('bad controller method call. This is an internal error and has been reported.');
 	}

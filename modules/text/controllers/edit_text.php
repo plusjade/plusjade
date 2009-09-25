@@ -1,10 +1,11 @@
 <?php
 
+/*
+ * stores and displays text.
+ */
+ 
 class Edit_Text_Controller extends Edit_Tool_Controller {
 
-/*
- *
- */
 	function __construct()
 	{
 		parent::__construct();	
@@ -13,27 +14,29 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 /*
  * add single Item
  */
-	public function add($tool_id=NULL)
+	public function add($parent_id=NULL)
 	{
-		valid::id_key($tool_id);		
+		valid::id_key($parent_id);		
 
 		$text = ORM::factory('text')
 			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $text->loaded)
+			->find($parent_id);	
+		if(!$text->loaded)
 			die('invalid text id');
 
 		if($_POST)
 		{
 			$text->body = $_POST['body'];
+			# update the cache
+			$text->cache = $this->parse_tokens($text->body);
 			$text->save();
 			die('Text Changes Saved');
 		}
 		
-		$primary = new View("edit_text/add_item");
-		$primary->item = $text;
-		$primary->js_rel_command = "update-text-$text->id";
-		die($primary);
+		$view = new View("edit_text/add_item");
+		$view->item = $text;
+		$view->js_rel_command = "update-text-$text->id";
+		die($view);
 	}
 	
 	
@@ -46,7 +49,7 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
 	}
 	
 
-	public static function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($parent_id, $site_id)
 	{
 		return true;
 	}

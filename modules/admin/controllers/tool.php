@@ -266,9 +266,10 @@ class Tool_Controller extends Controller {
 			->delete($tool->parent_id);
 
 		# is tool protected?
+			# note: the page may not be set if the page was deleted but the tool still exists.
 		if('yes' == $tool->system_tool->protected)
-			yaml::delete_value($this->site_name, 'pages_config', $tool->pages->current()->page_name);
-			
+			if(isset($tool->pages->current()->page_name))
+				yaml::delete_value($this->site_name, 'pages_config', $tool->pages->current()->page_name);
 		
 		# DELETE the custom folder for this tool. (houses custom css files)
 		$custom_folder = $this->assets->themes_dir("$this->theme/tools/$tool->system_tool->name/_created/$tool->parent_id");

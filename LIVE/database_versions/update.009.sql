@@ -84,3 +84,30 @@ CREATE TABLE IF NOT EXISTS `review_items` (
 
 UPDATE `plusjade`.`version` SET `at` = '009';
 
+
+
+
+
+-- new format type "form"
+
+INSERT INTO `plusjade`.`system_tool_types` (
+`id` ,
+`system_tool_id` ,
+`type` ,
+`view` ,
+`desc`
+)
+VALUES (
+NULL , '4', 'forms', 'list', 'create a custom html form to be emailed to the address of your choice.'
+);
+
+
+
+
+
+
+
+
+
+
+

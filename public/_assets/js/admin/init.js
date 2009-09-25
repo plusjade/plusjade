@@ -66,7 +66,7 @@ $(document).ready(function()
 			var id		= $(this).attr('rel');
 			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
 			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">'+ toolname +' item</span>'+ edit + ' ' + del + '</div>';
+			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">item</span>'+ edit + ' ' + del + '</div>';
 			$(this).prepend(toolbar);			
 		});
 	};	

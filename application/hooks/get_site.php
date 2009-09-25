@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
 /*
  * This is the Main GateKeeper to Plusjade.
  * It routes all logic to appropriate controllers.
@@ -10,6 +11,7 @@
 		b. is page_name:		grab tools, Build page, render the page.
 		c. is get/controller:	Admin, map to appropriate controller.
  */
+ 
 function get_site()
 {
 	$session = Session::instance();
@@ -38,8 +40,11 @@ function get_site()
 	$site = ORM::factory('site')
 		->where(array($field_name => $site_name))
 		->find();
-	if (!$site->loaded) 
+	if (!$site->loaded)
+	{
+		header("HTTP/1.0 404 Not Found");
 		die('site does not exist');
+	}
 	
 	# IMPORTANT: sets the site name & non-sensitive site_data.
 	$_SESSION['site_name']	= $site->subdomain;
@@ -127,10 +132,6 @@ function get_site()
 			if(!$page->loaded)
 				Event::run('system.404');
 
-			# is the page public?
-			if('no' == $page->enable AND !$this->client->can_edit($this->site_id))
-				Event::run('system.404');
-			
 			# Load the page!
 			$build_page = new Build_Page_Controller;
 			die($build_page->_index($page));

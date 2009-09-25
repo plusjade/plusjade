@@ -17,39 +17,40 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 /*
  *	rearrange format-item positions
  */
-	public function manage($tool_id=NULL)
+	public function manage($parent_id=NULL)
 	{
-		valid::id_key($tool_id);
+		valid::id_key($parent_id);
 		
 		$format = ORM::factory('format')
 			->where('fk_site', $this->site_id)
-			->find($tool_id);	
+			->find($parent_id);	
 		if(FALSE === $format->loaded)
 			die('invalid format id');
 
 		$primary = new View('edit_format/manage');
 		$primary->items = $format->format_items;
-		$primary->tool_id = $tool_id;
+		$primary->tool_id = $parent_id;
 		die($primary);
 	}
 
 /*
  * add a format item
  */	
-	public function add($tool_id=NULL)
+	public function add($parent_id=NULL)
 	{
-		valid::id_key($tool_id);	
+		valid::id_key($parent_id);	
 		if($_POST)
 		{
 			$max = ORM::factory('format_item')
 				->select('MAX(position) as highest')
-				->where('format_id', $tool_id)
+				->where('format_id', $parent_id)
 				->find();		
 
 			$new_item = ORM::factory('format_item');
 			$new_item->fk_site		= $this->site_id;
-			$new_item->format_id	= $tool_id;
+			$new_item->format_id	= $parent_id;
 			$new_item->title		= $_POST['title'];
+			$new_item->type			= (isset($_POST['type'])) ? $_POST['type'] : '';
 			$new_item->image		= (isset($_POST['image'])) ? $_POST['image'] : '';
 			$new_item->body			= $_POST['body'];
 			$new_item->position		= ++$max->highest;
@@ -59,13 +60,13 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 
 		$format = ORM::factory('format')
 			->where('fk_site', $this->site_id)
-			->find($tool_id);	
-		if(FALSE === $format->loaded)
+			->find($parent_id);	
+		if(!$format->loaded)
 			die('invalid format id');		
 		
 		$primary = new View("edit_format/add_$format->type");
-		$primary->tool_id = $tool_id;	
-		$primary->js_rel_command = "update-format-$tool_id";
+		$primary->tool_id = $parent_id;	
+		$primary->js_rel_command = "update-format-$parent_id";
 		die($primary);
 	}
 
@@ -86,6 +87,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			$format_item->title = $_POST['title'];
+			$format_item->type	= (isset($_POST['type'])) ? $_POST['type'] : '';
 			$format_item->image	= (isset($_POST['image'])) ? $_POST['image'] : '';
 			$format_item->body	= $_POST['body'];
 			$format_item->save();
@@ -137,13 +139,13 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 /*
  * Configure format tool settings
  */ 
-	public function settings($tool_id=NULL)
+	public function settings($parent_id=NULL)
 	{
-		valid::id_key($tool_id);		
+		valid::id_key($parent_id);		
 		
 		$format = ORM::factory('format')
 			->where('fk_site', $this->site_id)
-			->find($tool_id);	
+			->find($parent_id);	
 		if(FALSE === $format->loaded)
 			die('invalid format');
 			
@@ -155,7 +157,8 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 			$format->save();
 			die('Format Settings Saved.');
 		}
-
+		
+		# setup view toggling based on format type.
 		switch($format->type)
 		{
 			case 'people':
@@ -171,6 +174,9 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 			case 'tabs':
 				$type_views = array('stock');
 				break;
+			case 'forms':
+				$type_views = array('list');
+				break;
 			default:
 				$type_views = array();
 				break;
@@ -179,7 +185,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 		$view = new View('edit_format/settings');
 		$view->format			= $format;
 		$view->type_views		= $type_views;
-		$view->js_rel_command	= "update-format-$tool_id";			
+		$view->js_rel_command	= "update-format-$parent_id";			
 		die($view);
 	}
 
@@ -188,12 +194,12 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
  * callback function when this tool is deleted.
  * cleans up extra data
  */ 	
-	public static function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($parent_id, $site_id)
 	{
 		ORM::factory('format_item')
 			->where(array(
 				'fk_site'	=> $site_id,
-				'format_id'	=> $tool_id,
+				'format_id'	=> $parent_id,
 				))
 			->delete_all();
 

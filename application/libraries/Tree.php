@@ -13,7 +13,7 @@ class Tree_Core {
  * display node data for public navigation tool since
  * more multiple navigations can be on same page.
  */
-	public static function render_node_navigation($item)
+	public static function render_node_navigation($item, $page_name)
 	{
 		$type = (empty($item->type)) ? 'none' : $item->type;
 
@@ -34,12 +34,36 @@ class Tree_Core {
 		}	
 		return "<li id=\"item_$item->id\"><span>$entry</span>";
 	}
-		
+
+/*
+ * show the public categories list.
+ */
+	public static function render_node_showroom($item, $page_name)
+	{
+		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
+	}
+
+	public static function showroom_admin($item, $page_name)
+	{
+		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><b rel="' . $item->url . '">' . $item->name . '</b> <small>('. $item->item_count .')</small></span>'; 
+	}
+	
+	
+	
+/*
+ * show the categories in the edit showroom interfaces.
+ */	
+	public static function render_edit_showroom($item, $page_name)
+	{
+		return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
+	}	
+	
+	
 /* 
  * Uses Tree traversal method to display neat nested ul/li list.
  * $items (object) are required to have lft/rgt values
 */
-	public static function display_tree($toolname, $items, $page_name=null, $admin=FALSE)
+	public static function display_tree($toolname, $items, $page_name=null, $admin=FALSE, $custom_callback=FALSE)
 	{	  
 		# start with an empty $right stack
 		$right		= array();	
@@ -66,12 +90,15 @@ class Tree_Core {
 			$new	= $compare[$q]	= count($right);
 			$old	= $compare[$q-1];
 
-			# generate output for each node	
-			if( is_callable("render_node_$toolname") )
-				$entry = call_user_func("render_node_$toolname", $item, $page_name);
-			else
-				$entry = call_user_func(array('Tree', 'render_node_navigation'), $item);
+			# generate output for each node
+			# $entry = call_user_func("render_node_$toolname", $item, $page_name);
 			
+			$custom_callback = (empty($custom_callback))
+				? "render_node_$toolname"
+				: $custom_callback;
+				
+			$entry = call_user_func(array('Tree', $custom_callback), $item, $page_name);
+
 			/*
 			 * Output the list entries.
 			 * 	Case 1: New level = Old level OR is root level.

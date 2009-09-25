@@ -90,7 +90,7 @@ class Site_Controller extends Controller {
 		$new_page->menu			= 'yes';
 		$new_page->save();
 		
-		
+		/*
 		# add sample tools to homepage.
 		$sample_tools = array(
 			'Format',
@@ -98,18 +98,17 @@ class Site_Controller extends Controller {
 			'Album',
 			'Text'
 		);
-		
 		#TODO establish types of tools, with views, etc.
 		foreach($sample_tools as $name)
 			Tool_Controller::_create_tool($new_page->id, $name, $site_name, FALSE, TRUE);
-		
+		*/
 		
 		# install page builders.
 		$install = array(
 			'Account',
-			'Blog',
-			'Forum',
-			'Calendar'
+			#'Blog',
+			#'Forum',
+			#'Calendar'
 		);
 		foreach($install as $toolname)
 			Tool_Controller::_auto_tool($toolname, $new_site->id, $site_name, 'base');

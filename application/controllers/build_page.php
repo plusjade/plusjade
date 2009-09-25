@@ -15,13 +15,12 @@ class Build_Page_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
-		#$this->profiler = new Profiler;		
+		# $this->profiler = new Profiler;		
 		$this->template = new View('shell');	
 		
 		# Global CSS			
 		if(!$this->client->can_edit($this->site_id))
 			$this->template->linkCSS("_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
-		
 	}
  
 /*
@@ -31,6 +30,10 @@ class Build_Page_Controller extends Controller {
  */
 	public function _index($page)
 	{
+		# is the page public?
+		if('no' == $page->enable AND !$this->client->can_edit($this->site_id))
+			Event::run('system.404');
+				
 		# can we serve a cached page?
 		if($this->serve_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
 		{
@@ -285,6 +288,8 @@ class Build_Page_Controller extends Controller {
 		if($cache)
 		{
 			$date = date('m.d.y g:ia e');
+			if(!is_dir(DATAPATH . "$this->site_name/cache"))
+				mkdir(DATAPATH . "$this->site_name/cache");
 			file_put_contents(DATAPATH . "$this->site_name/cache/$cache.html", $this->template->render() . "\n<!-- cached $date -->");
 		}
 		

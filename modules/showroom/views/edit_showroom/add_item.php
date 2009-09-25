@@ -22,10 +22,10 @@
 	
 		<div id="params" class="toggle fieldsets">
 			<b>Item Name</b>
-			<br/><input type="text" name="name" rel="text_req" maxlength="50" style="width:275px">
+			<br/><input type="text" name="name" class="send_input" rel="text_req"  maxlength="50" style="width:275px">
 			<br/><br/>
 			<b>URL</b>
-			<br/><input type="text" name="url" class="auto_filename" rel="text_req" maxlength="50" style="width:275px">
+			<br/><input type="text" name="url" class="auto_filename receive_input" rel="text_req" maxlength="50" style="width:275px">
 			
 			<br/><br/>
 			<b>Category</b>
@@ -95,7 +95,8 @@
 	
 // custom ajax form
 	$(".custom_ajaxForm").ajaxForm({
-		beforeSubmit: function(formData){
+		beforeSubmit: function(formData, form){
+			if(! $("input", form[0]).jade_validate()) return false;	
 			$('.facebox .show_submit').show();
 			// JSONize image selections
 			var data = new Array();

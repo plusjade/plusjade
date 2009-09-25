@@ -12,19 +12,15 @@ class Text_Controller extends Public_Tool_Controller {
 /*
  * expects the parent text table object
  */
- 
 	public function _index($text)
 	{
 		# Need this to be able to append toolbar in edit mode
 		if(empty($text->body) AND $this->client->logged_in())
 			$text->body = '<p class="aligncenter">(sample text)</p>';
-		
-		# parse the body
-		$text->body = $this->public_parse($text->body);
-		
-		$primary = new View("public_text/basic/stock");
-		$primary->item = $text;
-		return $this->wrap_tool($primary, 'text', $text);
+
+		$view = new View("public_text/basic/stock");
+		$view->item = $text;
+		return $this->wrap_tool($view, 'text', $text);
 	}
 
 

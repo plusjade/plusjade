@@ -1,10 +1,9 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
+
 
 class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
-/*
- *	An basic product listing generator with nestable categories.
- */
+
 	function __construct()
 	{
 		parent::__construct();	
@@ -14,14 +13,16 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  * Display the categories drilldown
  * UPDATE category positions
  */
-	public function manage($tool_id=NULL)
+	public function manage($parent_id=NULL)
 	{
-		valid::id_key($tool_id);
+		valid::id_key($parent_id);
 		
 		$showroom = ORM::factory('showroom')
 			->where('fk_site' , $this->site_id)
-			->find($tool_id);
-
+			->find($parent_id);
+		if(!$showroom->loaded)
+			die('invalid showroom');
+			
 		# show category list.
 		$db = new Database;
 		$items = $db->query("
@@ -34,15 +35,10 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			ORDER BY cat.lft ASC 
 		");
 
-
-		function render_node_showroom($item)
-		{
-			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><b rel="' . $item->url . '">' . $item->name . '</b> <small>('. $item->item_count .')</small></span>'; 
-		}
-		$primary = new View("edit_showroom/manage");
-		$primary->tree = Tree::display_tree('showroom', $items, null, TRUE);		
-		$primary->tool_id = $tool_id;
-		die($primary);
+		$view = new View("edit_showroom/manage");
+		$view->tree = Tree::display_tree('showroom', $items, null, TRUE, 'showroom_admin');		
+		$view->parent_id = $parent_id;
+		die($view);
 	}
 
 
@@ -55,12 +51,12 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  
  * Gets output positions from this::manage
  */ 
-	public function save_tree($tool_id)
+	public function save_tree($parent_id)
 	{
 		if($_POST)
 		{
-			valid::id_key($tool_id);
-			echo Tree::save_tree('showroom', 'showroom_cat', $tool_id, $this->site_id, $_POST['output']);
+			valid::id_key($parent_id);
+			echo Tree::save_tree('showroom', 'showroom_cat', $parent_id, $this->site_id, $_POST['output']);
 		}
 		die();
 	}	
@@ -68,9 +64,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * Add categories
  */ 
-	public public function add($tool_id=NULL)
+	public public function add($parent_id=NULL)
 	{
-		valid::id_key($tool_id);
+		valid::id_key($parent_id);
 		if($_POST)
 		{
 			if(empty($_POST['category']))
@@ -78,19 +74,19 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 			$showroom = ORM::factory('showroom')
 				->where('fk_site', $this->site_id)
-				->find($tool_id);	
-			if(FALSE === $showroom->loaded)			
-				die('adding categories to invalid showroom.');
+				->find($parent_id);	
+			if(!$showroom->loaded)			
+				die('invalid showroom.');
 
-			$url	= trim($_POST['url']);
-			$url	= (empty($url)) ? trim($_POST['category']) : $url; 
+			$url = trim($_POST['url']);
+			$url = (empty($url)) ? trim($_POST['category']) : $url; 
 
 			$_POST['local_parent'] = 
 				((empty($_POST['local_parent']) OR !is_numeric($_POST['local_parent'])))
 				? $showroom->root_id : $_POST['local_parent'];
 
 			$new_cat = ORM::factory('showroom_cat');
-			$new_cat->showroom_id	= $tool_id;
+			$new_cat->showroom_id	= $parent_id;
 			$new_cat->fk_site		= $this->site_id;
 			$new_cat->url			= valid::filter_php_url($url);
 			$new_cat->name			= trim($_POST['category']);
@@ -104,7 +100,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		}
 
 		$primary = new View('edit_showroom/add_category');
-		$primary->tool_id = $tool_id;				
+		$primary->tool_id = $parent_id;				
 		die($primary);	
 	}
 
@@ -118,7 +114,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		$category = ORM::factory('showroom_cat')
 			->where('fk_site', $this->site_id)
 			->find($cat_id);	
-		if(FALSE === $category->loaded)
+		if(!$category->loaded)
 			die('invalid category item id');
 		
 		if($_POST)
@@ -143,9 +139,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * manage items view for a particular category
  */ 
-	public function items($tool_id=NULL, $cat_id=NULL)
+	public function items($parent_id=NULL, $cat_id=NULL)
 	{
-		valid::id_key($tool_id);
+		valid::id_key($parent_id);
 		valid::id_key($cat_id);
 	
 		$items = ORM::factory('showroom_cat_item')
@@ -159,7 +155,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 		$primary = new View('edit_showroom/manage_items');
 		$primary->items = $items;
-		$primary->tool_id = $tool_id;
+		$primary->tool_id = $parent_id;
 		die($primary);
 	}
 	
@@ -200,17 +196,12 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			die('Showroom item added');
 		}
 
-		
 		# Get list of categories
 		$showroom = ORM::factory('showroom', $parent_id);
-		function render_node_showroom($item)
-		{
-			return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
-		}
-		
+
 		$view = new View("edit_showroom/add_item");
 		$view->parent_id	= $parent_id;
-		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats);	
+		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, FALSE, 'render_edit_showroom');	
 		die($view);
 	}
 	
@@ -260,10 +251,6 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		
 		# Get list of categories
 		$showroom = ORM::factory('showroom', $category->showroom_id);
-		function render_node_showroom($item)
-		{
-			return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
-		}
 			
 		# parse images	
 		$images = json_decode($item->images);
@@ -271,10 +258,9 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			$images = array();
 		foreach($images as $image)
 			$image->thumb = image::thumb($image->path);
-			
-		
+				
 		$primary = new View("edit_showroom/edit_item");
-		$primary->categories	= Tree::display_tree('showroom', $showroom->showroom_cats);	
+		$primary->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, FALSE, 'render_edit_showroom');
 		$primary->category_id	= $category->id;
 		$primary->item			= $item;
 		$primary->images		= $images;
@@ -334,14 +320,14 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 /*
  * TODO: This works but we need to make this ORM.
  */	
-	public static function _tool_deleter($tool_id, $site_id)
+	public static function _tool_deleter($parent_id, $site_id)
 	{
 		$db = new Database;
 		$db->query("
 			DELETE cats.*, items.*
 			FROM showroom_cats as cats, showroom_cat_items as items
 			WHERE cats.fk_site = '$site_id'
-			AND cats.showroom_id = '$tool_id'
+			AND cats.showroom_id = '$parent_id'
 			AND cats.id = items.showroom_cat_id
 		");
 		
@@ -349,7 +335,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		ORM::factory('showroom_cat')
 			->where(array(
 				'fk_site'		=> $site_id,
-				'showroom_id'	=> $tool_id,
+				'showroom_id'	=> $parent_id,
 			))
 			->delete_all();
 		

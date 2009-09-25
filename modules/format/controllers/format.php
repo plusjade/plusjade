@@ -89,6 +89,17 @@ class Format_Controller extends Public_Tool_Controller {
 		return $view;
 	}
 
+	
+/*
+ * Formats the view to show an html form
+ */
+	private static function forms($format)
+	{
+		$view = new View("public_format/forms/list");
+		return $view;
+	}
+	
+	
 /*
  * output the appropriate javascript based on the format view.
  */	
@@ -153,6 +164,19 @@ class Format_Controller extends Public_Tool_Controller {
 				break;
 			
 			case 'tabs':
+				$js = '
+					$(".tabs_tab_list li a").click(function(){
+						$("#format_wrapper_' . $format->id . ' .format_item").hide();
+						$(".tabs_tab_list li a").removeClass("active");
+						var id = $(this).addClass("active").attr("href");
+						$(id).show();
+						return false;
+					});
+					$(".tabs_tab_list li a:first").click();
+				';
+				break;
+				
+			case 'forms':
 				$js = '
 					$(".tabs_tab_list li a").click(function(){
 						$("#format_wrapper_' . $format->id . ' .format_item").hide();

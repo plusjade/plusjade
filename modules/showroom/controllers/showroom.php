@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 
 
 class Showroom_Controller extends Public_Tool_Controller {
@@ -15,31 +15,31 @@ class Showroom_Controller extends Public_Tool_Controller {
  */ 
 	public function _index($showroom)
 	{
-		
 		$url_array	= uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'showroom', $showroom->id);		
-		$category	= $url_array['1'];
-		$item		= $url_array['2'];
+		list($page_name, $category, $item) = $url_array;
+		$page_name	= $this->get_page_name($page_name, 'showroom', $showroom->id);		
 
-		$primary = new View("public_showroom/display/index");
+
+		$primary = new View("public_showroom/display/wrapper");
 		
-		# show the categories list.
-		function render_node_showroom($item, $page_name)
-		{
-			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
-		}
-		$primary->categories = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name);
-	
-	
-		# which category do we show on the front page?
+		# parse the params.
+		# format: toggle cat list | # of columns | 
+		$params = explode('|',$showroom->params);
+		
+		# do we show the category list?
+		$primary->categories = ('off' == $params[0])
+			? ''
+			: Tree::display_tree('showroom', $showroom->showroom_cats, $page_name);
+		
+		# is the category item url specified?
 		if('get' == $url_array['0'] OR (empty($category) AND empty($item)))
 		{
 			$primary->items = (empty($showroom->home_cat))
 				? 'Home Category not set'
-				: self::items_category($page_name, $showroom->id, $showroom->home_cat);
+				: self::items_category($page_name, $showroom, $showroom->home_cat);
 		}
 		elseif(empty($item))
-			$primary->items = self::items_category($page_name, $showroom->id, $category, $showroom->view);
+			$primary->items = self::items_category($page_name, $showroom, $category);
 		else
 			$primary->item = self::item($page_name, $category, $item);
 
@@ -47,8 +47,9 @@ class Showroom_Controller extends Public_Tool_Controller {
 
 		# add custom javascript;
 		$primary->global_readyJS(self::javascripts($showroom));
-		# admin hack.
-		if($this->client->logged_in())
+		
+		# admin js hack.
+		if($this->client->can_edit($this->site_id))
 			$primary->global_readyJS('
 				$("#click_hook").click(function(){
 					$().add_toolkit_items("showroom");
@@ -62,29 +63,50 @@ class Showroom_Controller extends Public_Tool_Controller {
 /*
  * show items from a given category
  * TODO: FIX THIS
+ * category_id can be either the id or the url.
  */
-	private function items_category($page_name, $tool_id, $category, $view='list')
+	private function items_category($page_name, $showroom, $category_id)
 	{
-		$category_ob = ORM::factory('showroom_cat')
+		# get the parent to determine the view.
+		if(!is_object($showroom))
+			$showroom = ORM::factory('showroom', $showroom);
+		
+		# get the category		
+		$category = ORM::factory('showroom_cat')
 			->where(array(
 				'fk_site'		=> $this->site_id,
-				'showroom_id'	=> $tool_id,
-				'url'			=> $category
+				'showroom_id'	=> $showroom->id,
 			))
-			->find();
-		if(FALSE === $category_ob->loaded)
-			return 'invalid category';
+			->find($category_id);
+			
+		if(!$category->loaded)
+			return '<h1>invalid category</h1>';
 
+		# get the items.
 		$items = ORM::factory('showroom_cat_item')
 			->where(array(
 				'fk_site'			=> $this->site_id,
-				'showroom_cat_id'	=> $category_ob->id
+				'showroom_cat_id'	=> $category->id
 			))
 			->find_all();
 		if(0 == $items->count())
-			return 'No items. Check back soon!';
-			
-		$view = new View("public_showroom/display/items_$view");
+			return '<h1>No items. Check back soon!</h1>';
+		
+		$view = new View("public_showroom/display/$showroom->view");
+		
+		# do view stuff
+		if('gallery' == $showroom->view)
+		{
+			# request javascript file
+			$view->request_js_files('lightbox/lightbox.js');
+			# parse the params.
+			# format: toggle cat list | # of columns | 
+			$params = explode('|',$showroom->params);
+			$view->columns = (isset($params[1]) and is_numeric($params[1]))
+				? $params[1]
+				: 2;
+		}
+		
 		$view->category		= $category;
 		$view->page_name	= $page_name;
 		$view->items		= $items;
@@ -95,47 +117,33 @@ class Showroom_Controller extends Public_Tool_Controller {
 /*
  * show a single item
  */
-	private function item($page_name, $category, $item)
+	private function item($page_name, $category, $item_url)
 	{
-		$item_object = ORM::factory('showroom_cat_item')
+		$item = ORM::factory('showroom_cat_item')
 			->where(array(
 				'fk_site' => $this->site_id,
-				'url'	  => $item,
+				'url'	  => $item_url,
 			))
 			->find();
-		if(FALSE === $item_object->loaded)
-			return 'Invalid item';
+		if(!$item->loaded)
+			return '<h1>Invalid item</h1>';
 
-		# images  with thumbnails
-		$image_array = explode('|', $item_object->images);
-		$images = array();
-		foreach($image_array as $image)
-		{
-			if(0 < substr_count($image, '/'))
-			{
-				$filename = strrchr($image, '/');
-				$small = str_replace($filename, "/_sm$filename", $image);
-			}
-			else
-				$small = "/_sm/$image";
-			
-			$images[] = "$small|$image";
-		}
+		# prep image Json.
 
-		$primary = new View('public_showroom/display/single_item');
-		$primary->item		= $item_object;
-		$primary->images	= $images;	
-		$primary->category	= $category;
-		$primary->page_name	= $page_name;
-		$primary->img_path	= $this->assets->assets_url();
-		return $primary;
+		$view = new View('public_showroom/display/single_item');
+		$view->item			= $item;
+		$view->images		= $images;	
+		$view->category		= $category;
+		$view->page_name	= $page_name;
+		$view->img_path		= $this->assets->assets_url();
+		return $view;
 	}
 
 	
 	
 	
 /*
- * output the appropriate javascript based on the format view.
+ * output the appropriate javascript based on the type and view.
  */	
 	private function javascripts($showroom)
 	{
@@ -148,7 +156,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 					var target_div = "div.showroom_items";
 					var loading = "<div class=\"ajax_loading\">Loading...</div>";
 
-					$(".showroom_wrapper").click($.delegate({		
+					$("body").click($.delegate({		
 						"a.loader": function(e){
 								$(target_div).html(loading);
 								$(target_div).load(e.target.href, function(){
@@ -170,7 +178,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 				break;
 		}
 		# place the javascript.
-		return $this->place_javascript($js, TRUE);
+		return $this->place_javascript($js);
 	}
 	
 	
@@ -178,12 +186,12 @@ class Showroom_Controller extends Public_Tool_Controller {
  * ajax handler
  *
  */
-	public function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $parent_id)
 	{		
 		list($page_name, $category, $item) = $url_array;
 
 		if(! empty($category) AND empty($item) )
-			echo  self::items_category($page_name, $tool_id, $category);
+			echo  self::items_category($page_name, $parent_id, $category);
 		elseif(! empty($category) AND !empty($item) )
 			echo self::item($page_name, $category, $item);
 
@@ -203,7 +211,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 		# this can all be done in the overloaded save function for
 		# navigations model - look into it.	
 		$new_cat = ORM::factory('showroom_cat');
-		$new_cat->showroom_id	= $tool_id;
+		$new_cat->showroom_id	= $parent_id;
 		$new_cat->fk_site		= $site_id;
 		$new_cat->name			= 'ROOT';
 		$new_cat->local_parent	= 0;
@@ -211,8 +219,8 @@ class Showroom_Controller extends Public_Tool_Controller {
 		$new_cat->save();
 			
 		$showroom = ORM::factory('showroom')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);
+			->where('fk_site', $site_id)
+			->find($parent_id);
 		
 		$showroom->root_id = $new_cat->id;
 		$showroom->save();

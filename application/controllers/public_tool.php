@@ -16,10 +16,9 @@ abstract class Public_Tool_Controller extends Controller {
 	
 	
 /*
-  Builds a wrapper for each tool instance,
-  adding toolname, tool_id, and attributes to the wrapper.
+  Builds a wrapper for each tool instance, adding toolname, tool_id, and attributes to the wrapper.
   
-  Additionally this intelligently modularizes the tools assets when in admin mode.
+  Intelligently modularizes the tools assets when in admin mode.
 	in admin mode the tool is self-contained within the wrapper.
 	It houses HTML, inline CSS, and inline Javascript.
 	This allows full in-browser updates and editing.
@@ -41,16 +40,10 @@ abstract class Public_Tool_Controller extends Controller {
 		# should we modularize the CSS ?
 		if($this->client->can_edit($this->site_id) OR TRUE === $sub_tool)
 		{
-			# if we switch themes while still in admin mode, the tool_css file
-			# will not exist relative to the new theme. We have to create it.
 			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/_created/$tool->id/{$tool->type}_$tool->view.css");
-			
-			// ---- legacy cleanup: delete the old "css" folders
-			$old_folder	= $this->assets->themes_dir("$this->theme/tools/$toolname/css");
-			if(is_dir($old_folder))
-				Jdirectory::remove($old_folder);
-			// ---- end cleanup
 
+			# switching themes while in admin mode, will require
+			# new per tool_css files relative to new theme.
 			$css = (file_exists($custom_css))
 				? file_get_contents($custom_css)
 				: Tool_Controller::_generate_tool_css($toolname, $tool->id, $tool->type, $tool->view, $this->site_name, $this->theme, TRUE);
@@ -98,32 +91,6 @@ abstract class Public_Tool_Controller extends Controller {
 		return $js; 
 	}
 
-	
-/*
- * parses stored html for tool tokens and replaces those tokens with
- * appropriate HTML output.
- */
-	public function public_parse($body)
-	{
-		# we are doing newsletter only as of now.
-		str_replace('{newsletter}', '', $body, $count);
-	
-		if(0 < $count)
-		{
-			$pages_config = yaml::parse($this->site_name, 'pages_config');
-			if(empty($pages_config['newsletter']))
-				return $body;
-
-			$parent_id = explode('-', $pages_config['newsletter']);
-			$parent_id = $parent_id['1'];
-		
-			# get the newsletter HTML.
-			$newsletter = new Newsletter_Controller;
-			$body = str_replace('{{newsletter}}', $newsletter->_index($parent_id), $body);
-		}
-		return $body;
-	}
-	
 	
 /*
  * protected pages must maintain their page_name path

@@ -490,7 +490,8 @@ a.block_mode:hover,
 	font-size:12px !important;
 	font-family: verdana !important;
 	margin-bottom:2px;
-	z-index:200 !important;
+	z-index:199 !important;
+	position:relative !important;
 }
 .jade_toolbar_wrapper div.bar{
 	background:#d52020 url(/_assets/images/admin/gradients.jpg) repeat-x 0px -465px;
@@ -535,7 +536,7 @@ a.block_mode:hover,
 	clear:both !important;
 	margin-top:6px;
 	background:transparent url('/_assets/images/admin/drop.png') no-repeat bottom right;
-	z-index:200 !important;
+	z-index:300 !important;
 }
 .jade_toolbar_wrapper ul.toolkit_dropdown{
 	position:relative;
@@ -548,6 +549,7 @@ a.block_mode:hover,
 	padding:5px !important;
 	background:#fff !important;
 	line-height:2em !important;
+	z-index:300 !important;
 }
 .jade_toolbar_wrapper ul.toolkit_dropdown li{
 	display:block;

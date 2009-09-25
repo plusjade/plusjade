@@ -18,5 +18,19 @@ class Showroom_Cat_Model extends ORM {
 		return parent::save();
 	}
 	
+/**
+ * Allows a model to be loaded by id or url
+ */
+	public function unique_key($id)
+	{
+		if ( ! empty($id) AND is_string($id) AND ! ctype_digit($id))
+		{
+			return 'url';
+		}
 
+		return parent::unique_key($id);
+	}
+	
+	
+	
 } // End

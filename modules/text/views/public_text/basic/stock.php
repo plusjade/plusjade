@@ -1,5 +1,5 @@
 
 
-<?php echo $item->body?>
+<?php echo $item->cache?>
 
 

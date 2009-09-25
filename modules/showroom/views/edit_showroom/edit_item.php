@@ -104,7 +104,8 @@
 	
 // custom ajax form
 	$(".custom_ajaxForm").ajaxForm({
-		beforeSubmit: function(formData){
+		beforeSubmit: function(formData, form){
+			if(! $("input", form[0]).jade_validate()) return false;	
 			$('.facebox .show_submit').show();
 			// JSONize image selections
 			var data = new Array();

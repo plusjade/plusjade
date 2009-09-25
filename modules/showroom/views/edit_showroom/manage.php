@@ -1,8 +1,8 @@
 
-<span class="on_close">update-showroom-<?php echo $tool_id?></span>
+<span class="on_close">update-showroom-<?php echo $parent_id?></span>
 
 <div  id="common_tool_header" class="buttons">
-	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $tool_id?>" title="showroom">Save Category Tree</button>
+	<button type="submit" id="link_save_sort" class="jade_positive" rel="<?php echo $parent_id?>" title="showroom">Save Category Tree</button>
 	<div id="common_title">Manage Showroom Categories</div>
 </div>	
 
@@ -13,7 +13,7 @@
 		<li><a href="#" id="edit_node">Edit category</a></li>
 		<li><a href="#" id="delete_node">Delete category</a></li>
 		<br/>
-		<li><a href="/get/edit_showroom/items/<?php echo $tool_id?>/" id="show_items">List items</a></li>
+		<li><a href="/get/edit_showroom/items/<?php echo $parent_id?>/" id="show_items">List items</a></li>
 	</ul>
 </div>
 
@@ -71,7 +71,7 @@ $(document).ready(function()
 		if(!url) {alert('url is empty'); return false};
 		
 		$('.facebox .show_submit').show();
-		$.post('/get/edit_showroom/add/<?php echo $tool_id?>/',
+		$.post('/get/edit_showroom/add/<?php echo $parent_id?>/',
 			{category : name, url: url, local_parent : el_id}, function(data){
 			// data is the new "id"
 			$simpleTreeCollection.get(0).addNode(data, name);
