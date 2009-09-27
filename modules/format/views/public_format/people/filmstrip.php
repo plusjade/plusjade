@@ -3,11 +3,11 @@
 <div id="format_people_filmstrip">
 	<?php
 		foreach($format->format_items as $item):
-			$thumb = image::thumb($item->image);
+			$thumb = image::thumb($item->meta);
 	?>
 	<div class="people_thumb">
 		<a href="#format_item_<?php echo $item->id?>" rel="<?php echo $item->id?>">
-			<img src="<?php echo "$img_path/$item->image"?>" alt="">
+			<img src="<?php echo "$img_path/$item->meta"?>" alt="">
 		</a>
 		<br><?php echo $item->title?>
 	</div>

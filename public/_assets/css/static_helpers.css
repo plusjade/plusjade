@@ -19,6 +19,18 @@ b.error{
 	color:red;
 }
 
+.error_div{
+	background: #fad6d6 !important;
+}
+span.error_msg{
+	display:block;
+	color:red;
+}
+	
+
+
+/* ajax loader */
+
 div.ajax_loading{
 	text-align:center;
 	background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%;

@@ -1,14 +1,41 @@
 
+/* format form list view */
 
-#format_wrapper_++{
+#format_wrapper_++ {
 
 }
-	/*  --- faqs simple view  --- */
-#format_wrapper_++  dt.minus{
-	padding-left:20px;
-	background:transparent url('/_assets/tools/format/faq/delete.png') no-repeat 0% 50%;
+ /* the form */
+#format_wrapper_++ form.format_form_list div.format_item {
+	margin-bottom:10px;
+	padding:5px;
 }
-#format_wrapper_++ dt.plus{
-	padding-left:20px;
-	background:transparent url('/_assets/tools/format/faq/add.png') no-repeat 0% 50%;
+#format_wrapper_++ .req_icon{
+	color:red;
+}
+
+/* inputs */ 
+#format_wrapper_++ form.format_form_list input.text_input {
+	width:300px;
+}
+#format_wrapper_++ form.format_form_list textarea {
+	width:400px;
+	height:300px;
+}
+#format_wrapper_++ form.format_form_list select {
+
+}
+
+/* status message after valid form submit*/
+
+#format_wrapper_++ .form_status_box{
+	padding:10px;
+	text-align:center;
+}
+#format_wrapper_++ .form_status_box.success{
+	background:lightgreen;
+	border:1px solid green;
+}
+#format_wrapper_++ .form_status_box.error{
+	background:#fad6d6;
+	border:1px solid #cc0000;
 }

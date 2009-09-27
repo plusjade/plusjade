@@ -97,7 +97,7 @@
 	$(".custom_ajaxForm").ajaxForm({
 		beforeSubmit: function(formData, form){
 			if(! $("input", form[0]).jade_validate()) return false;	
-			$('.facebox .show_submit').show();
+			$(document).trigger('show_submit.plusjade');
 			// JSONize image selections
 			var data = new Array();
 			$('#sortable_images_wrapper img').each(function(){

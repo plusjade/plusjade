@@ -102,7 +102,9 @@ NULL , '4', 'forms', 'list', 'create a custom html form to be emailed to the add
 );
 
 
+-- update the format item tables for more generic purpose
 
+ALTER TABLE `format_items` CHANGE `image` `meta` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
 
 
 

@@ -95,6 +95,63 @@ class Format_Controller extends Public_Tool_Controller {
  */
 	private static function forms($format)
 	{
+		if($_POST)
+		{
+			$values = array();
+			$post = new Validation($_POST);
+			$post->pre_filter('trim');
+			
+			# setup the form requirements.
+				# TODO add more specific rule filters based on type.
+				# e.g. validate, phone, email, website input where applicable.
+			foreach($format->format_items as $item)
+			{
+				$field_name	= "$item->id:" . valid::filter_php_url($item->title);
+				$values[$field_name] = '';
+				
+				if(!empty($item->album))
+					$post->add_rules("$field_name", 'required');
+			}
+			
+			# on error
+			if(!$post->validate())
+			{
+				$view = new View("public_format/forms/list");
+				$view->errors = $post->errors();
+				$view->values = $_POST;
+				$view->format = $format; # this is only necessary for ajax mode, which we shouldnt need often.
+				return $view;
+			}
+			
+			# on success send the email and display status message.
+			$to = (empty($format->params))
+				? 'superjadex12@gmail.com'
+				: $format->params;
+			$subject = 'Customer message from: '.url::site();			
+			$headers = 'From: webmaster@example.com' . "\r\n" .
+				'Reply-To: webmaster@example.com' . "\r\n" .
+				'X-Mailer: PHP/' . phpversion();
+				
+			ob_start();
+			unset($_POST['post_handler']);
+			foreach ($_POST as $name => $value)
+			{
+				$name = explode(':', $name);
+				echo "<b>{$name[1]}</b>: $value\r\n";
+			}
+			$view = new View("public_format/forms/status");
+			$view->success = FALSE;
+			
+			# REMEMBER, this is for dev host only.
+			$view->output = ob_get_clean();
+			return $view;	
+			
+			if(mail($to, $subject, ob_get_clean(), $headers))
+				$view->success = TRUE;
+
+			return $view;			
+		}
+		
 		$view = new View("public_format/forms/list");
 		return $view;
 	}
@@ -215,6 +272,29 @@ class Format_Controller extends Public_Tool_Controller {
 		return $this->place_javascript($js, TRUE);
 	}
 
+	
+	
+/*
+ * ajax handler.
+ */ 	
+	public function _ajax($url_array, $parent_id)
+	{
+		$format = ORM::factory('format')
+			->where('fk_site', $this->site_id)
+			->find($parent_id);
+		if(!$format->loaded)
+			die('invalid format id');
+			
+		
+		die(self::forms($format));
+		
+		
+		die('something is wrong with the url');
+	}
+
+	
+	
+	
 /*
  * add the format to the site.
  */ 

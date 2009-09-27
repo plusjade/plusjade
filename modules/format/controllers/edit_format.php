@@ -29,7 +29,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 
 		$primary = new View('edit_format/manage');
 		$primary->items = $format->format_items;
-		$primary->tool_id = $parent_id;
+		$primary->parent_id = $parent_id;
 		die($primary);
 	}
 
@@ -51,7 +51,8 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 			$new_item->format_id	= $parent_id;
 			$new_item->title		= $_POST['title'];
 			$new_item->type			= (isset($_POST['type'])) ? $_POST['type'] : '';
-			$new_item->image		= (isset($_POST['image'])) ? $_POST['image'] : '';
+			$new_item->meta			= (isset($_POST['meta'])) ? $_POST['meta'] : '';
+			$new_item->album		= (isset($_POST['album'])) ? $_POST['album'] : '';
 			$new_item->body			= $_POST['body'];
 			$new_item->position		= ++$max->highest;
 			$new_item->save();			
@@ -62,12 +63,12 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find($parent_id);	
 		if(!$format->loaded)
-			die('invalid format id');		
-		
-		$primary = new View("edit_format/add_$format->type");
-		$primary->tool_id = $parent_id;	
-		$primary->js_rel_command = "update-format-$parent_id";
-		die($primary);
+			die('invalid format id');
+				
+		$view = new View("edit_format/add_$format->type");
+		$view->parent_id = $parent_id;	
+		$view->js_rel_command = "update-format-$parent_id";
+		die($view);
 	}
 
 
@@ -88,7 +89,8 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 		{
 			$format_item->title = $_POST['title'];
 			$format_item->type	= (isset($_POST['type'])) ? $_POST['type'] : '';
-			$format_item->image	= (isset($_POST['image'])) ? $_POST['image'] : '';
+			$format_item->meta	= (isset($_POST['meta'])) ? $_POST['meta'] : '';
+			$format_item->album	= (isset($_POST['album'])) ? $_POST['album'] : '';
 			$format_item->body	= $_POST['body'];
 			$format_item->save();
 			die('format item updated');
@@ -99,12 +101,12 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 			->find($format_item->format_id);	
 		if(FALSE === $format->loaded)
 			die('invalid format id');		
-		
-		$primary = new View("edit_format/edit_$format->type");
-		$primary->item = $format_item;
-		$primary->img_path = $this->assets->assets_url();
-		$primary->js_rel_command = "update-format-$format_item->format_id";
-		die($primary);
+
+		$view = new View("edit_format/edit_$format->type");
+		$view->item = $format_item;
+		$view->img_path = $this->assets->assets_url();
+		$view->js_rel_command = "update-format-$format_item->format_id";
+		die($view);
 	}
 
 /*
@@ -153,7 +155,7 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
 		{
 			$format->name = $_POST['name'];
 			$format->view = $_POST['view'];
-			#$format->params = $_POST['params'];
+			$format->params = (isset($_POST['params'])) ? $_POST['params'] : '';
 			$format->save();
 			die('Format Settings Saved.');
 		}

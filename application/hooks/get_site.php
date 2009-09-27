@@ -95,8 +95,8 @@ function get_site()
 		# Is page_name protected?
 		$page_config_value = yaml::does_key_exist($site->subdomain, 'pages_config', $page_name);
 		
-		# Is public ajax request?
-		# Only protected pages can use ajax so we get info from pages_config.yaml
+		# Is protected ajax request?
+		# get info from pages_config.yaml
 		if($page_config_value AND request::is_ajax())
 		{
 			# extract toolname and parent_id from pages_config.yaml
@@ -107,6 +107,13 @@ function get_site()
 			$url_array['0'] = $page_name; 
 			
 			# send to tool _ajax handler. we expect raw data output.
+			die(Load_Tool::factory($toolname)->_ajax($url_array, $parent_id));
+		}
+		# ajax call to a non protected tool.
+		elseif(isset($_POST['post_handler']) AND request::is_ajax())
+		{
+			# currently only enabled for format  form type.
+			list($toolname, $parent_id) = explode(':', $_POST['post_handler']);
 			die(Load_Tool::factory($toolname)->_ajax($url_array, $parent_id));
 		}
 		else

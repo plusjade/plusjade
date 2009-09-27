@@ -13,15 +13,21 @@
 	</div>
 	<div class="common_main_panel fieldsets">
 		<b>Format Name</b>
-		<br><input type="text" name="name" value="<?php echo $format->name?>" style="width:300px">
+		<br/><input type="text" name="name" value="<?php echo $format->name?>" style="width:300px">
 	
-		<br><br>
+		<br/><br/>
 		<b>Format Type</b>
 			<input type="text" value="<?php echo $format->type?>" READONLY>
 			
-		<br><br>
+		<br/><br/>
+
+		<b>Format Params</b>
+		<br/><input type="text" name="params" value="<?php echo $format->params?>" style="width:300px">
+
+		<br/><br/>
+
 		<b>Format <?php echo $format->type?> View</b>
-		<br><select name="view">
+		<br/><select name="view">
 			<?php
 				foreach($type_views as $view)
 					if($view == $format->view)
