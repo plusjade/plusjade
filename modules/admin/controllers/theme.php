@@ -386,6 +386,11 @@ class Theme_Controller extends Controller {
 			$dest	= DATAPATH . "$site_name/themes/$theme/$type/$filename";
 		}
 		
+		# make sure the destination directory exists
+		# if(!is_dir(DATAPATH . "$site_name/themes/$theme/$type"))
+		#	mkdir(DATAPATH . "$site_name/themes/$theme/$type");
+		
+		
 		if('css' == $type)
 			$filtered = str_replace(
 				array('../images', '%IMAGES%', '%FILES%'),

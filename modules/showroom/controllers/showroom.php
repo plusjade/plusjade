@@ -12,39 +12,66 @@ class Showroom_Controller extends Public_Tool_Controller {
  * The index displays various showroom views based on the url and routes as necessary
  * This is for non-ajax requests. _ajax handles ajax routing.
  * expects parent showroom table object
+ 
+	define the params position format:
+	0: category navigation main view
+		0 = off
+		full
+		flat
+	
  */ 
 	public function _index($showroom)
 	{
 		$url_array	= uri::url_array();
-		list($page_name, $category, $item) = $url_array;
+		list($page_name, $category_id, $item) = $url_array;
 		$page_name	= $this->get_page_name($page_name, 'showroom', $showroom->id);		
 
-
+		# parse the params.
+		$params = explode('|',$showroom->params);
 		$primary = new View("public_showroom/display/wrapper");
 		
-		# parse the params.
-		# format: toggle cat list | # of columns | 
-		$params = explode('|',$showroom->params);
-		
-		# do we show the category list?
-		$primary->categories = ('off' == $params[0])
-			? ''
-			: Tree::display_tree('showroom', $showroom->showroom_cats, $page_name);
-		
 		# is the category item url specified?
-		if('get' == $url_array['0'] OR (empty($category) AND empty($item)))
+		if('get' == $url_array['0'] OR (empty($category_id) AND empty($item)))
 		{
 			$primary->items = (empty($showroom->home_cat))
-				? 'Home Category not set'
-				: self::items_category($page_name, $showroom, $showroom->home_cat);
+				? '(Home Category not set)'
+				: self::items_category($page_name, $showroom, (int) $showroom->home_cat);
 		}
 		elseif(empty($item))
-			$primary->items = self::items_category($page_name, $showroom, $category);
+			$primary->items = self::items_category($page_name, $showroom, $category_id);
 		else
-			$primary->item = self::item($page_name, $category, $item);
+			$primary->item = self::item($page_name, $category_id, $item);
 
 
-
+		# determine the category to highlight.
+		$category_id = (empty($category_id))
+			? $showroom->home_cat
+			: $category_id; 			
+			
+		
+		# how do we show the category list on every showroom page?
+		$category_list = '';
+		if(!empty($params[0]))
+		{
+			if('flat' == $params[0])
+			{
+				# showing only root categories.
+				$root_cats = ORM::factory('showroom_cat')
+					->where(array(
+						'fk_site'		=> $this->site_id,
+						'showroom_id'	=> $showroom->id,
+						'local_parent'	=> $showroom->root_id,
+					))
+					->orderby(array('lft' => 'asc'))
+					->find_all();	
+				$category_list = Tree::display_flat_tree('showroom', $root_cats, $page_name, $category_id);	
+			}
+			else
+				$category_list = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name, $category_id);
+	
+		}
+		$primary->categories = $category_list;
+		
 		# add custom javascript;
 		$primary->global_readyJS(self::javascripts($showroom));
 		
@@ -78,19 +105,33 @@ class Showroom_Controller extends Public_Tool_Controller {
 				'showroom_id'	=> $showroom->id,
 			))
 			->find($category_id);
-			
 		if(!$category->loaded)
-			return '<h1>invalid category</h1>';
-
-		# get the items.
-		$items = ORM::factory('showroom_cat_item')
+			return '<div class="not_found">Invalid category</div>';
+		
+		# get any sub categories ...
+		$sub_cats = ORM::factory('showroom_cat')
 			->where(array(
-				'fk_site'			=> $this->site_id,
-				'showroom_cat_id'	=> $category->id
+				'fk_site'		=> $this->site_id,
+				'showroom_id'	=> $showroom->id,
+				'lft >='		=> "$category->lft",
+				'lft <='		=> "$category->rgt",
 			))
 			->find_all();
+			
+		# create array from the cat and sub_cats
+		$cat_ids = array();
+		foreach($sub_cats as $cat)
+			$cat_ids[] = $cat->id;
+	
+		# get all the items.
+		$items = ORM::factory('showroom_cat_item')
+			->where(array(
+				'fk_site' => $this->site_id,
+			))
+			->in('showroom_cat_id', $cat_ids)
+			->find_all();
 		if(0 == $items->count())
-			return '<h1>No items. Check back soon!</h1>';
+			return '<div class="not_found">No items. Check back soon!</div>';
 		
 		$view = new View("public_showroom/display/$showroom->view");
 		
@@ -100,17 +141,30 @@ class Showroom_Controller extends Public_Tool_Controller {
 			# request javascript file
 			$view->request_js_files('lightbox/lightbox.js');
 			# parse the params.
-			# format: toggle cat list | # of columns | 
 			$params = explode('|',$showroom->params);
-			$view->columns = (isset($params[1]) and is_numeric($params[1]))
+			$view->columns = (isset($params[1]) AND is_numeric($params[1]))
 				? $params[1]
 				: 2;
 		}
+
+		# get the path to this category
+		$path = ORM::factory('showroom_cat')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'showroom_id'	=> $showroom->id,
+				'lft <'			=> $category->lft,
+				'rgt >'			=> $category->rgt,
+				'local_parent !='=> 0
+			))
+			->orderby(array('lft' => 'asc'))
+			->find_all();
 		
+		$view->path			= $path;
 		$view->category		= $category;
+		$view->sub_categories	= Tree::display_tree('showroom', $sub_cats, $page_name);
 		$view->page_name	= $page_name;
-		$view->items		= $items;
 		$view->img_path		= $this->assets->assets_url();
+		$view->items		= $items;
 		return $view;
 	}
 
@@ -126,7 +180,7 @@ class Showroom_Controller extends Public_Tool_Controller {
 			))
 			->find();
 		if(!$item->loaded)
-			return '<h1>Invalid item</h1>';
+			return '<div class="not_found">Invalid item</div>';
 
 		# prep image Json.
 
@@ -158,6 +212,8 @@ class Showroom_Controller extends Public_Tool_Controller {
 
 					$("body").click($.delegate({		
 						"a.loader": function(e){
+								$("a.loader").removeClass("active");
+								$(e.target).addClass("active");
 								$(target_div).html(loading);
 								$(target_div).load(e.target.href, function(){
 									$("#click_hook").click();

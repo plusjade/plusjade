@@ -16,6 +16,15 @@
 
 }
 
+#showroom_wrapper_++ div.showroom_categories ul li span a.loader:hover,
+#showroom_wrapper_++ div.showroom_categories ul li span a.active {
+	color:red;
+}
+
+
+#showroom_wrapper_++ div.category_header {
+ margin-bottom:10px;
+}
 
 /* items gallery container */
 #showroom_wrapper_++ div.showroom_items{

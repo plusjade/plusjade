@@ -172,7 +172,7 @@ class Build_Page_Controller extends Controller {
 				$cache = $page->id;
 			}
 		
-		$this->wrapper($data, $cache);
+		$this->wrapper($data, $page->template, $cache);
 	}
 
 	
@@ -198,7 +198,7 @@ class Build_Page_Controller extends Controller {
 		}
 		
 		header("HTTP/1.0 404 Not Found");
-		$this->wrapper($message, '404_not_found', FALSE);
+		$this->wrapper($message, FALSE, '404_not_found', FALSE);
 	}
 	
 
@@ -207,14 +207,12 @@ class Build_Page_Controller extends Controller {
  * from auth/utada.php that needs to be wrapped in a theme-based shell.	
  * the final step for the plusjade pages. inputs $data into the site template.
  * expects a an array matching the appropriate containers
+ * $exists = does this page exist? set to false for 404 not found wrapper.
  */
-	private function wrapper($data, $cache=FALSE, $exists=TRUE)
+	private function wrapper($data, $template ='master', $cache=FALSE, $exists=TRUE)
 	{
-
- 
 		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');
-		$template 	= (empty($page->template)) ? 'master' : $page->template;
 		$path		= $this->assets->themes_dir("$this->theme/templates");
 		
 		ob_start();

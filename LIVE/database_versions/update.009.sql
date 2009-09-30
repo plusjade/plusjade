@@ -82,30 +82,7 @@ CREATE TABLE IF NOT EXISTS `review_items` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 
-UPDATE `plusjade`.`version` SET `at` = '009';
-
-
-
-
-
--- new format type "form"
-
-INSERT INTO `plusjade`.`system_tool_types` (
-`id` ,
-`system_tool_id` ,
-`type` ,
-`view` ,
-`desc`
-)
-VALUES (
-NULL , '4', 'forms', 'list', 'create a custom html form to be emailed to the address of your choice.'
-);
-
-
--- update the format item tables for more generic purpose
-
-ALTER TABLE `format_items` CHANGE `image` `meta` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
-
+UPDATE `staging`.`version` SET `at` = '009' WHERE CONVERT( `version`.`at` USING utf8 ) = '008' LIMIT 1 ;
 
 
 

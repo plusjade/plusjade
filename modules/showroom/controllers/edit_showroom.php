@@ -36,7 +36,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		");
 
 		$view = new View("edit_showroom/manage");
-		$view->tree = Tree::display_tree('showroom', $items, null, TRUE, 'showroom_admin');		
+		$view->tree = Tree::display_tree('showroom', $items, NULL, NULL, 'showroom_admin', TRUE);		
 		$view->parent_id = $parent_id;
 		die($view);
 	}
@@ -201,7 +201,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
 		$view = new View("edit_showroom/add_item");
 		$view->parent_id	= $parent_id;
-		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, FALSE, 'render_edit_showroom');	
+		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, NULL, 'render_edit_showroom');	
 		die($view);
 	}
 	
@@ -260,7 +260,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			$image->thumb = image::thumb($image->path);
 				
 		$primary = new View("edit_showroom/edit_item");
-		$primary->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, FALSE, 'render_edit_showroom');
+		$primary->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, NULL, 'render_edit_showroom');
 		$primary->category_id	= $category->id;
 		$primary->item			= $item;
 		$primary->images		= $images;

@@ -13,7 +13,7 @@ class Tree_Core {
  * display node data for public navigation tool since
  * more multiple navigations can be on same page.
  */
-	public static function render_node_navigation($item, $page_name)
+	public static function render_node_navigation($item, $page_name, $active)
 	{
 		$type = (empty($item->type)) ? 'none' : $item->type;
 
@@ -38,12 +38,18 @@ class Tree_Core {
 /*
  * show the public categories list.
  */
-	public static function render_node_showroom($item, $page_name)
+	public static function render_node_showroom($item, $page_name, $active)
 	{
-		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->url .'" class="loader">' . $item->name . '</a></span>'; 
+		if(empty($active))
+			$active = '_234-2348022-';
+			
+		$active = is_numeric($active)
+				? (($item->id == $active) ? 'active' : '')
+				: (($item->url === $active) ? 'active' : '');		
+		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->url .'" class="loader '. $active .'">' . $item->name . '</a></span>'; 
 	}
 
-	public static function showroom_admin($item, $page_name)
+	public static function showroom_admin($item, $page_name, $active)
 	{
 		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><b rel="' . $item->url . '">' . $item->name . '</b> <small>('. $item->item_count .')</small></span>'; 
 	}
@@ -53,7 +59,7 @@ class Tree_Core {
 /*
  * show the categories in the edit showroom interfaces.
  */	
-	public static function render_edit_showroom($item, $page_name)
+	public static function render_edit_showroom($item, $page_name, $active)
 	{
 		return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
 	}	
@@ -63,7 +69,7 @@ class Tree_Core {
  * Uses Tree traversal method to display neat nested ul/li list.
  * $items (object) are required to have lft/rgt values
 */
-	public static function display_tree($toolname, $items, $page_name=null, $admin=FALSE, $custom_callback=FALSE)
+	public static function display_tree($toolname, $items, $page_name=NULL, $active=NULL, $custom_callback=NULL, $admin=FALSE)
 	{	  
 		# start with an empty $right stack
 		$right		= array();	
@@ -78,10 +84,10 @@ class Tree_Core {
 		foreach ($items as $item) 
 		{
 			# only check stack if there is one
-			if ( count($right) > 0 )
+			if (count($right) > 0)
 			{
 				# check if we should remove a node from the stack
-				while ( $right[count($right)-1] < $item->rgt )
+				while ($right[count($right)-1] < $item->rgt)
 					array_pop($right);
 			}
 			
@@ -92,12 +98,11 @@ class Tree_Core {
 
 			# generate output for each node
 			# $entry = call_user_func("render_node_$toolname", $item, $page_name);
-			
 			$custom_callback = (empty($custom_callback))
 				? "render_node_$toolname"
 				: $custom_callback;
 				
-			$entry = call_user_func(array('Tree', $custom_callback), $item, $page_name);
+			$entry = call_user_func(array('Tree', $custom_callback), $item, $page_name, $active);
 
 			/*
 			 * Output the list entries.
@@ -109,19 +114,15 @@ class Tree_Core {
 			if($new == $old)
 			{
 				# First element is always the root holder.
-				if( '1' == $q AND TRUE === $admin)
+				if('1' == $q AND $admin)
 				{
 					echo '<ul class="simpleTree">',"\n",'<li class="root" id="item_'. $item->id .'" rel="'. $item->id .'"><span>(Root)</span>';				
 					# needed so simple_tree js has a place to add to an empty root.
-					if('1' == count($items) )
+					if('1' == count($items))
 						echo '<ul><li class="line"></li></ul>';
 				}
-				elseif( '1' != $q )
-				{
-					echo "</li>\n";
-					echo $entry;
-				}
-
+				elseif('1' != $q)
+					echo "</li>\n$entry";
 			}			
 			else
 			{
@@ -132,7 +133,7 @@ class Tree_Core {
 				 * 		add new.
 				 */
 				 
-				if($new > $old )
+				if($new > $old)
 				{		
 					for($x = $old ; $x < $new; $x++)
 					{
@@ -149,6 +150,7 @@ class Tree_Core {
 					
 					echo $entry;
 				}
+				
 			}
 
 			# add this node to the stack
@@ -162,12 +164,39 @@ class Tree_Core {
 			echo "</li></ul>\n";
 		
 		# Close the root holder
-		if( TRUE === $admin )
+		if($admin)
 			echo '</li></ul>';
 	
 		return ob_get_clean();
 	} 		
 
+	
+/* 
+ * display a flat tree. takes a list of items and displays them in
+ * a single depth tree.
+ * $items (object)
+*/
+	public static function display_flat_tree($toolname, $items, $page_name=null, $active=NULL, $custom_callback=NULL)
+	{	 
+		# Display each row
+		ob_start();
+		echo '<ul>';
+		foreach ($items as $item) 
+		{
+			# generate output for each node
+			# $entry = call_user_func("render_node_$toolname", $item, $page_name);
+			$custom_callback = (empty($custom_callback))
+				? "render_node_$toolname"
+				: $custom_callback;
+				
+			$entry = call_user_func(array('Tree', $custom_callback), $item, $page_name, $active);
+
+			echo "$entry\n";
+		}	
+		echo '</ul>';
+	
+		return ob_get_clean();
+	} 		
 	
 /*
  * Saves the nested positions of the menu elements
