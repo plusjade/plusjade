@@ -197,10 +197,14 @@ class Page_Controller extends Controller {
 /*
  * View and handler for adding a new page with a page_builder pre-installed.
  */
-	public function add_builder($system_tool_id=NULL)
+	public function add_builder()
 	{
-		valid::id_key($system_tool_id);
+		# which protected tool?
+		if(empty($_GET['system_tool']))
+			die('invalid system tool');	
+		$system_tool_id = valid::id_key($_GET['system_tool']);
 		
+		# get the system tool.
 		$system_tool = ORM::factory('system_tool')
 			->select('*, LOWER(name) AS name')
 			->where(array(
@@ -209,7 +213,7 @@ class Page_Controller extends Controller {
 			))
 			->find($system_tool_id);
 		if(!$system_tool->loaded)
-			die('invalid tool.');
+			die('invalid system tool.');
 
 		$toolname = valid::filter_php_filename($system_tool->name);
 		
@@ -217,15 +221,18 @@ class Page_Controller extends Controller {
 		{
 			# Validate page_name & duplicate check
 			$filename = self::validate_page_name($_POST['label'], $_POST['page_name'], 'ROOT');
-	
+			
+			# create a new page.
 			$max = ORM::factory('page')
 				->select('MAX(position) as highest')
 				->where('fk_site', $this->site_id)
 				->find();		
 		
+			# does a template exist for this protected tool?
 			$template =
 				(file_exists($this->assets->themes_dir("$this->theme/templates/".strtolower($toolname).'.html')))
-				? strtolower($toolname) : 'master';
+				? strtolower($toolname)
+				: 'master';
 		
 			$new_page = ORM::factory('page');
 			$new_page->fk_site		= $this->site_id;
@@ -235,11 +242,17 @@ class Page_Controller extends Controller {
 			$new_page->position		= ++$max->highest;
 			if(! empty($_POST['menu']) AND 'yes' == $_POST['menu'])
 				$new_page->menu	= 'yes';
-				
 			$new_page->save();
 
+			# init tool controller
+			$tool_controller = new Tool_Controller();
+			
 			# create the tool.
-			Tool_Controller::_create_tool($new_page->id, $system_tool_id, $this->site_name, NULL, TRUE);
+			$tool = $tool_controller->_create_tool($system_tool_id, NULL, NULL, TRUE);
+	
+			# add it to this page.
+			$tool_controller->_add_to_page($tool, $new_page);
+	
 	
 			# send html to javascript handler
 			$visibility	= (empty($_POST['menu'])) ? 'hidden' : 'enabled';		
@@ -252,6 +265,7 @@ class Page_Controller extends Controller {
 				'filename'		=> $filename,
 				'page_builder'	=> "$toolname-$system_tool_id"
 			);
+			# output to the javascript UI.
 			die(View::factory('page/page_wrapper_html', array('vars' => $vars)));
 		}
 

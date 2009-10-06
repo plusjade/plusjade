@@ -15,7 +15,7 @@ class Album_Controller extends Public_Tool_Controller {
  * expects parent album table object
  */	
 	public function _index($album, $sub_tool=FALSE)
-	{
+	{		
 		# this is a hack for allowed sub_tools only.
 		if(!is_object($album))
 		{
@@ -28,7 +28,7 @@ class Album_Controller extends Public_Tool_Controller {
 		
 		# images
 		$images = json_decode($album->images);	
-		
+				
 		if(NULL === $images OR !is_array($images))
 			return $this->wrap_tool('no images.', 'album', $album);
 			
@@ -36,7 +36,7 @@ class Album_Controller extends Public_Tool_Controller {
 			$image->thumb = image::thumb($image->path);
 		
 		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
-		$primary = $this->$display_view($images);
+		$primary = $this->$display_view($album, $images);
 		
 		# add custom javascript;
 		$primary->global_readyJS(self::javascripts($album));
@@ -47,7 +47,7 @@ class Album_Controller extends Public_Tool_Controller {
 /*
  * a view for lightbox functionality
  */
-	private function lightbox($images)
+	private function lightbox($album, $images)
 	{
 		$view = new View('public_album/images/lightbox');
 		$view->images = $images;
@@ -63,10 +63,15 @@ class Album_Controller extends Public_Tool_Controller {
 /*
  * a view for gallery functionality
  */
-	private function gallery($images)
+	private function gallery($album, $images)
 	{
 		$view = new View('public_album/images/gallery');
 		$view->images = $images;
+		
+		# toggle the gallery elements 
+		$toggle = explode('|', $album->toggle);
+		$view->has_panels = ('no' == $toggle[0]) ? FALSE : TRUE;
+		$view->has_filmstrip = (!empty($toggle[1]) AND 'no' == $toggle[1]) ? FALSE : TRUE;
 		$view->img_path = $this->assets->assets_url();
 
 		# request javascript file
@@ -88,32 +93,39 @@ class Album_Controller extends Public_Tool_Controller {
 				break;
 				
 			case 'gallery':
-					$js =  '
-					$("#format_gallery_wrapper").galleryView({
-						panel_width: 800,
-						panel_height: 400,
-						frame_width: 75,
-						frame_height: 75,
-						filmstrip_size: 3,
-						overlay_height: 50,
-						overlay_font_size: "1em",
-						transition_speed: 400,
-						transition_interval: 3000,
-						overlay_opacity: 0.6,
-						overlay_color: "black",
-						background_color: "black",
-						overlay_text_color: "white",
-						caption_text_color: "white",
-						border: "1px solid black",
-						nav_theme: "light",
-						easing: "swing",
-						filmstrip_position: "bottom",
-						overlay_position: "bottom",
-						show_captions: false,
-						fade_panels: true,
-						pause_on_hover: true
-					});
-				';
+			
+					# get the paramaters
+					$params = json_decode($album->params);
+					if(Null !== $params AND is_object($params))
+					{
+						$js = '$("#format_gallery_wrapper").galleryView({';
+						foreach($params as $key => $value)
+							if(is_numeric($value) OR $value == 'true' OR $value == 'false')
+								$js .= "\n$key:$value,";
+							else
+								$js .= "\n$key:'$value',";	
+						$js .= "nav_theme : 'light'});";
+					}
+					else
+						$js = '
+						$("#format_gallery_wrapper").galleryView({
+							panel_width: 660,
+							panel_height: 250,
+							frame_width: 75,
+							frame_height: 75,
+							filmstrip_size: 3,
+							overlay_height: 50,
+							transition_speed: 400,
+							transition_interval: 2000,
+							overlay_opacity: 0.6,
+							easing: "swing",
+							filmstrip_position: "bottom",
+							overlay_position: "bottom",
+							show_captions: false,
+							fade_panels: true,
+							pause_on_hover: true
+						});
+						';
 				break;
 				
 			default:
@@ -123,82 +135,6 @@ class Album_Controller extends Public_Tool_Controller {
 		# place the javascript.
 		return $this->place_javascript($js, TRUE);
 	}
-
-/* 
- * doesnt work need to update
- */
-	private function cycle($images, $img_path)
-	{
-		die('offline');
-		$primary = new View('public_album/images/cycle');
-		# Javascript
-		$primary->request_js_files('easing/jquery.easing.1.3.js');										
-		$primary->request_js_files('cycle_lite/jquery.cycle.all.min.js');								
-
-		$options = array(
-			'fx'		=> '"scrollDown"',
-			'speedIn'	=> '2000',
-			'speedOut'	=> '500',
-			'easeIn'	=> '"easeOutBounce"',
-			'easeOut'	=> '"easeInBack"',
-			
-			'next'		=> '',
-			'prev'		=> '',
-			'before'	=> '',
-			'after'		=> '',
-			'height'	=> '',
-			'sync'		=> '',
-			'fit'		=> '',
-			'pause'		=> '',
-			'delay'		=> '-2000',
-			'slideExpr'	=> '',
-			'random'	=> '',
-			'animOut'	=> '',
-		);
-					
-		//function(){$("#cycle_title_'.$album->id.'").html(this.alt)},				
-
-
-		$params = explode(':', $album->params);	
-
-		$effect = '"SCROLL"';
-		if(! empty($params['0']) )
-			$effect = $params['0'];
-
-		if( empty($params['1']) )
-		{
-			$effect = '
-				{
-					fx:"'.$params['0'].'",
-					speed:2000,
-					delay:-1000,
-					sync: 1	
-				}
-			';
-		}
-
-		$initialize = "$('#cycle_wrapper_$album->id').cycle($effect);";
-
-		$primary->global_readyJS('
-			$.fn.cycle.transitions.TOSS = function($cont, $slides, opts) { 
-				opts.fx			=	"toss";
-				opts.easing		=	"easeOutExpo";
-				opts.delay		=	-2000;
-				opts.animOut	=  { top: 200, left: -300 };
-			};	
-			$.fn.cycle.transitions.SCROLL = function($cont, $slides, opts) { 
-				opts.fx =      "scrollDown";
-				opts.speedIn =  2000; 
-				opts.speedOut = 500; 
-				opts.easeIn =  "easeOutBounce";
-				opts.easeOut = "easeInBack";
-				opts.before = function(){$("#cycle_title_'.$album->id.'").html(this.alt)}; // transition callback (scope set to element to be shown) 
-
-			};
-			'.$initialize.'
-		');	
-	}
-
 
 	
 /*

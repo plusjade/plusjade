@@ -50,7 +50,6 @@ class Site_Controller extends Controller {
 		$new_site->theme 	 = $theme;
 		$new_site->save();
 		
-
 		# Establish user access and claim status.
 		if(empty($user_id))
 		{
@@ -90,6 +89,11 @@ class Site_Controller extends Controller {
 		$new_page->menu			= 'yes';
 		$new_page->save();
 		
+		## This is normally where we would add sample tools with sample data
+		## and attach them to various pages.
+		## -------------------------------------------
+		
+		
 		/*
 		# add sample tools to homepage.
 		$sample_tools = array(
@@ -103,7 +107,10 @@ class Site_Controller extends Controller {
 			Tool_Controller::_create_tool($new_page->id, $name, $site_name, FALSE, TRUE);
 		*/
 		
-		# install page builders.
+		/*
+		# create new pages with page_builders pre installed.
+		# this should use the logic in the pages controller
+		# since we are creating pages w/ tools and not the other way around.
 		$install = array(
 			'Account',
 			#'Blog',
@@ -111,11 +118,13 @@ class Site_Controller extends Controller {
 			#'Calendar'
 		);
 		foreach($install as $toolname)
-			Tool_Controller::_auto_tool($toolname, $new_site->id, $site_name, 'base');
+			Tool_Controller::_auto_builder($toolname, $new_site->id, $site_name, 'base');
 
 		# add account_page name to site_config.
 		yaml::edit_site_value($site_name, 'site_config', 'account_page', 'account');
-
+		*/
+		
+		
 		if(empty($user_id))
 			url::redirect("http://$site_name.". ROOTDOMAIN);
 		

@@ -4,9 +4,9 @@
 <?php
 	if(0 < $path->count())
 		foreach($path as $cat):?>
-			<a href="<?php echo url::site("$page_name/$cat->url")?>" class="loader"><?php echo $cat->name?></a> &#8594; 
+			<a href="<?php echo url::site("$page_name/$cat->id/$cat->url")?>" class="loader"><?php echo $cat->name?></a> &#8594; 
+	<a href="<?php echo url::site("$page_name/$category->id/$category->url")?>" class="loader"><?php echo $category->name?></a>
 		<?php endforeach;?>
-	<a href="<?php echo url::site("$page_name/$category->url")?>" class="loader"><?php echo $category->name?></a>
 </div>
 
 <?php
@@ -31,8 +31,8 @@
 		{
 			# show the thumb of the first image in the album.
 			$full_path = $images[0]->path;
-			$small = image::thumb($full_path);
-			$image = "<img src=\"$img_path/$small\" alt=\"{$images[0]->caption}\">";
+			$thumb = image::thumb($full_path, $thumb_size);
+			$image = "<img src=\"$img_path/$thumb\" alt=\"{$images[0]->caption}\">";
 		}	
 		?>	
 		<div id="showroom_item_<?php echo $item->id?>" class="showroom_item" rel="<?php echo $item->id?>">

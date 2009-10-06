@@ -1,5 +1,5 @@
 
-<?php echo form::open("page/add_builder/$system_tool_id/$toolname", array('class' => 'custom_ajaxForm') );?>	
+<?php echo form::open("page/add_builder?system_tool=$system_tool_id", array('class' => 'custom_ajaxForm') );?>	
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" id="add_page_submit" name="add_page" class="jade_positive">Add Page Builder</button>

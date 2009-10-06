@@ -108,7 +108,7 @@ span.image{background-position:0px -420px}
 span.info{background-position:0px -440px}
 span.help{background-position:0px -452px}
 span.home{background-position:0px -471px}
-span.heart{background-position:0px -500px}
+span.heart{background-position:0px -486px}
 
 .admin_reset .on_close{display:none}
 
@@ -1026,7 +1026,18 @@ ul.common_tabs_x{
 	padding:15px 0;
 	border-top:1px solid #0099cc;
 }
-
+.common_half_left{
+	background:#eee;
+	width:40%;
+	float:left;
+	padding:10px;
+}
+.common_half_right{
+	width:54%;
+	float:right;
+	padding:10px;
+	border:1px dashed #eee;
+}
 #common_view_toggle li{margin-bottom:5px;}
 #common_view_toggle li a.selected,
 #common_view_toggle li a:hover{

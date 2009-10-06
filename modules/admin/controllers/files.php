@@ -1,5 +1,4 @@
-<?php
-class Files_Controller extends Controller {
+<?php defined('SYSPATH') or die('No direct script access.');
 
 /* 
  * Files refer to a repository for misc. assets uploaded by the user.
@@ -7,6 +6,9 @@ class Files_Controller extends Controller {
  * Location: @ /public/_data/$this->site_name/assets.
  * This class basically does CRUD relative to this folder.
  */	 
+ 
+class Files_Controller extends Controller {
+
 	function __construct()
 	{
 		parent::__construct();
@@ -18,18 +20,28 @@ class Files_Controller extends Controller {
 		}
 	}
 
+	
+	
+	public $image_types = array(
+		'.jpg'	=> 'jpeg',
+		'.jpeg'	=> 'jpeg',
+		'.png'	=> 'png',
+		'.gif'	=> 'gif',
+		'.tiff'	=> 'tiff',
+		'.bmp'	=> 'bmp',
+		);
 /*
  * index view for file browser.
  * everything is loaded within this view.
  */
 	public function index()
 	{
-		$files	= self::folder_contents($this->assets->assets_dir(), '_sm');
+		$files	= self::folder_contents($this->assets->assets_dir(), '_tmb');
 		
-		$primary = new View('files/index');
-		$primary->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
-		$primary->files = $files;
-		die($primary);
+		$view = new View('files/index');
+		$view->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
+		$view->files = $files;
+		die($view);
 	}
 	
 /*
@@ -39,16 +51,16 @@ class Files_Controller extends Controller {
 	public function contents($folder=NULL)
 	{
 		$folder	= str_replace(':', '/', $folder);	
-		$files	= self::folder_contents($this->assets->assets_dir($folder), '_sm');
+		$files	= self::folder_contents($this->assets->assets_dir($folder), '_tmb');
 		
-		$primary = new View('files/folder');
-		$primary->files = $files;
-		$primary->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
-		die($primary);
+		$view = new View('files/folder');
+		$view->files = $files;
+		$view->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
+		die($view);
 	}
 
 /*
- * Add files to a specified folder in website asset repo.
+ * View to Add files to a specified folder in website asset repo.
  * This outputs the view. self::upload handles the processing.
  */	
 	public function add_files($directory=NULL)
@@ -58,9 +70,9 @@ class Files_Controller extends Controller {
 		if(!is_dir($full_path))
 			die('invalid directory');
 
-		$primary = new View('files/add_files');
-		$primary->directory = $directory;
-		die($primary);
+		$view = new View('files/add_files');
+		$view->directory = $directory;
+		die($view);
 	}
 
 /*
@@ -74,7 +86,7 @@ class Files_Controller extends Controller {
 			die('invalid directory');
 
 		# Do we have a file
-		if(! is_uploaded_file($_FILES['Filedata']['tmp_name']) )
+		if(!is_uploaded_file($_FILES['Filedata']['tmp_name']))
 			die('Invalid File');
 		
 		# test for size restrictions?
@@ -87,45 +99,69 @@ class Files_Controller extends Controller {
 
 		# sanitize the filename.
 		$ext		= strrchr($_FILES['Filedata']['name'], '.');
-		$filename	= str_replace($ext, '', $_FILES['Filedata']['name']);
 		$ext		= strtolower($ext);
+		$filename	= str_replace($ext, '', $_FILES['Filedata']['name']);
 		$filename	= valid::filter_php_filename($filename).$ext;
 		
-		# place the file.
-		if(!move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename"))
-			die('Error: File not uploaded.');
-		
-		# is file an image?
-		$image_types = array(
-			'.jpg'	=> 'jpeg',
-			'.jpeg'	=> 'jpeg',
-			'.png'	=> 'png',
-			'.gif'	=> 'gif',
-			'.tiff'	=> 'tiff',
-			'.bmp'	=> 'bmp',
-		);
-		
-		if(array_key_exists($ext, $image_types))
+
+		# create thumbnails for images.
+		if(array_key_exists($ext, $this->image_types))
 		{
-			# Create sm thumb (TODO: optimize this later)
-			$image_sm	= new Image("$full_path/$filename");			
-			$sm_width	= $image_sm->__get('width');
-			$sm_height	= $image_sm->__get('height');
-			
-			# Make square thumbnails
-			if( $sm_width > $sm_height )
-				$image_sm->resize(75,75,Image::HEIGHT)->crop(75,75);
+			# does the thumb dir exist?
+			if(!is_dir("$full_path/_tmb"))
+				mkdir("$full_path/_tmb");
+
+			# initiliaze image as library object.	
+			$image	= new Image($_FILES['Filedata']['tmp_name']);			
+			$width	= $image->__get('width');
+			$height	= $image->__get('height');
+
+
+			# Make square thumbnails (always need 75's for plusjade system)
+				# are we instructed to make any more thumbnails?
+			if(isset($_POST['thumb']))
+				array_push($_POST['thumb'], 75);
 			else
-				$image_sm->resize(75,75,Image::WIDTH)->crop(75,75);
-			
-			
-			if(!is_dir("$full_path/_sm"))
-				mkdir("$full_path/_sm");
+				$_POST['thumb'] = array(75);
+
+			foreach($_POST['thumb'] as $size)
+			{
+				if(!is_dir("$full_path/_tmb/$size"))
+					mkdir("$full_path/_tmb/$size");				
+				if($width > $height)
+					$image->resize($size, $size, Image::HEIGHT)->crop($size, $size);
+				else
+					$image->resize($size, $size, Image::WIDTH)->crop($size, $size);
 				
-			$image_sm->save("$full_path/_sm/$filename");		
-		}		
+				$image->save("$full_path/_tmb/$size/$filename");
+			}
+			
+			# save an optimized original version.
+			# todo. save any apsurdly huge image to a max dimension.
+			# if the file is over 300kb its likely not optimized.
+			if(300000 < $_FILES['Filedata']['size'])
+				$image->quality(75)->save("$full_path/$filename");
+			else
+			{
+				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename");			
+				# $image->save("$full_path/$filename");
+			}
+		}
+		else
+		{
+			# save the non image file.
+			# turn php pages to text.
+			str_replace('php', '', $ext, $match);
+			if(0 < $match)
+				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename.txt");	
+			else
+				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename");
+		}
+
 		die('File uploaded');
 	}
+	
+	
 /*
  * add new folder to a specific directory
  * default folder is root: data/site_name/assets
@@ -152,42 +188,48 @@ class Files_Controller extends Controller {
 			die('Could not create folder.');
 		}
 			
-		$primary = new View('files/add_folder');
-		$primary->directory = $directory;
-		$primary->filter = '';
-		die($primary);
+		$view = new View('files/add_folder');
+		$view->directory = $directory;
+		$view->filter = '';
+		die($view);
 	}
 
 	
 /*
  * delete a folder or file from the asset repository.
  */
-	public function delete($path=NULL)
+	public function delete($path_string=NULL)
 	{
-		if(NULL == $path)
+		if(NULL == $path_string)
 			die('No path sent');
 		
-		$path		= str_replace(':', '/', $path);
-		$filename	= substr(strrchr($path, '/'), 1);
-		$full_path	= $this->assets->assets_dir($path);
-		$thumb_path	= str_replace($filename, "_sm/$filename", $full_path);
+		$path_string = str_replace(':', '/', $path_string, $matches);
+		$filename	= (0 < $matches) ? substr(strrchr($path_string, '/'), 1) : $path_string;
+		$ext 		= (strrchr($filename, '.'));
+		$full_path	= $this->assets->assets_dir($path_string);
 		
 		if(is_dir($full_path))
-		{
-			if('tools' == $path)
-				die('Tools folder is required');
-				
+		{	
+			if('_tmb' == $filename)
+				die('Cannot delete this folder.');
 			if(Jdirectory::remove($full_path))
-				die('Folder deleted');
-				
+				die('Folder deleted');	
 			die('Could not delete the folder.');
 		}
 		elseif(file_exists($full_path))
 		{
 			if(unlink($full_path))
 			{
-				if(file_exists($thumb_path))
-					unlink($thumb_path);
+				# is this an image?
+				if(array_key_exists($ext, $this->image_types))
+				{
+					# get and recurse the _tmb directory.
+					$thumb_path = str_replace($filename, '', $full_path).'_tmb/';
+					$thumb_dirs = Jdirectory::contents($thumb_path, 'root', 'list_dir');
+					foreach($thumb_dirs as $dir)
+						if(file_exists("$thumb_path/$dir/$filename"))
+							unlink("$thumb_path/$dir/$filename");				
+				}
 				die('File deleted');
 			}	
 			die('Could not delete the file.');
@@ -230,7 +272,7 @@ class Files_Controller extends Controller {
 	}
 
 
-/*
+/* CURRENTLY NOT USING --- 
  * Used to give cleaner urls to a website's asset folder.
  * This method can be accessed via site.com/files/<path>
  * I'm thinking we should try to avoid displaying images associated with tools

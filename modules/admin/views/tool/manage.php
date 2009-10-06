@@ -51,7 +51,7 @@
 							<?php endforeach;?>
 							
 							<br><br>
-							<a href="/get/tool/add/<?php echo "$tool->id/$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add to Page</a>
+							<a href="/get/tool/add?tool_id=<?php echo "$tool->id&page_id=$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add to Page</a>
 							<br>
 							<a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->parent_id"?>" class="show_view">quick view</a>
 								
@@ -127,7 +127,14 @@
 				"tool_id" : args[2],
 			};		
 			$.get(this.href, function(data){
-				// sends the resulting insert_id from the pages_tools table.
+				// expecting an insert_id from pages_tools table
+				// if the result data is NOT numeric, display the error message
+				/*
+				if(!is_numeric(data)) {
+					alert(data);
+					return false;				
+				}
+				*/
 				tool.instance = data;
 				$().jade_inject_tool('add', tool);
 			});

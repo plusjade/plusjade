@@ -16,7 +16,7 @@
 		<h3 class="aligncenter">Add Page Builders</h3>
 		<ul class="page_builders">
 			<?php foreach($page_builders as $tool):?>
-				<li><span class="icon shield">&#160; &#160; </span><a href="/get/page/add_builder/<?php echo "$tool->id/$tool->name"?>" rel="facebox" id="2"><?php echo $tool->name?></a></li>
+				<li><span class="icon shield">&#160; &#160; </span><a href="/get/page/add_builder?system_tool=<?php echo $tool->id?>" rel="facebox" id="2"><?php echo $tool->name?></a></li>
 			<?php endforeach;?>
 		</ul>
 		<br><br>

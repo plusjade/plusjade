@@ -18,7 +18,7 @@ class Build_Page_Controller extends Controller {
 		# $this->profiler = new Profiler;		
 		$this->template = new View('shell');	
 		
-		# Global CSS			
+		# Global CSS for live pages only		
 		if(!$this->client->can_edit($this->site_id))
 			$this->template->linkCSS("_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
 	}
@@ -46,7 +46,6 @@ class Build_Page_Controller extends Controller {
 		$data					= array(' ',' ',' ',' ',' ',' ');
 		$tools_array			= array();
 		$_SESSION['js_files']	= array();
-		$primary				= '';
 		$prepend				= '';
 		$append					= '';
 		
@@ -89,6 +88,7 @@ class Build_Page_Controller extends Controller {
 			}
 		}
 
+		# get the tools for this page.
 		if($tools->count() > 0)
 		{	
 			foreach ($tools as $tool)
@@ -198,7 +198,8 @@ class Build_Page_Controller extends Controller {
 		}
 		
 		header("HTTP/1.0 404 Not Found");
-		$this->wrapper($message, FALSE, '404_not_found', FALSE);
+		# might also have a custom 404 template page instead of "master"
+		$this->wrapper($message, 'master', '404_not_found', FALSE);
 	}
 	
 
@@ -209,7 +210,7 @@ class Build_Page_Controller extends Controller {
  * expects a an array matching the appropriate containers
  * $exists = does this page exist? set to false for 404 not found wrapper.
  */
-	private function wrapper($data, $template ='master', $cache=FALSE, $exists=TRUE)
+	private function wrapper($data, $template, $cache=FALSE, $exists=TRUE)
 	{
 		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');

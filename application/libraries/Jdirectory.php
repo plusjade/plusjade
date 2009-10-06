@@ -92,6 +92,51 @@ class Jdirectory_Core {
 		
 		return FALSE;
 	}
+
+
+	public static function sub_directories($dir)
+	{
+	
+		$retval = array(); 	
+		if(substr($dir, -1) != "/")
+			$dir .= "/"; # add trailing slash if missing 	 	
+		
+		# open pointer to directory and read list of files 
+		$d = @dir($dir) or die("Jdirectory::contents: Failed opening directory $dir for reading");
+		
+		while(false !== ($entry = $d->read())) 
+		{ 
+			# skip hidden files and any omissions
+			if($entry[0] == ".")
+				continue;
+				
+			if(is_dir("$dir$entry")) 
+			{
+				if('list_dir' == $recurse)
+					array_push($retval, $entry);
+				elseif(TRUE == $recurse && is_readable("$dir$entry/"))
+					$retval[$entry] = self::contents("$dir$entry/", $entry, true);
+
+			} 		 
+		} 
+		$d->close(); 
+
+		
+		$dir = "/etc/php5/";
+
+		// Open a known directory, and proceed to read its contents
+		if(is_dir($dir))
+		{
+			if($dh = opendir($dir))
+			{
+				while(($file = readdir($dh)) !== false)
+				{
+					echo "filename: $file : filetype: " . filetype($dir . $file) . "\n";
+				}
+				closedir($dh);
+			}
+		}
+	}
 	
 /*
  * Original PHP code by Chirp Internet: www.chirp.com.au 

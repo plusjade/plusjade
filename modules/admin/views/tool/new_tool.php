@@ -80,7 +80,7 @@ $(document).ready(function()
 
 			$(document).trigger('show_submit.plusjade');
 			$('.common_main_panel').hide().before('<div class="plusjade_ajax floatleft" style="width:600px;"><b>Adding Tool: May take a few seconds...</b></div>');
-			$.post('/get/tool/create/<?php echo $page_id?>',
+			$.post('/get/tool/create_to_page?page_id=<?php echo $page_id?>',
 				{tool:tool, type:type},
 				function(data){
 					// contains toolname,method,tool_id, parent_id, instance.

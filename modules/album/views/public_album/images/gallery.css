@@ -1,13 +1,38 @@
 
-#album_wrapper_++{
+#album_wrapper_++ {
 
 }
-
 	/* --- album albums gallery --- */
+
+#album_wrapper_++ .galleryview {
+	margin:0 auto;
+}
+
+#album_wrapper_++ #format_gallery_wrapper,
+#album_wrapper_++ #format_gallery_wrapper .filmstrip {
+	background:white;
+}
 
 #album_wrapper_++ .galleryview{
 	margin:0 auto;
 }
+
+#album_wrapper_++ .galleryview div.panel{
+	border:1px solid black;
+}
+
+#album_wrapper_++ .galleryview div.overlay{
+	background:black;
+}
+
+#album_wrapper_++ .galleryview div.caption{
+	color:white;
+}
+#album_wrapper_++ .galleryview div.panel-overlay,
+#album_wrapper_++ .galleryview div.panel-overlay a{
+	color:white;
+}
+
 .nav-next,
 .nav-prev,
 .nav-overlay,
@@ -15,13 +40,34 @@
 	width:20px;
 	height:20px;
 }
-.nav-next{
+.nav-next {
 	background: url(/_assets/tools/album/light/next.png) no-repeat 0 0;
+	cursor:cursor;
+	cursor:pointer;
 }
-.nav-prev{
+.nav-prev {
 	background: url(/_assets/tools/album/light/prev.png) no-repeat 0 0;
+	cursor:cursor;
+	cursor:pointer;
 }
 
-.pointer_img{
+.panel-prev {
+	background: url(/_assets/tools/album/light/panel-nav-prev.png) no-repeat 0 0;
+	width:42px;
+	height:42px;
+	cursor:cursor;
+	cursor:pointer;
+}
+
+.panel-next {
+	background: url(/_assets/tools/album/light/panel-nav-next.png) no-repeat 0 0;
+	width:42px;
+	height:42px;
+	cursor:cursor;
+	cursor:pointer;
+}
+
+
+.pointer_img {
 	background: url(/_assets/tools/album/light/pointer.png) no-repeat 0 0;
 }

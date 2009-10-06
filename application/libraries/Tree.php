@@ -46,15 +46,13 @@ class Tree_Core {
 		$active = is_numeric($active)
 				? (($item->id == $active) ? 'active' : '')
 				: (($item->url === $active) ? 'active' : '');		
-		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->url .'" class="loader '. $active .'">' . $item->name . '</a></span>'; 
+		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><a href="/'. $page_name .'/'. $item->id .'/'. $item->url .'" class="loader '. $active .'">' . $item->name . '</a></span>'; 
 	}
 
 	public static function showroom_admin($item, $page_name, $active)
 	{
 		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span><b rel="' . $item->url . '">' . $item->name . '</b> <small>('. $item->item_count .')</small></span>'; 
 	}
-	
-	
 	
 /*
  * show the categories in the edit showroom interfaces.

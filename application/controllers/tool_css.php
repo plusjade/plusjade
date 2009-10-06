@@ -4,7 +4,6 @@
 /**
  * Compile the tools css for each page
  * edit css files for each tool
- * This controller shoudl be renamed to a more specific "tool" css controller
  */
  
 class Tool_Css_Controller extends Controller {

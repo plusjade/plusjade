@@ -19,34 +19,40 @@ class Showroom_Controller extends Public_Tool_Controller {
 		full
 		flat
 	
+	
+	url formats: 
+		categories: mysite.com/page_name/cat_id/category/n-sub-cat/n2-sub-cat
+		items: mysite.com/page_name/item_id/item-url-name
  */ 
 	public function _index($showroom)
 	{
 		$url_array	= uri::url_array();
-		list($page_name, $category_id, $item) = $url_array;
+		list($page_name, $first_node, $item) = $url_array;
 		$page_name	= $this->get_page_name($page_name, 'showroom', $showroom->id);		
 
 		# parse the params.
 		$params = explode('|',$showroom->params);
 		$primary = new View("public_showroom/display/wrapper");
 		
-		# is the category item url specified?
-		if('get' == $url_array['0'] OR (empty($category_id) AND empty($item)))
+		
+		# what is the url asking for?
+		if('get' == $url_array['0'] OR (empty($first_node)))
 		{
+			# if empty, display default category
 			$primary->items = (empty($showroom->home_cat))
 				? '(Home Category not set)'
 				: self::items_category($page_name, $showroom, (int) $showroom->home_cat);
 		}
-		elseif(empty($item))
-			$primary->items = self::items_category($page_name, $showroom, $category_id);
+		elseif(is_numeric($first_node))
+			$primary->items = self::items_category($page_name, $showroom, $first_node);
 		else
-			$primary->item = self::item($page_name, $category_id, $item);
+			$primary->item = self::item($page_name, $first_node, $item);
 
 
 		# determine the category to highlight.
-		$category_id = (empty($category_id))
+		$first_node = (empty($first_node))
 			? $showroom->home_cat
-			: $category_id; 			
+			: $first_node; 			
 			
 		
 		# how do we show the category list on every showroom page?
@@ -64,10 +70,10 @@ class Showroom_Controller extends Public_Tool_Controller {
 					))
 					->orderby(array('lft' => 'asc'))
 					->find_all();	
-				$category_list = Tree::display_flat_tree('showroom', $root_cats, $page_name, $category_id);	
+				$category_list = Tree::display_flat_tree('showroom', $root_cats, $page_name, $first_node);	
 			}
 			else
-				$category_list = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name, $category_id);
+				$category_list = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name, $first_node);
 	
 		}
 		$primary->categories = $category_list;
@@ -145,6 +151,9 @@ class Showroom_Controller extends Public_Tool_Controller {
 			$view->columns = (isset($params[1]) AND is_numeric($params[1]))
 				? $params[1]
 				: 2;
+			$view->thumb_size = (isset($params[2]) AND is_numeric($params[2]))
+				? $params[2]
+				: 75;
 		}
 
 		# get the path to this category
@@ -244,12 +253,15 @@ class Showroom_Controller extends Public_Tool_Controller {
  */
 	public function _ajax($url_array, $parent_id)
 	{		
-		list($page_name, $category, $item) = $url_array;
+		list($page_name, $first_node) = $url_array;
 
-		if(! empty($category) AND empty($item) )
-			echo  self::items_category($page_name, $parent_id, $category);
-		elseif(! empty($category) AND !empty($item) )
-			echo self::item($page_name, $category, $item);
+		if(empty($first_node))
+			die('invalid showroom request');
+			
+		if(is_numeric($first_node))
+			echo self::items_category($page_name, $parent_id, $first_node);
+		else
+			echo self::item($page_name, $first_node, $item);
 
 		die();
 	}

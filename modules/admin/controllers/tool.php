@@ -52,21 +52,50 @@ class Tool_Controller extends Controller {
 	}
 
 /*
- *	create a new tool and add it to specific page.
+ * View and Handler for creating a tool in the system and placing onto page. 
+ * attempts to create a new tool and add it to a specific page.
  */
-	public function create($page_id=NULL)
-	{		
-		valid::id_key($page_id);		
+	public function create_to_page()
+	{	
+		if(empty($_GET['page_id']))
+			die('invalid input');		
+		$page_id = valid::id_key($_GET['page_id']);
 
 		if($_POST)
 		{
 			if(empty($_POST['type']) OR empty($_POST['tool']))
 				die('nothing posted.');
-				
-			# all tools passed here should be non-protected
-			die(self::_create_tool($page_id, $_POST['tool'], $this->site_name, $_POST['type'], FALSE, FALSE, TRUE));
+			
+			# get the page
+			$page = ORM::factory('page')
+				->where('fk_site', $this->site_id)
+				->find($page_id);
+			if(!$page->loaded)
+				die('invalid page');
+			
+			
+			# if page is protected, disallow protected tools to be created.		
+			$allow_protected = (yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+				? FALSE
+				: TRUE;
+
+			# try to create the tool. (returns tool data object)
+			$tool = $this->_create_tool($_POST['tool'], $_POST['type'], NULL, $allow_protected);
+		
+			# add the tool to this page. (returns the instance_id)
+			$instance_id = $this->_add_to_page($tool, $page);
+
+			# send the data to the UI
+			$tool_data = new stdClass;
+			$tool_data->toolname	= $tool->system_tool->name;
+			$tool_data->method		= $tool->system_tool->helper_method;
+			$tool_data->parent_id	= $tool->parent_id;
+			$tool_data->tool_id		= $tool->id;
+			$tool_data->instance	= $instance_id;
+			die(json_encode($tool_data));
 		}	
 		
+		# get all available non-protected tools.
 		$tools = ORM::factory('system_tool')
 			->where(array(
 				'protected'	=> 'no',
@@ -74,68 +103,22 @@ class Tool_Controller extends Controller {
 				'visible'	=> 'yes'
 			))
 			->find_all();
-	
 		$primary = new View('tool/new_tool');
 		$primary->tools_list = $tools;
 		$primary->page_id = $page_id;
 		die($primary);
-		
-	}
-
-/*
- * auto create a page_builder.
-	i.e. Creates a new page with a new protected tool added to it.
- * used at auth->create_website() to automatically load page_builders to new websites.
- 
-	This can be a static function since we should not reference "this" site,
-	but rather any given site. (this site would reference the plusjade site).
-	
- * this should only be used internally so no need for crazy validation.
- */
-	public static function _auto_tool($toolname, $site_id, $site_name, $theme)
-	{
-		$toolname = strtolower($toolname);
-	
-		$max = ORM::factory('page')
-			->select('MAX(position) as highest')
-			->where('fk_site', $site_id)
-			->find();		
-	
-		# if a page_builder template exists, assign it.
-		$template =
-			(file_exists(DATAPATH . "$site_name/themes/$theme/templates/$toolname.html"))
-			? $toolname
-			: 'master';
-	
-		$new_page = ORM::factory('page');
-		$new_page->fk_site		= $site_id;
-		$new_page->page_name	= valid::filter_php_filename($toolname);
-		$new_page->label		= ucfirst($toolname);
-		$new_page->template		= $template;
-		$new_page->position		= ++$max->highest;
-		$new_page->menu			= 'yes';
-		$new_page->save();
-		
-		# TODO: this has not been updated sitewide.
-		$type = NULL; # the type lets you specify a specific view for the tool.
-		
-		# attempt to add the tool.
-		if(TRUE !== self::_create_tool($new_page->id, $toolname, $site_name, $type, TRUE, TRUE))
-			die("Could not add $toolname");
-		
-		return TRUE;
 	}
 
 	
 /*
- * actually creates the tool and generates assets.
- * this is separate so we can use this modularly in other areas.
- * used here and @ page.php
- 
- * this method is static so we can overt the construct logged in check.
+ * strictly creates a tool within the plusjade system.
+ * RETURNS: (object) the generated global tool record on success.
+ * ERRORS: are hard-died as of now.
+ * 	this is separate so we can use this modularly in other areas.
+ * 	Currently ONLY used here and page_controller->add_builder()
  * 
  */
-	public static function _create_tool($page_id, $system_tool_id, $site_name, $type=NULL, $allow_protected=FALSE, $sample=FALSE, $javascript=FALSE)
+	public function _create_tool($system_tool_id, $type=NULL, $view=NULL, $allow_protected=FALSE, $sample=FALSE)
 	{
 		# get the system tool
 		$system_tool = ORM::factory('system_tool')
@@ -144,97 +127,132 @@ class Tool_Controller extends Controller {
 			->find($system_tool_id);
 		if(!$system_tool->loaded)
 			die("invalid system_tool: $system_tool_id ");
-
-		# are protected tools allowed on this page?
+		
+		# is this tool protected and are we allowed to create it?
 		if('yes' == $system_tool->protected AND !$allow_protected)
-			die('Cannot add page builders to this page.');
-			
+			die('You cannot create a protected tool.');
+
 		# set the type (if none specified, hit the default)
 		$type = (empty($type)) ? $system_tool->type : $type ;
 		
-		# set the default view for the type.
-		$system_tool_type = ORM::factory('system_tool_type')
-			->where(array(
-				'system_tool_id' => $system_tool_id,
-				'type'			 => $type
-			))
-			->find();
-		$view = $system_tool_type->view;
+		# is the view set?
+		if(empty($view))
+		{
+			# set the default view for the type.
+			$system_tool_type = ORM::factory('system_tool_type')
+				->where(array(
+					'system_tool_id' => $system_tool_id,
+					'type'			 => $type
+				))
+				->find();
+			$view = $system_tool_type->view;
+		}
 		
-		
-		# load the site_config to get the site_id, this benchmarked much faster.
-		$site_config = yaml::parse($site_name, 'site_config');
-
 		# add row to the tools parent table.
 		$parent = ORM::factory($system_tool->name);
-		$parent->fk_site = $site_config['site_id'];
+		$parent->fk_site = $this->site_id;
 		$parent->type = $type;
+		$parent->view = $view;
 		$parent->save();
 		
 		# add new global tool record
 		$tool = ORM::factory('tool');
-		$tool->fk_site = $site_config['site_id'];
+		$tool->fk_site = $this->site_id;
 		$tool->system_tool_id = $system_tool->id;
 		$tool->parent_id = $parent->id;
 		$tool->save();
 		
-		// ----
-		# add tool to specified page.
+		# generate tool_css file
+		self::_generate_tool_css($system_tool->name, $parent->id, $type, $view, $this->site_name, $this->theme);
+		
+		# run _tool_adder
+		Load_Tool::factory($system_tool->name)->_tool_adder($parent->id, $this->site_id, $sample);
+		# return the tool data.
+		return $tool;
+	}
+
+
+	
+/*
+ * strictly adds an existing tool to an existing page. 
+ * RETURNS: instance_id of the newly created instance.
+   
+   this validates against protected tools and pages.
+   
+	expects a tool and a page as objects, 
+	if no objects, they must be ids.
+ *
+ */
+	public function _add_to_page($tool, $page)
+	{
+		# make sure the tool is an object
+		if(!is_object($tool))
+		{
+			$tool = ORM::factory('tool')
+				->where('fk_site', $this->site_id)
+				->find($tool);
+			if(!$tool->loaded)
+				return 'invalid tool';
+		}
+		
+		# make sure the page is an object
+		if(!is_object($page))
+		{
+			$page = ORM::factory('page')
+				->where('fk_site', $this->site_id)
+				->find($page);
+			if(!$page->loaded)
+				return 'invalid page';
+		}
+
+		
+		# is the tool we are trying to add protected?	
+		if('yes' == $tool->system_tool->protected)
+		{
+			# is this page a root page?
+			str_replace('/', '', $page->page_name, $matches);
+			if(0 < $matches)
+				return 'protected tools must be on root pages';
+				
+			# is this page already protected?		
+			if($page_config_value = yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
+				return 'this page already contains a protected tool';
+		}
+
 		
 		# get min position of tools on page
 		$db = new Database;	
 		$lowest = $db->query("
 			SELECT MIN(position) as lowest
 			FROM pages_tools 
-			WHERE page_id ='$page_id'
-			AND fk_site = '{$site_config['site_id']}'
+			WHERE page_id ='$page->id'
+			AND fk_site = '$this->site_id'
 		")->current()->lowest;
 		
+		# add a new record to pages_tools
+		# effectively "adding this tool to this page"
 		$data = array(
 			'tool_id'	=> $tool->id,
-			'page_id'	=> $page_id,
-			'fk_site'	=> $site_config['site_id'],
+			'page_id'	=> $page->id,
+			'fk_site'	=> $this->site_id,
 			'position'	=> ($lowest-1)
 		);
 		$instance_id = $db->insert('pages_tools', $data)->insert_id();
-		// ----
-		
-		
-		# if tool is protected, add page to pages_config file.
-		if('yes' == $system_tool->protected)
+
+		# only on successs...
+		if('yes' == $tool->system_tool->protected)
 		{
-			$page = ORM::factory('page', $page_id);
-		
-			$newline = "\n$page->page_name:$system_tool->name-$parent->id";
-			yaml::add_value($site_name, 'pages_config', $newline);
+			# protect the page relative to this new tool.
+			$newline = "\n$page->page_name:{$tool->system_tool->name}-$tool->parent_id";
+			yaml::add_value($this->site_name, 'pages_config', $newline);		
 		}
-		
-		# generate tool_css file
-		self::_generate_tool_css($system_tool->name, $parent->id, $type, $view, $site_name, $site_config['theme']);
-		
-		# run _tool_adder
-		$step_2 = 'add';
-		$public_tool = Load_Tool::factory($system_tool->name);
-		if(is_callable(array($public_tool, '_tool_adder')))
-			$step2 = $public_tool->_tool_adder($parent->id, $site_config['site_id'], $sample);
 
-		# is the tool being added via the UI?
-		if($javascript)
-		{
-			# pass tool data to tool view "new_tool"
-			$obj = (object) array(
-				'toolname'	=> $system_tool->name,
-				'method'	=> $step2,
-				'instance'	=> $instance_id,
-				'parent_id'	=> $parent->id,
-				'tool_id'	=> $tool->id,
-			);		
-			return json_encode($obj);
-		}	
-		return TRUE;
+		return "$instance_id";
 	}
-
 	
+	
+	
+
 /*
  *	Delete a tool and all its instances : parent table & in pages_tools as well.
  *  Comes from the tools js red toolbar
@@ -244,11 +262,11 @@ class Tool_Controller extends Controller {
 	public function delete($tool_id=NULL)
 	{
 		valid::id_key($tool_id);		
-		
+
 		# delete all page instances of this tool.
 		$db = new Database;	
 		$db->delete('pages_tools', array('tool_id' => $tool_id, 'fk_site' => $this->site_id));		
-		
+
 		# get the tool.
 		$tool = ORM::factory('tool')
 			->where('fk_site', $this->site_id)
@@ -259,27 +277,26 @@ class Tool_Controller extends Controller {
 		# Protect account tool.
 		if('account' == $tool->system_tool->name)
 			die('Account tool cannot be deleted, since other tools depend on it!');
-		
+
 		# delete the parent table row.
 		$parent = ORM::factory($tool->system_tool->name)
 			->where('fk_site', $this->site_id)
 			->delete($tool->parent_id);
-
+	
 		# is tool protected?
 			# note: the page may not be set if the page was deleted but the tool still exists.
 		if('yes' == $tool->system_tool->protected)
 			if(isset($tool->pages->current()->page_name))
 				yaml::delete_value($this->site_name, 'pages_config', $tool->pages->current()->page_name);
 		
+
 		# DELETE the custom folder for this tool. (houses custom css files)
-		$custom_folder = $this->assets->themes_dir("$this->theme/tools/$tool->system_tool->name/_created/$tool->parent_id");
+		$custom_folder = $this->assets->themes_dir("$this->theme/tools/" . strtolower($tool->system_tool->name) . "/_created/$tool->parent_id");
 		if(is_dir($custom_folder))
 			Jdirectory::remove($custom_folder);
-		
+			
 		# run tool_deleter
-		$edit_tool	= Load_Tool::edit_factory($tool->system_tool->name);
-		if( is_callable(array($edit_tool,'_tool_deleter')) )
-			$edit_tool->_tool_deleter($tool->parent_id, $this->site_id);
+		Load_Tool::edit_factory($tool->system_tool->name)->_tool_deleter($tool->parent_id, $this->site_id);
 		
 		# finally, delete the tool 
 		$tool->delete();
@@ -294,49 +311,68 @@ class Tool_Controller extends Controller {
  * ----------------- manage tool instances on pages --------------------
  * ---------------------------------------------------------------------
  */
- 
-/*
- * Adds a tool instance to the specified page.
- */
-	public function add($tool_guid=NULL, $page_id=NULL)
-	{
-		valid::id_key($tool_guid);	
-		valid::id_key($page_id);		
 
-		# add tool to specified page.
-		$db = new Database;
-		# get min position of tools on page
-		$lowest = $db->query("
-			SELECT MIN(position) as lowest
-			FROM pages_tools 
-			WHERE page_id ='$page_id'
-			AND fk_site = '$this->site_id'
-		")->current()->lowest;
+
+
+/*
+ * handler only for adding a tool instance to a specific page.
+ */
+	public function add()
+	{
+		if(empty($_GET['tool_id']) OR empty($_GET['page_id']))
+			die('invalid paramaters');
+		$tool_id = valid::id_key($_GET['tool_id']);	
+		$page_id = valid::id_key($_GET['page_id']);
 		
-		$data = array(
-			'tool_id'	=> $tool_guid,
-			'page_id'	=> $page_id,
-			'fk_site'	=> $this->site_id,
-			'position'	=> ($lowest-1)
-		);
+		$instance_id = $this->_add_to_page($tool_id, $page_id);
 		
-		echo $db->insert('pages_tools', $data)->insert_id();
-		die();
+		#javascript UI needs this to return the instance_id
+		die($instance_id);
 	}
 
+	
 /*
- * Remove a tool instance from the specified page.
+ * Remove a tool instance from the page.
  * Does not delete the tool.
  */
-	public function remove($page_id=NULL, $instance=NULL)
+	public function remove()
 	{
-		valid::id_key($page_id);
-		valid::id_key($instance);
-
+		if(empty($_GET['instance_id']))
+			die('invalid instance_id');
+			
+		$instance_id = valid::id_key($_GET['instance_id']);
 		$db = new Database;	
+		
+		# get the instance
+		$instance = $db->query("
+			SELECT * FROM pages_tools
+			WHERE id = '$instance_id'
+			AND fk_site = '$this->site_id'
+		")->current();
+		if(!is_object($instance))
+			die('invalid instance');
+			
+		# get the tool.
+		$tool = ORM::factory('tool')
+			->where('fk_site', $this->site_id)
+			->find($instance->tool_id);
+			
+		# is this tool protected?
+		if('yes' == $tool->system_tool->protected)
+		{
+			# get the page.
+			$page = ORM::factory('page')
+				->where('fk_site', $this->site_id)
+				->find($instance->page_id);
+			
+			# remove the protected signifier for this page.
+			yaml::delete_value($this->site_name, 'pages_config', $page->page_name);
+		}
+		
+		# delete the instance.
 		$db->delete('pages_tools', 
 			array(
-				'id'	  => $instance,
+				'id'	  => $instance_id,
 				'fk_site' => $this->site_id
 			)
 		);		
@@ -526,31 +562,7 @@ class Tool_Controller extends Controller {
 			->where('fk_site', $this->site_id)
 			->find($tool_id);
 		
-		
-		
-		
-		// ------------------- start legacy support -------------------
-		# legacy support for no type:
-		if(empty($tool->type))
-			$tool->type = $system_tool->type;
-			
-		# legacy support for no view
-		if(empty($tool->view))
-		{
-			$system_tool_type = ORM::factory('system_tool_type')
-				->where(array(
-					'system_tool_id' => $system_tool_id,
-					'type'			 => $tool->type
-				))
-				->find();
-			$tool->view = $system_tool_type->view;
-		}
-		if(empty($tool->type) OR empty($tool->view))
-			$tool->save();
-		// ------------------- end legacy support -------------------
-
-		
-		
+		# type and view should be required to continue.
 		
 		# Overwrite old file with new file contents;
 		if($_POST)
@@ -652,45 +664,16 @@ class Tool_Controller extends Controller {
 
 /*
  * Generates a new css file for a tool based on tool type and view.
- * The method cascaded down the available css tree as follows:
+ * The method cascades down the available css tree as follows:
 	Theme template (TODO: template has not been implimented yet)
 	Theme stock
 	+Jade stock
+	static so public controllers can overt the login check.
+	used at tool_css_controller->live()
  */
 	public static function _generate_tool_css($toolname, $tool_id, $type, $view, $site_name, $theme, $return_contents=FALSE)
 	{
-		// ------------------- start legacy support -------------------
-		if(empty($type) OR empty($view))
-		{
-			$system_tool = ORM::factory('system_tool')
-				->select('*, LOWER(name) AS name')
-				->find($toolname);
-				
-			$tool = ORM::factory($toolname, $tool_id);	
-			
-			# legacy support for no type:
-			if(empty($type))
-			{
-				$type = $tool->type = $system_tool->type;
-			}
-			
-			# legacy support for no view
-			if(empty($view))
-			{
-				$system_tool_type = ORM::factory('system_tool_type')
-					->where(array(
-						'system_tool_id' => $system_tool->id,
-						'type'			 => $type
-					))
-					->find();
-				$view = $tool->view = $system_tool_type->view;
-			}
-			
-			$tool->save();
-		}	
-		// ------------------- end legacy support -------------------
-		
-		
+		# all parameters should be required.
 		$tools_folder	= DATAPATH . "$site_name/themes/$theme/tools";
 		$theme_file		= "$tools_folder/$toolname/$type/$view.css";
 		$stock_file		= MODPATH . "$toolname/views/public_$toolname/$type/$view.css";
@@ -755,6 +738,3 @@ class Tool_Controller extends Controller {
 } // end 
 
  
-
-
-

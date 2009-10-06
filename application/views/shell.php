@@ -3,7 +3,6 @@
 <html>
 <head>
 	<?php
-	#$this->profiler = new Profiler;
 	if(!empty($title)) echo "<title>$title</title>\n\t";
 	if(!empty($meta_tags)) echo $meta_tags;
 	if(!empty($inline_global_css)) echo $inline_global_css;
@@ -17,12 +16,7 @@
 	if(!empty($admin_panel)) echo $admin_panel;
 	if(!empty($error)) echo $error;
 	
-	# Required for all controllers passing with primary...	
-	if(!empty($output))
-		echo $output;
-	else
-		echo $primary;
-	
+	if(!empty($output)) echo $output;
 	?>
 	<script type="text/javascript"> 
 	  //<![CDATA[

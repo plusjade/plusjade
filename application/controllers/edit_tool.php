@@ -42,11 +42,11 @@ abstract class Edit_Tool_Controller extends Controller {
 		
 		# ------------------------------------------------------
 		
-		# SHOWROOM TOKEN.
-		$pattern = '{showroom_cats:(\d+)}';
+		# SHOWROOM TOKEN. format: {showroom_cats:parent_id:parameters}
+		$pattern ='/{showroom_cats:(\d+)\:(\w+)\}/';
 		
 		if(0 < preg_match($pattern, $body, $match))
-		{			
+		{
 			# get the page name.
 			$page_name = yaml::does_value_exist($this->site_name, 'pages_config', "showroom-{$match[1]}");
 			if(!$page_name)
@@ -57,8 +57,26 @@ abstract class Edit_Tool_Controller extends Controller {
 			if(!$showroom->loaded)
 				return $body;
 			
-			$categories = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name);
+			# how should the list be displayed?
+			if(!empty($match[2]) AND 'flat' == $match[2])
+			{
+				# showing only root categories.
+				$root_cats = ORM::factory('showroom_cat')
+					->where(array(
+						'fk_site'		=> $this->site_id,
+						'showroom_id'	=> $showroom->id,
+						'local_parent'	=> $showroom->root_id,
+					))
+					->orderby(array('lft' => 'asc'))
+					->find_all();
+					
+				$categories = Tree::display_flat_tree('showroom', $root_cats, $page_name);
+			}
+			else
+				$categories = Tree::display_tree('showroom', $showroom->showroom_cats, $page_name);
+
 			$body = preg_replace($pattern, $categories, $body, 1);
+
 		}
 		
 		return $body;

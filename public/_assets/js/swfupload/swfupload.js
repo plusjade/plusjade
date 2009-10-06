@@ -137,8 +137,8 @@ SWFUpload.prototype.initSettings = function () {
 	this.ensureDefault("file_types", "*.*");
 	this.ensureDefault("file_types_description", "All Files");
 	this.ensureDefault("file_size_limit", "20 MB");	// Default zero means "unlimited"
-	this.ensureDefault("file_upload_limit", 20);
-	this.ensureDefault("file_queue_limit", 12);
+	this.ensureDefault("file_upload_limit", 50);
+	this.ensureDefault("file_queue_limit", 50);
 
 	// Flash Settings
 	this.ensureDefault("flash_url", "/_assets/js/swfupload/Flash/swfupload.swf");

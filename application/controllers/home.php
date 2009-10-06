@@ -38,6 +38,7 @@ class Home_Controller extends Controller {
 			return self::display_create();
 	}
 
+	
 /*
  * Internal function used to setup the create view.
  */	

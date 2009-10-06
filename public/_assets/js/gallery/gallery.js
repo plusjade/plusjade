@@ -25,7 +25,6 @@
 		var wrapper_width;
 		var item_count = 0;
 		var slide_method;
-		var img_path;
 		var paused = false;
 		var frame_caption_size = 20;
 		var frame_margin_top = 5;
@@ -43,16 +42,16 @@
 /************************************************/	
 		function showItem(i) {
 			//Disable next/prev buttons until transition is complete
-			$('img.nav-next').unbind('click');
-			$('img.nav-prev').unbind('click');
+			$('.nav-next').unbind('click');
+			$('.nav-prev').unbind('click');
 			j_frames.unbind('click');
 			if(has_panels) {
 				if(opts.fade_panels) {
 					//Fade out all panels and fade in target panel
 					j_panels.fadeOut(opts.transition_speed).eq(i%item_count).fadeIn(opts.transition_speed,function(){
 						if(!has_filmstrip) {
-							$('img.nav-prev').click(showPrevItem);
-							$('img.nav-next').click(showNextItem);		
+							$('.nav-prev').click(showPrevItem);
+							$('.nav-next').click(showNextItem);		
 						}
 					});
 				} 
@@ -88,8 +87,8 @@
 						if(!opts.fade_panels) {
 							j_panels.hide().eq(i%item_count).show();
 						}
-						$('img.nav-prev').click(showPrevItem);
-						$('img.nav-next').click(showNextItem);
+						$('.nav-prev').click(showPrevItem);
+						$('.nav-next').click(showNextItem);
 						enableFrameClicking();
 					});
 				} else if(slide_method=='pointer') {
@@ -104,8 +103,8 @@
 						if(!opts.fade_panels) {
 							j_panels.hide().eq(i%item_count).show();
 						}	
-						$('img.nav-prev').click(showPrevItem);
-						$('img.nav-next').click(showNextItem);
+						$('.nav-prev').click(showPrevItem);
+						$('.nav-next').click(showNextItem);
 						enableFrameClicking();
 					});
 				}
@@ -178,39 +177,22 @@
 			if($('.panel-overlay').length>0) {j_panels.append('<div class="overlay"></div>');}
 			
 			if(!has_filmstrip) {
-				//Add navigation buttons
-				$('<div></div>').addClass('nav-next').appendTo(j_gallery).css({
-					'position':'absolute',
-					'zIndex':'10',
-					'cursor':'pointer',
-					'top':((opts.panel_height-22)/2)+'px',
-					'right':'10px',
-					'display':'none',
-				}).click(showNextItem);
-				$('<div></div>').addClass('nav-prev').appendTo(j_gallery).css({
-					'position':'absolute',
-					'zIndex':'10',
-					'cursor':'pointer',
-					'top':((opts.panel_height-22)/2)+'px',
-					'left':'10px',
-					'display':'none'
-				}).click(showPrevItem);
-				
-				$('<img />').addClass('nav-overlay').attr('src',img_path+opts.nav_theme+'/panel-nav-next.png').appendTo(j_gallery).css({
+				//Add navigation buttons				
+				$('<div></div>').addClass('nav-overlay panel-next').appendTo(j_gallery).css({
 					'position':'absolute',
 					'zIndex':'12',
 					'top':((opts.panel_height-22)/2)-10+'px',
 					'right':'0',
 					'display':'none'
-				});
+				}).click(showPrevItem);;
 				
-				$('<img />').addClass('nav-overlay').attr('src',img_path+opts.nav_theme+'/panel-nav-prev.png').appendTo(j_gallery).css({
+				$('<div></div>').addClass('nav-overlay panel-prev').appendTo(j_gallery).css({
 					'position':'absolute',
 					'zIndex':'12',
 					'top':((opts.panel_height-22)/2)-10+'px',
 					'left':'0',
 					'display':'none'
-				});
+				}).click(showNextItem);;
 			}
 			j_panels.css({
 				'width':(opts.panel_width-parseInt(j_panels.css('paddingLeft').split('px')[0],10)-parseInt(j_panels.css('paddingRight').split('px')[0],10))+'px',
@@ -229,12 +211,9 @@
 				'height':opts.overlay_height+'px',
 				'top':(opts.overlay_position=='top'?'0':opts.panel_height-opts.overlay_height+'px'),
 				'left':'0',
-				'padding':'0 10px',
-				'color':opts.overlay_text_color,
-				'fontSize':opts.overlay_font_size
+				'padding':'0 10px'
 			});
 			$('.panel-overlay a',j_panels).css({
-				'color':opts.overlay_text_color,
 				'textDecoration':'underline',
 				'fontWeight':'bold'
 			});
@@ -245,7 +224,6 @@
 				'height':opts.overlay_height+'px',
 				'top':(opts.overlay_position=='top'?'0':opts.panel_height-opts.overlay_height+'px'),
 				'left':'0',
-				'background':opts.overlay_color,
 				'opacity':opts.overlay_opacity
 			});
 			$('.panel iframe',j_panels).css({
@@ -279,8 +257,8 @@
 				'zIndex':'17',
 				'top':'0',
 				'left':'0',
-				'height':(opts.frame_height+10)+'px',
-				'background':opts.background_color
+				'height':(opts.frame_height+10)+'px'
+				//'background':opts.background_color
 			});
 			j_frames.css({
 				'float':'left',
@@ -311,7 +289,6 @@
 				'margin':'0',
 				'width':opts.frame_width+'px',
 				'padding':'0',
-				'color':opts.caption_text_color,
 				'textAlign':'center',
 				'fontSize':'10px',
 				'height':frame_caption_size+'px',
@@ -384,14 +361,6 @@
 /************************************************/
 		return this.each(function() {
 			j_gallery = $(this);
-			//Determine path between current page and filmstrip images
-			//Scan script tags and look for path to GalleryView plugin
-			$('script').each(function(i){
-				var s = $(this);
-				if(s.attr('src') && s.attr('src').match(/jquery\.galleryview/)){
-					img_path = s.attr('src').split('jquery.galleryview')[0]+'themes/';	
-				}
-			});
 			
 			//Hide gallery to prevent Flash of Unstyled Content (FoUC) in IE
 			j_gallery.css('visibility','hidden');
@@ -450,9 +419,8 @@
 			/************************************************/
 					j_gallery.css({
 						'position':'relative',
-						//'margin':'0',
-						'background':opts.background_color,
-						'border':opts.border,
+						//'background':opts.background_color,
+						//'border':opts.border,
 						'width':gallery_width+'px',
 						'height':gallery_height+'px'
 					});

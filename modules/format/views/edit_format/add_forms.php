@@ -99,19 +99,6 @@ $generic = array(
 	li.delete_item{
 		width:40px !important;
 	}
-	
-	.common_half_left{
-		background:#eee;
-		width:40%;
-		float:left;
-		padding:10px;
-	}
-	.common_half_right{
-		width:54%;
-		float:right;
-		padding:10px;
-		border:1px dashed #eee;
-	}
 </style>
 
 

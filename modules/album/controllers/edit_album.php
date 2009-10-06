@@ -66,20 +66,45 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		$album = ORM::factory('album')
 			->where('fk_site', $this->site_id)
 			->find($tool_id);	
-		if(FALSE === $album->loaded)
+		if(!$album->loaded)
 			die('invalid album');
 			
 		if($_POST)
 		{
 			$album->name = $_POST['name'];
 			$album->view = $_POST['view'];
+			$album->toggle = $_POST['toggle'];
 			$album->params = $_POST['params'];
 			$album->save();
 			die('Album Settings Saved.');
 		}
-
+		
+		
+		$gallery_params = array(
+			'panel_width' => 660,
+			'panel_height' => 250,
+			'frame_width' => 75,
+			'frame_height' => 75,
+			'filmstrip_size' => 3,
+			'overlay_height' => 50,
+			'transition_speed' => 400,
+			'transition_interval' => 2000,
+			'overlay_opacity' => 0.6,
+			'easing' => "swing",
+			'filmstrip_position' => "bottom",
+			'overlay_position' => "bottom",
+			'show_captions' => 'false',
+			'fade_panels' => 'true',
+			'pause_on_hover' => 'true'
+		);
+		
+		$params = json_decode($album->params);
+		if(NULL == $params OR !is_object($params))
+			$params = (object) $gallery_params;
+		
 		$view = new View('edit_album/settings');
 		$view->album = $album;
+		$view->params = $params;
 		$view->js_rel_command = "update-album-$tool_id";			
 		die($view);
 	}

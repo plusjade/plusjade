@@ -12,6 +12,7 @@
 				<li><a href="/get/admin/settings" rel="facebox"><span class="icon wrench">&#160; &#160; </span> Settings</a></li>
 				<li><a href="/get/page/navigation" rel="facebox"><span class="icon sitemap">&#160; &#160; </span>Navigation</a></li>
 				<li><a href="/get/theme/logo" rel="facebox"><span class="icon asterisk">&#160; &#160; </span>Logo</a></li>				
+				<li><a href="/get/import/tool" rel="facebox"><span class="icon heart">&#160; &#160; </span>Import Tool</a></li>				
 				<li><a href="/get/admin/logout"><span class="icon cross">&#160; &#160; </span> Logout</a></li>
 			</ul>		
 		</li>	
@@ -43,7 +44,7 @@
 		</li>
 
 		<li class="this_page" style="width:175px">
-			<a href="/get/tool/create/<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD PAGE CONTENT</a>
+			<a href="/get/tool/create_to_page?page_id=<?php echo $page_id?>" class="block_mode" rel="facebox"><span class="icon plus">&#160; &#160; </span> ADD PAGE CONTENT</a>
 		</li>
 		
 		<li class="floatright" style="width:65px !important;">

@@ -2,6 +2,8 @@
 
 class Showroom_Model extends ORM {
 	
+	protected $family = array('showroom_cat', 'showroom_cat_items');
+	
 	protected $has_many = array('showroom_cats');
 	#protected $sorting = array('page_name' => 'asc');
 	
