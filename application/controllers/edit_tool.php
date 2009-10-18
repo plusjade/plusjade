@@ -44,7 +44,7 @@ abstract class Edit_Tool_Controller extends Controller {
 		
 		# SHOWROOM TOKEN. format: {showroom_cats:parent_id:parameters}
 		$pattern ='/{showroom_cats:(\d+)\:(\w+)\}/';
-		
+
 		if(0 < preg_match($pattern, $body, $match))
 		{
 			# get the page name.

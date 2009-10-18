@@ -62,7 +62,16 @@ class Tree_Core {
 		return ' <li id="item_' . $item->id . '"><span><a href="#" id="cat_' . $item->id . '" rel="' . $item->id . '">' . $item->name . '</a></span>'; 
 	}	
 	
-	
+/*
+ * show the categories in the edit navigation interfaces.
+ */	
+	public static function render_edit_navigation($item)
+	{
+		return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span> <small style="display:none">Type: '. $item->type .' <br> Data: '. $item->data .'</small>'; 
+	}
+
+
+		
 /* 
  * Uses Tree traversal method to display neat nested ul/li list.
  * $items (object) are required to have lft/rgt values
@@ -202,17 +211,13 @@ class Tree_Core {
  * $parent_model	= name of tool table model
  * $item_model		= name of name of the tool item table model
  * $tool_id			= tool id
- * $output			= unformatted string from ul list
-		
-		output variable comes via ajax post request
-		Data Format: < id:local_parent:position| >
+ * $json			= expecting an array with object nodes.
+		object.id, object.local_parent_id, object.position
  */ 
-	public static function save_tree($parent_model, $item_model, $tool_id, $site_id, $output)
+	public static function save_tree($parent_model, $item_model, $tool_id, $site_id, $json)
 	{
-		$all_items	= array();
-		$elements	= explode('|', rtrim($output, '|'));
-		
-		$parent_object = ORM::factory($parent_model)
+		# get the parent table
+		$parent = ORM::factory($parent_model)
 			->where('fk_site', $site_id)
 			->find($tool_id);
 	
@@ -225,50 +230,40 @@ class Tree_Core {
 			))
 			->find_all();
 	
+		$all_items	= array();
 		foreach($items as $item)
 			$all_items[$item->id] = $item->id;
 
-		# echo '<pre>';print_r($elements);echo'</pre>';die();
-		
-		# if more than one exists ...
-		if(1 < count($elements))
+
+		# parse the given element nodes.
+		foreach($json as $node)
 		{
-			foreach($elements as $element)
-			{
-				$element_data = explode(':', $element);
-				
-				# validate the data so corrupt data does not break the tree.
-				foreach($element_data as $data)
-					if(!ctype_digit($data))
-						continue 2;
-				
-				list($id, $parent, $position) = $element_data;
+			# Item exists so remove from the delete array.
+			unset($all_items[$node->id]);
+			
+			# validate the data so corrupt data does not break the tree.
+			foreach($node as $data)
+				if(!is_numeric($data))
+					continue 2;
 
-				# If no parent, assign to root_id // Javascript assigns "0" to elements returning no parent
-				if('0' == $parent)
-					$parent = $parent_object->root_id;
-
-				# todo: reference fk_site.
-				$item = ORM::factory($item_model, $id); 
-				$item->local_parent = $parent;
-				$item->position = $position;
-				$item->save();	
-				
-				# Item exists so remove from the delete array.
-				unset($all_items[$id]);
-			}
+			# todo: reference fk_site.
+			$item = ORM::factory($item_model, $node->id); 
+			# If no parent, assign to root_id // Javascript assigns "0" to elements returning no parent
+			$item->local_parent = (empty($node->local_parent_id))
+				? $parent->root_id
+				: $node->local_parent_id ;
+			$item->position = $node->position;
+			$item->save();
 		}
 			
 		# Delete elements.
 		if(0 < count($all_items))
-		{
 			ORM::factory($item_model)
 				->where('fk_site', $site_id)
 				->delete_all($all_items);
-		}
-
+		
 		# Update Left and right values of whole tree
-		self::rebuild_tree($item_model, $parent_object->root_id, $site_id, '1');
+		self::rebuild_tree($item_model, $parent->root_id, $site_id, '1');
 		
 		return 'Tree Saved'; # status response	
 	}

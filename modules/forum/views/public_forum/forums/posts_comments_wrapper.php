@@ -52,9 +52,11 @@
 	<div id="add_comment_wrapper">
 		<form id="submit_comment" action="<?php echo url::site("$page_name/view/$post->id")?>" method="POST">
 			<input type="hidden" name="post_id" value="<?php echo $post->id?>">
-			<b>Add Reply</b>
-			<br><br>
-			<textarea name="body" style="width:100%;height:200px"></textarea>
+			
+			<fieldset>
+				<label>Add Reply</label>
+				<br/><textarea name="body" rel="text_req"></textarea>
+			</fieldset>
 			<p><button type="submit">Add Reply</button></p>
 		</form>
 	</div>

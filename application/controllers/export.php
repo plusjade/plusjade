@@ -62,7 +62,7 @@ class Export_Controller extends Controller {
 		if(!$tool->loaded)
 			die('invalid tool');
 		
-		$toolname = $tool->system_tool->name;
+		$toolname = strtolower($tool->system_tool->name);
 		
 		# load the tool parent
 		$parent = ORM::factory($toolname, $tool->parent_id);

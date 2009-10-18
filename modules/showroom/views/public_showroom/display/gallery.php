@@ -5,8 +5,8 @@
 	if(0 < $path->count())
 		foreach($path as $cat):?>
 			<a href="<?php echo url::site("$page_name/$cat->id/$cat->url")?>" class="loader"><?php echo $cat->name?></a> &#8594; 
-	<a href="<?php echo url::site("$page_name/$category->id/$category->url")?>" class="loader"><?php echo $category->name?></a>
 		<?php endforeach;?>
+	<a href="<?php echo url::site("$page_name/$category->id/$category->url")?>" class="loader"><?php echo $category->name?></a>
 </div>
 
 <?php

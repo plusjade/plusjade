@@ -72,7 +72,7 @@ class Account_Controller extends Public_Tool_Controller {
 				break;
 				
 			default:
-				die("$page_name : $action : trigger 404 not found");
+				Event::run('system.404');
 		}
 		
 		# the logic above will determine whether the user is logged in/out
@@ -92,13 +92,13 @@ class Account_Controller extends Public_Tool_Controller {
  */
 	private function all_users($page_name)
 	{
-		$primary = new View('public_account/accounts/all_users');
-		$primary->page_name = $page_name;
-		$primary->users =
+		$view = new View('public_account/accounts/all_users');
+		$view->page_name = $page_name;
+		$view->users =
 			ORM::factory('account_user')
 			->where('fk_site', $this->site_id)
 			->find_all();
-		return $primary;
+		return $view;
 	}
 	
 
@@ -114,38 +114,52 @@ class Account_Controller extends Public_Tool_Controller {
 		{
 			if(ROOTACCOUNT === $this->site_name)
 			{
-				$primary = self::plusjade_dashboard($page_name);
+				$dashboard = self::plusjade_dashboard($page_name);
+				return $dashboard;
 			}
-			else
-			{
-				$primary = new View('public_account/accounts/dashboard_index');
-				$primary->account_user = $this->account_user->get_user();
-			}
+
+			$dashboard = new View('public_account/accounts/dashboard_index');
+			$dashboard->account_user = $this->account_user->get_user();
+			return $dashboard;
 		}
-		elseif(! empty($_POST['username']) )
+		elseif($_POST)
 		{
+			# validate login form.
+			$post = new Validation($_POST);
+			$post->pre_filter('trim');
+			$post->add_rules('username', 'required');
+			$post->add_rules('password', 'required');
+			# on error
+			if(!$post->validate())
+			{
+				$login = $this->display_login($page_name);
+				$login->errors = $post->errors();
+				$login->values = $_POST;
+				return $login;
+			}	
+			
 			# atttempt to log user in.
 			if($this->account_user->login($_POST['username'], (int)$this->site_id, $_POST['password'], TRUE))
 			{
 				if(ROOTACCOUNT === $this->site_name)
-					$primary = self::plusjade_dashboard($page_name);
-				else
 				{
-					$primary = new View('public_account/accounts/dashboard_index');
-					$primary->account_user = $this->account_user->get_user();
+					$dashboard = self::plusjade_dashboard($page_name);
+					return $dashboard;
 				}
+				
+				$dashboard = new View('public_account/accounts/dashboard_index');
+				$dashboard->account_user = $this->account_user->get_user();
+				return $dashboard;
 			}
-			else
-			{
-				$primary = $this->display_login($page_name);
-				$primary->errors = 'Invalid username or password';
-			}
-		}
-		else
-			$primary = $this->display_login($page_name);
 
-		$primary->page_name = $page_name;
-		return $primary;
+			$login = $this->display_login($page_name);
+			$login->values = $_POST;
+			$login->failed_login = TRUE;
+			return $login;
+		}
+		
+		$login = $this->display_login($page_name);
+		return $login;
 	}
 
 /*
@@ -156,10 +170,16 @@ class Account_Controller extends Public_Tool_Controller {
 		$account = ORM::factory('account')
 			->where('fk_site', $this->site_id)
 			->find();
-			
+
+		$fields = array(
+			'username'	 => array('Username','input','text_req', ''),
+			'password'	 => array('Password','password','text_req', ''),
+		);
+		
 		$view = new View('public_account/accounts/login');
 		$view->page_name = $page_name;
 		$view->account = $account;
+		$view->fields = $fields;
 		return $view;
 	}
 	
@@ -174,9 +194,17 @@ class Account_Controller extends Public_Tool_Controller {
 			->where('fk_site', $this->site_id)
 			->find();
 		
+		$fields = array(
+			'username'	=> array('Username','input','text_req', ''),
+			'email'		=> array('Email','input','text_req', ''),
+			'password'	=> array('Password','password','text_req', ''),
+			'password2'	=> array('Confirm Password','password','text_req', ''),
+		);
+		
 		$wrapper = new View('public_account/accounts/index');
 		$wrapper->page_name = $page_name;
 		$wrapper->content = new View('public_account/accounts/create_account');
+		$wrapper->content->fields = $fields;
 		$wrapper->content->errors = $errors;
 		$wrapper->content->values = $values;
 		$wrapper->content->page_name = $page_name;
@@ -207,26 +235,17 @@ class Account_Controller extends Public_Tool_Controller {
 			$post->pre_filter('trim');
 			$post->add_rules('email', 'required', 'valid::email'); 
 			$post->add_rules('username', 'required', 'valid::alpha_numeric');
-			$post->add_rules('password', 'required', 'matches[password2]', 'valid::alpha_dash');
-			$values = array(
-				'email'		=> '',
-				'username'	=> '',
-				'password'	=> '',
-				'password2'	=> '',
-			);
-			$values	= arr::overwrite($values, $post->as_array()); 			
+			$post->add_rules('password', 'required', 'matches[password2]', 'valid::alpha_dash');			
 			if(!$post->validate())
 			{
-				$errors = $values;
-				$errors	= arr::overwrite($errors, $post->errors('form_error_messages'));
-				
-				return self::display_create($page_name, $values, $errors);
+				# $errors	= arr::overwrite($_POST, $post->errors('form_error_messages'));
+				return self::display_create($page_name, $_POST, $post->errors());
 			}
 			# Create new user
 			$account_user = ORM::factory('account_user');
 			
 			if($account_user->username_exists($_POST['username'], $this->site_id))
-				return self::display_create($page_name, $values, 'username already exists');
+				return self::display_create($page_name, $_POST, 'username already exists');
 
 			unset($_POST['password2']);
 			$account_user->fk_site = $this->site_id;
@@ -237,7 +256,7 @@ class Account_Controller extends Public_Tool_Controller {
 
 			# save the user 
 			if(!$account_user->save())
-				return self::display_create($page_name, $values, 'There was a problem creating account.');
+				return self::display_create($page_name, $_POST, 'There was a problem creating account.');
 			
 			# Log user in
 			if(! $this->account_user->login($account_user, (int)$this->site_id, $_POST['password']))
@@ -614,6 +633,11 @@ class Account_Controller extends Public_Tool_Controller {
  */
 	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
+	
+		# add account_page name to site_config.
+		# HACK, this won't work if the page name is changed. need to pass page_name.
+		yaml::edit_site_value($site_name, 'site_config', 'account_page', 'account');
+		
 		# other tools may depend on this admin user being logged in at site creation!
 		if($sample)
 		{
@@ -625,7 +649,6 @@ class Account_Controller extends Public_Tool_Controller {
 			$account_user->password = 'change_this_password';
 			$account_user->save();
 		}
-		return 'add';
 	}
 	
 }  # end

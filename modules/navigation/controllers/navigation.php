@@ -33,9 +33,8 @@ class Navigation_Controller extends Public_Tool_Controller {
  */		 
 	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
-		# this can all be done in the overloaded save function for
+		# this can possibly be done in the overloaded save function for
 		# navigations model - look into it.
-		
 		$new_item = ORM::factory('navigation_item');
 		$new_item->navigation_id	= $tool_id;
 		$new_item->fk_site			= $site_id;
@@ -51,8 +50,7 @@ class Navigation_Controller extends Public_Tool_Controller {
 		
 		$navigation->root_id = $new_item->id;
 		$navigation->save();
-
-
+		
 		
 		if($sample)
 		{
@@ -88,8 +86,7 @@ class Navigation_Controller extends Public_Tool_Controller {
 			# Update left and right values
 			Tree::rebuild_tree('navigation_item', $navigation->root_id, $site_id, '1');
 			
-		}	
-		return 'manage';
+		}
 	}
 	
 }  /* -- end -- */

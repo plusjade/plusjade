@@ -1,10 +1,4 @@
 
-
-<div style="text-align:center; padding:10px; margin-bottom:10px; background:lightblue;">
-	Hello this is the forum.
-</div>
-
-	
 <div id="forum_navigation_wrapper">
 
 	<a href="<?php echo url::site("$page_name/submit")?>" id="submit_new">Submit New</a>	

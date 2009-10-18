@@ -20,42 +20,30 @@ class Blog_Controller extends Public_Tool_Controller {
 		date_default_timezone_set('America/Los_Angeles');# just for now
 		list($page_name, $action, $value, $value2) = Uri::url_array();
 		$page_name	= $this->get_page_name($page_name, 'blog', $blog->id);
-		$action		= (empty($action)) ? 'SomethingRandom' : $action ;
+		$action		= (empty($action)) ? 'homepage' : $action ;
 
-		$primary = new View("public_blog/blogs/index");
-		$primary->tool_id = $blog->id;
-		$primary->set_global('blog_page_name', $page_name);
-		$primary->tags = $this->get_tags($blog->id);
-		$primary->sticky_posts = $this->get_sticky_posts($blog->sticky_posts);
-		$primary->recent_comments = $this->get_recent_comments($blog->id);
+		$view = new View("public_blog/blogs/index");
+		$view->tool_id = $blog->id;
+		$view->set_global('blog_page_name', $page_name);
+		$view->tags = $this->get_tags($blog->id);
+		$view->sticky_posts = $this->get_sticky_posts($blog->sticky_posts);
+		$view->recent_comments = $this->get_recent_comments($blog->id);
 
 		
 		switch($action)
 		{
 			case 'entry':
-				
 				$content = self::single_post($page_name, $value);
 				break;
-			
 			case 'tag':
 				$content = self::tag_search($blog->id, $value);
 				break;
-				
 			case 'archive':
 				$content = self::show_archive($blog->id, $value, $value2);
-				break;
-
-			case 'comment':
-				valid::id_key($value);
-				if($_POST)
-					$primary->response = self::post_comment($value);
-				
-				$content = self::single_post($page_name, NULL, $value);
-				break;
-				
-			default:
+				break;			
+			case 'homepage':
 				# blog homepage
-				$items = $this->db->query("
+				$blog_posts = $this->db->query("
 					SELECT blog_posts.*, 					
 					DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on,
 					GROUP_CONCAT(DISTINCT blog_post_tags.value ORDER BY blog_post_tags.value  separator ',') as tag_string,
@@ -70,68 +58,20 @@ class Blog_Controller extends Public_Tool_Controller {
 					ORDER BY created DESC
 				");
 				$content = new View('public_blog/blogs/multiple_posts');	
-				$content->items = $items;	
+				$content->blog_posts = $blog_posts;	
+				break;
+			
+			default:
+				Event::run('system.404');
 				break;
 		}
-		$primary->content = $content;
+		$view->content = $content;
 		# get the custom javascript;
-		$primary->global_readyJS(self::javascripts());
+		$view->global_readyJS(self::javascripts());
 		
-		return $this->wrap_tool($primary, 'blog', $blog);
+		return $this->wrap_tool($view, 'blog', $blog);
 	}
-	
 
-/*
- * output the appropriate javascript based on the calendar view.
- * currently we just have one though
- */	
-	private function javascripts()
-	{
-		$js = '
-			$("body").click($.delegate({
-				".blog_wrapper a[rel*=blog_ajax]": function(e){
-					$(".blog_content").html("<div class=\"ajax_loading\">Loading...</div>");
-					$(".blog_content").load(e.target.href);
-					return false;
-				},
-				".blog_wrapper a.get_comments":function(e){
-					var url		= $(e.target).attr("rel");
-					$container	= $(e.target).parent();
-					
-					$container.html("<div class=\"ajax_loading\">Loading...</div>");
-					$.get(url, function(data){
-						$container.replaceWith(data);
-					});
-					return false;
-				}
-			}));
-
-			$("body").submit($.delegate({
-				".blog_wrapper form.public_ajaxForm": function(e){
-					var form = $(e.target);
-					$(form).ajaxSubmit({
-						beforeSubmit: function(){
-							if( $("input[type=text]", form).jade_validate() )
-								return true;
-							
-							return false;
-						},
-						success: function(data) {
-							$(".comments_wrapper", form).append(data);
-							$(".add_comment", form).replaceWith("<div class=\"blog_response\">Comment Added!</div>");
-							e.stopPropagation();
-						}
-					});
-					e.stopPropagation();		
-					return false;
-				}
-			}));		
-		
-		';
-		# place the javascript.
-		return $this->place_javascript($js, FALSE);
-	}
-	
 	
 /*
  * return single post view
@@ -148,7 +88,7 @@ class Blog_Controller extends Public_Tool_Controller {
 			$url	= $id;
 		}
 		
-		$item = $this->db->query("
+		$blog_post = $this->db->query("
 			SELECT blog_posts.*, DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, 
 			GROUP_CONCAT(DISTINCT blog_post_tags.value ORDER BY blog_post_tags.value  separator ',') as tag_string
 			FROM blog_posts 
@@ -157,13 +97,12 @@ class Blog_Controller extends Public_Tool_Controller {
 			AND blog_posts.fk_site = '$this->site_id'
 			AND blog_posts.status = 'publish'
 		")->current();
-
-		if(! is_object($item) )
-			return 'This post does not exist';
+		if(empty($blog_post->id))
+			Event::run('system.404');
 		
-		$content->item = $item;
-		$content->set_global('title', $item->title);
-		$content->comments = $this->get_comments($page_name, $item->id, $item->blog_id);
+		$content->blog_post = $blog_post;
+		$content->set_global('title', $blog_post->title);
+		$content->comments = $this->get_comments($page_name, $blog_post->id);
 		$content->blog_page_name = $page_name;
 		return $content;
 	}
@@ -174,8 +113,9 @@ class Blog_Controller extends Public_Tool_Controller {
  */
 	private function tag_search($tool_id, $tag)
 	{
-		$content = new View('public_blog/blogs/multiple_posts');
-		$items = $this->db->query("
+		$tag = valid::filter_php_url($tag);
+		$view = new View('public_blog/blogs/multiple_posts');
+		$blog_posts = $this->db->query("
 			SELECT blog_posts.*,					
 			DATE_FORMAT(created, '%M %e, %Y, %l:%i%p') as created_on, blog_post_tags.value,
 			GROUP_CONCAT(DISTINCT blog_post_tags.value ORDER BY blog_post_tags.value  separator ',') as tag_string,
@@ -190,10 +130,12 @@ class Blog_Controller extends Public_Tool_Controller {
 			GROUP BY blog_posts.id HAVING tag_match > '0'
 			ORDER BY created DESC
 		");
-		$content->items = $items;
+		$view->blog_posts = $blog_posts;
+		$view->tag = $tag;
+		$view->tag_search = $blog_posts->count();
 		#Javascript
-		$content->request_js_files('expander/expander.js');		
-		return $content;		
+		#$view->request_js_files('expander/expander.js');		
+		return $view;		
 	}
 	
 /*
@@ -202,7 +144,7 @@ class Blog_Controller extends Public_Tool_Controller {
  */	
 	private function show_archive($tool_id, $value, $value2)
 	{
-		$content = new View("public_blog/blogs/archive");
+		$view = new View("public_blog/blogs/archive");
 		$date_search = false;
 		
 		# year search
@@ -227,7 +169,7 @@ class Blog_Controller extends Public_Tool_Controller {
 			$date_search = "AND created >= '$start' AND created < '$end'";				
 		}
 
-		$items = $this->db->query("
+		$blog_posts = $this->db->query("
 			SELECT blog_posts.*, 
 			DATE_FORMAT(created, '%Y') as year,
 			DATE_FORMAT(created, '%M') as month,
@@ -239,27 +181,26 @@ class Blog_Controller extends Public_Tool_Controller {
 			ORDER BY created
 			LIMIT 0, 10
 		");
-		$content->items = $items;
-		return $content;
+		$view->blog_posts = $blog_posts;
+		return $view;
 	}
 	
 /*
  * get and display a view of all comments from a specific post.
- * uses ajax
  */		
-	private function get_comments($page_name, $post_id=NULL, $tool_id = NULL)
+	private function get_comments($page_name, $post_id=NULL)
 	{
-		$content = new View('public_blog/blogs/comments');
+		$view = new View('public_blog/blogs/comments');
 		
-		if(NULL == $tool_id)
-		{
-			$parent =  $this->db->query("
-				SELECT blog_id FROM blog_posts 
-				WHERE id = '$post_id' AND fk_site = '$this->site_id'
-			")->current();
-			$tool_id = $parent->blog_id;
-		}			
-			
+		$blog_post =  $this->db->query("
+			SELECT id, blog_id, url FROM blog_posts 
+			WHERE id = '$post_id' AND fk_site = '$this->site_id'
+		")->current();
+		
+		# get this first because we might be posting.
+		$view->comment_form = self::comment_form($page_name, $blog_post);
+		
+		# get this second so if we post, it will display it.
 		$comments = $this->db->query("
 			SELECT *,
 			DATE_FORMAT(created_at, '%M %e, %Y, %l:%i%p') as clean_date
@@ -268,16 +209,16 @@ class Blog_Controller extends Public_Tool_Controller {
 			AND fk_site = '$this->site_id'
 			ORDER BY created_at
 		");
-		$content->comments = $comments;
-		$content->blog_post_id = $post_id;
-		$content->tool_id = $tool_id;
-		$content->blog_page_name = $page_name;
-		$content->admin_js = '';
+		$view->comments = $comments;
+		$view->blog_post = $blog_post;
+		$view->page_name = $page_name;
+		$view->admin_js = '';
+		
 		# Javascript 
 		# TODO: this is being duplicated on all posts,
 		# make this into a function and call the function instead.
 		if($this->client->can_edit($this->site_id))
-			$content->admin_js = '
+			$view->admin_js = '
 				$("#post_comments_'.$post_id.' .comment_item").each(function(i){
 					var toolname = "blog";
 					var id		= $(this).attr("rel");
@@ -286,23 +227,57 @@ class Blog_Controller extends Public_Tool_Controller {
 					$(this).prepend(toolbar);
 				});
 			';
-		return $content;
-
+		return $view;
 	}
 
+
 /*
- * function for handling post request on the post-comment form.
- * uses ajax.
+ * view and post handler for adding comment form.
  */	
-	private function post_comment($post_id=NULL)
+	private function comment_form($page_name, $blog_post)
 	{
+		if(is_numeric($blog_post) AND !is_object($blog_post))
+		{
+			$blog_post =  $this->db->query("
+				SELECT id, blog_id, url FROM blog_posts 
+				WHERE id = '$blog_post' AND fk_site = '$this->site_id'
+			")->current();
+			if(!is_object($blog_post))
+				return 'invalid post';
+		}
+		
+		# setup the form fields.
+		$fields = array(
+			'body'	=> array('Comment','textarea','text_req', ''),
+			'name'	=> array('Name','input','text_req', ''),
+			'email'	=> array('Email','input','text_req', ''),
+			'url'	=> array('Website','input','', ''),
+		);
+		
 		if($_POST)
 		{
-			##ini_set('date.timezone', 'America/Los_Angeles');
-
+			# validate submit form.
+			$post = new Validation($_POST);
+			$post->pre_filter('trim');
+			$post->add_rules('body', 'required');
+			$post->add_rules('name', 'required');
+			$post->add_rules('email', 'required');
+			
+			# on error
+			if(!$post->validate())
+			{
+				$view = new View('public_blog/blogs/comment_form');
+				$view->blog_post = $blog_post;
+				$view->fields = $fields;
+				$view->page_name = $page_name;
+				$view->errors = $post->errors();
+				$view->values = $_POST;
+				return $view;
+			}
+			
 			$data = array(
-				'blog_id'		=> $_POST['tool_id'],
-				'blog_post_id'		=> $post_id,
+				'blog_id'		=> $blog_post->blog_id,
+				'blog_post_id'	=> $blog_post->id,
 				'fk_site'		=> $this->site_id,
 				'body'			=> $_POST['body'],
 				'name'			=> $_POST['name'],
@@ -310,16 +285,20 @@ class Blog_Controller extends Public_Tool_Controller {
 				'email'			=> $_POST['email'],
 				'created_at'	=> strftime("%Y-%m-%d %H:%M:%S"),					
 			);
-			
 			$insert_id = $this->db->insert('blog_post_comments', $data);
-			return '		
-			<div class="comment_item">				
-				<div class="comment_name">'.$_POST['name'].' says...</div>
-				<div class="comment_time">just now</div>
-				<div class="comment_body">' .$_POST['body']. '</div>
-			</div>
-			';		
+			
+			# success
+			$view = new View('public_blog/blogs/status');
+			$view->success = true;
+			return $view;	
 		}
+		
+		# send form view
+		$view = new View('public_blog/blogs/comment_form');
+		$view->blog_post = $blog_post;
+		$view->fields = $fields;
+		$view->page_name = $page_name;		
+		return $view;
 	}
 
 /* Sidebar functions */
@@ -346,10 +325,10 @@ class Blog_Controller extends Public_Tool_Controller {
  */		
 	private function get_sticky_posts($id_string=Null)
 	{
-		if( empty($id_string) )
+		if(empty($id_string))
 			return false;
 			
-		$item =  $this->db->query("
+		$blog_posts =  $this->db->query("
 			SELECT blog_posts.title, blog_posts.url
 			FROM blog_posts
 			WHERE id IN ($id_string)
@@ -357,7 +336,7 @@ class Blog_Controller extends Public_Tool_Controller {
 			AND status = 'publish'
 			LIMIT 0,5
 		");
-		return $item;	
+		return $blog_posts;	
 	}
 
 /*
@@ -376,42 +355,61 @@ class Blog_Controller extends Public_Tool_Controller {
 		return $comments;	
 	}
 
-
+/*
+ * output the appropriate javascript based on the calendar view.
+ * currently we just have one though
+ */	
+	private function javascripts()
+	{
+		$js = '
+			$("body").click($.delegate({
+				".blog_wrapper a[rel*=blog_ajax]": function(e){
+					$(".blog_content").html("<div class=\"ajax_loading\">Loading...</div>");
+					$(".blog_content").load(e.target.href);
+					return false;
+				},
+				".blog_wrapper a.get_comments":function(e){
+					var url		= $(e.target).attr("rel");
+					$container	= $(e.target).parent();
+					
+					$container.html("<div class=\"ajax_loading\">Loading...</div>");
+					$.get(url, function(data){
+						$container.replaceWith(data);
+					});
+					return false;
+				}
+			}));		
+		';
+		# place the javascript.
+		return $this->place_javascript($js, FALSE);
+	}
 
 	
 /*
  * ajax handler.
  */ 
-	public function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $blog_id)
 	{
 		list($page_name, $action, $value) = $url_array;
-		
 		switch($action)
 		{
 			case 'entry':
-				die( $this->single_post($page_name, $value) );
+				if($_POST)
+				{
+					# todo: make sure post isset.
+					die($this->comment_form($page_name, $_POST['blog_post_id']));
+				}
+				die($this->single_post($page_name, $value));
 				break;
-			
+			case 'comment':
+				die($this->get_comments($page_name, $value));
+				break;			
 			case 'tag':
 				break;	
-				
 			case 'archive':
 				break;
-
-			case 'comment':
-				# this is an ajaxForm comment post request
-				# OR ajax request to view comments
-				valid::id_key($value);
-				if($_POST)
-					die( self::post_comment($value) );
-				else
-					die( self::get_comments($page_name, $value) );
-				break;
-				
-			default:
-				die('no action');
-				break;
 		}
+		die('no action');
 	}
 	
 	
@@ -439,11 +437,9 @@ class Blog_Controller extends Public_Tool_Controller {
 			   'blog_id'		=> $tool_id,
 			   'value'			=> 'general',					
 			);
-			$db->insert('blog_post_tags', $data);
-		
-		
+			$db->insert('blog_post_tags', $data);		
 		}
-		return 'add';
+
 	}
 
 	

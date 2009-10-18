@@ -1,28 +1,31 @@
 
-
-
 <form id="forum_submit_item" action="<?php echo url::site("$page_name/submit")?>" method="POST" class="fieldsets">
 	
 	<h3>Submit a New Post</h3>
 
-	<b>Category</b>
-	<select name="forum_cat_id">
-		<?php
-		foreach($categories as $cat)
-			echo "<option value=\"$cat->id\" rel=\"$cat->url\">$cat->name</option>";
-		?>
-	</select>
+	<?php if(isset($errors)) echo val_form::show_error_box($errors);?>
 	
-	<br><br>
+	<fieldset>
+		<label>Category</label>
+		<select name="forum_cat_id">
+			<?php
+			foreach($categories as $cat)
+				echo "<option value=\"$cat->id\" rel=\"$cat->url\">$cat->name</option>";
+			?>
+		</select>
+	</fieldset>	
+
+	<?php
+	$fields = array(
+		#'category'	=> array('Category','select','text_req'),
+		'title'	=> array('Title','input','text_req',''),
+		'body'	=> array('Post','textarea','text_req','')
+	);
+	if(!isset($values)) $values = array();
+	if(!isset($errors)) $errors = array();
+	?>
+	<?php echo val_form::generate_fields($fields, $values, $errors);?>
 	
-	<b>Title</b>
-	<br><input type="text" name="title" rel="text_req" style="width:500px">
-	
-	<br><br>
-	
-	<b>Post</b>
-	<br><textarea name="body" style="height:150px;width:100%"></textarea>
-	<br>
 	<button type="submit">Submit</button>
 </form>
 
@@ -31,7 +34,7 @@
 $('#forum_submit_item').ajaxForm({
 	//target: "#contact_wrapper_%VAR% #newsletter_form",
 	beforeSubmit: function(fields, form) {
-		if(!$("input[type=text]", form[0]).jade_validate() ) return false;
+		if(!$("input, textarea", form[0]).jade_validate() ) return false;
 	},
 	success: function(data) {
 		// todo: output a success message man.

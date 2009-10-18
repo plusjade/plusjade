@@ -9,9 +9,11 @@
 	if(isset($errors))
 	{
 		?>
-		<div class="form_status_box error">
-			<b>Form Not Sent!</b>
-			<br/>Only <?php echo count($errors)?> more fields to go...
+		<div class="jade_form_status_box box_negative">
+			<div><span>Form Not Sent!</span></div>
+			<div class="error_count">
+				Only <?php echo count($errors)?> more fields to go...
+			</div>
 		</div>
 		<?php
 	}		
@@ -21,13 +23,13 @@
 		$type		= explode(':', $item->type);
 		$field_name	= "$item->id:" . valid::filter_php_url($item->title);
 		$unique		= 1;
-		$asterisk	= '';
-		$error_div	= '';
+		$star		= '';
+		$jade_error	= '';
 		$rel		= '';
 		
 		# was there an error with this field?
 		if(!empty($errors[$field_name]))
-			$error_div = 'error_div';
+			$jade_error = 'jade_error';
 		
 		# does a previous field value exist?
 		if(empty($values[$field_name]))
@@ -36,7 +38,7 @@
 		# is field required? :: 0 = optional , 1 = required		
 		if(!empty($item->album))
 		{
-			$asterisk = '<b class="req_icon">*</b>';
+			$star = '<span class="jade_required_star">*</span>';
 			
 			# what type of requirement? (this is for javascript)
 			$rel = (isset($type[1]))
@@ -45,8 +47,8 @@
 			$rel = $rel . '_req';
 		}
 		?>
-		<div id="format_item_<?php echo $item->id?>" class="format_item <?php echo $error_div?>" rel="<?php echo $item->id?>">
-			<b><?php echo $item->title?></b> <?php echo $asterisk?>
+		<fieldset id="format_item_<?php echo $item->id?>" class="format_item <?php echo $jade_error?>" rel="<?php echo $item->id?>">
+			<label><?php echo $item->title?> <?php echo $star?></label>
 			<div class="user_info"><?php echo $item->body?></div>
 		<?php
 		switch($type[0])
@@ -122,7 +124,7 @@
 		}
 			if(isset($errors[$field_name])) echo "<span class='error_msg'>{$errors[$field_name]}</span>";
 		?>	
-		</div>
+		</fieldset>
 		<?php
 	}	
 	?>	
@@ -134,12 +136,8 @@
 <script type="text/javascript">
 		$('.format_form_list').ajaxForm({		 
 			beforeSubmit: function(fields, form){
-			
-				// console.log(fields);console.log(form);console.log(form[0]);return false;
-				
 				if(! $("input, textarea", form[0]).jade_validate()) return false;
 				$('.format_form_list').html('<div class="ajax_loading">Loading...</div>');
-				//return false;
 			},
 			success: function(data) {
 				$('.format_form_list').replaceWith(data);

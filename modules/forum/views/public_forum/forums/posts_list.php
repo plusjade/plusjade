@@ -5,7 +5,7 @@
 	<div class="each_post_wrapper">
 		<div class="votes">
 			<span><?php echo $post->forum_cat_post_comment->vote_count?></span>
-			votes
+			<br/>votes
 		</div>
 		
 		<div class="comments">

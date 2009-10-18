@@ -44,9 +44,14 @@ class Showroom_Controller extends Public_Tool_Controller {
 				: self::items_category($page_name, $showroom, (int) $showroom->home_cat);
 		}
 		elseif(is_numeric($first_node))
-			$primary->items = self::items_category($page_name, $showroom, $first_node);
+		{
+			if('0' == substr($first_node, 0, 1))
+				$primary->item = self::item($page_name, $first_node, $item);
+			else
+				$primary->items = self::items_category($page_name, $showroom, $first_node);
+		}
 		else
-			$primary->item = self::item($page_name, $first_node, $item);
+			Event::run('system.404');
 
 
 		# determine the category to highlight.
@@ -180,22 +185,39 @@ class Showroom_Controller extends Public_Tool_Controller {
 /*
  * show a single item
  */
-	private function item($page_name, $category, $item_url)
+	private function item($page_name, $item_id, $item_name)
 	{
+		$item_id = substr($item_id, 1);
 		$item = ORM::factory('showroom_cat_item')
 			->where(array(
-				'fk_site' => $this->site_id,
-				'url'	  => $item_url,
+				'fk_site' => $this->site_id
 			))
-			->find();
+			->find($item_id);
 		if(!$item->loaded)
 			return '<div class="not_found">Invalid item</div>';
 
-		# prep image Json.
+		# get the category	
+		$category = ORM::factory('showroom_cat')
+			->where(array(
+				'fk_site' => $this->site_id
+			))
+			->find($item->showroom_cat_id);
 
+		# get the path to this items category
+		$path = ORM::factory('showroom_cat')
+			->where(array(
+				'fk_site'		=> $this->site_id,
+				'showroom_id'	=> $category->showroom_id,
+				'lft <'			=> $category->lft,
+				'rgt >'			=> $category->rgt,
+				'local_parent !='=> 0
+			))
+			->orderby(array('lft' => 'asc'))
+			->find_all();
+			
 		$view = new View('public_showroom/display/single_item');
 		$view->item			= $item;
-		$view->images		= $images;	
+		$view->path			= $path;
 		$view->category		= $category;
 		$view->page_name	= $page_name;
 		$view->img_path		= $this->assets->assets_url();
@@ -257,12 +279,14 @@ class Showroom_Controller extends Public_Tool_Controller {
 
 		if(empty($first_node))
 			die('invalid showroom request');
-			
-		if(is_numeric($first_node))
-			echo self::items_category($page_name, $parent_id, $first_node);
-		else
-			echo self::item($page_name, $first_node, $item);
 
+		if(is_numeric($first_node))
+		{
+			if('0' == substr($first_node, 0, 1))
+				echo self::item($page_name, $first_node, '');
+			else
+				echo self::items_category($page_name, $parent_id, $first_node);
+		}
 		die();
 	}
 

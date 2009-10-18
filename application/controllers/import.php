@@ -51,7 +51,7 @@ class Import_Controller extends Controller {
 		foreach($tool->parent_table as $field => $value)
 			if('id' != $field)
 				$new_parent->$field = $value;
-			
+		$new_parent->fk_site = $this->site_id;
 
 		if($new_parent->save())
 		{
@@ -76,6 +76,7 @@ class Import_Controller extends Controller {
 					elseif('id' != $field)
 						$new_data->$field = $value;
 				}
+				$new_data->fk_site = $this->site_id;
 				$new_data->save();
 				$new_data->clear();
 			}

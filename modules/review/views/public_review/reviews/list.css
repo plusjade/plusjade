@@ -1,0 +1,58 @@
+
+#review_wrapper_++ {
+
+}
+/* add review form */ 
+#review_wrapper_++ .review_form {
+
+}
+#review_wrapper_++ .review_form  fieldset{
+border:0;
+padding:3px;
+margin-bottom:3px;
+}
+#review_wrapper_++ .review_form  label{
+font-weight:bold;
+}
+#review_wrapper_++ .review_form input  {
+	background:#fff url(/_data/pinky/themes/titan/images/input_background.png) repeat-x;
+	height: 25px;
+	width:240px;
+	padding: 5px; 
+	font-size: 14px; 
+	color: #222222;
+	border: 1px solid #cecece;
+}
+#review_wrapper_++ .review_form textarea  {
+	background:#fff url(/_data/pinky/themes/titan/images/input_background.png) repeat-x; 
+	width: 99%; 
+	height: 115px; 
+	border: 1px solid #d7d7d7; 
+	padding: 5px; 
+}
+#review_wrapper_++ .review_form button  {
+	background: #52bbe2; 
+	margin: 15px 0;
+	font-weight: bold; 
+	font-size: 1.4em; 
+	color: #fff; 
+	padding:5px 10px; 
+	border:0; 
+}
+#review_wrapper_++ .review_form button:hover  {
+	background: orange; cursor: pointer;
+}
+
+/* add review list display */ 
+#review_wrapper_++ .review_item {
+margin-bottom:10px;
+}
+#review_wrapper_++ .review_rating {
+
+}
+#review_wrapper_++ .review_body {
+	padding:10px;border:1px dashed #ccc;
+}
+#review_wrapper_++ .review_name {
+
+}

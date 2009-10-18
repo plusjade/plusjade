@@ -5,7 +5,7 @@
 <?php echo form::open_multipart("edit_showroom/add_item/$parent_id", array('class' => 'custom_ajaxForm'))?>
 	<input type="hidden" name="images" value="">
 	<input type="hidden" name="category_id" value="">
-	<input type="hidden" name="body" value="offline">
+	<input type="hidden" name="body" value="">
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" class="jade_positive" accesskey="enter">Add Item</button>
 		<div id="common_title">Add New Showroom Item</div>

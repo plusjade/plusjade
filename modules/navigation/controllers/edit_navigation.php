@@ -30,14 +30,9 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		$pages = ORM::factory('page')
 			->where('fk_site', $this->site_id)
 			->find_all();	
-			
-		function render_node_navigation($item)
-		{
-			return ' <li rel="'. $item->id .'" id="item_' . $item->id . '"><span>' . $item->display_name . '</span> <small style="display:none">Type: '. $item->type .' <br> Data: '. $item->data .'</small>'; 
-		}
 
 		$primary = new View('edit_navigation/manage');
-		$primary->tree = Tree::display_tree('navigation', $navigation_items, NULL, TRUE);
+		$primary->tree = Tree::display_tree('navigation', $navigation_items, NULL, NULL, 'render_edit_navigation', TRUE);
 		$primary->tool_id = $tool_id;
 		$primary->pages = $pages;
 		die($primary);
@@ -90,7 +85,11 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 		if($_POST)
 		{
 			valid::id_key($tool_id);
-			echo Tree::save_tree('navigation', 'navigation_item', $tool_id, $this->site_id, $_POST['output']);
+			$json = json_decode($_POST['json']);
+			if(NULL === $json OR !is_array($json))
+				die('invalid json');
+				
+			echo Tree::save_tree('navigation', 'navigation_item', $tool_id, $this->site_id, $json);
 		}
 		die();
 	}
@@ -144,7 +143,7 @@ class Edit_Navigation_Controller extends Edit_Tool_Controller {
 
 		if($_POST)
 		{
-			$navigation->title = $_POST['title'];
+			$navigation->name = $_POST['name'];
 			$navigation->save();
 			die('Navigation Settings Saved');	
 		}

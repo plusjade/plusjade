@@ -45,19 +45,12 @@
 						</div>
 				<?php endif;?>
 						<div id="icon_<?php echo $tool->id?>" class="asset <?php echo $class?>">
-							Pages: 
+							<a href="/get/tool/add?tool_id=<?php echo "$tool->id&page_id=$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add to Page</a>
+							<br/><a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->parent_id"?>" class="show_view">quick view</a>
+							<br/><a href="/get/tool/delete/<?php echo $tool->id?>" class="jade_delete_tool" rel="<?php echo $tool->id?>">delete!</a>
 							<?php foreach($tool->pages as $page) :?>
 								<br><a href="<?php echo url::site($page->page_name)?>"><?php echo $page->page_name?></a>
 							<?php endforeach;?>
-							
-							<br><br>
-							<a href="/get/tool/add?tool_id=<?php echo "$tool->id&page_id=$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add to Page</a>
-							<br>
-							<a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->parent_id"?>" class="show_view">quick view</a>
-								
-							<br>
-							<a href="/get/tool/delete/<?php echo $tool->id?>" class="jade_delete_tool" rel="<?php echo $tool->id?>">delete!</a>
-							
 						</div>
 				<?php		
 				++$start;
@@ -72,7 +65,7 @@
 		<div class="contents" style="height:400px; ">
 			<span class="icon cross floatright">&#160; &#160;</span>
 			<h2 class="aligncenter">*For previewing purposes only*</h2>
-			<div id="output_tool_html"></div>
+			<div class="output_tool_html"></div>
 		</div>
 	</span>
 	
@@ -81,6 +74,7 @@
 
 <script type="text/javascript">
 	
+	// show the tool types
 	$('#tool_list_wrapper a').click(function(){
 		$('#tool_list_wrapper a').removeClass('active');
 		var pane = $(this).addClass('active').attr('href');	
@@ -90,7 +84,7 @@
 	});
 	$('#tool_list_wrapper a:first').click();
 	
-	
+	// delete the tool.
 	$('.jade_delete_tool').click(function(){
 		if(confirm('This cannot be undone. Delete this tool?')) {
 			var id = $(this).attr('rel');
@@ -102,18 +96,17 @@
 		return false;
 	});
 	
-	$('#tools_browser_wrapper a.show_view').click(function(){
-		
+	// show tool quick view.
+	$('#tools_browser_wrapper a.show_view').click(function() {	
 		$('.save_pane')
 			.clone()
 			.prependTo('#tools_browser_wrapper')
 			.addClass('helper')
 			.show();
 
-		var url = $(this).attr('href');
-		$('.save_pane.helper #output_tool_html')
+		$('.save_pane.helper .output_tool_html')
 			.html('<div class="plusjade_ajax">Loading...</div>')
-			.load(url);
+			.load($(this).attr('href'));
 		
 		return false;
 	});
@@ -128,13 +121,10 @@
 			};		
 			$.get(this.href, function(data){
 				// expecting an insert_id from pages_tools table
-				// if the result data is NOT numeric, display the error message
-				/*
-				if(!is_numeric(data)) {
+				if(isNaN(data)) {
 					alert(data);
 					return false;				
 				}
-				*/
 				tool.instance = data;
 				$().jade_inject_tool('add', tool);
 			});

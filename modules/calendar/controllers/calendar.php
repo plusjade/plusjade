@@ -10,27 +10,20 @@ class Calendar_Controller extends Public_Tool_Controller {
 	
 	public function _index($calendar)
 	{
-		$url_array	= Uri::url_array();
-		$page_name	= $this->get_page_name($url_array['0'], 'calendar', $calendar->id);
-		$action		= (empty($action)) ? 'nonsense' : $url_array['1'];
-		$year		= $url_array['2'];
-		$month		= $url_array['3'];
-		$day		= $url_array['4'];
+		# $date format = year-month-day
+		list($page_name, $action, $date) = Uri::url_array();
+		$page_name	= $this->get_page_name($page_name, 'calendar', $calendar->id);
+		$action		= (empty($action)) ? 'nonsense' : $action;
+		
 		$primary	= new View('public_calendar/small/index');
-			
+
 		switch($action)
-		{
-			case 'month':
-				break;				
+		{			
 			case 'day':
-				$primary->events = $this->day($calendar->id, $year, $month, $day);
+				$primary->events = $this->day($calendar->id, $date);
 				break;			
-			default:
-				$year	= date('Y');
-				$month	= date('m');
-				break;
 		}
-		$primary->calendar = $this->month($page_name, $calendar->id, $year, $month);
+		$primary->calendar = $this->month($page_name, $calendar->id, $date);
 		
 		# get the custom javascript;
 		$primary->global_readyJS(self::javascripts());
@@ -38,49 +31,31 @@ class Calendar_Controller extends Public_Tool_Controller {
 		return $this->wrap_tool($primary, 'calendar', $calendar);
 	}
 	
-/*
- * output the appropriate javascript based on the calendar view.
- * currently we just have one though
- */	
-	private function javascripts()
-	{
-		$js = '
-		
-			$("body").click($.delegate({
-				".phpajaxcalendar_wrapper a[rel=ajax]": function(e){
-					$("a[rel*=ajax]").removeClass("selected");
-					$(this).addClass("selected");
-					
-					$("#calendar_event_details").html("<div class=\"ajax_loading\">Loading...</div>");
-					$("#calendar_event_details").load(e.target.href,{}, function(){
-						$("#click_hook").click();
-					});
-					return false;	
-				},
-				
-				".phpajaxcalendar_wrapper a.monthnav": function(e){
-					$(".phpajaxcalendar_wrapper").html("<div class=\"ajax_loading\">Loading...</div>");
-					$(".phpajaxcalendar_wrapper").load(e.target.href);
-					return false;	
-				}
-			}));	
-		';
-		# place the javascript.
-		return $this->place_javascript($js, FALSE);
-	}
-	
-	
 
 /*
- * Ajax query for month (last and next buttons)
+ * get a specific month
  */
-	public function month($page_name, $tool_id, $year=NULL, $month=NULL)
+	private function month($page_name, $tool_id, $date)
 	{
 		valid::id_key($tool_id);
-		valid::year($year);
-		valid::month($month);
+		if(empty($date))
+		{
+			$year	= date('Y');
+			$month	= date('m');		
+		}
+		else
+		{	
+			$date = explode('-' , $date);
+			# strictly need the formated date, else throw page not found.
+			if(1 > count($date) OR count($date) > 3)
+				Event::run('system.404');
+				
+			list($year, $month) = $date; 
+			valid::year($year);
+			valid::month($month);
+		}
 		$date_array = array();
-
+	
 		$dates = ORM::factory('calendar_item')
 			->where(array(
 				'fk_site'		=> $this->site_id,
@@ -105,14 +80,22 @@ class Calendar_Controller extends Public_Tool_Controller {
 	
 	
 /* 
- * Ajax get a list of events for a certain date
+ * get a list of events for a certain date
  */
-	public function day($tool_id, $year=NULL, $month=NULL, $day=NULL)
+	public function day($tool_id, $date)
 	{
+		if(empty($date))
+			Event::run('system.404');	
+		$date = explode('-' , $date);
+		# strictly need the formated date, else throw page not found.
+		if(3 != count($date))
+			Event::run('system.404');
+
+		list($year, $month, $day) = $date; 		
 		valid::year($year);
 		valid::month($month);
 		valid::day($day);
-
+		
 		$events = ORM::factory('calendar_item')
 			->where(array(
 				'fk_site'		=> $this->site_id,
@@ -123,7 +106,6 @@ class Calendar_Controller extends Public_Tool_Controller {
 			))
 			->find_all();	
 
-		
 		$primary = new View('public_calendar/small/day');
 		$primary->events = $events;
 		$primary->date = "$year $month $day";
@@ -165,23 +147,48 @@ class Calendar_Controller extends Public_Tool_Controller {
 		}
 	}
 
+/*
+ * output the appropriate javascript based on the calendar view.
+ * currently we just have one though
+ */	
+	private function javascripts()
+	{
+		$js = '
+		
+			$("body").click($.delegate({
+				".phpajaxcalendar_wrapper a[rel=ajax]": function(e){
+					$("a[rel*=ajax]").removeClass("selected");
+					$(this).addClass("selected");
+					
+					$("#calendar_event_details").html("<div class=\"ajax_loading\">Loading...</div>");
+					$("#calendar_event_details").load(e.target.href,{}, function(){
+						$("#click_hook").click();
+					});
+					return false;	
+				},
+				
+				".phpajaxcalendar_wrapper a.monthnav": function(e){
+					$(".phpajaxcalendar_wrapper").html("<div class=\"ajax_loading\">Loading...</div>");
+					$(".phpajaxcalendar_wrapper").load(e.target.href);
+					return false;	
+				}
+			}));	
+		';
+		# place the javascript.
+		return $this->place_javascript($js, FALSE);
+	}
 	
 /*
  * ajax handler.
  */ 	
 	public function _ajax($url_array, $tool_id)
-	{		
-		/*
-		$page_name = @$url_array['0'];
-		$action	= @$url_array['1'];
-		$year	= @$url_array['2'];
-		$month	= @$url_array['3'];
-		$day	= @$url_array['4'];
-		*/
-		if('month' == $url_array['1'])
-			die( self::month($url_array['0'], $tool_id, $url_array['2'], $url_array['3']) );
-		elseif('day' == $url_array['1'])
-			die( self::day($tool_id, $url_array['2'], $url_array['3'], $url_array['4']) );
+	{
+		list($page_name, $action, $date) = $url_array;
+		
+		if('month' == $action)
+			die(self::month($page_name, $tool_id, $date));
+		elseif('day' == $action)
+			die(self::day($tool_id, $date));
 	
 		die('something is wrong with the url');
 	}
@@ -203,7 +210,6 @@ class Calendar_Controller extends Public_Tool_Controller {
 			$new_item->desc			= "Pizza party at my house to celebrate my new website launch. Starts at 3pm, bring your buddies!";
 			$new_item->save();		
 		}
-		return 'add';
 	}
 	
 	

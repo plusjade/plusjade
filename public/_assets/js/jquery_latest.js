@@ -93,7 +93,7 @@ jQuery.strstr = function( haystack, needle, bool ) {
 jQuery.fn.jade_validate = function() {
 
 	$(this).removeClass("input_error");
-	$(this).parent('div').removeClass("error_div");
+	$(this).parent('fieldset').removeClass("jade_error");
 	$("span.error_msg").remove();
 	var nameRegex = /^[a-zA-Z]+(([\'\,\.\- ][a-zA-Z ])?[a-zA-Z]*)*$/;
 	var emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -108,7 +108,7 @@ jQuery.fn.jade_validate = function() {
 			case "text_req":
 				if(!val){
 					$(this).addClass("input_error");
-					$(this).parent('div').addClass("error_div");
+					$(this).parent('fieldset').addClass("jade_error");
 					$(this).after(' <span class="error_msg">Cannot be blank</span>');
 					errors = true;
 				}
@@ -116,7 +116,7 @@ jQuery.fn.jade_validate = function() {
 			case "email_req":
 				if(! val.match(emailRegex) ){
 					$(this).addClass("input_error");
-					$(this).parent('div').addClass("error_div");
+					$(this).parent('fieldset').addClass("jade_error");
 					$(this).after(' <span class="error_msg">Invalid email</span>');
 					errors = true;
 				}
@@ -124,7 +124,7 @@ jQuery.fn.jade_validate = function() {
 			case "url_req":
 				if(!val.match(urlRegex)){
 					$(this).addClass("input_error");
-					$(this).parent('div').addClass("error_div");
+					$(this).parent('fieldset').addClass("jade_error");
 					$(this).after(' <span class="error_msg">Invalid url</span>');
 					errors = true;
 				}
@@ -132,7 +132,7 @@ jQuery.fn.jade_validate = function() {
 			case "phone_req":
 				if(!val.match(phoneRegex)){
 					$(this).addClass("input_error");
-					$(this).parent('div').addClass("error_div");
+					$(this).parent('fieldset').addClass("jade_error");
 					$(this).after(' <span class="error_msg">Numbers, spaces, and () - . only please.</span>');
 					errors = true;
 				}

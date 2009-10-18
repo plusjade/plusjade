@@ -120,8 +120,6 @@ class Site_Controller extends Controller {
 		foreach($install as $toolname)
 			Tool_Controller::_auto_builder($toolname, $new_site->id, $site_name, 'base');
 
-		# add account_page name to site_config.
-		yaml::edit_site_value($site_name, 'site_config', 'account_page', 'account');
 		*/
 		
 		

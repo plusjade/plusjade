@@ -5,7 +5,7 @@
 		</div>
 	<?php else:?>	
 		<a href="<?php echo url::site()?>">
-			<img src="<?php echo $this->assets->assets_url($this->banner)?>" id="header_banner" alt="<?php echo $this->banner?>">
+			<img src="<?php echo $this->assets->assets_url($this->banner)?>" id="header_banner" alt="<?php echo $this->site_name?> logo">
 		</a>
 	<?php endif;?>
 </span>

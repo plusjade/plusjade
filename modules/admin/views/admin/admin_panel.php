@@ -70,13 +70,15 @@
 		{
 			// THIS IS HIDDEN: Exists so JS can grab html.
 			// $tools_array is sent from build_page controller.
+			$i=1;
 			foreach($tools_array as $data_array)
 			{
 				$data_array['page_id']		= $page_id;
+				$data_array['layer']		= ++$i;
 				$data_array['protected']	=
 					(in_array($data_array['name_id'], $protected_array))
-					? TRUE : FALSE;					
-				
+					? TRUE 
+					: FALSE;
 				echo View::factory('tool/toolkit_html', array('data_array'=> $data_array));
 			}
 		}

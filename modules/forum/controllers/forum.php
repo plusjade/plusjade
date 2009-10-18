@@ -12,7 +12,7 @@ class Forum_Controller extends Public_Tool_Controller {
  * routes the url in no-ajax mode.
  * expects parent forum table object
  */ 
-	function _index($forum)
+	public function _index($forum)
 	{
 		$url_array	= Uri::url_array();
 		$page_name	= $this->get_page_name($url_array['0'], 'forum', $forum->id);
@@ -436,8 +436,27 @@ class Forum_Controller extends Public_Tool_Controller {
 			
 		if($_POST)
 		{
-			if(empty($_POST['title']) OR empty($_POST['body']))
-				die('Title and Body cannot empty');
+			# validate submit form.
+			$post = new Validation($_POST);
+			$post->pre_filter('trim');
+			$post->add_rules('title', 'required');
+			$post->add_rules('body', 'required');
+
+			# on error
+			if(!$post->validate())
+			{
+				# get the categories
+				$categories = self::categories($tool_id);
+				if(!$categories)
+					return 'There are no categories to add posts to =(';
+					
+				$view = new View('public_forum/forums/submit');
+				$view->page_name = $page_name;
+				$view->categories = $categories;
+				$view->errors = $post->errors();
+				$view->values = $_POST;
+				return $view;
+			}
 
 			# add to post table
 			$new_post = ORM::Factory('forum_cat_post');
@@ -459,12 +478,21 @@ class Forum_Controller extends Public_Tool_Controller {
 			# update post with comment_id.
 			$new_post->forum_cat_post_comment_id = $new_comment->id;
 			$new_post->save();
-			#TODO: output a success message.
+			
+			# output a success message.
+			$status = new View('public_forum/forums/status');
+			$status->success = true;
+			return $status;
 		}
 		
+		# get the categories
+		$categories = self::categories($tool_id);
+		if(!$categories)
+			return 'There are no categories to add posts to =(';
+			
 		$primary = new View('public_forum/forums/submit');
 		$primary->page_name = $page_name;
-		$primary->categories = self::categories($tool_id);
+		$primary->categories = $categories;
 		return $primary;
 	}
 
@@ -487,7 +515,7 @@ class Forum_Controller extends Public_Tool_Controller {
 			))
 			->find();	
 		if(TRUE == $has_voted->loaded)
-			die('already voted.');
+			return 'already voted.';
 			
 		$vote = ('down' == $vote) ? -1 : 1 ;
 		
@@ -502,7 +530,7 @@ class Forum_Controller extends Public_Tool_Controller {
 		$log_vote->fk_site = $this->site_id; # for site garbage collection.
 		$log_vote->save();
 
-		die('Vote has been accepted!');
+		return 'Vote has been accepted!';
 	}	
 	
 /*
@@ -515,11 +543,8 @@ class Forum_Controller extends Public_Tool_Controller {
 		if(!$this->account_user->logged_in($this->site_id))
 			die('Please Login');
 			
-		if($_POST)
-		{
-			if(empty($_POST['body']))
-				die('Reply cannot be empty.');
-			
+		if(!empty($_POST['body']))
+		{			
 			if('post' == $type)
 			{
 				$post = ORM::Factory('forum_cat_post', $id);
@@ -527,10 +552,16 @@ class Forum_Controller extends Public_Tool_Controller {
 				$id =  $post->forum_cat_post_comment_id;
 				$post->save();
 			}
+			
 			$comment = ORM::Factory('forum_cat_post_comment', $id);
 			$comment->body = $_POST['body'];
 			$comment->save();
-			die('Changes Saved'); # send data to javascript if enabled.
+			
+			# output a success message.
+			$status = new View('public_forum/forums/status');
+			$status->success = true;
+			$status->message = 'Edits Saved!!';
+			return $status;
 		}
 
 		$primary = new View('public_forum/forums/edit');
@@ -539,23 +570,30 @@ class Forum_Controller extends Public_Tool_Controller {
 		switch($type)
 		{
 			case 'post':
-				$post = ORM::Factory('forum_cat_post')->find($id);
+				$post = ORM::Factory('forum_cat_post')
+					->find($id);
+				if(!$post->loaded)
+					return 'invalid post id';
 				$primary->post = (TRUE == $post->loaded) ? $post : FALSE ;
 				$comment_id = $post->forum_cat_post_comment_id;
-				break;
-				
+				break;	
 			case 'comment':
 				$primary->post = FALSE;
 				$comment_id = $id;
-				break;
-				
+				break;	
 			default:
-				die('Invalid type');
+				Event::run('system.404');
 		}
 		
-		$primary->comment	= ORM::Factory('forum_cat_post_comment')->find($comment_id);
-		$primary->type		= $type;
-		$primary->id		= $id;
+		$comment = ORM::Factory('forum_cat_post_comment')
+			->where('account_user_id', $this->account_user->get_user()->id)
+			->find($comment_id);
+		if(!$comment->loaded)
+			return 'invalid comment id';
+	
+		$primary->comment = $comment;
+		$primary->type	  = $type;
+		$primary->id	  = $id;
 		return $primary;
 	}
 
@@ -565,7 +603,7 @@ class Forum_Controller extends Public_Tool_Controller {
  * param $url_array = (array) an array of url signifiers
  * param $tool_id 	= (int) the tool id of the tool.
  */ 	
-	function _ajax($url_array, $tool_id)
+	public function _ajax($url_array, $tool_id)
 	{
 		list($page_name, $action, $data, $data2) = $url_array;
 		$action = (empty($action) OR 'tool' == $action)
@@ -600,7 +638,8 @@ class Forum_Controller extends Public_Tool_Controller {
 					die(self::my_comments_list($page_name));
 				if('starred' == $data)
 					die(self::my_starred_list($page_name));
-				die('trigger 404');
+				
+				Event::run('system.404');
 				break;
 
 			case 'submit':
@@ -614,9 +653,9 @@ class Forum_Controller extends Public_Tool_Controller {
 				die(self::edit($page_name, $tool_id, $data, $data2));
 				break;
 			default:
-				die("$page_name : <b>$action</b> : trigger 404 not found");
+				Event::run('system.404');
 		}
-		die('<br>something is wrong with the url');
+		die('incorrect url parameters');
 	}
 	
 	
@@ -624,6 +663,14 @@ class Forum_Controller extends Public_Tool_Controller {
  */	
 	public static function _tool_adder($tool_id, $site_id, $sample=FALSE)
 	{
+		# create a general category.
+		$new_cat			= ORM::factory('forum_cat');
+		$new_cat->forum_id	= $tool_id;
+		$new_cat->fk_site	= $site_id;
+		$new_cat->name		= 'General';
+		$new_cat->url		= 'general';
+		$new_cat->save();
+			
 		if($sample)
 		{	
 			# sample category
@@ -684,14 +731,8 @@ class Forum_Controller extends Public_Tool_Controller {
 			# update post with comment_id.
 			$new_post->forum_cat_post_comment_id = $new_comment->id;
 			$new_post->save();
-			
-			
 		}
-		return 'manage';
 	}
 	
 } /*end*/
-
-#echo'<pre>'; print_r($primary->posts);echo'</pre>';die('asdf');
-
 

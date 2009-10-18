@@ -1,10 +1,7 @@
 ﻿
 $(document).ready(function()
 {
-
-/*
- * TOGGLE ADMIN BAR	
- */
+/* TOGGLE ADMIN BAR	*/
 	$(".toggle_admin_bar").click(function(){
 		$('#shadow').slideUp('slow');
 		$("#admin_bar_wrapper").slideUp("slow", function(){
@@ -21,14 +18,10 @@ $(document).ready(function()
 			$("#hide_link").slideUp("slow");
 		});
 	});	
-	
 	$('#shadow div').css({background: '#000', opacity: 0.2});
 
-/*
- * ACTIVATE Sitewide admin bar dropdowns
- */
-	$('#admin_bar li.dropdown ul').hide();
-	
+/* ACTIVATE Sitewide admin bar dropdowns */
+	$('#admin_bar li.dropdown ul').hide();	
 	$('#admin_bar li.dropdown div').click(function(){
 		$('#admin_bar li.dropdown ul').hide();
 		$(this).next('ul').show();
@@ -37,37 +30,35 @@ $(document).ready(function()
 		return false;		
 	});
 
-/*
- * Click away hides open toolbars
- */
+/* Click away hides open toolbars */
 	$('body:not(.jade_toolbar_wrapper)').click(function(){
 		$('li.dropdown ul').hide();
 		$('.actions_wrapper .toolkit_wrapper').hide();
 		$('#admin_bar li.dropdown div').removeClass('dropdown_selected');
 	});
 
-/*
- * ADD redbar Tool toolkit to all tool instances on the page.
- */
-	 $('.common_tool_wrapper').each(function(){
+/* ADD redbar Tool toolkit to all tool instances on the page.*/
+	 $('.common_tool_wrapper').each(function(i){
 		var instanceId = $(this).attr('id').split('_')[1];
-		var toolkit = $('#toolkit_' + instanceId).html();
-		var toolbar = '<div id="toolbar_' + instanceId  + '" class="jade_toolbar_wrapper">' + toolkit + '</div>';
-		$(this).prepend(toolbar);
+		var toolkit = $('#toolkit_' + instanceId).html();		
+		$('<div id="toolbar_' + instanceId  + '"></div>')
+		.addClass('jade_toolbar_wrapper')
+		.prepend(toolkit)
+		.prependTo(this);
 	 });
-
-	 
-/* 
- * add blue tool-item toolkits to DOM ajax requests
- */
-	jQuery.fn.add_toolkit_items = function(toolname){
+ 
+/* add blue tool-item toolkits to DOM ajax requests */
+	jQuery.fn.add_toolkit_items = function(toolname) {
 		var toolname = toolname.toLowerCase();
 		$('.'+ toolname +'_item', this).each(function(i){		
 			var id		= $(this).attr('rel');
-			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>';
-			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">delete</a>';
-			var toolbar	= '<div class="jade_admin_item_edit"><span class="item_name">item</span>'+ edit + ' ' + del + '</div>';
-			$(this).prepend(toolbar);			
+			var edit	= '<span class="icon cog">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/edit/' + id + '" rel="facebox">edit</a>  ';
+			var del		= '<span class="icon cross">&nbsp; &nbsp; </span> <a href="/get/edit_' + toolname + '/delete/' + id + '" class="js_admin_delete" rel="'+ toolname +'_item_'+ id +'">del</a>';
+			$('<div></div>')
+			.addClass('jade_admin_item_edit')
+			.prepend(edit)
+			.append(del)
+			.prependTo(this);	
 		});
 	};	
 	
@@ -123,11 +114,8 @@ $(document).ready(function()
 	};	
 
 
-/*
- * DELEGATE admin link functionality
- */
-	$("body").click($.delegate({
-	
+/* DELEGATE admin link functionality */
+	$("body").click($.delegate({	
 	  // facebox load ajax
 		"a[rel=facebox]": function(e){
 			var pane = ((e.target.id)) ? '2' : 'base';	
@@ -137,8 +125,7 @@ $(document).ready(function()
 					});
 			}, false, "facebox_"+ pane);
 			return false;
-		},
-		
+		},		
 	  // facebox for icon spans since delegation does not bubble.
 		"a[rel=facebox] span.icon": function(e){
 			$parent = $(e.target).parent();
@@ -150,8 +137,7 @@ $(document).ready(function()
 					});
 			}, false, "facebox_"+pane);
 			return false;
-		},
-		
+		},		
 	  // facebox load div content
 		"a[rel=facebox_div]": function(e){
 			var pane = ((e.target.id)) ? '2' : 'base';
@@ -159,8 +145,7 @@ $(document).ready(function()
 			var target = e.target.href.replace(url,'');			
 			$.facebox($(target).clone().show(), false, "facebox_"+pane);
 			return false;
-		},
-		
+		},		
 	  // DELETE tool or tool item		
 		"a.js_admin_delete": function(e) {
 			var url = $(e.target).attr("href");
@@ -175,14 +160,12 @@ $(document).ready(function()
 			</div>';	
 			$.facebox(data, 'confirm_facebox', 'facebox_2');
 			return false;		
-		},
-		
+		},		
 	  // CANCEL delete button
 		"a.cancel_delete": function() {
 			$.facebox.close();
 			return false;	
 		},
-
 	  // DELETE CONFIRMED tool object. (not instance but an actual tool)
 		"a.jade_confirm_delete_common": function(e) {
 			var url	= $(e.target).attr("href");
@@ -196,9 +179,7 @@ $(document).ready(function()
 				setTimeout('$("#center_response").fadeOut(4000)', 1500);	
 			});
 			return false;
-		},
-
-		
+		},	
 	  // OFF*** DELETE CONFIRMED common button in facebox
 		"a.OFF_jade_confirm_delete_common": function(e) {
 			var url	= $(e.target).attr("href");
@@ -212,7 +193,6 @@ $(document).ready(function()
 			});
 			return false;
 		},
-
 	  // remove a tool instance from the page and DOM.
 		"a.jade_tool_remove": function(e) {
 			var url	= $(e.target).attr("href");
@@ -225,8 +205,6 @@ $(document).ready(function()
 			});
 			return false;
 		},
-
-
 	  // ?? delete a file asset maybe?
 		'ul.row_wrapper .delete_item a' :function(e){
 			if(confirm('This cannot be undone. Delete this item?')){
@@ -236,20 +214,17 @@ $(document).ready(function()
 				});
 			}
 			return false;
-		},
-		
+		},		
 	  // ACTIVATE action Tool toolkit menus	
 		".actions_link": function(e) {
 			$(e.target).next('div').toggle();
 			return false;
 		},
-
 	  // ACTIVATE action Tool toolkit menus for span icons	
 		".actions_link span.icon": function(e) {
 			$(e.target).parent('a').next('div').toggle();
 			return false;
 		},		
-
 	  // toggle edit tool view panes
 		"#common_view_toggle li a": function(e){
 			$('.common_main_panel div.toggle').hide();
@@ -258,14 +233,8 @@ $(document).ready(function()
 			$('.common_main_panel div'+ div).show();
 			return false;
 		},	
-
-
-
-		
-	/* Click actions for css styler ----- */
-	/* ------------------------------------------------------------  */
-		
-	// load the styler contents (css)
+	/* Click actions for css styler ----- */	
+	  // load the styler contents (css)
 		"a[rel=css_styler]": function(e) {
 			$.facebox.close();
 			$('div.styler_wrapper').show();
@@ -276,8 +245,7 @@ $(document).ready(function()
 				$(document).trigger('ajaxify.form');				
 			});
 			return false;
-		},
-		
+		},	
 	  // hide the styler dialog
 		"div.styler_wrapper a.hide": function(e) {
 			$('div.dialog_wrapper').toggle('fast');			
@@ -292,8 +260,7 @@ $(document).ready(function()
 				$(e.target).html('hide')
 			}
 			return false;
-		},
-		
+		},		
 	  // close the styler dialog
 		"div.styler_wrapper a.close": function(e) {
 			$(document).trigger('on_close.execute');
@@ -301,25 +268,20 @@ $(document).ready(function()
 			$('div.styler_wrapper div.styler_dialog').html('');
 			$('#files_browser_wrapper img').unbind('dblclick');
 			return false;
-		},
-		
+		},		
 	  // cross button hides the pop up dialog
 		'span.icon.cross.floatright' : function(e) {
 			$(e.target).parent('div').hide();
 		}
 	}));
-	
-/* 
- * auto-filter form fields delegation
- */
-$('body').keyup($.delegate({
 
+/* auto-filter form fields delegation */
+$('body').keyup($.delegate({
 	"input.send_input": function(e){
 		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '-').toLowerCase();
 		$(e.target).siblings('input.receive_input').val(input);
 		$('span#link_example').html(input);
-	},
-	
+	},	
 	"input.auto_filename": function(e){
 		var input = $(e.target).val().replace(/[^-a-z0-9_]/ig, '').toLowerCase();
 		$(e.target).val(input);
@@ -328,9 +290,7 @@ $('body').keyup($.delegate({
 }));
 
 
-/* 
- * Add the css styler wrapper into the DOM.
- */
+/* Add the css styler wrapper into the DOM. */
 	$('body')
 	.append('<div class="styler_wrapper admin_reset" style="display:none"> \
 		<div class="actions"> \
@@ -346,9 +306,7 @@ $('body').keyup($.delegate({
 	$('div.styler_wrapper').css('top', $.getPageHeight()- 405);
 
 	
-/*
- * ajaxify the forms 
- */
+/* ajaxify the forms */
 	$(document).bind('ajaxify.form', function(){
 		$('.ajaxForm').ajaxForm({		 
 			beforeSubmit: function(fields, form){
@@ -366,8 +324,6 @@ $('body').keyup($.delegate({
 				.removeAttr('disabled')
 				.addClass('jade_positive');
 				$(document).trigger('server_response.plusjade', data);
-				
-				
 				// if 2 fbs are active, we assume the form is submitted from 2
 				// so we close only box 2, else close everything.				
 				//var whichBox = (1 < $('.facebox_active').length) ? 'facebox_2' : null;
@@ -377,17 +333,13 @@ $('body').keyup($.delegate({
 	});
 
 	
-/*
- * show the submit ajax loading graphic.
- */
+/* show the submit ajax loading graphic. */
 $(document).bind('show_submit.plusjade', function(){
 	$('.facebox_response.active').remove();
 	$('.admin_reset .show_submit').show();
 });
 
-/*
- * show the resultant server data
- */
+/* show the resultant server data */
 $(document).bind('server_response.plusjade', function(e, data){
 	$('.show_submit').hide();
 	$('.facebox_response.active').remove();
@@ -399,7 +351,6 @@ $(document).bind('server_response.plusjade', function(e, data){
 		.insertAfter('.facebox_response');
 	setTimeout('$(".facebox_response.active").fadeOut(4000)', 1500);	
 });
-
 
 /* 
  * Bind functions to after facebox is revealed event.
@@ -421,9 +372,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 		$('.facebox div.wysiwyg iframe').css('min-height', height-30);
 	});
 
-/*
- * Bind functions to the CLOSE facebox event.
- */	
+/* Bind functions to the CLOSE facebox event. */	
 	$(document).bind('close.facebox', function() {
 		$('body').removeClass('disable_body').removeAttr('scroll');
 		$('.facebox .show_submit').hide();
@@ -434,9 +383,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 		$('#files_browser_wrapper img').unbind('dblclick');
 	});
 
-/*
- * execute an on_close command
- */
+/* execute an on_close command */
 	$(document).bind('on_close.execute', function() {
 		var action = ((1 == $('.on_close').length))
 		? $('.on_close').html()
@@ -481,32 +428,36 @@ $(document).bind('server_response.plusjade', function(e, data){
 	});
 
 	
-/*
- * ACTIVATE sortable containers
- */
-	for(i=1;i<=5;i++){
-		$('.container_'+i).addClass("CONTAINER_WRAPPER").attr('rel', i);
+/* ACTIVATE sortable containers */
+	for(i=1;i<=5;i++) {
+		var fake = $('<div></div>')
+		.addClass('common_tool_wrapper fake')
+		.css({height:'20px'});
+		
+		$('.container_'+i)
+		.addClass("CONTAINER_WRAPPER")
+		.append(fake)
+		.attr('rel', i);
 	}
-
+	
 	$('.CONTAINER_WRAPPER').sortable({
-		items: 'span.common_tool_wrapper',
+		items: 'span.common_tool_wrapper:not(.fake)',
 		connectWith: '.CONTAINER_WRAPPER',
+		handle: '.jade_toolbar_wrapper div.name_wrapper',
 		forcePlaceholderSize: true,
+		forceHelperSize: true,
 		placeholder: 'CONTAINER_placeholder',
-		//appendTo: 'body',
 		cursor: 'move',
 		cursorAt: 'top',
-		//forceHelperSize: true,
-		handle: '.jade_toolbar_wrapper div.name_wrapper',
 		scrollSensitivity: 40,
 		tolerance: 'pointer',
-		helper: 'original',
 		appendTo: 'body',
 
 		start: function(event, ui) {
 			$('.CONTAINER_WRAPPER').toggleClass('highlight_containers');
 			$(ui.item).toggleClass('sort_active').children('div:last').hide();
 		},
+
 		stop: function(event, ui) {
 			$('.CONTAINER_WRAPPER').toggleClass('highlight_containers');
 			$(ui.item).toggleClass('sort_active').children('div:last').show();
@@ -515,18 +466,16 @@ $(document).bind('server_response.plusjade', function(e, data){
 			var page_id = $('#click_hook').attr('rel');
 			var data = new Array();
 			$('#center_response').html('Saving tool positions...').show();
-			$(".CONTAINER_WRAPPER").each(function(){
-
+			$(".CONTAINER_WRAPPER").each(function() {
 				var container = $(this).attr("rel");
-				var kids = $(this).children("span.common_tool_wrapper");
-				
-				$(kids).each(function(i){
-					var instance = new Object();
-					instance.id = this.id.split('_')[1];
-					instance.container = container;
-					instance.position = i;
-					data.push(instance);
-				});
+				$(this).children("span.common_tool_wrapper")
+					.each(function(i) {
+						var instance = new Object();
+						instance.id = this.id.split('_')[1];
+						instance.container = container;
+						instance.position = i;
+						data.push(instance);
+					});
 			});
 			var dataString = $.toJSON(data); // console.log(data); alert(dataString);
 			
@@ -537,21 +486,11 @@ $(document).bind('server_response.plusjade', function(e, data){
 				}
 			);
 		}
-		//revert: true
 	});	
 
+/* Centralize the main admin interfaces (Pages, Files and theme handling) */
 
-// 	
-// ------------------------------------------------------------------------------
-
-
-/* Centralize the main admin interfaces here so we can cache
- * Pages, Files and theme handling.
-*/
-
-/* 
- * Pages browser function delegation.
- */
+/* Pages browser function delegation. */
 	$('body').click($.delegate({
 	// open file dropdown lists
 		'#page_browser_wrapper img.file_options, #page_browser_wrapper span.icon.page': function(e){
@@ -624,7 +563,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			var id = $(e.target).attr('id');
 			var filename = $(e.target).attr('title');
 			var klass = folder_path.replace(/\//g,'_');
-			var html = '<img src="/_assets/images/admin/folder.jpg" rel="'+ folder_path +'" class="open_folder"> <span class="icon page">&#160; &#160;</span> ';
+			var html = '<img src="/_assets/images/admin/folder.png" rel="'+ folder_path +'" class="open_folder"> <span class="icon page">&#160; &#160;</span> ';
 			$('#page_wrapper_'+ id +' img').replaceWith(html);
 			
 			var container = '<div class="'+ klass +' sub_folders"></div>';
@@ -694,8 +633,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 
 	// delete a file from data or theme
 		'#files_browser_wrapper div.file_asset span.cross': function(e){
-			if(confirm('This cannot be undone. Delete this file?'))
-			{
+			if(confirm('This cannot be undone. Delete this file?')) {
 				var path	= $('#breadcrumb').attr('rel');
 				var type	= $('#breadcrumb').attr('class');
 				var file	= $(e.target).parent('div').attr('rel');
@@ -736,8 +674,6 @@ $(document).bind('server_response.plusjade', function(e, data){
 
 	}));
 
-	
-
 // doubleclick file browser actions
 	$('body').dblclick($.delegate({
 	  // add selected image to gallery.
@@ -750,33 +686,34 @@ $(document).bind('server_response.plusjade', function(e, data){
 	}));
 	
 
-/*
-	SimpleTree stuff
-	as much as we can centralize, but is not everything.
-*/
+/* SimpleTree stuff - as much as we can centralize, but is not everything. */
 	$('body').click($.delegate({
 	// Gather and save nest data.
 		'.facebox #link_save_sort' : function(e) {	
-			var output = '';
 			var tool = $(e.target).attr("title");
 			var parent_id = $(e.target).attr("rel");
+			var data = new Array();
 			
-			$(".facebox #simpletree_wrapper ul").each(function(){
+			$(".facebox #simpletree_wrapper ul").each(function() {
 				var parentId = $(this).parent().attr("rel");
 				if(!parentId) parentId = 0;
 				var $kids = $(this).children("li:not(.root, .line, .line-last)");
-				
-				// Data set format: "id:local_parent_id:position#"
-				$kids.each(function(i){
-					if(undefined == $(this).attr('rel')) return true;
-					output += $(this).attr('rel') + ':' + parentId + ':' + i + "|";
+
+				$kids.each(function(i) {
+					if(undefined == $(this).attr('rel')) return true; 
+					var node = new Object();
+					node.id = $(this).attr('rel');
+					node.local_parent_id = parentId;
+					node.position = i;
+					data.push(node);
 				});
 			});
-			if(!output){alert('Nothing to save.'); return false;}
-			// alert (output); return false;
+			var json = $.toJSON(data); // alert(dataString);
+			if(!json){alert('Nothing to save.'); return false;}
+			//console.log(json); return false;
 			$(document).trigger('show_submit.plusjade');
 			$.post('/get/edit_'+ tool +'/save_tree/' + parent_id,
-				{output: output},
+				{json: json},
 				function(data){
 					$(document).trigger('server_response.plusjade', data);				
 				}
@@ -790,8 +727,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			$(e.target).addClass('active');
 			return false;
 		}
-}));
-
+	}));
 
 	$("#save_sort").click(function() {
 		var order = $("#generic_sortable_list").sortable("serialize");
@@ -807,10 +743,8 @@ $(document).bind('server_response.plusjade', function(e, data){
 	});
 			
 			
-/*
- * resizing functions
- */
-	$(window).resize(function(){
+/* resizing functions */
+	$(window).resize(function() {
 		// bottom styler dialog
 		var state = $('div.styler_wrapper a.toggle').html();
 		var height = 405;
@@ -824,14 +758,10 @@ $(document).bind('server_response.plusjade', function(e, data){
 		$('.facebox div.wysiwyg iframe')
 		.css('min-height', height-30);
 	});
-	
 	// $(window).scroll(function(){});	
 
 
-	
-	
 // Album Management Functions:
-
 	// delegate editing image caption
 	$('body').click($.delegate({
 	// show save caption pane
@@ -860,13 +790,8 @@ $(document).bind('server_response.plusjade', function(e, data){
 		}
 	}));
 	
-
-	
 // --- misc funcitons ---
- 
-/*
- * checks if a value is in an array.
- */
+/* checks if a value is in an array. */
 	Array.prototype.in_array = function(p_val) {
 		for(var i = 0, l = this.length; i < l; i++) {
 			if(this[i] == p_val)

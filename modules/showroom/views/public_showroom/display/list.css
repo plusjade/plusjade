@@ -15,9 +15,15 @@
 #showroom_wrapper_++ div.showroom_categories ul li span a{
 
 }
+#showroom_wrapper_++ div.showroom_categories ul li span a.loader:hover,
+#showroom_wrapper_++ div.showroom_categories ul li span a.active {
+	color:red;
+}
+#showroom_wrapper_++ div.category_header {
+ margin-bottom:10px;
+}
 
-
-/* item container */
+/* item list container */
 #showroom_wrapper_++ div.showroom_items{
 
 }
@@ -27,7 +33,7 @@
 #showroom_wrapper_++ div.showroom_items div.showroom_item div.item_name{
 
 }
-#showroom_wrapper_++ div.showroom_items div.showroom_item div.item_body{
+#showroom_wrapper_++ div.showroom_items div.showroom_item div.item_intro{
 
 }
 #showroom_wrapper_++ div.showroom_items div.showroom_item div.item_image{
@@ -37,5 +43,17 @@
 /* single item view */
 
 #showroom_wrapper_++ div.single_item{
+
+}
+#showroom_wrapper_++ div.single_item div.single_name {
+
+}
+#showroom_wrapper_++ div.single_item div.single_link  {
+
+}
+#showroom_wrapper_++ div.single_item div.single_body {
+
+}
+#showroom_wrapper_++ div.single_item div.single_image {
 
 }

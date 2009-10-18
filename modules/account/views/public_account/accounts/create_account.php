@@ -12,38 +12,14 @@
 
 <form id="create_new_form" action="<?php echo url::site("$page_name/create")?>" method="POST">	
 	<div id="auth_form" class="create_form">
+		
 		<?php
-		if(! empty($errors))
-			if(is_array($errors))
-				foreach($errors as $error)
-					echo "<p>$error</p>";
-			else
-				echo "<b>$errors</b>";
+		if(isset($errors)) echo val_form::show_error_box($errors);		
+		if(!isset($values)) $values = array();
+		if(!isset($errors) OR !is_array($errors)) $errors = array();
+		echo val_form::generate_fields($fields, $values, $errors);
 		?>		
-		<div class="fieldsets">
-			<b>Username</b><br>
-			<input type="text" name="username" value="" rel="text_req" maxlength="25"/>
-		</div>
-
-		<div class="fieldsets">
-			<b>Email</b><br>
-			<input type="text" name="email" value="" class="full"  rel="email_req" maxlength="50"/>
-		</div>
-		
-		<div class="fieldsets">
-			<b>Password</b><br>
-			<input type="password" name="password" class="full" rel="text_req" maxlength="50" />
-		</div>
-		
-		<div class="fieldsets">
-			<b>Confirm Password</b><br>
-			<input type="password" name="password2" class="full" rel="text_req" maxlength="50"/>
-		</div>
-		
-		<div class="buttons">
-			<button type="submit" class="jade_positive">Create Account</button>
-		</div>
-		
+		<button type="submit">Create Account</button>
 	</div>
 </form>
 <script type="text/javascript">

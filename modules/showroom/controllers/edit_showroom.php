@@ -53,10 +53,14 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
  */ 
 	public function save_tree($parent_id)
 	{
-		if($_POST)
+		valid::id_key($parent_id);
+		if(isset($_POST['json']))
 		{
-			valid::id_key($parent_id);
-			echo Tree::save_tree('showroom', 'showroom_cat', $parent_id, $this->site_id, $_POST['output']);
+			$json = json_decode($_POST['json']);
+			if(NULL === $json OR !is_array($json))
+				die('invalid json');
+				
+			echo Tree::save_tree('showroom', 'showroom_cat', $parent_id, $this->site_id, $json);
 		}
 		die();
 	}	
@@ -236,7 +240,8 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 			$item->url				= valid::filter_php_url($url);
 			$item->showroom_cat_id	= $_POST['category_id'];
 			$item->name				= $_POST['name'];
-			$item->intro			= $_POST['body'];
+			$item->intro			= $_POST['intro'];
+			$item->body				= $_POST['body'];
 			$item->images			= $_POST['images'];
 			$item->save();
 			die('Showroom item saved');

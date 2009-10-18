@@ -87,7 +87,7 @@ class Tool_Controller extends Controller {
 
 			# send the data to the UI
 			$tool_data = new stdClass;
-			$tool_data->toolname	= $tool->system_tool->name;
+			$tool_data->toolname	= strtolower($tool->system_tool->name);
 			$tool_data->method		= $tool->system_tool->helper_method;
 			$tool_data->parent_id	= $tool->parent_id;
 			$tool_data->tool_id		= $tool->id;
@@ -167,7 +167,7 @@ class Tool_Controller extends Controller {
 		
 		# run _tool_adder
 		Load_Tool::factory($system_tool->name)->_tool_adder($parent->id, $this->site_id, $sample);
-		# return the tool data.
+		
 		return $tool;
 	}
 
@@ -242,8 +242,9 @@ class Tool_Controller extends Controller {
 		# only on successs...
 		if('yes' == $tool->system_tool->protected)
 		{
+			$toolname = strtolower($tool->system_tool->name);
 			# protect the page relative to this new tool.
-			$newline = "\n$page->page_name:{$tool->system_tool->name}-$tool->parent_id";
+			$newline = "\n$page->page_name:$toolname-$tool->parent_id";
 			yaml::add_value($this->site_name, 'pages_config', $newline);		
 		}
 

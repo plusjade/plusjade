@@ -146,16 +146,6 @@
 	margin:10px 0;
 	
 }
-#blog_wrapper_++ .add_comment p{
-	overflow:auto;
-
-}
-#blog_wrapper_++ .add_comment span{
-	display:block;
-	float:left;
-	width:120px;
-	font-weight:bold;
-}
 #blog_wrapper_++ .add_comment input{
 	float:left;
 	padding:5px;

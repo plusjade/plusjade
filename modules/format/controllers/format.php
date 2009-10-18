@@ -124,32 +124,42 @@ class Format_Controller extends Public_Tool_Controller {
 			}
 			
 			# on success send the email and display status message.
-			$to = (empty($format->params))
-				? 'superjadex12@gmail.com'
-				: $format->params;
-			$subject = 'Customer message from: '.url::site();			
-			$headers = 'From: webmaster@example.com' . "\r\n" .
-				'Reply-To: webmaster@example.com' . "\r\n" .
-				'X-Mailer: PHP/' . phpversion();
-				
+			$replyto = 'unknown';
 			ob_start();
+			echo "This message was sent by a customer from a form on your website!\r\n";
+			echo "DO NOT REPLY TO THIS EMAIL.\r\nUse the given contact information below\r\n";
+			echo "Thank you! - (Jade) \r\n----------------------------------\r\n\r\n";
+			
 			unset($_POST['post_handler']);
 			foreach ($_POST as $name => $value)
 			{
+				if('email' == $name[1] AND !empty($value))
+					$replyto = $value;
+					
 				$name = explode(':', $name);
-				echo "<b>{$name[1]}</b>: $value\r\n";
+				echo "{$name[1]}: $value\r\n--------------------\r\n";
 			}
 			$view = new View("public_format/forms/status");
 			$view->success = FALSE;
 			
 			# REMEMBER, this is for dev host only.
-			$view->output = ob_get_clean();
-			return $view;	
-			
+			# $view->output = ob_get_clean();
+			# return $view;	
+
+			# to do FIX THE HEADERS.
+			$to = (empty($format->params))
+				? 'superjadex12@gmail.com'
+				: $format->params;
+			$subject = 'Customer message from: ' . url::site();			
+			$headers = "From: noreply@plusjade.com \r\n" .
+				'Reply-To: ' . $replyto . "\r\n" .
+				'X-Mailer: PHP/' . phpversion();
+				
 			if(mail($to, $subject, ob_get_clean(), $headers))
 				$view->success = TRUE;
 
-			return $view;			
+			return $view;
+			die();
 		}
 		
 		$view = new View("public_format/forms/list");
@@ -234,16 +244,9 @@ class Format_Controller extends Public_Tool_Controller {
 				break;
 				
 			case 'forms':
-				$js = '
-					$(".tabs_tab_list li a").click(function(){
-						$("#format_wrapper_' . $format->id . ' .format_item").hide();
-						$(".tabs_tab_list li a").removeClass("active");
-						var id = $(this).addClass("active").attr("href");
-						$(id).show();
-						return false;
-					});
-					$(".tabs_tab_list li a:first").click();
-				';
+				# the javascript gets added inline via the forms view
+				# since it needs to resent/re-init if the form encounters errors.
+				$js = '';
 				break;
 				
 			default: # people
