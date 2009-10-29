@@ -66,7 +66,7 @@ $(document).ready(function()
  * ADD blue tool-item toolkits
  * selector format: .tool_wrapper .tool_item
  */	
-	var tools = ['showroom', 'format', 'blog', 'reviews'];
+	var tools = ['showroom', 'format', 'blog', 'review'];
 	$.each(tools, function(){
 		$().add_toolkit_items(this);
 	});
@@ -77,18 +77,15 @@ $(document).ready(function()
 	action	= (string)
 	tool	= (object)
 */
-	jQuery.fn.jade_inject_tool = function(action, tool){
-	
+	jQuery.fn.jade_inject_tool = function(action, tool) {	
 		var include_js = 'yes'; // Set loading status...
 		
 		if('add' == action) {
-			// default add to container_1
 			$('div.container_1').prepend('<div id="new_tool_placeholder" class="load_tool_html">Adding Tool...</div>');
 		} else {
 			include_js = 'no';
 			$('#'+ tool.toolname +'_wrapper_'+ tool.parent_id).html('<div class="load_tool_html">Updating...</div>');
 		}
-
 		// Get the tool output from the server...
 		$.get('/get/tool/html/'+ tool.toolname +'/'+ tool.parent_id, {js: include_js}, function(data){	
 			if('add' == action) {
@@ -103,11 +100,9 @@ $(document).ready(function()
 					.replaceWith('<span id="instance_'+ tool.instance +'" class="common_tool_wrapper local" rel="guid_' + tool.tool_id + '">' + toolbar + data + '</span>');	
 				});
 			}
-			else {
-				// replace old tool html with new html
+			else { // replace old tool html with new html
 				$('#'+ tool.toolname +'_wrapper_'+ tool.parent_id).replaceWith(data);
 			}
-			
 			// apply blue per-item toolbars
 			$('#'+ tool.toolname +'_wrapper_'+ tool.parent_id).add_toolkit_items(tool.toolname);
 		});
@@ -205,16 +200,15 @@ $(document).ready(function()
 			});
 			return false;
 		},
-	  // ?? delete a file asset maybe?
-		'ul.row_wrapper .delete_item a' :function(e){
-			if(confirm('This cannot be undone. Delete this item?')){
-				var id = $(e.target).attr('rel');
-				$.get(e.target.href, function(){
-					$('#item_'+ id).remove();
-				});
-			}
+	  // ##THIS DOES NOT WORK FOR SOME  ##
+	  //toggle the tab interfaces for edit_tool views.
+		".common_tabs_x li a": function(e) {
+			$('.common_tabs_x li a').removeClass('active');
+			var pane = $(this).attr('href');
+			$('.common_full_panel div.toggle').hide();
+			$('.common_full_panel div'+ pane).show();
 			return false;
-		},		
+		},	
 	  // ACTIVATE action Tool toolkit menus	
 		".actions_link": function(e) {
 			$(e.target).next('div').toggle();
@@ -232,6 +226,16 @@ $(document).ready(function()
 			var div = $(e.target).addClass('selected').attr('href');
 			$('.common_main_panel div'+ div).show();
 			return false;
+		},
+	  // ?? deletes a sortable row_wrapper list element?
+		'ul.row_wrapper .delete_item a' :function(e){
+			if(confirm('This cannot be undone. Delete this item?')){
+				var id = $(e.target).attr('rel');
+				$.get(e.target.href, function(){
+					$('#item_'+ id).remove();
+				});
+			}
+			return false;
 		},	
 	/* Click actions for css styler ----- */	
 	  // load the styler contents (css)
@@ -241,22 +245,20 @@ $(document).ready(function()
 			$('div.styler_wrapper .styler_dialog')
 			.html('<div class="loading">Loading...</div>')
 			.load(e.target.href, function(){
-				$('.facebox .show_submit').hide();
+				$('.show_submit').hide();
 				$(document).trigger('ajaxify.form');				
 			});
 			return false;
 		},	
 	  // hide the styler dialog
 		"div.styler_wrapper a.hide": function(e) {
-			$('div.dialog_wrapper').toggle('fast');			
-			var state = $(e.target).html();
-			
-			if('hide'== state){
+			$('div.dialog_wrapper').toggle();			
+			if('hide'== $(e.target).html()) {
 				$(e.target).html('show');
 				$('div.styler_wrapper').css('top', $.getPageHeight()- 32);
 			}
-			else{
-				$('div.styler_wrapper').css('top', $.getPageHeight()- 435);
+			else {
+				$('div.styler_wrapper').css('top', $.getPageHeight()- 405);
 				$(e.target).html('hide')
 			}
 			return false;
@@ -265,14 +267,20 @@ $(document).ready(function()
 		"div.styler_wrapper a.close": function(e) {
 			$(document).trigger('on_close.execute');
 			$('div.styler_wrapper').hide();
-			$('div.styler_wrapper div.styler_dialog').html('');
-			$('#files_browser_wrapper img').unbind('dblclick');
+			$('div.styler_wrapper div.styler_dialog').empty();
 			return false;
-		},		
-	  // cross button hides the pop up dialog
+		},
+	  // close any generic save pane
+		'.save_pane .icon.cross':function(e) {
+			$(e.target).parent('.contents').parent('.save_pane').remove();
+		}
+		
+		/*
+	  // cross tag hides the pop up dialog
 		'span.icon.cross.floatright' : function(e) {
 			$(e.target).parent('div').hide();
 		}
+		*/	
 	}));
 
 /* auto-filter form fields delegation */
@@ -341,8 +349,8 @@ $(document).bind('show_submit.plusjade', function(){
 
 /* show the resultant server data */
 $(document).bind('server_response.plusjade', function(e, data){
-	$('.show_submit').hide();
 	$('.facebox_response.active').remove();
+	$('.show_submit').hide();
 	$('.facebox_response')
 		.clone()
 		.addClass('active')
@@ -360,7 +368,7 @@ $(document).bind('server_response.plusjade', function(e, data){
  */	
 	$(document).bind('reveal.facebox', function(){
 		$('body').addClass('disable_body').attr('scroll','no');
-		$('.facebox .show_submit').hide();
+		$('.show_submit').hide();
 		$('.facebox_response.active').remove();
 		$('textarea.render_html').wysiwyg();
 		$(document).trigger('ajaxify.form');
@@ -375,12 +383,9 @@ $(document).bind('server_response.plusjade', function(e, data){
 /* Bind functions to the CLOSE facebox event. */	
 	$(document).bind('close.facebox', function() {
 		$('body').removeClass('disable_body').removeAttr('scroll');
+		$('.facebox_response.active').remove();
 		$('.facebox .show_submit').hide();
 		$(document).trigger('on_close.execute');
-		
-		// testing, dont no if this works the way i want it to.
-		// supposed to unbind delegated functionality since it has different ones
-		$('#files_browser_wrapper img').unbind('dblclick');
 	});
 
 /* execute an on_close command */
@@ -488,17 +493,19 @@ $(document).bind('server_response.plusjade', function(e, data){
 		}
 	});	
 
+
 /* Centralize the main admin interfaces (Pages, Files and theme handling) */
+/*--------------------------*/
 
 /* Pages browser function delegation. */
 	$('body').click($.delegate({
-	// open file dropdown lists
+	  // open file dropdown lists
 		'#page_browser_wrapper img.file_options, #page_browser_wrapper span.icon.page': function(e){
 			$('#page_browser_wrapper ul.option_list').hide();
 			$(e.target).nextAll('ul').show();
 		},
 		
-	// show a new folder directory
+	  // show a new folder directory
 		'#page_browser_wrapper .open_folder': function(e){
 			var path = $(e.target).attr('rel');
 			var klass = path.replace(/\//g,'_');
@@ -525,7 +532,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			return false;
 		},
 		
-	// open new page facebox
+	  // open new page facebox
 		'#page_browser_wrapper a.new_page': function(e){
 			$.facebox(function(){
 				var path = $('#breadcrumb').attr('rel');
@@ -536,7 +543,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			return false;
 		},
 		
-	// delete a page
+	  // delete a page
 		'#page_browser_wrapper a.delete_page': function(e){
 			if('folder' == $(e.target).attr('rel'))
 			{
@@ -557,7 +564,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			return false;
 		},
 
-	// turn a page into a folder path
+	  // turn a page into a folder path
 		'#page_browser_wrapper a.folderize': function(e){
 			var folder_path = $(e.target).attr('rel');
 			var id = $(e.target).attr('id');
@@ -570,16 +577,27 @@ $(document).bind('server_response.plusjade', function(e, data){
 			$('#directory_window').prepend(container);
 			$(e.target).parent('li').remove();
 			return false;
-		}	
+		},
+	  // add a page builder link.
+		'#add_page_builder' : function() {
+			var system_tool = $('#page_builder_select option:selected').val();
+			$.facebox(function(){
+					$.get('/get/page/add_builder', {'system_tool': system_tool}, function(data){
+						$.facebox(data, false, "facebox_2");
+					});
+			}, false, "facebox_2");
+			return false;
+		}
 	}));	
 	
+
 	
 /* 
  * File Browser function delegation
  */
 	$('body').click($.delegate({
 	
-	// load the file browser into the bottom pane =D
+	  // load the file browser into the bottom pane =D
 		'a.get_file_browser':function(e){
 			var mode = $(e.target).attr('rel');
 			$('div.styler_wrapper').show();
@@ -590,9 +608,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			});
 			return false;
 		},
-
-		
-	// ajax load a real-directory path
+	  // ajax load a real-directory path
 		'#files_browser_wrapper .get_folder' : function(e){
 			$('#directory_window').html('<div lass="ajax_loading">Loading...</div>');
 			var url = $(e.target).attr('href');
@@ -612,83 +628,327 @@ $(document).bind('server_response.plusjade', function(e, data){
 				// ex: one, one/two, one/two/three.
 				for (i=0; i < folder_count; i++){
 					var result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
-					folder_string += ' / <a href="/get/'+ type +'/contents/'+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
+					folder_string += ' / <a href="/get/'+ type +'/contents?dir='+ result_string +'" rel="'+ result_string +'" class="get_folder">'+ folder_array[i] +'</a>';
 				}
 			}
 			$('#breadcrumb').attr('rel', path).html(folder_string);			
 			return false;
 		},
-
-		
-	// add a file to a real directory folder
+	  // add files or folders to a real directory folder
 		'#files_browser_wrapper a.add_asset': function(e){
 			$.facebox(function(){
 				var path = $('#breadcrumb').attr('rel');
-				$.get(e.target.href +'/'+ path,
+				$.get(e.target.href +'?dir='+ path,
 					function(data){$.facebox(data, false, 'facebox_2')}
 				);
 			}, false, 'facebox_2');
 			return false;
 		},
 
-	// delete a file from data or theme
-		'#files_browser_wrapper div.file_asset span.cross': function(e){
-			if(confirm('This cannot be undone. Delete this file?')) {
-				var path	= $('#breadcrumb').attr('rel');
-				var type	= $('#breadcrumb').attr('class');
-				var file	= $(e.target).parent('div').attr('rel');
-				var ufile	= ((path)) ? ':' : '';
-				ufile	+= file;
-				$.get('/get/'+ type +'/delete/'+ path + ufile,
+	  // move assets within the assets directory. 	
+		'.move_selected': function(e) {	
+			var path = $('#breadcrumb').attr('rel');
+			
+			if('drop!' == $(e.target).html()) {
+				$(e.target).html('move');		
+				if('undefined' == mover) { alert('data not set'); return false;}
+				if(path == mover.path) { alert('original and new destination is the same'); return false;}
+				$.post('/get/files/move?dir='+ path, {path:mover.path, json:mover.json},
 					function(data){
-						file = file.replace('.', '_')
-						$('#directory_window #' + file).remove();
+						$('#directory_window').html('<div>Loading...</div>');
+						$('#directory_window').load('/get/files/contents?dir=' + path);
 						$(document).trigger('server_response.plusjade', data);
-			})};
+				});
+				delete mover;
+			}
+			else {
+				// JSONize asset selections
+				var data = new Array();		
+				$("#files_browser_wrapper img.ui-selected").each(function() {
+					var asset = new Object();
+					asset.name = $(this).attr('title');
+					data.push(asset);
+				});
+				if(0 == data.length) {alert('nothing selected');return false};
+				
+				mover = new Object();
+				mover.path = path;
+				mover.json = $.toJSON(data);
+				$(e.target).html('drop!');
+			}
 			return false;
 		},
 
-	// delete are a real directory folder from _data
-		'#files_browser_wrapper.data_files div.folder_asset span.cross': function(e){
-			$parent	= $(e.target).parent('div');
-			var path	= $parent.attr('rel');
-			var folder	= $parent.attr('id');
-			
-			if('tools' == path){ alert('Tools folder is required.'); return false}
-			if(confirm('This cannot be undone. Delete folder and all inner contents?')) {
-				$.get('/get/files/delete/'+ path,
+	  // delete assets from the assets directory.
+		'.delete_selected': function(){
+			if(confirm('This cannot be undone. Delete this file?')) {		
+				// JSONize asset selections
+				var data = new Array();		
+				$("#files_browser_wrapper img.ui-selected").each(function() {
+					var asset = new Object();
+					asset.name = $(this).attr('title');
+					data.push(asset);				
+					$(this).parent('div').remove();
+				});
+				if(0 == data.length) {alert('nothing selected'); return false};
+				var json = $.toJSON(data); // alert(dataString);			
+				var path = $('#breadcrumb').attr('rel');		
+				$.post('/get/files/delete?dir='+ path, {json:json},
 					function(data){
-						$('#directory_window #' + folder).remove();
 						$(document).trigger('server_response.plusjade', data);
-			})};
-			return false;
+				});
+				return false;
+			}
 		},
 		
-	// remove images from gallery	
-		'#remove_images' : function(){
-			$("#sortable_images_wrapper img.ui-selected").each(function(){
-				$(this).parent('div').remove();
+	  // show the thumbnail panel
+		'.thumb_selected' : function() {
+			// JSONize asset selections
+			var data = new Array();		
+			$("#files_browser_wrapper img.ui-selected").each(function() {
+				var asset = new Object();
+				asset.name = $(this).attr('title');
+				data.push(asset);
 			});
-			return false;		
+			if(0 == data.length) {alert('nothing selected');return false};
+
+			$('.save_pane.helper').remove();
+			$('.save_pane').clone().addClass('helper').show().prependTo('.common_full_panel');
+			json = $.toJSON(data);
+			return false;
+		},
+	  // execute the thumbnail generator
+		'button.do_thumb': function() {
+			if('undefined' == json) { alert('data not set'); return false;}
+			var path = $('#breadcrumb').attr('rel');
+			var sizes = new Array();	
+			$('div.save_pane.helper input:checked').each(function(i) {
+				sizes.push($(this).val());
+			});
+			if(0 == sizes.length) { alert('no thumbnails selected'); return false;}
+
+			$.post('/get/files/thumbs?dir='+ path, {'sizes[]':sizes, 'json':json},
+				function(data) {
+					$(document).trigger('server_response.plusjade', data);		
+					$('div.save_pane.helper .contents').html(data);
+					setTimeout('$("div.save_pane.helper").remove()', 1000);
+			});
 		}
 
 	}));
 
-// doubleclick file browser actions
-	$('body').dblclick($.delegate({
-	  // add selected image to gallery.
-		'#files_browser_wrapper img.to_showroom':function(e) {
-			$(e.target).addClass('selected');
-			$(e.target).parent('div').addClass('selected');
-			$(e.target).clone().prependTo('#images .gallery');
+/* 
+ * Tools browser function delegation
+ */
+	$('body').click($.delegate({
+	  // save the tool meta-name
+		'#tools_browser_wrapper table td span.icon.save': function(e){
+			var name = $(e.target).siblings('input').val();
+			var tool_id = $(e.target).attr('rel');
+			$(document).trigger('show_submit.plusjade');
+			$.get('/get/tool/update/' + tool_id, {name :name}, function(data){
+				$(document).trigger('server_response.plusjade', data);
+				console.log('good'); // solve this.
+			});
+		},
+	  // delete the tool.
+		'.jade_delete_tool': function(e) {
+			if(confirm('This cannot be undone. Delete this tool?')) {
+				var id = $(e.target).attr('rel');
+				$.get(e.target.href, function(data){
+					$('#icon_'+ id).remove();
+					$(document).trigger('server_response.plusjade', data);
+				});
+			}
+			return false;
+		},		
+	  // show tool quick view.
+		'#tools_browser_wrapper a.show_view': function(e) {	
+			$('.save_pane')
+				.clone()
+				.prependTo('#tools_browser_wrapper')
+				.addClass('helper')
+				.show();
+			$('.save_pane.helper .output_tool_html')
+				.html('<div class="plusjade_ajax">Loading...</div>')
+				.load(e.target.href);
+			return false;
+		},		
+	  // add tool to the current page:
+		'a.to_page': function(e) {
+			var args = $(e.target).attr('rel').split(':');
+			var tool = {
+				"toolname" : args[0],
+				"parent_id" : args[1],
+				"tool_id" : args[2],
+			};		
+			$.get(e.target.href, function(data) {
+				// expecting an insert_id from pages_tools table
+				if(isNaN(data)){alert(data); return false};
+				tool.instance = data;
+				$().jade_inject_tool('add', tool);
+			});
 			return false;
 		}
 	}));
-	
 
+/* 
+ * Theme function delegation
+ */
+	$('body').click($.delegate({
+	/* manage themes index */
+	  // load a theme button
+		"button#load_theme" : function() {
+			var theme = $("select[name='theme'] option:selected").text();		
+			$('#directory_window').html('Loading file...');
+			$.get('/get/theme/contents/'+ theme,
+				function(data){
+					$('#directory_window').html(data);
+					var link = ' / <a href="/get/theme/contents/'+ theme +'" class="get_folder">'+ theme +'</a>';
+					$('#breadcrumb').html(link);
+					$('#upload_files').attr('href','/get/theme/add_files/'+theme);
+				}
+			);
+			return false;
+		},
+	  // activate a theme button
+		"button#activate_theme" : function() {
+			var current_theme = $('#be-HaPpy_My-FriEnds').attr('title');
+			var theme = $("select[name='theme'] option:selected").text();		
+			if(current_theme == theme) {alert('Theme already active.'); return false};
+			if(confirm('Activate this theme: ' + theme + '?')) {	
+				$('.facebox .show_submit').show();
+				$.post('/get/theme/change', {theme: theme}, function(data) {
+					if('TRUE' == data) location.reload();
+					else { alert(data); $.facebox.close();}
+				});
+			}
+			return false;
+		},	
+	  // delete a theme button
+		"button#delete_theme" : function() {
+			var current_theme = $('#be-HaPpy_My-FriEnds').attr('title');
+			var theme = $("select[name='theme'] option:selected").text();
+			if(current_theme == theme) {alert('Cannot delete active theme.'); return false};	
+			if(confirm('This cannot be undone. Delete this entire theme folder?')) {
+				$.get('/get/theme/delete/'+ theme,
+					function(data) {
+						$("select[name='theme'] option:selected").remove();	
+						$('#directory_window').empty();
+						$('#breadcrumb').empty();
+						$('#upload_files').attr('href','/get/theme/add_files/' + current_theme);
+					}
+				);
+			}
+			return false;
+		},
+	  // add a theme button
+		"button#add_theme" : function() {
+			var theme = $("input[name='add_theme']").val();
+			if(!theme || 'safe_mode' == theme) {
+				alert('specify a theme name other than "safe_mode"');
+				return false;
+			}
+			$.post('/get/theme/add_theme', {theme : theme},
+				function(data){
+					$("select[name='theme']").append('<option>'+ data +'</option>');
+					$('#show_response_beta').html(data);
+				}
+			);
+			return false;
+		},
+	/* common crud for templates/css interface */
+	  // Load file from select dropdown into textarea
+		"button.load_theme_file" : function(e) {
+			var type = $(e.target).attr('rel');
+			var $scope = $('#theme_'+ type +'_wrapper');
+			var file = $("select[name='files'] option:selected", $scope).text();			
+			$('textarea', $scope).val('Loading file...');
+			$.get('/get/theme/load/'+ type +'/'+ file +'?v=39840',
+				function(data) {
+					$('textarea', $scope).val(data);
+					// DOESNT WORK! set file as selected
+					$("div.save_pane select[name='update_file'] option", $scope).removeAttr('selected');
+					$('.current_file', $scope).html(file);
+					$("div.save_pane select[name='update_file'] option[value='"+ file +"']", $scope).attr({selected:'selected'});
+				}
+			);
+			return false;
+		},
+	  // delete a theme file 
+		"button.delete_theme_file" : function(e) {
+			var type = $(e.target).attr('rel');
+			var $scope = $('#theme_'+ type +'_wrapper');
+			var current_theme = $('#be-HaPpy_My-FriEnds').attr('title');
+			var file = $("select[name='files'] option:selected", $scope).text();
+			if(confirm('This cannot be undone. Delete file: '+ file))
+				$.get('/get/theme/delete/' + current_theme + ':' + type + ':'+ file,
+					function(data) {
+						$("select[name='files'] option:selected", $scope).remove();
+						$('#show_response_beta').html(data);
+					}
+				);
+		},		
+	  // show theme save_pane
+		'button.show_theme_save' : function(e) {
+			var type = $(e.target).attr('rel');
+			var $scope = $('#theme_'+ type +'_wrapper');	
+			$('.save_pane.helper', $scope).remove();
+			$('.save_pane', $scope).clone().addClass('helper').show().prependTo('#theme_'+ type +'_wrapper .common_full_panel');
+			return false;
+		},		
+	  // update a theme file
+		'button.update_theme_file': function(e) {
+			var type = $(e.target).attr('rel');
+			var $scope = $('#theme_'+ type +'_wrapper');
+			var file = $("div.save_pane.helper select[name='update_file'] option:selected", $scope).text();
+			var contents = $('textarea', $scope).val();
+			
+			$('div.save_pane.helper .contents', $scope).html('Saving '+ file + '...');
+			$.post('/get/theme/save/'+ type +'/'+ file, {contents: contents }, function(data){
+				$('div.save_pane.helper .contents', $scope).html(data + ' saved!!');
+				setTimeout('$("#theme_'+ type +'_wrapper div.save_pane.helper").remove()', 1000);
+			});
+			return false;
+		},
+	  // save as new file
+		'button.new_theme_file': function(e) {
+			var type = $(e.target).attr('rel');
+			var lang = ('templates'== type) ? 'html' : 'css';
+			var $scope = $('#theme_'+ type +'_wrapper');
+			if(! $("div.save_pane.helper input[name='new_file']").jade_validate()) return false;		
+			var file = $("div.save_pane.helper input[name='new_file']").val() + '.' + lang;	
+			var contents = $('textarea', $scope).val();
+			
+			$('div.save_pane.helper .contents', $scope).html('Creating ...' + file);
+			$.post('/get/theme/save/'+ type +'/'+ file, {contents: contents }, function(data){
+				$('select.files_list', $scope).append('<option value="'+ data +'">'+ data +'</option>');
+				$('div.save_pane.helper .contents', $scope).html(data + ' saved!!');
+				setTimeout('$("#theme_'+ type +'_wrapper div.save_pane.helper").remove()', 1000);
+			});
+			return false;
+		}
+	}));
+
+/* css keydown functionality */	
+	$('body').keydown($.delegate({	
+	  // TAB update the DOM with current css
+		'#theme_css_wrapper textarea#edit_css' : function(e) {
+			if (e.keyCode == 9) {		
+				$('head link#global-sheet').remove();
+				$('#global-style').remove();
+				$('<style id="global-style" type="text/css"></style>')
+				.html($('#theme_css_wrapper textarea#edit_css').val())
+				.appendTo('head');		
+				return false;
+			}	
+		}
+	}));
+
+	
 /* SimpleTree stuff - as much as we can centralize, but is not everything. */
 	$('body').click($.delegate({
-	// Gather and save nest data.
+	  // Gather and save nest data.
 		'.facebox #link_save_sort' : function(e) {	
 			var tool = $(e.target).attr("title");
 			var parent_id = $(e.target).attr("rel");
@@ -719,7 +979,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 				}
 			)	
 		},
-		
+	  // something	
 		'#simpletree_wrapper li.root > span' : function(e){
 			$('#simpletree_wrapper span.active')
 			.removeClass('active')
@@ -729,6 +989,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 		}
 	}));
 
+  // save the simpleTree
 	$("#save_sort").click(function() {
 		var order = $("#generic_sortable_list").sortable("serialize");
 		var url = $(this).attr('rel');
@@ -742,7 +1003,61 @@ $(document).bind('server_response.plusjade', function(e, data){
 		})				
 	});
 			
+
 			
+			
+			
+// Album Management Functions:
+	$('body').click($.delegate({
+	// show save caption pane
+		'.facebox #sortable_images_wrapper span': function(e){
+			$('.save_pane').clone().addClass('helper').show().insertBefore('.common_full_panel');		
+			var caption = $(e.target)
+				.parent('span')
+				.next('img')
+				.addClass('editing')
+				.attr('title');
+			$('.save_pane input[name="caption"]').val(caption);
+			return false;
+		},
+	// save the caption
+		'.facebox #sortable_images_wrapper .save_pane button':function(e){
+			var caption = $('.save_pane input[name="caption"]').val(caption);
+			$('#sortable_images_wrapper img.editing').attr('title', caption);
+			$('.save_pane.helper').remove();
+			$('#sortable_images_wrapper img').removeClass('editing');
+			$(document).trigger('server_response.plusjade', 'Caption Saved');			
+		},
+		/*
+	// close the save pane
+		'.facebox .save_pane .icon.cross':function(e){
+			$('.save_pane.helper').remove();
+			$('#sortable_images_wrapper img').removeClass('editing');
+			console.log('album/image save pane');
+		},	
+		*/
+	// remove images from gallery	
+		'#remove_images' : function() {
+			$("#sortable_images_wrapper img.ui-selected").each(function(){
+				$(this).parent('div').remove();
+			});
+			return false;		
+		},
+		
+	  // editor place function handler
+		'.place_selected': function() {
+			$("#files_browser_wrapper img.ui-selected").each(function() {
+				$('<div></div>')
+				.addClass('album_images')
+				.prepend('<span class="icon move">&#160; &#160;</span><span class="icon cog">&#160; &#160;</span>')
+				.append($(this).clone().removeClass('ui-selected'))
+				.appendTo($('#sortable_images_wrapper'));
+			});
+			return false;		
+		}
+	}));
+
+
 /* resizing functions */
 	$(window).resize(function() {
 		// bottom styler dialog
@@ -760,35 +1075,6 @@ $(document).bind('server_response.plusjade', function(e, data){
 	});
 	// $(window).scroll(function(){});	
 
-
-// Album Management Functions:
-	// delegate editing image caption
-	$('body').click($.delegate({
-	// show save caption pane
-		'.facebox #sortable_images_wrapper b': function(e){
-			$('.save_pane').clone().addClass('helper').show().insertBefore('.common_left_panel');		
-			var caption = $(e.target)
-				.parent('span')
-				.next('img')
-				.addClass('editing')
-				.attr('title');
-			$('.save_pane input[name="caption"]').val(caption);
-			return false;
-		},
-	// save the caption
-		'.facebox .save_pane button':function(e){
-			var caption = $('.save_pane input[name="caption"]').val(caption);
-			$('#sortable_images_wrapper img.editing').attr('title', caption);
-			$('.save_pane.helper').remove();
-			$('#sortable_images_wrapper img').removeClass('editing');
-			$(document).trigger('server_response.plusjade', 'Caption Saved');			
-		},
-	// close the save pane
-		'.facebox .save_pane .icon.cross':function(e){
-			$('.save_pane.helper').remove();
-			$('#sortable_images_wrapper img').removeClass('editing');
-		}
-	}));
 	
 // --- misc funcitons ---
 /* checks if a value is in an array. */

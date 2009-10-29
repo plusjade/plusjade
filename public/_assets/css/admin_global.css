@@ -59,10 +59,12 @@ span.move{background-position:0px -361px}
 span.template{background-position:0px -380px}
 span.images{background-position:0px -398px}
 span.image{background-position:0px -420px}
-span.info{background-position:0px -440px}
+span.info{background-position:0px -435px}
 span.help{background-position:0px -452px}
 span.home{background-position:0px -471px}
 span.heart{background-position:0px -486px}
+span.date{background-position:0px -500px}
+span.save{background-position:0px -524px}
 
 .admin_reset .on_close{display:none}
 
@@ -137,7 +139,7 @@ a.block_mode:hover,
 #admin_bar li.dropdown ul li a{display:block; width:110px; height:28px; padding:0 4px; text-decoration:none; background:#fff;}
 
 /* --- toggle show/hide tool_panel --- */
-#hide_link {display:none; position:fixed;  top:0; left:80%; width:100px; text-align:center; z-index: 9999;}
+#hide_link {display:none; position:fixed;  top:0; left:90%; width:100px; text-align:center; z-index: 9999;}
 #hide_link a {width:70px; display:block; padding:3px; background:#d52020 url('/_assets/images/admin/gradients.jpg') repeat-x 0px -465px; color:#fff; text-decoration:none; border:1px solid #333; border-top:0;}
 #hide_link a:hover {background:#fff; color:red;}
 
@@ -310,7 +312,7 @@ ul.common_tabs_x{padding:5px 0 !important; margin:0;}
 .common_left_panel{width:180px;float:left;padding:5px;color:#333 !important}
 .common_main_panel{width:590px;min-height:350px;float:right;padding:5px;color:#333 !important;}
 .common_main_panel ul li{color:#333 !important}
-.common_full_panel{width:99%;margin:0 auto;padding:15px 0;border-top:1px solid #0099cc;}
+.common_full_panel{width:99%;margin:0 auto; padding:10px 0;}
 .common_half_left{background:#eee;width:40%;float:left;padding:10px;}
 .common_half_right{width:54%;float:right;padding:10px;border:1px dashed #eee;}
 #common_view_toggle li{margin-bottom:5px;}
@@ -357,7 +359,6 @@ ul.common_tabs_x{padding:5px 0 !important; margin:0;}
 #auth_content_wrapper{width:80%;float:left;margin-left:10px;}
 
 /* admin views ----------------------- */
-/* ----------------------- */
 /* claim */
 .benefit_wrapper{width:50%;float:left;padding:10px;}
 .create_wrapper{width:44%;float:left;padding:10px;}
@@ -371,47 +372,54 @@ ul.common_tabs_x{padding:5px 0 !important; margin:0;}
 .enabled_yes{border:2px solid green;background:#d9f2d3 !important;}
 .enabled_no{border:2px solid red;background:#ffe2e3 !important;}
 
-/* page/manage @all_pages view */
-#directory_window{background:#e2effc; /*lightblue*/}
+/* pages, files, themes directory wrappers */
+#directory_window{ackground:#e2effc; /*lightblue*/}
 #directory_window div.sub_folders{display:none;}
-#directory_window div.asset{height:100px;width:105px;float:left;margin:3px;padding:2px;overflow:hidden;font-size:0.9em;text-align:center;}
+#directory_window div.asset{height:110px; width:90px; float:left;margin:3px;overflow:hidden;font-size:0.9em;}
 #directory_window a{}
 
-#page_browser_wrapper .breadcrumb_wrapper,
-#files_browser_wrapper .breadcrumb_wrapper,
-#tools_browser_wrapper .breadcrumb_wrapper{padding:5px;float:right;background:lightblue url('/_assets/images/admin/gradients.jpg') repeat-x 0px -110px;color:#fff;}
-#page_browser_wrapper .breadcrumb_wrapper a,
-#files_browser_wrapper .breadcrumb_wrapper a{color:#fff;text-decoration:underline;}
-#page_browser_wrapper .breadcrumb_wrapper a:hover,
-#files_browser_wrapper .breadcrumb_wrapper a:hover{color:black;}
+/* breadcrumb */ 
+.breadcrumb_wrapper{padding:3px; background:#dde9fe; border:1px solid lightblue;}
+.breadcrumb_wrapper a{text-decoration:underline;}
+.breadcrumb_wrapper a:hover{}
 
 /* page browser */ 
+img.new_page_drop{cursor:move !important;padding:3px !important;border:1px dashed #333 !important}
 #page_browser_wrapper a{text-decoration:none;}
 #page_browser_wrapper img{display:block;margin:0 auto;}
+#page_browser_wrapper .enabled  div{ackground:#fff;}
+#page_browser_wrapper .hidden div{background:#f2f1f1;}
+#page_browser_wrapper .disabled div{background:#fbe2e2;}
 #page_browser_wrapper img,
-#page_browser_wrapper span.icon.page,
-#files_browser_wrapper span.icon.delete,
-#files_browser_wrapper .asset img{cursor:cursor;cursor:pointer;}
-#page_browser_wrapper .enabled,
-#files_browser_wrapper div.asset{background:#fff;border:1px solid #99ccff;}
-#page_browser_wrapper .hidden{background:#f2f1f1;border:1px solid #ccc;}
-#page_browser_wrapper .disabled{background:#fbe2e2;border:1px solid pink;}
+#page_browser_wrapper span.icon.page{cursor:cursor;cursor:pointer;}
 #page_browser_wrapper ul.option_list{width:110px;display:none;position:absolute;list-style:none;line-height:1.7em;margin:0;padding:5px;text-align:left !important;background:#ffffcc;font-size:0.9em;border:1px solid orange;-moz-border-radius: 10px;-webkit-border-radius: 10px;border-radius: 10px;	}
 #page_browser_wrapper ul.option_list li{}
 
+
+/* files browser */
+#files_browser_wrapper ul.file_links{list-style:none; float:right; margin:0; padding:0;}
+#files_browser_wrapper ul.file_links li {display:inline; margin-left:15px;}
+#files_browser_wrapper div.asset{}
+#files_browser_wrapper div.asset span.info {position:absolute; height:16px; cursor:pointer; cursor:cursor;}
+#files_browser_wrapper .asset img {display:block; margin:auto}
+#files_browser_wrapper div.file_asset img {border:2px solid #ccc;}
+#files_browser_wrapper .asset span{display:block; text-align:center;}
+
+img.ui-selected{border:2px solid orange!important; background:orange !important;}
+.ui-state-highlight{background:lightgreen !important;}
+
+
 /* tools browser */ 
-#tools_browser_wrapper .safe{background:#fff;border:1px solid #99ccff; /* sky blue */}
-#tools_browser_wrapper .orphan{background:#FBE3E4;border:1px solid #ff9999;color:#8a1f11;}
+#tools_browser_wrapper table{width:99%; border:0;}
+#tools_browser_wrapper table th{background:#333; color:#fff; text-align:center; font-weight:normal;}
+#tools_browser_wrapper table td{padding:2px;}
+#tools_browser_wrapper table td input{width:160px; padding:0; border:1px solid #eee;}
+#tools_browser_wrapper table td span.icon.save{cursor:pointer; cursor:cursor;}
+#tools_browser_wrapper .has_pages{background:#fff;border:1px solid #99ccff; /* sky blue */}
+#tools_browser_wrapper .no_pages{background:#FBE3E4;border:1px solid #ff9999;color:#8a1f11;}
 #tools_browser_wrapper .global{background:#ffffcc;border:1px solid #FBC2C4;color:#8a1f11;}
 
-/* files browser */ 
-#files_browser_wrapper div.editor_info{padding:6px;background:#ffffcc;}
-#files_browser_wrapper div.asset.selected{border:1px solid orange !important;background:#ffffcc !important;}
-.close_file_browser{display:block;padding:5px 10px;background:orange;text-align:center;}
-.close_file_browser:hover{background:red;color:#fff;}
-img.ui-selected{background:orange !important;}
-img.new_page_drop{cursor:move !important;padding:3px !important;border:1px dashed #333 !important}
-.ui-state-highlight{background:lightgreen !important;}
+
 
 /* common save pane */ 
 .save_pane{position:absolute;display:block;width:350px;z-index:5000;background:transparent url('/_assets/images/admin/drop.png') repeat bottom right;}
@@ -421,7 +429,7 @@ img.new_page_drop{cursor:move !important;padding:3px !important;border:1px dashe
 a.get_file_browser.images{display:block;width:100px;height:75px;padding:5px;margin:0 auto;background:url('/_assets/images/admin/image_icon.jpg') no-repeat 5px 5px;text-decoration:none;}
 a.get_file_browser.images:hover{background:url('/_assets/images/admin/image_icon_over.jpg') no-repeat 5px 5px;border:1px dashed green;}
 
-	/* add new_page */
+/* add new_page page */
 #new_page_wrapper .pane_left{width:51%;float:left;	}
 .sub_options, .root_options{background:#eee;padding:10px;}
 #new_page_wrapper .pane_right{width:42%;float:right}
@@ -431,44 +439,42 @@ a.get_file_browser.images:hover{background:url('/_assets/images/admin/image_icon
 #link_example{color:green;}	
 	
 
-	/* tool/add @new_tool view */
+/* tool/add @new_tool view */
 #tool_list_wrapper ul{line-height:1.5em;}
 #tool_view_wrapper{background:#eee;border:1px solid #ccc;}
 #tool_view_wrapper div.each_tool{display:none;margin:5px;	}
 #tool_view_wrapper div.each_tool div.desc{margin-top:10px;padding:10px;background:#ffffcc;}
 
-	/* tool manage */
-.window_tool{display:none;clear:both;overflow:auto;}
+/* tool manage */
+.window_tool{height:280px;display:none;clear:both;overflow:auto;}
 .window_header{margin-bottom:10px}
 
 #tool_list_wrapper a:hover,
 #tool_list_wrapper a.active{color: red !important;}
-.output_tool_html{width:99%;height:300px;overflow:auto;border:1px solid #FBC2C4;background:#fff;}
+.output_tool_html{width:99%;height:250px;overflow:auto; border:1px solid #FBC2C4;background:#fff;}
+
+
+/* theme manager */
+.theme_index_block{margin-bottom:10px; padding:8px; border:1px dashed #ccc;}
 
 /* droppables and sortable images css */
-#sortable_images_wrapper{overflow:auto;border:1px solid #ccc;background:#eee;}
+#sortable_images_wrapper{overflow:auto;}
 #sortable_images_wrapper div{float:left;margin:3px;background:#fff;}
-#sortable_images_wrapper div span{display:block;}
-#sortable_images_wrapper div span b,
-#sortable_images_wrapper div span em{display:block;padding:2px;font-weight:normal;font-style:none;font-size:0.9em;}
-#sortable_images_wrapper div span em{background:#ffffcc;cursor:move;}
-#sortable_images_wrapper div span b{float:right;width:35%;background:#e6fcfe;text-align:center;cursor:cursor;cursor:pointer;}
-#sortable_images_wrapper div span b:hover,
-#sortable_images_wrapper div span em:hover{background:orange;}
+#sortable_images_wrapper div span.icon{cursor:cursor; cursor:pointer;position:relative;top:10px;}
+#sortable_images_wrapper div span.icon.move{}
+#sortable_images_wrapper div span.icon.cog{left:45px;}
 
-#sortable_images_wrapper div img{padding:5px;background:#fff;}
+#sortable_images_wrapper div img{display:block; clear:both; border:2px solid #ccc;}
 #sortable_images_wrapper img.ui-selecting {background:#FECA40;}
 #sortable_images_wrapper img.ui-selected{background:orange;}	
-.ui-selectable-helper{z-index:9999 !important;border:2px dashed green !important;}
+.ui-selectable-helper{z-index:999999 !important;border:2px dashed green !important;}
 
 /* -- swf uploader styles ------------------------------- */
 #swf_wrapper{}
 #swf_wrapper div.fieldset {border:1px solid #afe14c;margin: 10px 0;padding: 20px 10px}
 #swf_wrapper span.legend {font-weight:bold;font: 700 14px Arial, Helvetica, sans-serif;color: #73b304;}
 #swf_wrapper div.flash {width: 450px;height:200px;overflow:auto;margin: 10px 5px;border-color: #D9E4FF;-moz-border-radius:5px;-webkit-border-radius:5px;}
-#swf_wrapper button,
-#swf_wrapper input,
-#swf_wrapper select,
+#swf_wrapper button, #swf_wrapper input, #swf_wrapper select,
 #swf_wrapper textarea {border-width: 1px; margin-bottom: 10px;padding: 2px 3px;}
 #swf_wrapper input[disabled]{ border: 1px solid #ccc } /* FF 2 Fix */
 #swf_wrapper label { width: 150px; text-align: right; display:block;margin-right: 5px;}
