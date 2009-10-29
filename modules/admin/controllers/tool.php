@@ -9,7 +9,7 @@
 		updates managed via the tool module logic.
 	instanced
 		instances are recorded onto pages and tell which tools should display where.
-	cloned
+	cloned (not yet added)
 		creates a new tool that models an existing tool.
 	deleted.
 		deletes the tool and all its instances.
@@ -38,7 +38,7 @@ class Tool_Controller extends Controller {
 			))
 			->find_all();
 			
-		# Get all tool references from pages_tools owned by this site.
+		# Get all tool from the tools table.
 		$tools = ORM::factory('tool')
 			->where('fk_site', $this->site_id)
 			->orderby(array('system_tool_id'=>'asc', 'id'=>'asc'))
@@ -251,8 +251,26 @@ class Tool_Controller extends Controller {
 		return "$instance_id";
 	}
 	
-	
-	
+/*
+ * update stuff from an existing tool. mainly just name right now
+ */
+	public function update($tool_id=NULL)
+	{
+		valid::id_key($tool_id);
+		if(!isset($_GET['name']))
+			die('no name specified');
+			
+		# get the tool.
+		$tool = ORM::factory('tool')
+			->where('fk_site', $this->site_id)
+			->find($tool_id);
+		if(!$tool->loaded)
+			die('Tool does not exist');
+			
+		$tool->name = $_GET['name'];
+		$tool->save();
+		die('Name Saved!!');
+	}
 
 /*
  *	Delete a tool and all its instances : parent table & in pages_tools as well.
@@ -480,17 +498,18 @@ class Tool_Controller extends Controller {
  * used to insert updated tool data into the DOM via ajax
  * $().jade_update_tool_html js function @admin/init.js
  */	
-	public function html($toolname=NULL, $tool_id=NULL)
+	public function html($toolname=NULL, $parent_id=NULL)
 	{
-		valid::id_key($tool_id);
+		#die('asdfa');
+		#valid::id_key($parent_id);
 		# TODO: probably should query this in the db...
 		
 		$parent = ORM::factory($toolname)
 			->where('fk_site', $this->site_id)
-			->find($tool_id);
+			->find($parent_id);
 		if(!$parent->loaded)
 			die('Tool does not exist');
-			
+		
 		die(Load_Tool::factory($toolname)->_index($parent));
 	}
 

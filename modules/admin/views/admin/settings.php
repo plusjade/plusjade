@@ -35,6 +35,10 @@
 			<option>timezone list</option>
 		</select>
 		
+		<br/><br/>
+		<b>Publish Site</b>
+		<br/><input type="checkbox" name="publish" value="yes"> Yes
+		
 		<br><br>
 		Toggle Site building Wizard. 
 		<br> The site wizard walks you through all the basic controls 

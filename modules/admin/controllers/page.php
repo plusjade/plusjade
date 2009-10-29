@@ -387,11 +387,19 @@ class Page_Controller extends Controller {
 			if($filename != $_POST['old_page_name'])
 				yaml::edit_key($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
 
-
 			# if the page was the account page, update site_config
 			if($this->account_page == $_POST['old_page_name'])
 				yaml::edit_site_value($this->site_name, 'site_config', 'account_page', $filename);
 
+				
+			# should we publish this page?
+			if(isset($_POST['publish']) AND 'yes' == $_POST['publish'])
+			{
+				$cache = DATAPATH ."$this->site_name/cache/$page_id.html";
+				if(file_exists($cache))
+					unlink($cache);
+			}
+			
 			# TODO:  i have no idea how to do this. ->
 			# if the page has sub-pages, update the sub-page names.
 			

@@ -26,6 +26,11 @@ class Album_Controller extends Public_Tool_Controller {
 				return $this->wrap_tool('album error, please contact support', 'album', $album);	
 		}
 		
+		# set the thumbnail size USES TOGGLE:
+		$thumb_size = (isset($album->toggle) AND is_numeric($album->toggle))
+			? $album->toggle
+			: 75;
+			
 		# images
 		$images = json_decode($album->images);	
 				
@@ -33,7 +38,7 @@ class Album_Controller extends Public_Tool_Controller {
 			return $this->wrap_tool('no images.', 'album', $album);
 			
 		foreach($images as $image)
-			$image->thumb = image::thumb($image->path);
+			$image->thumb = image::thumb($image->path, $thumb_size);
 		
 		$display_view = (empty($album->view)) ? 'lightbox' :  $album->view;
 		$primary = $this->$display_view($album, $images);

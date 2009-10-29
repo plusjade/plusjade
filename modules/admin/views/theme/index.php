@@ -4,15 +4,13 @@
 	<div id="common_title">Theme Files Browser</div>
 </div>
 
-<div id="files_browser_wrapper" class="theme_files">
-	
+<div id="files_browser_wrapper" class="theme_files">	
 	<div class="common_left_panel">
-
-		<div style="padding:8px; border:1px dashed #ccc; margin-bottom:10px">
+		<div class="theme_index_block">
 			<span class="icon add_page">&#160; &#160; </span> <a href="/get/theme/add_files/<?php echo $this->theme?>" rel="facebox" id="upload_files">Upload Files</a>
 		</div>
 		
-		<div style="padding:8px; border:1px dashed #ccc; margin-bottom:10px">
+		<div class="theme_index_block">
 			<h3>Your Themes</h3>
 			<select name="theme">
 				<?php
@@ -24,27 +22,24 @@
 				?>
 			</select>
 			
-			<p>
-				<button id="load_theme" type="submit" class="jade_positive" style="width:140px">Load Theme</button>
-			</p>
-				<button id="activate_theme" type="submit" class="jade_positive" style="width:140px">Activate Theme</button>	
-			<p>
-				<button id="delete_theme" type="submit" class="jade_negative" style="width:140px">Delete Theme</button>	
-			</p>
+			<br/><br/>
+			<button id="load_theme" type="submit" class="jade_positive" style="width:140px">Load Theme</button>
+			<br/><br/>
+			<button id="activate_theme" type="submit" class="jade_positive" style="width:140px">Activate Theme</button>	
+			<br/><br/>
+			<button id="delete_theme" type="submit" class="jade_negative" style="width:140px">Delete Theme</button>		
 		</div>
 		
-		<div style="padding:8px; border:1px dashed #ccc">
+		<div class="theme_index_block">
 			<h3>Create New Theme</h3>
 			<input type="text" name="add_theme" class="auto_filename" maxlength="30" style="width:140px">
 			<br><br><button id="add_theme" type="submit" class="jade_positive" style="width:140px">Add Theme</button>
 		</div>
 	</div>
 
-	
-	<div class="breadcrumb_wrapper" style="width:590px;">
+	<div class="breadcrumb_wrapper" style="float:left; width:590px;">
 		themes <span id="breadcrumb" rel="" class="theme"> / <a href="/get/theme/contents/<?php echo $this->theme?>" rel="ROOT" class="get_folder"><?php if('safe_mode' != $this->theme) echo $this->theme?></a></span>
 	</div>	
-	
 	
 	<div id="directory_window" class="common_main_panel full_height" rel="ROOT" style="height:350px; overflow:auto">
 		<?php
@@ -57,84 +52,3 @@
 
 </div>
 <div class="clearboth"></div>
-
-
-
-
-<script type="text/javascript">
-
-/* ------------------ LOADING AND DELETING  ------------------ */ 
-	
-// load a theme button
-	$("#load_theme").click(function(){
-		var theme = $("select[name='theme'] option:selected").text();		
-		$('#directory_window').html('Loading file...');
-		$.get('/get/theme/contents/'+ theme,
-			function(data){
-				$('#directory_window').html(data);
-				var link = ' / <a href="/get/theme/contents/'+ theme +'" class="get_folder">'+ theme +'</a>';
-				$('#breadcrumb').html(link);
-				$('#upload_files').attr('href','/get/theme/add_files/'+theme);
-			}
-		);
-		return false;
-	});
-
-// activate a theme button
-	$("#activate_theme").click(function(){
-		var theme = $("select[name='theme'] option:selected").text();		
-		if('<?php echo $this->theme?>' == theme) {
-			alert('Theme already active.');
-			return false;
-		}
-		if(confirm('Activate this theme: ' + theme + '?')) {	
-			$('.facebox .show_submit').show();
-			$.post('/get/theme/change', {theme: theme}, function(data){
-				if('TRUE' == data)
-					location.reload();
-				else {
-					alert(data);
-					$.facebox.close();
-				}
-			});
-		}
-		return false;
-	});
-	
-// delete a theme button
-	$("#delete_theme").click(function(){
-		theme = $("select[name='theme'] option:selected").text();
-		if('<?php echo $this->theme?>' == theme) {
-			alert('Cannot delete active theme.');
-			return false;
-		}	
-		if(confirm('This cannot be undone. Delete this entire theme folder?')) {
-			$.get('/get/theme/delete/'+ theme,
-				function(data){
-					$("select[name='theme'] option:selected").remove();	
-					$('#directory_window').empty();
-					$('#breadcrumb').empty();
-					$('#upload_files').attr('href','/get/theme/add_files/<?php echo $this->theme?>');
-				}
-			);
-		}
-		return false;
-	});
-
-
-// add a theme button
-	$("#add_theme").click(function(){
-		var theme = $("input[name='add_theme']").val();
-		if(!theme || 'safe_mode' == theme){
-			alert('specify a theme name other than "safe_mode"');
-			return false;
-		}
-		$.post('/get/theme/add_theme', {theme : theme},
-			function(data){
-				$("select[name='theme']").append('<option>'+ data +'</option>');
-				$('#show_response_beta').html(data);
-			}
-		);
-		return false;
-	});
-</script>

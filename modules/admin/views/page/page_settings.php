@@ -82,6 +82,8 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			?>
 		</div>
 		
+		<b>Publish Page</b>
+		<input type="checkbox" name="publish" value="yes"> Yes
 	</div>
 	
 	<input type="hidden" name="old_page_name" value="<?php echo $filename?>">

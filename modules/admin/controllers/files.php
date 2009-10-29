@@ -9,6 +9,15 @@
  
 class Files_Controller extends Controller {
 
+	public $image_types = array(
+		'.jpg'	=> 'jpeg',
+		'.jpeg'	=> 'jpeg',
+		'.png'	=> 'png',
+		'.gif'	=> 'gif',
+		'.tiff'	=> 'tiff',
+		'.bmp'	=> 'bmp',
+		);		
+		
 	function __construct()
 	{
 		parent::__construct();
@@ -18,29 +27,18 @@ class Files_Controller extends Controller {
 			if( empty($_POST['PHPSESSID']) )
 				die('Please login');
 		}
-	}
-
+	}	
 	
-	
-	public $image_types = array(
-		'.jpg'	=> 'jpeg',
-		'.jpeg'	=> 'jpeg',
-		'.png'	=> 'png',
-		'.gif'	=> 'gif',
-		'.tiff'	=> 'tiff',
-		'.bmp'	=> 'bmp',
-		);
 /*
  * index view for file browser.
  * everything is loaded within this view.
  */
 	public function index()
 	{
-		$files	= self::folder_contents($this->assets->assets_dir(), '_tmb');
-		
 		$view = new View('files/index');
+		$view->image_types = $this->image_types;
 		$view->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
-		$view->files = $files;
+		$view->files = self::folder_contents($this->assets->assets_dir(), '_tmb');
 		die($view);
 	}
 	
@@ -48,13 +46,16 @@ class Files_Controller extends Controller {
  * Show contents of a particular folder. Used for ajax calls.
  * $folder comes in data format: folder:sub-folder:sub-sub-folder
  */
-	public function contents($folder=NULL)
+	public function contents()
 	{
-		$folder	= str_replace(':', '/', $folder);	
-		$files	= self::folder_contents($this->assets->assets_dir($folder), '_tmb');
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$dir = self::validate_dir($_GET['dir']);
 		
+		#die($dir);
 		$view = new View('files/folder');
-		$view->files = $files;
+		$view->image_types = $this->image_types;
+		$view->files = self::folder_contents($dir, '_tmb');
 		$view->mode = (empty($_GET['mode'])) ? '' : $_GET['mode'] ;
 		die($view);
 	}
@@ -63,32 +64,31 @@ class Files_Controller extends Controller {
  * View to Add files to a specified folder in website asset repo.
  * This outputs the view. self::upload handles the processing.
  */	
-	public function add_files($directory=NULL)
+	public function add_files()
 	{
-		$real_dir	= str_replace(':', '/', $directory);
-		$full_path	= $this->assets->assets_dir($real_dir);
-		if(!is_dir($full_path))
-			die('invalid directory');
-
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$short_dir = str_replace(':', '/', $_GET['dir']);
+		$dir = self::validate_dir($_GET['dir']);
+		
 		$view = new View('files/add_files');
-		$view->directory = $directory;
+		$view->short_url_dir = $_GET['dir'];
 		die($view);
 	}
 
 /*
  * Upload files to specified folder. Swf uploader uses this.
  */	
-	public function upload($directory=NULL)
-	{
-		$directory = str_replace(':', '/', $directory);
-		$full_path = $this->assets->assets_dir($directory);
-		if(!is_dir($full_path))
-			die('invalid directory');
-
+	public function upload()
+	{	
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$dir = self::validate_dir($_GET['dir']);
+		
 		# Do we have a file
 		if(!is_uploaded_file($_FILES['Filedata']['tmp_name']))
 			die('Invalid File');
-		
+			
 		# test for size restrictions?
 		# ( $_FILES['Filedata']['size'] > 90000 )
 		
@@ -108,8 +108,8 @@ class Files_Controller extends Controller {
 		if(array_key_exists($ext, $this->image_types))
 		{
 			# does the thumb dir exist?
-			if(!is_dir("$full_path/_tmb"))
-				mkdir("$full_path/_tmb");
+			if(!is_dir("$dir/_tmb"))
+				mkdir("$dir/_tmb");
 
 			# initiliaze image as library object.	
 			$image	= new Image($_FILES['Filedata']['tmp_name']);			
@@ -117,34 +117,34 @@ class Files_Controller extends Controller {
 			$height	= $image->__get('height');
 
 
-			# Make square thumbnails (always need 75's for plusjade system)
+			# Make square thumbnails (always need 100's for plusjade system)
 				# are we instructed to make any more thumbnails?
 			if(isset($_POST['thumb']))
-				array_push($_POST['thumb'], 75);
+				array_push($_POST['thumb'], 100);
 			else
-				$_POST['thumb'] = array(75);
+				$_POST['thumb'] = array(100);
 
 			foreach($_POST['thumb'] as $size)
 			{
-				if(!is_dir("$full_path/_tmb/$size"))
-					mkdir("$full_path/_tmb/$size");				
+				if(!is_dir("$dir/_tmb/$size"))
+					mkdir("$dir/_tmb/$size");				
 				if($width > $height)
 					$image->resize($size, $size, Image::HEIGHT)->crop($size, $size);
 				else
 					$image->resize($size, $size, Image::WIDTH)->crop($size, $size);
 				
-				$image->save("$full_path/_tmb/$size/$filename");
+				$image->save("$dir/_tmb/$size/$filename");
 			}
 			
 			# save an optimized original version.
 			# todo. save any apsurdly huge image to a max dimension.
 			# if the file is over 300kb its likely not optimized.
 			if(300000 < $_FILES['Filedata']['size'])
-				$image->quality(75)->save("$full_path/$filename");
+				$image->quality(75)->save("$dir/$filename");
 			else
 			{
-				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename");			
-				# $image->save("$full_path/$filename");
+				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$dir/$filename");			
+				# $image->save("$dir/$filename");
 			}
 		}
 		else
@@ -153,9 +153,9 @@ class Files_Controller extends Controller {
 			# turn php pages to text.
 			str_replace('php', '', $ext, $match);
 			if(0 < $match)
-				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename.txt");	
+				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$dir/$filename.txt");	
 			else
-				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$full_path/$filename");
+				move_uploaded_file($_FILES['Filedata']['tmp_name'], "$dir/$filename");
 		}
 
 		die('File uploaded');
@@ -166,78 +166,263 @@ class Files_Controller extends Controller {
  * add new folder to a specific directory
  * default folder is root: data/site_name/assets
  */
-	public function add_folder($directory=NULL)
+	public function add_folder()
 	{
-		$directory = str_replace(':', '/', $directory);
-		$full_path = $this->assets->assets_dir($directory);
-		
-		if(!is_dir($full_path))
-			die('invalid directory');
-			
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$short_dir = str_replace(':', '/', $_GET['dir']);
+		$dir = self::validate_dir($_GET['dir']);
+
 		if($_POST)
 		{
 			$folder_name = trim($_POST['folder_name']);
-			$folder_name = valid::filter_php_url($_POST['folder_name']);
+			$folder_name = valid::filter_php_url($folder_name);
 			
-			if(is_dir("$full_path/$folder_name"))
+			if(is_dir("$dir/$folder_name"))
 				die('folder already exists');
 				
-			if(mkdir("$full_path/$folder_name"))
+			if(mkdir("$dir/$folder_name"))
 				die('Folder created.');
 				
 			die('Could not create folder.');
 		}
 			
 		$view = new View('files/add_folder');
-		$view->directory = $directory;
+		$view->short_dir = $short_dir;
+		$view->short_url_dir = $_GET['dir'];
 		$view->filter = '';
 		die($view);
 	}
 
-	
 /*
- * delete a folder or file from the asset repository.
+ * move assets within the asset repository.
  */
-	public function delete($path_string=NULL)
+	public function move()
 	{
-		if(NULL == $path_string)
-			die('No path sent');
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$new_dir = self::validate_dir($_GET['dir']);
 		
-		$path_string = str_replace(':', '/', $path_string, $matches);
-		$filename	= (0 < $matches) ? substr(strrchr($path_string, '/'), 1) : $path_string;
-		$ext 		= (strrchr($filename, '.'));
-		$full_path	= $this->assets->assets_dir($path_string);
+		# old dir
+		if(!isset($_POST['path']))
+			die('no old dir');				
+		$old_dir = self::validate_dir($_POST['path']);
 		
-		if(is_dir($full_path))
-		{	
-			if('_tmb' == $filename)
-				die('Cannot delete this folder.');
-			if(Jdirectory::remove($full_path))
-				die('Folder deleted');	
-			die('Could not delete the folder.');
-		}
-		elseif(file_exists($full_path))
-		{
-			if(unlink($full_path))
-			{
+		# json assets
+		if(empty($_POST['json']))
+			die('nothing sent');			
+		$json = self::validate_json($_POST['json']);
+
+		# loop through the assets	
+		foreach($json as $asset)
+		{		
+			rename("$old_dir/$asset->name", "$new_dir/$asset->name");
+			
+			if(!is_dir("$old_dir/$asset->name"))
+			{	
 				# is this an image?
+				$ext = (strrchr($asset->name, '.'));
 				if(array_key_exists($ext, $this->image_types))
 				{
-					# get and recurse the _tmb directory.
-					$thumb_path = str_replace($filename, '', $full_path).'_tmb/';
-					$thumb_dirs = Jdirectory::contents($thumb_path, 'root', 'list_dir');
-					foreach($thumb_dirs as $dir)
-						if(file_exists("$thumb_path/$dir/$filename"))
-							unlink("$thumb_path/$dir/$filename");				
+					if(!is_dir("$new_dir/_tmb"))
+						mkdir("$new_dir/_tmb");
+						
+					# get and recurse the old _tmb directory.
+					$thumb_dirs = Jdirectory::contents("{$old_dir}_tmb/", 'root', 'list_dir');
+					foreach($thumb_dirs as $dir)	
+						if(file_exists("{$old_dir}_tmb/$dir/$asset->name"))
+						{
+							if(!is_dir("$new_dir/_tmb/$dir"))
+								mkdir("$new_dir/_tmb/$dir");	
+							
+							rename("{$old_dir}_tmb/$dir/$asset->name", "$new_dir/_tmb/$dir/$asset->name");				
+						}
+				
 				}
-				die('File deleted');
-			}	
-			die('Could not delete the file.');
+			}
 		}
-		die('invalid path');
+		die('Assets Moved.');
 	}
 
 
+/*
+ * delete assets from the asset repository.
+ */
+	public function delete()
+	{
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$dir = self::validate_dir($_GET['dir']);
+		
+		if(empty($_POST['json']))
+			die('nothing sent');			
+		$json = self::validate_json($_POST['json']);
+			
+		foreach($json as $asset)
+		{
+ 			$ext = (strrchr($asset->name, '.'));
+			$full_path = "$dir$asset->name";
+			if(is_dir($full_path))
+			{	
+				if('_tmb' == $asset->name)
+					die('Cannot delete this folder.');
+				
+				Jdirectory::remove($full_path);
+			}
+			elseif(file_exists($full_path))
+			{
+				if(unlink($full_path))
+					if(array_key_exists($ext, $this->image_types))
+					{			
+						# get and recurse the _tmb directory.
+						$thumb_dirs = Jdirectory::contents("$dir/_tmb/", 'root', 'list_dir');
+						foreach($thumb_dirs as $tmb_dir)
+							if(file_exists("$dir/_tmb/$tmb_dir/$asset->name"))
+								unlink("$dir/_tmb/$tmb_dir/$asset->name");				
+					}
+			}
+		}
+		die('Assets deleted');
+	}
+
+
+	
+/*
+ * create thumbs for images from the asset repository.
+ */
+	public function thumbs()
+	{
+		if(!isset($_GET['dir']))
+			$_GET['dir'] = '';
+		$dir = self::validate_dir($_GET['dir']);
+
+		# sizes array
+		if(empty($_POST['sizes']) OR !is_array($_POST['sizes']))
+			die('invalid sizes');
+		
+		# json assets array
+		if(empty($_POST['json']))
+			die('nothing sent');
+		$json = self::validate_json($_POST['json']);
+
+		
+		# run through the sent assets and generate thumbs.
+		foreach($json as $asset)
+		{
+ 			$ext = (strrchr($asset->name, '.'));
+
+			if(is_dir("$dir/$asset->name") AND '_tmb' != $asset->name)
+			{	
+				self::recurse_dir_thumbs("$dir/$asset->name", 'root', true, $_POST['sizes']);
+			}
+			elseif(file_exists("$dir/$asset->name") AND array_key_exists($ext, $this->image_types))
+			{	
+				self::generate_thumbs($dir, $asset->name, $_POST['sizes']);
+			}
+		}
+		die('Thumbnails generated');
+	}
+
+/*
+ *
+ */
+	private function recurse_dir_thumbs($dir, $parent = 'root', $recurse=false, $sizes, $omit = '_tmb') 
+	{ 
+		if(substr($dir, -1) != "/")
+			$dir .= "/"; # add trailing slash if missing 	 	
+		
+		# open pointer to directory and read list of files 
+		$d = @dir($dir) or die("Jdirectory::contents: Failed opening directory $dir for reading");
+		
+		while(false !== ($entry = $d->read())) 
+		{ 
+			# skip hidden files and any omissions
+			if( ($entry[0] == "." ) OR (! empty($omit) AND $entry == "$omit" ) )
+				continue;
+				
+			if(is_dir("$dir$entry")) 
+			{
+				if(TRUE == $recurse && is_readable("$dir$entry/"))
+					self::recurse_dir_thumbs("$dir$entry/", $entry, true, $sizes, '_tmb');
+			} 
+			elseif(is_readable("$dir$entry") && $entry != 'Thumbs.db')
+			{	
+				# is this file is an image
+				$ext = (strrchr($entry, '.'));
+				if(array_key_exists($ext, $this->image_types))
+					self::generate_thumbs($dir, $entry, $sizes);
+			}
+		} 
+		$d->close(); 
+		return 'done';
+	}
+
+	
+/*
+ * actual handler for generating thumbnails based on given sizes array
+	$dir = directory to file
+	$filename = name of the file
+	$sizes = array of sizes to be generated.
+ */
+	private function generate_thumbs($dir, $filename, $sizes)
+	{
+		# does the thumb dir exist?
+		if(!is_dir("$dir/_tmb"))
+			mkdir("$dir/_tmb");
+
+		# initiliaze image as library object.	
+		$image	= new Image("$dir/$filename");			
+		$width	= $image->__get('width');
+		$height	= $image->__get('height');
+		
+		foreach($sizes as $size)
+		{
+			#if($size != 100 AND $size > $width AND $size > $height)
+				#continue; 
+			if(file_exists("$dir/_tmb/$size/$filename"))
+				continue;
+			if(!is_dir("$dir/_tmb/$size"))
+				mkdir("$dir/_tmb/$size");
+			
+			if($width > $height)
+				$image->resize($size, $size, Image::HEIGHT)->crop($size, $size)->quality(90);
+			else
+				$image->resize($size, $size, Image::WIDTH)->crop($size, $size)->quality(90);
+			
+			$image->save("$dir/_tmb/$size/$filename");
+		}	
+		return 'success';
+	}
+		
+	
+/*
+ * validates the GET url being sent from most of the ajax interaction urls
+ */	
+	private function validate_dir($dir=NULL)
+	{
+		$dir = str_replace(':', '/', $dir);
+		valid::file_dir($dir);
+		$dir = $this->assets->assets_dir($dir);	
+		
+		if(!is_dir($dir))
+			die('invalid dir');
+		
+		return $dir;	
+	}
+
+/*
+ * validate that the json string is properly formed for file hanling.
+ */
+	private static function validate_json($json)
+	{		
+		$json = json_decode($json);		
+		if(NULL === $json OR !is_array($json))
+			die('invalid json');
+		
+		return $json;
+	}
+	
+	
 /*
  * Similar to Jdirectory::contents but only gets contents of one folder/directory at a time.
  * Builds the array differently for "file browser" specific data handling.
@@ -305,19 +490,11 @@ class Files_Controller extends Controller {
 	
 		if(!file_exists($dir_path))
 			die('remember to do 404 not found');
-			
-		$image_types = array(
-			'jpg'	=> 'jpeg',
-			'jpeg'	=> 'jpeg',
-			'png'	=> 'png',
-			'gif'	=> 'gif',
-			'tiff'	=> 'tiff',
-			'bmp'	=> 'bmp',
-		);
+
 		$ext = strtolower(substr(strrchr($filename, "."), 1));
-		if(array_key_exists($ext, $image_types))
+		if(array_key_exists($ext, $this->image_types))
 		{
-			$type = $image_types[$ext];
+			$type = $this->image_types[$ext];
 			header("Content-Type: image/$type");
 			readfile($dir_path);
 		}

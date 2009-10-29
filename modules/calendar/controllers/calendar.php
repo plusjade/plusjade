@@ -14,14 +14,16 @@ class Calendar_Controller extends Public_Tool_Controller {
 		list($page_name, $action, $date) = Uri::url_array();
 		$page_name	= $this->get_page_name($page_name, 'calendar', $calendar->id);
 		$action		= (empty($action)) ? 'nonsense' : $action;
+		if('tool' == $action)
+			$date = null;
 		
-		$primary	= new View('public_calendar/small/index');
+		$primary = new View('public_calendar/small/index');
 
 		switch($action)
 		{			
 			case 'day':
 				$primary->events = $this->day($calendar->id, $date);
-				break;			
+				break;
 		}
 		$primary->calendar = $this->month($page_name, $calendar->id, $date);
 		

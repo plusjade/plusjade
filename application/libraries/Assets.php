@@ -55,7 +55,7 @@ class Assets_Core {
  */		
 	public function assets_dir($directory=NULL)
 	{
-		$directory = ((NULL === $directory)) ? '' : "/$directory";
+		$directory = (empty($directory)) ? '' : "/$directory";
 		
 		return  DATAPATH . "$this->site_name/assets$directory";	
 	}

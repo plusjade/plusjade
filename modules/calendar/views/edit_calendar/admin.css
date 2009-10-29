@@ -42,12 +42,3 @@
     width: 200px; /*must have*/
     height: 200px; /*must have*/
 }
-
-.calendar_date_pane{
-	width:47%;
-	float:left;
-	margin-top:10px;
-	padding:5px;
-}
-
-

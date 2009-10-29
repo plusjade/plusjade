@@ -6,19 +6,16 @@
 	<div id="common_title">Manage Album</div>
 </div>	
 
-<div class="common_left_panel aligncenter">
-	<a href="#" class="get_file_browser images" rel="albums" title="Add images">&#160; &#160;</a>
-	
-	<div id="image_trash"></div>
-	<div><b>Drag images to Trash</b></div>
-	<br><a href="#" id="remove_images">Remove Selected images</a>
-</div>
+ <span class="icon images">&#160; &#160;</span> <a href="#" class="get_file_browser" rel="albums" title="Add images">Add Images</a> - 
 
-<div id="sortable_images_wrapper" class="common_main_panel" style="height:350px; overflow:auto">	
+<span class="icon cross">&#160; &#160;</span> <a href="#" id="remove_images">Remove Images</a>
+	
+<div id="sortable_images_wrapper" class="common_full_panel" style="height:350px; overflow:auto">	
 	<?php foreach($images as $image):?>
 		<div class="album_images">
-			<span class="handle"><b>edit</b> <em>drag</em></span>
-			<img src="<?php echo "$img_path/$image->thumb"?>" alt="<?php echo $image->path?>" title="<?php echo $image->caption?>">
+			<span class="icon move">&#160; &#160;</span>
+			<span class="icon cog">&#160; &#160;</span>
+			<img src="<?php echo "$img_path/$image->thumb"?>" width="75px" height="75px" alt="<?php echo $image->path?>" title="<?php echo $image->caption?>">
 		</div>
 	<?php endforeach;?>
 </div>
@@ -38,12 +35,12 @@
 
 <script type="text/javascript">
 
-// Load image album user interface functions.	
-<?php include Kohana::find_file('views', 'javascripts/image_album_ux', FALSE, 'js');?>
-	
+// make images sortable and selectable
+	$("#sortable_images_wrapper").sortable({items:'div', handle:'span.move'});
+	$("#sortable_images_wrapper").selectable({filter:'img', delay: 20});
 
 // Save the album
-	$('button#save_album').click(function(){
+	$('button#save_album').click(function() {
 		// JSONize image selections
 		var data = new Array();
 		$('#sortable_images_wrapper img').each(function(){

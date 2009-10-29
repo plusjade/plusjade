@@ -64,6 +64,7 @@
 	
 	<div style="display:none">
 		<span id="global_css_path"><?php echo $global_css_path?></span>
+		<span id="be-HaPpy_My-FriEnds" rel="<?php echo $page_id?>" title="<?php echo $this->theme?>" style="display:none"></span>
 		<span id="click_hook" rel="<?php echo $page_id?>" style="display:none"></span>
 		<?php						
 		if('0' < count($tools_array))

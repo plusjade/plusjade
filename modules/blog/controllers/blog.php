@@ -17,10 +17,11 @@ class Blog_Controller extends Public_Tool_Controller {
 */
 	public function _index($blog)
 	{
+		#echo kohana::debug($blog);die();
 		date_default_timezone_set('America/Los_Angeles');# just for now
 		list($page_name, $action, $value, $value2) = Uri::url_array();
 		$page_name	= $this->get_page_name($page_name, 'blog', $blog->id);
-		$action		= (empty($action)) ? 'homepage' : $action ;
+		$action		= (empty($action) OR 'tool' == $action) ? 'homepage' : $action ;
 
 		$view = new View("public_blog/blogs/index");
 		$view->tool_id = $blog->id;
@@ -29,7 +30,6 @@ class Blog_Controller extends Public_Tool_Controller {
 		$view->sticky_posts = $this->get_sticky_posts($blog->sticky_posts);
 		$view->recent_comments = $this->get_recent_comments($blog->id);
 
-		
 		switch($action)
 		{
 			case 'entry':

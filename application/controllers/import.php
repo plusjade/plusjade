@@ -24,6 +24,8 @@ class Import_Controller extends Controller {
   imported tools exist within the system but do not reside on any pages.
   ** use the tool manager to add tools to existing pages which handle protected/unprotected logic.
   TODO: css stylesheet parsing
+  
+  CAUTION: dont allow multiple account tools to be uploaded this way.
  */	
 	public function tool()
 	{
@@ -38,6 +40,9 @@ class Import_Controller extends Controller {
 		if(NULL === $tool or !is_object($tool))
 			die('invalid json');
 		
+		if(!isset($tool->name))
+			die('invalid object');
+			
 		$toolname = strtolower($tool->name);
 		
 		# is this a valid tool?
@@ -84,16 +89,32 @@ class Import_Controller extends Controller {
 		
 		
 		# create the tool_css file
+		#PROBLEM: the tool folder may not even exist yet ....GRRR
+		# should centralize directory checks, hack it up for now.
 		if(!empty($tool->css))
 		{
 			$css_data	 = preg_replace("/_(\d+)/", "_$new_parent->id", $tool->css);
-			$custom_dir	 = $this->assets->themes_dir("$this->theme/tools/$toolname/_created/$new_parent->id");
+			$tools_folder = $this->assets->themes_dir("$this->theme/tools");
 			$custom_file = "{$new_parent->type}_$new_parent->view.css";
-			
-			if(!is_dir($custom_dir))
-				mkdir($custom_dir);
+
+			# !! THESE CHECKS ARE REDUNDANT FROM _generate_tool_css !!
+			# is this theme tools folder created?
+			if(!is_dir($tools_folder))
+				mkdir($tools_folder);
 				
-			file_put_contents("$custom_dir/$custom_file", $css_data);
+			# is this specific toolname folder created?
+			if(!is_dir("$tools_folder/$toolname"))
+				mkdir("$tools_folder/$toolname");
+
+			# is the "_created" folder created within the toolname folder?
+			if(!is_dir("$tools_folder/$toolname/_created"))
+				mkdir("$tools_folder/$toolname/_created");
+				
+			# is this specific tool_id folder created?
+			if(!is_dir("$tools_folder/$toolname/_created/$new_parent->id"))
+				mkdir("$tools_folder/$toolname/_created/$new_parent->id");
+				
+			file_put_contents("$tools_folder/$toolname/_created/$new_parent->id/$custom_file", $css_data);
 		}
 		
 		die('tool has been imported!');

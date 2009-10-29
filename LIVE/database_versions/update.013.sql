@@ -1,0 +1,2 @@
+
+ALTER TABLE `tools` ADD `name` VARCHAR( 100 ) NOT NULL ;

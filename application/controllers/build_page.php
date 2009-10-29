@@ -9,7 +9,7 @@
  
 class Build_Page_Controller extends Controller {
 
-	public $serve_cache = FALSE;
+	public $serve_cache = TRUE;
 	public $serve_plusjade_home = FALSE;
 	
 	function __construct()
@@ -19,8 +19,8 @@ class Build_Page_Controller extends Controller {
 		$this->template = new View('shell');	
 		
 		# Global CSS for live pages only		
-		if(!$this->client->can_edit($this->site_id))
-			$this->template->linkCSS("_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0");
+		#if(!$this->client->can_edit($this->site_id))
+		$this->template->linkCSS("_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0", 'global-sheet');
 	}
  
 /*
@@ -302,14 +302,7 @@ class Build_Page_Controller extends Controller {
 	private function load_admin($page_id, $page_name)
 	{	
 		if($this->client->can_edit($this->site_id))
-		{
-			# pass global css as modular INLINE.
-			$css_path = $this->assets->themes_dir("$this->theme/css/global.css");
-			$css = (file_exists($css_path))
-				? file_get_contents($css_path)
-				: '/* global.css file does not exist. Please create it.*/';
-			$this->template->inline_global_css = "<style type=\"text/css\" id=\"global-style\">\n$css\n</style>\n";
-			
+		{			
 			# load admin global css and javascript.
 			$this->template->linkCSS('get/tool_css/admin');
 			$this->template->admin_linkJS('get/js/admin?v=1.1');
@@ -323,8 +316,8 @@ class Build_Page_Controller extends Controller {
 				$protected_array[] = $tool->id;
 
 			# Log in the $account_user admin account.
-			if(!$this->account_user->logged_in($this->site_id))
-				$this->account_user->force_login('admin', (int)$this->site_id);
+			#if(!$this->account_user->logged_in($this->site_id))
+			#	$this->account_user->force_login('admin', (int)$this->site_id);
 			
 			
 			# is this website claimed?

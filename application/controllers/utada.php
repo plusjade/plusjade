@@ -20,8 +20,8 @@ class Utada_Controller extends Controller {
 		# but checking on this requires that i first enter "can_edit" mode.
 		
 		if(ROOTACCOUNT != $this->site_name
-			OR !$this->account_user->logged_in($this->site_id)
-			OR 'jade' != $this->account_user->get_user()->username)
+			OR !$this->client->can_edit($this->site_id)
+			OR 'jade' != $this->client->get_user()->username)
 				die('invalid credentials');
 	}
 
@@ -91,7 +91,7 @@ class Utada_Controller extends Controller {
  */
 	public function grant_access()
 	{
-		if('adjf8w9eu4589ua8a' === $_POST['password'])
+		if('supausah' === $_POST['password'])
 		{
 			# Create access row for the master account
 			$user = ORM::factory('account_user', $this->account_user->get_user()->id);

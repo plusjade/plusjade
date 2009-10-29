@@ -1,6 +1,4 @@
 
-
-
 <div id="common_tool_header" class="buttons">
 	<button id="change_theme" type="submit" class="jade_positive">Install <span></span></button>
 	<div id="common_title">Install New Theme</div>
@@ -14,24 +12,18 @@
 		?>
 	</ul>
 	
-	<br>
 	<h3>Activate this theme?</h3>
 	<input type="checkbox" name="activate" value="true" CHECKED> Yes!
 </div>
 
 <div id="tool_view_wrapper" class="common_main_panel">	
-	<?php	
-	foreach($themes as $key => $theme)
-	{			
-		?>			
+	<?php foreach($themes as $key => $theme):?>		
 		<div id="theme_<?php echo $theme->id?>" class="each_theme aligncenter">				
 			<div class="desc">
 				<img src="<?php echo url::image_path("themes/$theme->name.$theme->image_ext")?>">
 			</div>
 		</div>
-		<?php
-	}
-	?>
+	<?php endforeach;?>
 </div>
 
 <script type="text/javascript">

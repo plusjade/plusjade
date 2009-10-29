@@ -60,12 +60,22 @@ abstract class Auth_Driver {
 	}
 
 	/**
+	 * Logs a user in.
+	 *
+	 * @param   string   username
+	 * @param   string   password
+	 * @param   boolean  enable auto-login
+	 * @return  boolean
+	 */
+	abstract public function login($username, $password, $remember);
+
+	/**
 	 * Forces a user to be logged in, without specifying a password.
 	 *
 	 * @param   mixed    username
 	 * @return  boolean
 	 */
-	abstract public function force_login($user);
+	abstract public function force_login($username);
 
 	/**
 	 * Logs a user in, based on stored credentials, typically cookies.
@@ -105,6 +115,14 @@ abstract class Auth_Driver {
 	}
 
 	/**
+	 * Get the stored password for a username.
+	 *
+	 * @param   mixed   username
+	 * @return  string
+	 */
+	abstract public function password($username);
+
+	/**
 	 * Completes a login by assigning the user to the session key.
 	 *
 	 * @param   string   username
@@ -117,6 +135,7 @@ abstract class Auth_Driver {
 
 		// Store username in session
 		$_SESSION[$this->config['session_key']] = $user;
+
 		return TRUE;
 	}
 

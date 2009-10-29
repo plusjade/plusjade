@@ -7,6 +7,7 @@ $image_types = array(
 	'tiff'	=> 'tiff',
 	'bmp'	=> 'bmp',
 );
+
 foreach ($files as $path => $data)
 {
 	$data = explode('|', $data);
@@ -28,24 +29,19 @@ foreach ($files as $path => $data)
 		?>
 		<div id="<?php echo $css_id?>" class="file_asset asset" rel="<?php echo $name?>">
 			<?php echo $img?>
-			<br><span title="<?php echo $name?>"><?php echo $display_name?></span>
-			 <span class="icon cross">&nbsp; &nbsp; </span>
+			<span title="<?php echo $name?>"><?php echo $display_name?></span>
 		</div>
 		<?php
 	}
-	# show folders
 	else
 	{
+		# show folders
 		?>
 		<div id="<?php echo $name?>" class="folder_asset asset" rel="<?php echo $path?>">
 			<img src="/_assets/images/admin/folder.png" href="/get/theme/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"  alt="">
-			<br><a href="/get/theme/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
+			<span><a href="/get/theme/contents/<?php echo $path?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a></span>
 		</div>
 		<?php
 	}
 }
-
 ?>
-
-
-

@@ -1,10 +1,3 @@
-
-
-<?php
-	$address = '2259 Honolulu Ave, Glendale, CA 91020';
-?>
-
-
 <!DOCTYPE html "-//W3C//DTD XHTML 1.0 Strict//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -12,24 +5,16 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <title>Google Maps JavaScript API Example</title>
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAATl3ouz6mDWUryXLiBg_56hTaRle_T4ihdSUpL4p8Tw_T5cVK1RQVO3SKhybAmz1Hb7JecRXQiqnSUA&sensor=false" type="text/javascript"></script>
-	
 	<style type="text/css">
-		body{padding:0;margin:0; width:440px; font-size:10px; font-family:verdana, serif;}
-		
-		#map_canvas{
-			border:1px solid #333;
-		}
-		form {
-			text-align:left;
-		}
-		form div{
-			margin: 3px 0;
-		}
-		#directions {width:440px; font-size:10px;}
+		body {padding:0;margin:0; width:<?php echo $width?>px; font-size:10px; font-family:verdana, serif;}
+		#map_canvas{border:1px solid #333;}
+		form {text-align:left;}
+		form div{margin: 3px 0;}
+		#directions {width:<?php echo $width?>px; font-size:10px;}
 	</style>
   </head>
   <body onload="initialize()" onunload="GUnload()">
-    <div id="map_canvas" style="width: 440px; height: 300px"></div>
+    <div id="map_canvas" style="width: <?php echo $width?>px; height: <?php echo $height?>px"></div>
 	
 	<form action="#" id="direction_form" onsubmit="overlayDirections();return false;" method="post">
 		<b>Get Directions To Here</b>
@@ -56,15 +41,12 @@ function initialize() {
 	//setup elements
 	map		= new GMap2(document.getElementById("map_canvas"));
 	gdir = new GDirections(map, document.getElementById("directions"));
-	var point	= new GLatLng(34.2053, -118.2269);
+	var point	= new GLatLng(<?php echo $coordinates?>);
 		
 	map.setCenter(point, 13); // default zoom level
 	map.addOverlay(new GMarker(point));
 	
 	map.openInfoWindow(map.getCenter(), document.getElementById("direction_form"));
-	
-	
-	
 	map.setUIToDefault();
 	
 	// map errors
@@ -108,8 +90,6 @@ function initialize() {
 
 	}
 	
-	
-	
 	/*
 	**
 	* Looks up the directions, overlays route on map,
@@ -129,13 +109,6 @@ function initialize() {
 		return false;
 	}
 
-</script>
-	
-	
-	
-	
-	
-	
-	
+</script>	
   </body>
 </html>

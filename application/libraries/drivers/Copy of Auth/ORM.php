@@ -11,6 +11,71 @@
  */
 class Auth_ORM_Driver extends Auth_Driver {
 
+	/**
+	 * Checks if a session is active.
+	 *
+	 * @param   string   role name
+	 * @param   array    collection of role names
+	 * @return  boolean
+	 */
+	public function logged_in($role)
+	{
+		$status = FALSE;
+
+		// Get the user from the session
+		$user = $this->session->get($this->config['session_key']);
+
+		if (is_object($user) AND $user instanceof Account_User_Model AND $user->loaded)
+		{
+			// Everything is okay so far
+			$status = TRUE;
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Logs a user in.
+	 *
+	 * @param   string   username
+	 * @param   string   password
+	 * @param   boolean  enable auto-login
+	 * @return  boolean
+	 */
+	public function login($user, $password, $remember)
+	{
+		if ( ! is_object($user))
+		{
+			// Load the user
+			$user = ORM::factory('user', $user);
+		}
+
+		// If the passwords match, perform a login
+		if ($user->has(ORM::factory('role', 'login')) AND $user->password === $password)
+		{
+			if ($remember === TRUE)
+			{
+				// Create a new autologin token
+				$token = ORM::factory('user_token');
+
+				// Set token data
+				$token->user_id = $user->id;
+				$token->expires = time() + $this->config['lifetime'];
+				$token->save();
+
+				// Set the autologin cookie
+				cookie::set('authautologin', $token->token, $this->config['lifetime']);
+			}
+
+			// Finish the login
+			$this->complete_login($user);
+
+			return TRUE;
+		}
+
+		// Login failed
+		return FALSE;
+	}
 
 	/**
 	 * this requires an logged-in account_user object. if its notthere 
@@ -21,7 +86,7 @@ class Auth_ORM_Driver extends Auth_Driver {
 	 */
 	public function force_login($user)
 	{
-		if (!is_object($user))
+		if ( ! is_object($user))
 			die('invalid user');
 
 		// Mark the session as forced, to prevent users from changing account information
@@ -93,6 +158,13 @@ class Auth_ORM_Driver extends Auth_Driver {
 	 */
 	public function password($user)
 	{
+		if ( ! is_object($user))
+		{
+			// Load the user
+			$user = ORM::factory('user', $user);
+		}
+
+		return $user->password;
 	}
 
 	/**

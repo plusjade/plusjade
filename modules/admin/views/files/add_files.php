@@ -11,11 +11,11 @@
 	<br/><br/>
 	<b>Create Image Thumbnails.</b>
 	
-	75x75 always made.<br/>
-	<input type="checkbox" name="100" value="100"> 100x100<br/>
-	<input type="checkbox" name="125" value="125"> 125x125<br/>
-	<input type="checkbox" name="150" value="150"> 150x150<br/>
+	100x100 always made.<br/>
 	<input type="checkbox" name="200" value="200"> 200x200<br/>
+	<input type="checkbox" name="300" value="300"> 300x300<br/>
+	<input type="checkbox" name="400" value="400"> 400x400<br/>
+	<input type="checkbox" name="500" value="500"> 500x500<br/>
 </div>
 
 <div id="swf_wrapper" class="common_main_panel">
@@ -30,7 +30,7 @@
 
 <script type="text/javascript">
 	var swfu = new SWFUpload({
-		upload_url: "<?php echo url::site("get/files/upload/$directory")?>",
+		upload_url: "<?php echo url::site("get/files/upload?dir=$short_url_dir")?>",
 		post_params: {"PHPSESSID" : "<?php echo session_id()?>"},
 		custom_settings : {
 			progressTarget : "fsUploadProgress",
@@ -49,7 +49,7 @@
 			$('.facebox .show_submit').hide();
 			$.facebox.close('facebox_2');
 			$('#directory_window').html('<div>Loading...</div>');
-			$('#directory_window').load('/get/files/contents/<?php echo $directory?>');
+			$('#directory_window').load('/get/files/contents?dir=<?php echo $short_url_dir?>');
 		}		
 	});
 	

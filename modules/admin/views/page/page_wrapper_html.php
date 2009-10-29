@@ -12,14 +12,29 @@ $display_name	= ('10' < strlen($filename)) ? substr($filename, 0, 10).'...' : $f
 		$type = 'folder';
 		?>
 			<img src="/_assets/images/admin/folder.png" rel="<?php echo $full_path?>" class="open_folder"> 
-			<span class="icon page">&#160; &#160;</span>
+			
 		<?php 
 	}
 	else
 		echo "<img src=\"/_assets/images/admin/file.gif\" class=\"file_options\">";
+	
+	
+	if(isset($type) AND 'folder' == $type)
+	{
+		$icon = '<span class="icon page">&#160; &#160;</span>';
+
+	}
+	else
+	{
+	
+		$icon = ((TRUE == $is_protected)) 
+			? "<span class='icon shield' title='$page_builder'>&#160; &#160; </span>"
+			: '';
+	}
 	?>
-	<?php if(TRUE == $is_protected) echo '<span class="icon shield" title="'.$page_builder.'">&#160; &#160; </span>'?>
-	<span title="<?php echo $filename?>"><?php echo $display_name?></span>
+
+	<div title="<?php echo $filename?>"><?php echo "$icon $display_name"?></div>
+	
 	<ul class="option_list">
 	
 		<?php

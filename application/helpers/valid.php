@@ -84,6 +84,16 @@ class valid_Core {
 		$string = trim($string);
 		return preg_replace("/[^-a-z0-9_.]/i", '-', (string) $string);
 	}	
+	
+	/* filter file folders
+	 */
+	static function file_dir($string)
+	{
+		if(0 < preg_match("/[^-a-z0-9_\/]/i", (string) $string))
+			die('invalid directory');
+	}
+	
+	
 	/**
 	 * Validate email, commonly used characters only
 	 *

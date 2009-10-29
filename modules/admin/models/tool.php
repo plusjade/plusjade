@@ -2,8 +2,8 @@
 
 class Tool_Model extends ORM {
 
-
-	protected $has_and_belongs_to_many = array('pages');
+	protected $has_many = array('pages' => 'pages_tools');
+	#protected $has_and_belongs_to_many = array('pages');
 	protected $has_one = array('system_tool');
 	protected $load_with = array('system_tool');
 	# protected $has_many = array('system_tool_types');

@@ -1,28 +1,19 @@
 
 
 <div id="common_tool_header">
-	<div id="common_title">All Site Tools <?php echo $page_id?></div>
+	<div style="float:right;padding-top:10px;">
+		Type: <select id="tool_list_wrapper">
+			<?php foreach($system_tools as $system_tool):?>
+				<option><?php echo $system_tool->name?></option>
+			<?php endforeach;?>
+		</select>
+	</div>	
+	<div id="common_title">All Site Tools</div>
 </div>
 
+
 <div id="tools_browser_wrapper">
-
-	<div class="common_left_panel">
-		<h2>Key</h2>
-		<b style="color:blue">Blue:</b> on local page.
-		<br><b style="color:orange">Orange:</b> on all pages.
-		<br><b style="color:red">Red:</b> Orphans.
-		
-		<ul id="tool_list_wrapper" style="line-height:1.1em">
-			<?php foreach($system_tools as $system_tool):?>
-				<li><a href="#window_<?php echo $system_tool->name?>"><?php echo $system_tool->name?></a></li>
-			<?php endforeach;?>
-		</ul>
-	</div>
-
-	<div class="breadcrumb_wrapper" style="width:590px">
-		<span id="breadcrumb" rel="">Album</span>
-	</div>	
-	<div id="directory_window" style="overflow:visible" class="common_main_panel">
+	<div id="directory_window" class="common_full_panel">
 
 			<?php 
 			$names = array('');
@@ -30,28 +21,41 @@
 			foreach($tools as $tool)
 			{
 				$names[$start] = $tool->system_tool->name;
-				$last = $start-1;
-				$class = (0 < $tool->pages->count())
-					? 'safe'
-					: 'orphan';
-				
+				$last = $start-1;					
+				$class = 'no_pages';
+				if(0 != $tool->pages_tools->count())
+					$class = (10 < $tool->pages_tools->current()->page_id)
+						? 'has_pages'
+						: 'global';
+
 				if($tool->system_tool->name != $names[$last]):
-				
-					if(isset($once)) echo '<br class="clearboth" /></div>';
+					if(isset($once)) echo '</table></div>';
 				?>
 					<div id="window_<?php echo $tool->system_tool->name?>" class="window_tool">
-						<div class="window_header">
-							<?php echo $tool->system_tool->name?>
-						</div>
+					<table>
+						<tr><th>Id</th> <th>Name</th> <th>Quick View</th> <th>Add To Page</th> <th>Delete</th> <th>Found Where?</th></tr>
 				<?php endif;?>
-						<div id="icon_<?php echo $tool->id?>" class="asset <?php echo $class?>">
-							<a href="/get/tool/add?tool_id=<?php echo "$tool->id&page_id=$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add to Page</a>
-							<br/><a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->parent_id"?>" class="show_view">quick view</a>
-							<br/><a href="/get/tool/delete/<?php echo $tool->id?>" class="jade_delete_tool" rel="<?php echo $tool->id?>">delete!</a>
-							<?php foreach($tool->pages as $page) :?>
-								<br><a href="<?php echo url::site($page->page_name)?>"><?php echo $page->page_name?></a>
-							<?php endforeach;?>
-						</div>
+						<tr id="icon_<?php echo $tool->id?>" class="<?php echo $class?>">
+							<td><?php echo $tool->id?></td>
+							<td width="200px" class="aligncenter"><input type="text" value="<?php echo $tool->name?>"> <span class="icon save" rel="<?php echo $tool->id?>" title="save name">&#160; &#160; </span></td>
+							<td width="90px" class="aligncenter"><span class="icon magnify">&#160; &#160;</span> <a href="/get/tool/html/<?php echo "{$tool->system_tool->name}/$tool->parent_id"?>" class="show_view">View</a></td>
+							<td width="90px" class="aligncenter"><span class="icon plus">&#160; &#160;</span> <a href="/get/tool/add?tool_id=<?php echo "$tool->id&page_id=$page_id"?>" class="to_page" rel="<?php echo "{$tool->system_tool->name}:$tool->parent_id:$tool->id"; ?>">Add</a></td>
+							<td width="90px" class="aligncenter"><span class="icon cross">&#160; &#160;</span> <a href="/get/tool/delete/<?php echo $tool->id?>" class="jade_delete_tool" rel="<?php echo $tool->id?>">delete</a></td>
+							<td class="alignright">
+								<?php if('has_pages' == $class):?>
+									(<?php echo $tool->pages->count()?>) Pages: 
+									<select>
+										<?php foreach($tool->pages as $page):?>
+											<option><?php echo $page->page_name?></option>
+										<?php endforeach;?>
+									</select>
+								<?php elseif('global' == $class):?>
+									globalized
+								<?php else:?>
+									nowhere =(
+								<?php endif;?>
+							</td>
+						</tr>
 				<?php		
 				++$start;
 				$once = true;
@@ -62,7 +66,7 @@
 	</div>
 	
 	<span class="save_pane" style="width:760px;margin-left:20px; display:none">
-		<div class="contents" style="height:400px; ">
+		<div class="contents" style="height:280px;">
 			<span class="icon cross floatright">&#160; &#160;</span>
 			<h2 class="aligncenter">*For previewing purposes only*</h2>
 			<div class="output_tool_html"></div>
@@ -73,62 +77,12 @@
 
 
 <script type="text/javascript">
-	
 	// show the tool types
-	$('#tool_list_wrapper a').click(function(){
-		$('#tool_list_wrapper a').removeClass('active');
-		var pane = $(this).addClass('active').attr('href');	
+	$('#tool_list_wrapper').change(function(){		
+		var pane = $("#tool_list_wrapper option:selected").val();
 		$('div.window_tool').hide(); 
-		$(pane).show();
+		$('#window_' + pane).show();
 		return false;
 	});
-	$('#tool_list_wrapper a:first').click();
-	
-	// delete the tool.
-	$('.jade_delete_tool').click(function(){
-		if(confirm('This cannot be undone. Delete this tool?')) {
-			var id = $(this).attr('rel');
-			$.get($(this).attr('href'), function(data){
-				$('#icon_'+ id).remove();
-				$(document).trigger('server_response.plusjade', data);
-			});
-		}
-		return false;
-	});
-	
-	// show tool quick view.
-	$('#tools_browser_wrapper a.show_view').click(function() {	
-		$('.save_pane')
-			.clone()
-			.prependTo('#tools_browser_wrapper')
-			.addClass('helper')
-			.show();
-
-		$('.save_pane.helper .output_tool_html')
-			.html('<div class="plusjade_ajax">Loading...</div>')
-			.load($(this).attr('href'));
-		
-		return false;
-	});
-	
-	// add tool to the current page:
-		$('a.to_page').click(function(){
-			var args = $(this).attr('rel').split(':');
-			var tool = {
-				"toolname" : args[0],
-				"parent_id" : args[1],
-				"tool_id" : args[2],
-			};		
-			$.get(this.href, function(data){
-				// expecting an insert_id from pages_tools table
-				if(isNaN(data)) {
-					alert(data);
-					return false;				
-				}
-				tool.instance = data;
-				$().jade_inject_tool('add', tool);
-			});
-			return false;
-		});
-	
+	$('#tool_list_wrapper option:first').change();	
 </script>

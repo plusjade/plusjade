@@ -1,6 +1,6 @@
 
 <style type="text/css">
-.droppable_tool{
+.droppable_tool {
 	width:120px;
 	height:120px;
 	float:left;
@@ -34,9 +34,7 @@
 	?>
 	</ul>
 
-	<div id="tool_droppable_wrapper">
-		
-	</div>
+	<div id="tool_droppable_wrapper"></div>
 </div>
 
 <div id="tool_view_wrapper" class="common_main_panel">		
@@ -97,7 +95,4 @@ $(document).ready(function()
 	});
 	
 });
-
-
-
 </script>

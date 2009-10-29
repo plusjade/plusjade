@@ -5,7 +5,6 @@
 	<?php
 	if(!empty($title)) echo "<title>$title</title>\n\t";
 	if(!empty($meta_tags)) echo $meta_tags;
-	if(!empty($inline_global_css)) echo $inline_global_css;
 	if(!empty($load_css)) echo $load_css;
 	if(!empty($load_js)) echo $load_js;
 	?>

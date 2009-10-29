@@ -10,11 +10,11 @@
 
 <div id="swf_wrapper" class="common_main_panel">
 	 <b>Click Browse</b> button to select up to 12 files at a time for uploading.
-	<br><br>
+	<br/><br/>
 	<b>Accepted filetypes:</b> <i>.html</i>, <i>.css</i>, <i>images(.jpg, .gif, .png)</i>
 	<p>
 	<b>NOTE:</b> Files will automatically be placed into appropriate folders.
-	<br>All other extensions will be omitted.
+	<br/>All other extensions will be omitted.
 	</p>
 	<span class="legend">Upload Queue</span>
 	<div class="fieldset flash" id="fsUploadProgress">

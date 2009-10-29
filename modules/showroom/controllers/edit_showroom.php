@@ -3,7 +3,6 @@
 
 class Edit_Showroom_Controller extends Edit_Tool_Controller {
 
-
 	function __construct()
 	{
 		parent::__construct();	
@@ -304,19 +303,31 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 	}
 	
 /*
- * SAVE showroom parent settings
- * Success Response via Facebox_response tier 2
- * [see root JS in this::manage() ]
+ * showroom parent settings
  */
 	public function settings($parent_id=NULL)
 	{
-		die('Showroom settings are currently disabled while we update our code. Thanks!');
 		valid::id_key($parent_id);
-		
+		$showroom = ORM::factory('showroom')
+			->where('fk_site', $this->site_id)
+			->find($parent_id);	
+		if(!$showroom->loaded)
+			die('invalid showroom');
+			
 		if($_POST)
 		{
-		
+			$showroom->name = $_POST['name'];
+			$showroom->view = $_POST['view'];
+			$showroom->params = $_POST['params'];
+			$showroom->attributes = $_POST['attributes'];
+			$showroom->save();
+			die('showroom Settings Saved.');
 		}
+		
+		$view = new View('edit_showroom/settings');
+		$view->showroom = $showroom;
+		$view->js_rel_command = "update-showroom-$parent_id";			
+		die($view);
 	}
 	
 

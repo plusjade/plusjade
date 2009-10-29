@@ -1,13 +1,8 @@
+
 <?php
 $class = ('albums' == $mode) ? 'to_album' : 'to_editor';
-$image_types = array(
-	'jpg'	=> 'jpeg',
-	'jpeg'	=> 'jpeg',
-	'png'	=> 'png',
-	'gif'	=> 'gif',
-	'tiff'	=> 'tiff',
-	'bmp'	=> 'bmp',
-);
+$tmb_size = 75;
+
 foreach ($files as $path => $data)
 {
 	$data = explode('|', $data);
@@ -20,32 +15,29 @@ foreach ($files as $path => $data)
 		$path			= str_replace(':', '/', $path);
 		$url			= $this->assets->assets_url() .'/'. $path ;
 		$url_thumb 		= image::thumb($url);
-		#$url_thumb		= str_replace($name, "_sm/$name", $url);
 		$display_name	= ('10' < strlen($name)) ? substr($name, 0, 10).'...' : $name;
-		$ext			= strtolower(substr(strrchr($name, "."), 1));
+		$ext			= strtolower(strrchr($name, "."));
 		
-		# if image, show the thumbnail version
+		# if image show thumbnail
 		$img = ((array_key_exists($ext, $image_types))) ?
-			"<img src=\"$url_thumb\" class=\"$class image_file\" rel=\"$url\" width=\"75\" height=\"75\" alt=\"$path\">"
-			: "<img src=\"/_assets/images/admin/file.gif\" width=\"75\" height=\"75\" alt=\"\">";
+			"<img src='$url_thumb' class='$class image_file' rel='$url' title='$name' width='$tmb_size' height='$tmb_size' alt='$path'>"
+			: "<img src='/_assets/images/admin/file.gif' title='$name' width='$tmb_size' height='$tmb_size' alt=''>";
 		
 		?>
-		<div id="<?php echo $css_id?>" class="file_asset asset" rel="<?php echo $name?>">
+		<div id="<?php echo $css_id?>" class="file_asset asset" rel="<?php echo $path?>">
+			<span class="icon info">&#160; &#160;</span>
 			<?php echo $img?>
-			<br><span title="<?php echo $name?>"><?php echo $display_name?></span>
-			 <span class="icon cross">&nbsp; &nbsp; </span>
+			<span title="<?php echo $name?>"><?php echo $display_name?></span>
 		</div>
 		<?php
 	}
-	# show folders
 	else
-	{
-		$delete = ('tools' == $name AND 'tools' == $path) ? '' : '<span class="icon cross">&nbsp; &nbsp; </span> ';
+	{	
+		# show folders
 		?>
 		<div id="<?php echo $name?>" class="folder_asset asset" rel="<?php echo $path?>">
-			<img src="/_assets/images/admin/folder.png" href="/get/files/contents/<?php echo "$path?mode=$mode"?>" class="get_folder" rel="<?php echo $path?>"  alt="">
-			<br><a href="/get/files/contents/<?php echo "$path?mode=$mode"?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a>
-			<?php echo $delete?>
+			<img src="/_assets/images/admin/folder.png" rel="<?php echo $path?>" title="<?php echo $name?>" width="<?php echo $tmb_size?>px" height="<?php echo $tmb_size?>px" alt="">
+			<span><a href="/get/files/contents?dir=<?php echo "$path&mode=$mode"?>" class="get_folder" rel="<?php echo $path?>"><?php echo $name?></a></span>
 		</div>
 		<?php
 	}
@@ -53,12 +45,7 @@ foreach ($files as $path => $data)
 ?>
 
 <script type="text/javascript">
-	$("#files_browser_wrapper .file_asset img").draggable({
-		revert: 'invalid',
-		helper: 'clone'
-	});
-
-	
+	$('#files_browser_wrapper').selectable({ filter: 'img', delay: 20});
 </script>
 
 

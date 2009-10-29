@@ -123,18 +123,17 @@ class Account_ORM_Driver extends Account_Driver {
 
 	/**
 	 * Forces a user to be logged in, without specifying a password.
-	 *
+	 * this has to be an object.
 	 * @param   mixed    username
 	 * @return  boolean
 	 */
 	public function force_login($user, $site_id)
 	{
-		if ( ! is_object($user))
+		if (!is_object($user))
 		{
-			// Load the user
-			$user = ORM::factory('account_user')
-				->where('fk_site', $site_id)
-				->find($user);
+			echo('account:force_login = user is not an object');
+			echo kohana::backtrace(debug_backtrace());
+			die();
 		}
 
 		// Mark the session as forced, to prevent users from changing account information

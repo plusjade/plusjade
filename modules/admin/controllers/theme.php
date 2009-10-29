@@ -230,7 +230,7 @@ class Theme_Controller extends Controller {
 		$file	= valid::filter_php_filename($file) . '%';
 		$file	= str_ireplace("$ext%", '', $file) . $ext;
 		
-		if(! file_exists($this->assets->themes_dir("$this->theme/$folder").$file) AND empty($_POST['contents']) )
+		if(! file_exists($this->assets->themes_dir("$this->theme/$folder").$file) AND !isset($_POST['contents']) )
 			die('Invalid File');	
 
 		if($_POST)

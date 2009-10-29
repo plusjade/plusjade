@@ -59,13 +59,13 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 /*
  * EDIT album settings
  */
-	public function settings($tool_id=NULL)
+	public function settings($parent_id=NULL)
 	{
-		valid::id_key($tool_id);		
+		valid::id_key($parent_id);		
 		
 		$album = ORM::factory('album')
 			->where('fk_site', $this->site_id)
-			->find($tool_id);	
+			->find($parent_id);	
 		if(!$album->loaded)
 			die('invalid album');
 			
@@ -105,7 +105,7 @@ class Edit_Album_Controller extends Edit_Tool_Controller {
 		$view = new View('edit_album/settings');
 		$view->album = $album;
 		$view->params = $params;
-		$view->js_rel_command = "update-album-$tool_id";			
+		$view->js_rel_command = "update-album-$parent_id";			
 		die($view);
 	}
 

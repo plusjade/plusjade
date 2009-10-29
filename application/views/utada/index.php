@@ -38,7 +38,6 @@
 		<?php 
 			foreach($sites as $site)
 				echo "<li>$site->subdomain<br><a href=\"/get/utada/remove_access/$site->id\">[x]Access</a></li>";
-
 		?>
 		</ul>
 	
@@ -54,23 +53,11 @@
 <script type="text/javascript">
 	$('#master_wrapper').click($.delegate({
 	
-		'.common_tabs_x a':function(e){
+		'.common_tabs_x a, .left_master a':function(e){
 			$('div.left_master').html('<div class="ajax_loading">Loading...</div>');
 			$('div.left_master').load(e.target.href);
 			return false;
-		},
-		
-		'.left_master a':function(e){
-			$('div.right_master').html('<div class="ajax_loading">Loading...</div>');
-			$('div.right_master').load(e.target.href);
-			return false;
-		},
-		
-		'a.adfafd_load_asset':function(e){
-			$('div.main_master').html('<div class="ajax_loading">Loading...</div>');
-			$('div.main_master').load(e.target.href);
-			return false;
-		}	
+		}
 	}));
 </script>
 

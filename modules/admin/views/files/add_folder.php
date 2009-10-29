@@ -1,10 +1,9 @@
 
 <?php
-$slash		= (('' == $directory)) ? '' : '/';
-$url_dir	= str_replace('/', ':', $directory);
+$slash = (('' == $short_dir)) ? '' : '/';
 ?>
 
-<?php echo form::open("files/add_folder/$url_dir", array('id' => 'files_add_folder_form') )?>
+<?php echo form::open("files/add_folder?dir=$short_url_dir", array('id' => 'files_add_folder_form') )?>
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" id="add_page_submit" name="add_folder" class="jade_positive">Add Folder</button>
 		<div id="common_title">Add New Folder</div>
@@ -25,7 +24,7 @@ $url_dir	= str_replace('/', ':', $directory);
 
 	<div id="new_page_url">
 		Path to Folder:
-		<br><b><?php echo url::site()."files/$directory$slash"?><span id="link_example">...</span></b>
+		<br><b><?php echo url::site()."files/$short_dir$slash"?><span id="link_example">...</span></b>
 	</div>	
 </form>	
 
@@ -53,7 +52,7 @@ $url_dir	= str_replace('/', ':', $directory);
 			$('.facebox .show_submit').hide();
 			$.facebox.close('facebox_2');
 			$('#directory_window').html('<div>Loading...</div>');
-			$('#directory_window').load('/get/files/contents/<?php echo $url_dir?>');
+			$('#directory_window').load('/get/files/contents?dir=<?php echo $short_url_dir?>');
 			$('#show_response_beta').html(data);
 		}
 	});

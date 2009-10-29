@@ -104,6 +104,7 @@ class Auth_Core {
 		{
 			if(sha1("r-A-n_$site_id-D-o:m") == cookie::get("unclaimed_$site_id"))
 				return TRUE;
+
 			return FALSE;
 		}
 		
@@ -111,10 +112,12 @@ class Auth_Core {
 		if(!$this->logged_in())
 			return FALSE;
 			
+		
 		$user = ORM::factory('account_user', $this->get_user()->id);
 		if($user->has(ORM::factory('site', $site_id)))
 			return TRUE;
-			
+
+
 		return FALSE;
 	}	
 	
@@ -140,14 +143,14 @@ class Auth_Core {
 	}
 
 	/**
-	 * Force a login. must be an object
+	 * Force a login for a specific username.
 	 *
 	 * @param   mixed    username
 	 * @return  boolean
 	 */
-	public function force_login($user)
+	public function force_login($username)
 	{
-		return $this->driver->force_login($user);
+		return $this->driver->force_login($username);
 	}
 
 	/**

@@ -90,7 +90,7 @@ class Account_User_Model extends ORM {
 	 */
 	public function save()
 	{
-		if ($this->loaded === FALSE)
+		if (!$this->loaded)
 		{
 			# when the user is first created, assign a token for him.
 			# we may not even need this for account_users though!!

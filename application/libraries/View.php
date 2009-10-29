@@ -406,16 +406,17 @@ class View_Core {
 /*
  *	Load CSS files in the source page
  */	
-	public function linkCSS($href, $path=FALSE, $var = 'load_css') 
+	public function linkCSS($href, $id=NULL, $var = 'load_css') 
 	{
-		if (!isset($this->$var))  
+		if (!isset($this->$var))
 			$this->$var = '';
 	
+		$id = (empty($id)) ? '' : "id=\"$id\"";
 		if (is_array($href)) 
 			foreach ($href as $value)
-				$this->$var .= '<link type="text/css" rel="stylesheet" href="' . url::site($value) . '" media="screen" />'."\n\t";
+				$this->$var .= '<link type="text/css" '. $id .' rel="stylesheet" href="' . url::site($value) . '" media="screen" />'."\n\t";
 		else
-			$this->$var .= '<link type="text/css" rel="stylesheet" href="' . url::site($href) . '" media="screen" />'."\n\t";
+			$this->$var .= '<link type="text/css"  '. $id .' rel="stylesheet" href="' . url::site($href) . '" media="screen" />'."\n\t";
 	}
 
 /*

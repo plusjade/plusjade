@@ -26,13 +26,12 @@
 	{
 		# images
 		$images = json_decode($item->images);
-		# echo kohana::debug($images);
 		if(!empty($images) AND is_array($images))
 		{
 			# show the thumb of the first image in the album.
 			$full_path = $images[0]->path;
 			$thumb = image::thumb($full_path, $thumb_size);
-			$image = "<img src=\"$img_path/$thumb\" alt=\"{$images[0]->caption}\">";
+			$image = "<img src='$img_path/$thumb' width='$thumb_size' height='$thumb_size' alt='{$images[0]->caption}'>";
 		}	
 		?>	
 		<div id="showroom_item_<?php echo $item->id?>" class="showroom_item" rel="<?php echo $item->id?>">

@@ -63,7 +63,7 @@ class yaml_Core {
 		# This should not need to happen very often.
 		if('pages_config' == $filename)
 		{
-			if(! self::build_pages_config($site_name) )
+			if(!self::build_pages_config($site_name))
 				die('yaml::build_pages_config() Could not create pages_config.yml');
 			
 			return self::parse($site_name, $filename, $full_path);
@@ -198,30 +198,26 @@ class yaml_Core {
 		if(file_exists($config_path))
 			return TRUE;
 			
-		$db = new Database;
-		
 		# OPTIMIZE this later. 2 queries = no good.
-		$site = $db->query("
-			SELECT site_id
-			FROM sites
-			WHERE subdomain = '$site_name'
-		")->current();
-		if(! is_object($site))
+		$site = ORM::factory('site', $site_name);
+		if(!$site->loaded)
 			return FALSE;
 
+		$db = new Database;
 		$protected_pages = $db->query("
-			SELECT pages_tools.*, LOWER(tools_list.name) as name, tools_list.protected, pages.page_name
+			SELECT pages_tools.*, tools.parent_id, LOWER(system_tools.name) as name, pages.page_name
 			FROM pages_tools
-			JOIN tools_list ON tools_list.id = pages_tools.tool
+			JOIN tools ON tools.id = pages_tools.tool_id
+			JOIN system_tools ON system_tools.id = tools.system_tool_id 
 			JOIN pages ON pages.id = pages_tools.page_id
-			WHERE pages_tools.fk_site = '$site->site_id'
-			AND tools_list.protected = 'yes'
+			WHERE pages_tools.fk_site = '$site->id'
+			AND system_tools.protected = 'yes'
 		");
 		
 		ob_start();
 		# page_name:toolname-tool_id
 		foreach($protected_pages as $page)
-			echo "$page->page_name:$page->name-$page->tool_id\n";
+			echo "$page->page_name:$page->name-$page->parent_id\n";
 	
 		if(file_put_contents($config_path, ob_get_clean()))
 			return TRUE;
