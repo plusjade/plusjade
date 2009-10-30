@@ -8,7 +8,7 @@
 			<?php endforeach;?>
 		</select>
 	</div>	
-	<div id="common_title">All Site Tools</div>
+	<div id="common_title">Site Tools Manager</div>
 </div>
 
 

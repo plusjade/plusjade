@@ -86,10 +86,8 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 			<b>Meta description</b>
 			<br/><input type="text" name="meta" value="<?php echo $page->meta?>" style="width:350px">
 		</div>
-
 	</div>
 	
-	</div>
 	<input type="hidden" name="old_page_name" value="<?php echo $filename?>">
 	<input type="hidden" name="directory" value="<?php echo $directory?>">
 </form>

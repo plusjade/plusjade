@@ -1,7 +1,7 @@
 
 
 <div id="common_tool_header">
-	<div id="common_title">Theme Files Browser</div>
+	<div id="common_title">Site Themes Manager</div>
 </div>
 
 <div id="files_browser_wrapper" class="theme_files">	

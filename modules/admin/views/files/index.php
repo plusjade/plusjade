@@ -11,7 +11,7 @@
 			<li><span class="icon add_page">&nbsp; &nbsp; </span> <a href="/get/files/add_files" class="add_asset">Add Files</a></li>	
 			<li><span class="icon add_folder">&nbsp; &nbsp; </span> <a href="/get/files/add_folder" class="add_asset">Add Folder</a></li>		
 		</ul>
-		<div id="common_title">Files Browser</div>
+		<div id="common_title">Site Files Manager</div>
 	</div>
 	
 	<div class="breadcrumb_wrapper">

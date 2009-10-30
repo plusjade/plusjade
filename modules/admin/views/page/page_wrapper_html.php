@@ -20,33 +20,20 @@ $display_name	= ('10' < strlen($filename)) ? substr($filename, 0, 10).'...' : $f
 	
 	
 	if(isset($type) AND 'folder' == $type)
-	{
 		$icon = '<span class="icon page">&#160; &#160;</span>';
-
-	}
 	else
-	{
-	
 		$icon = ((TRUE == $is_protected)) 
 			? "<span class='icon shield' title='$page_builder'>&#160; &#160; </span>"
 			: '';
-	}
 	?>
 
 	<div title="<?php echo $filename?>"><?php echo "$icon $display_name"?></div>
 	
 	<ul class="option_list">
 	
-		<?php
-		if(TRUE == $is_protected)
-		{		
-			?>
-			<li>
-				<span class="icon shield">&#160; &#160; </span> <?php echo $page_builder?>
-			</li>
-			<?php
-		}
-		?>
+		<?php if(TRUE == $is_protected):?>
+			<li><span class="icon shield">&#160; &#160; </span> <?php echo $page_builder?></li>
+		<?php endif;?>
 
 		<li>
 			<span class="icon magnify">&#160; &#160; </span> 
@@ -62,24 +49,17 @@ $display_name	= ('10' < strlen($filename)) ? substr($filename, 0, 10).'...' : $f
 			</a>
 		</li>
 		
-		<?php
-		if(FALSE == $is_folder AND FALSE == $is_protected)
-		{		
-			?>
+		<?php if(FALSE == $is_folder AND FALSE == $is_protected):?>
 			<li>
 				<span class="icon add_folder"> &#160; &#160; </span> 
 				 <a href="#" class="folderize" id="<?php echo $id?>" rel="<?php echo $full_path?>" title="<?php echo $filename?>">Make folder</a>
 			</li>
-			<?php
-		}
-		?>
+		<?php endif;?>
 		
 		<li>
 			<span class="icon cross">&#160; &#160; </span> 
 			<a href="/get/page/delete/<?php echo $id?>" id="<?php echo $id?>"  class="delete_page" rel="<?php echo $type?>">Delete</a>
 		</li>
-		
 	</ul>
-	
 </div>
 

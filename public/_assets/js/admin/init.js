@@ -499,31 +499,39 @@ $(document).bind('server_response.plusjade', function(e, data){
 
 /* Pages browser function delegation. */
 	$('body').click($.delegate({
-	  // open file dropdown lists
-		'#page_browser_wrapper img.file_options, #page_browser_wrapper span.icon.page': function(e){
+	  // refresh the pages display.
+		'a.refresh_pages': function(e) {
+			$('#page_browser_wrapper .common_full_panel').html('<div class="ajax_loading">Loading...</div>');
+			$('#page_browser_wrapper .common_full_panel').load('/get/page/list_all');
+			return false;
+		},		
+	  // open file dropdown lists page
+		'#page_browser_wrapper img.file_options': function(e){
 			$('#page_browser_wrapper ul.option_list').hide();
 			$(e.target).nextAll('ul').show();
 		},
-		
+	  // open file dropdown lists folder
+		'#page_browser_wrapper span.icon.page': function(e) {
+			$('#page_browser_wrapper ul.option_list').hide();
+			$(e.target).parent('div').siblings('ul').show();
+		},		
 	  // show a new folder directory
-		'#page_browser_wrapper .open_folder': function(e){
+		'#page_browser_wrapper .open_folder': function(e) {
 			var path = $(e.target).attr('rel');
 			var klass = path.replace(/\//g,'_');
+			var folder_string = '';	
 			
 			$('div.sub_folders').hide();
-			$('#directory_window').attr('rel',klass);		
-			$('div.'+klass).show();
+			$('#directory_window').attr('rel', klass);		
+			$('div.' + klass).show();
 			
 			// add the breadcrumb
-			var folder_string = '';	
-			if('ROOT' == path){
-				path = '';
-			}
-			else{
+			if('ROOT' == path) {path = '';}
+			else {
 				var folder_array = path.split('/');
 				var el_count = folder_array.length;
-
-				for (i=0; i < el_count; i++){
+				
+				for (i=0; i < el_count; i++) {
 					var result_string = $.strstr(path, folder_array[i], true) + folder_array[i];
 					folder_string += ' / <a href="/'+ result_string +'" rel="'+ result_string +'" class="open_folder">'+ folder_array[i] +'</a>';
 				}
@@ -531,7 +539,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			$('#breadcrumb').attr('rel',path).html(folder_string);
 			return false;
 		},
-		
+		/*
 	  // open new page facebox
 		'#page_browser_wrapper a.new_page': function(e){
 			$.facebox(function(){
@@ -542,7 +550,7 @@ $(document).bind('server_response.plusjade', function(e, data){
 			}, false, 'facebox_2');
 			return false;
 		},
-		
+		*/
 	  // delete a page
 		'#page_browser_wrapper a.delete_page': function(e){
 			if('folder' == $(e.target).attr('rel'))

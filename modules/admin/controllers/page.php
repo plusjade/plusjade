@@ -26,7 +26,28 @@ class Page_Controller extends Controller {
  */
  
 	public function index()
-	{		
+	{				
+		$page_builders = ORM::factory('system_tool')
+			->where(array(
+				'protected'	=> 'yes',
+				'enabled'	=> 'yes',
+				'visible'	=> 'yes'
+			))
+			->find_all();
+		
+		# get the pages list.
+		ob_start();
+		$this->list_all();
+		
+		$primary = new View("page/index");		
+		$primary->files_structure	= ob_get_clean();
+		$primary->page_builders		= $page_builders;
+		die($primary);
+	}
+	
+	
+	public function list_all()
+	{
 		$pages_data = ORM::factory('page')
 			->where('fk_site', $this->site_id)
 			->orderby('page_name')
@@ -46,17 +67,13 @@ class Page_Controller extends Controller {
 			$filename	= array_pop($node_array);
 			$directory	= implode('/', $node_array);
 
-			if( empty($directory) )
+			if(empty($directory))
 				$directory = 'ROOT';
 			
 			$folders_array[$directory][$filename] = $data;
 		}	
-		# troubleshooting...
-			#echo'<pre>';print_r($page_name_array);echo'</pre>';
-			#echo'<pre>';print_r($folders_array);echo'</pre>';die();
-		
+
 		# emulate file browsing interface
-		ob_start();
 		foreach($folders_array as $directory => $file_array)
 		{
 			$path_for_css = str_replace('/', '_', $directory, $count);
@@ -97,29 +114,15 @@ class Page_Controller extends Controller {
 				}	
 				
 				# is page_name a folder? (has children)
-				if(! empty($folders_array[$full_path]) )
+				if(!empty($folders_array[$full_path]))
 					$vars['is_folder'] = TRUE;
 				
 				# display html
 				echo View::factory('page/page_wrapper_html', array('vars' => $vars));
 			}
-			
 			echo '</div>';
-		}
-		
-		$page_builders = ORM::factory('system_tool')
-			->where(array(
-				'protected'	=> 'yes',
-				'enabled'	=> 'yes',
-				'visible'	=> 'yes'
-			))
-			->find_all();
-		
-		$primary = new View("page/index");
-		$primary->files_structure	= ob_get_clean();
-		$primary->page_builders		= $page_builders;
-		$primary->page_count		= $pages_data->count();
-		die($primary);
+		}		
+		echo '<script type="text/javascript">$("div.ROOT").show();</script>';
 	}
 
 /*
@@ -129,9 +132,8 @@ class Page_Controller extends Controller {
 	{
 		if($_POST)
 		{
-			$directory = (empty($_POST['directory'])) ? 'ROOT' : $_POST['directory']; 
-			
 			# Validate page_name & duplicate check
+			$directory = (empty($_POST['directory'])) ? 'ROOT' : $_POST['directory']; 		
 			$full_path = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory);
 
 			if('ROOT' != $directory)
@@ -168,6 +170,8 @@ class Page_Controller extends Controller {
 			die(View::factory('page/page_wrapper_html', array('vars' => $vars)));
 		}
 
+		
+		
 		# directory comes from pages browser via js
 		if(! isset($_GET['directory']) )
 			die('no directory selected');
@@ -186,10 +190,10 @@ class Page_Controller extends Controller {
 		
 		# Javascript duplicatate_page name filter Validation
 		# convert filter_array to string to use as javascript array
-		$filter_array	= self::get_filename_filter($directory);
+		$filter_array	= self::get_folder_filenames($directory);
 		$filter_string	= implode("','",$filter_array);
-		$filter_string	= "'$filter_string'";
-		$primary->filter = $filter_string;
+		
+		$primary->filter = "'$filter_string'";
 		die($primary);
 	}
 
@@ -269,7 +273,7 @@ class Page_Controller extends Controller {
 
 		# Javascript duplicatate_page name filter Validation
 		# convert filter_array to string for js
-		$filter_array		= self::get_filename_filter('ROOT');	
+		$filter_array		= self::get_folder_filenames('ROOT');	
 		$filter_string		= "'" . implode("','", $filter_array) . "'";
 		
 		$primary = new View("page/new_builder");
@@ -294,43 +298,17 @@ class Page_Controller extends Controller {
 			die('invalid page');
 		
 		# is this page set as homepage?
-		$site_config = yaml::parse($this->site_name, 'site_config');
-		if($page->page_name == $site_config['homepage'])
+		if($page->page_name == $this->homepage)
 			die('Cannot delete the current home page. Specify a new home page first.');
 		
-		# Get all pages to look for children.
-		$pages_data = ORM::factory('page')
-			->where('fk_site', $this->site_id)
-			->orderby('page_name')
-			->find_all();
-			
-		$page_name_array = array();
-		$folders_array = array();
-		
-		# create the page array
-		foreach($pages_data as $each_page)
-			$page_name_array[$each_page->page_name] = $each_page->id;
-	
-		# create array of all sub_directories	
-		foreach($page_name_array as $full_path => $data)
-		{
-			$node_array	= explode('/',$full_path);
-			$filename	= array_pop($node_array);
-			$directory	= implode('/', $node_array);
-
-			if( empty($directory) )
-				$directory = 'ROOT';
-			
-			$folders_array[$directory][$filename] = $data;
-		}	
-
-		# if this page contains children, we can delete them all.
-		# OR just not allow pages with children to be deleted.
-		if(array_key_exists($page->page_name, $folders_array))
+		# is this page a folder with children?
+		# we can delete them all, OR just not allow parents to be deleted.
+		$children = self::get_folder_filenames($page->page_name, 'change', $page->page_name);
+		if(0 < count($children))
 			die('A page must have no sub-pages before it can be deleted.');
 			#$id_set .= ','. implode(',', $folders_array[$page->page_name]);
 
-		
+			
 		# if deleting a protected page
 		yaml::delete_value($this->site_name, 'pages_config', $page->page_name);
 
@@ -342,37 +320,38 @@ class Page_Controller extends Controller {
 
 	
 /*
- * Configure page settings	
+ * Configure page settings
  */ 
 	public function settings($page_id=NULL)
 	{
 		valid::id_key($page_id);
-		$db = new Database;
-
+		
 		$page = ORM::factory('page')
 			->where('fk_site', $this->site_id)
 			->find($page_id);
 		if(!$page->loaded)
 			die('invalid page id');
-			
+
 		if($_POST)
 		{
 			# Validate page_name & duplicate check
 			$directory = (empty($_POST['directory'])) ? NULL : $_POST['directory']; 
-			$full_path = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory, $_POST['page_name']);
+			$new_page_name = $filename = self::validate_page_name($_POST['label'], $_POST['page_name'], $directory, $_POST['page_name']);
 
 			if(!empty($directory))
-				$full_path = "$directory/$filename";
+				$new_page_name = "$directory/$filename";
 
 			# if this page was the homepage, update homepage value
 			if($this->homepage == $_POST['old_page_name'])
 			{
-				$db->update('sites', array('homepage' => $filename), "id = '$this->site_id'");
-				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $filename );
+				$site = ORM::factory('site', $this->site_id);
+				$site->homepage = $filename;
+				$site->save();
+				yaml::edit_site_value($this->site_name, 'site_config', 'homepage', $filename);
 				$_POST['enable'] = 'yes'; # force homepage to be enabled.
 			}
-				
-			$page->page_name	= $full_path;
+			
+			$page->page_name	= $new_page_name;
 			$page->title		= $_POST['title'];
 			$page->meta			= $_POST['meta'];
 			$page->label		= $_POST['label'];
@@ -380,11 +359,33 @@ class Page_Controller extends Controller {
 			$page->menu			= $_POST['menu'];
 			$page->enable		= (isset($_POST['enable']))? $_POST['enable'] : 'yes';
 			$page->save();
-			
-			# if new page name & page is protected update the page_config file.
-			if($filename != $_POST['old_page_name'])
+		
+			# did the page name change?
+			# update all children within this "folder"
+			if($_POST['old_page_name'] != $filename)
+			{
+				# if this page is protected update the pages_config file.
 				yaml::edit_key($this->site_name, 'pages_config', $_POST['old_page_name'], $filename );
-
+			
+				$old_full_page = (empty($_POST['directory']))
+					? $_POST['old_page_name']
+					: $_POST['directory'] . '/' . $_POST['old_page_name'];
+				$dir_pages = self::get_folder_filenames($old_full_page, 'change');
+		
+				# if this page has children, update them!
+				foreach($dir_pages as $page_id => $page_name)
+				{
+					$page = ORM::factory('page')
+						->where('fk_site', $this->site_id)
+						->find($page_id);
+					if(!$page->loaded)
+						continue;
+						
+					$page->page_name = "$new_page_name/$page_name";
+					$page->save();
+				}
+			}
+	
 			# if the page was the account page, update site_config
 			if($this->account_page == $_POST['old_page_name'])
 				yaml::edit_site_value($this->site_name, 'site_config', 'account_page', $filename);
@@ -398,18 +399,14 @@ class Page_Controller extends Controller {
 					unlink($cache);
 			}
 			
-			# TODO:  i have no idea how to do this. ->
-			# if the page has sub-pages, update the sub-page names.
-			
 			die('Page Settings Saved'); # success				
 		}
 	
-		# Is this a subpage?
+		# Is this a subpage? (pop the end filename node from the directory.)
 		$filename	= $page->page_name;
 		$directory	= '';
 		$directory_array = explode('/',$filename);
-		
-		if( 1 < count($directory_array) )
+		if(1 < count($directory_array))
 		{
 			$filename	=  array_pop($directory_array);
 			$directory	= implode('/', $directory_array);
@@ -429,7 +426,7 @@ class Page_Controller extends Controller {
 			
 		# Javascript duplicate page_name filter Validation
 		# convert filter_array to string to use as javascript array
-		$filter_array = self::get_filename_filter($directory, $filename);
+		$filter_array = self::get_folder_filenames($directory, NULL, $filename);
 		$filter_string = implode("','",$filter_array);			
 		$primary->page_filter_js = "'$filter_string'";
 		
@@ -464,7 +461,7 @@ class Page_Controller extends Controller {
 		$page_name = valid::filter_php_url($page_name);
 
 		# Validate Unique Page_name relative to page directory		
-		$filter_array = self::get_filename_filter($directory, $omit);	
+		$filter_array = self::get_folder_filenames($directory, NULL, $omit);	
 		if(in_array($page_name, $filter_array))
 			die('Page name already exists');
 
@@ -481,13 +478,13 @@ class Page_Controller extends Controller {
 				2. users/location/country/city/state		
 		without "%%" #2 will match.
 */
-	private function get_filename_filter($directory='ROOT', $omit=NULL)
+	private function get_folder_filenames($directory='ROOT', $mode='validate', $omit=NULL)
 	{
 		$directory = (empty($directory)) ? 'ROOT' : $directory;
 		$filter_array = array();
 		
 		$pages = ORM::factory('page')
-			->select(array("CONCAT('%%', page_name) as page_name"))
+			->select(array("CONCAT('%%', page_name) as page_name, id"))
 			->where('fk_site', $this->site_id)
 			->find_all();
 	
@@ -495,7 +492,7 @@ class Page_Controller extends Controller {
 		{
 			foreach($pages as $page)
 			{
-				# does name contain forward slash?
+				# root page names do not contain forward slashes
 				str_replace('/','_', $page->page_name, $count);
 				if('0' == $count)
 					$filter_array[] = ltrim($page->page_name, '%');
@@ -509,14 +506,26 @@ class Page_Controller extends Controller {
 		}
 		else
 			foreach($pages as $page)
-				if( preg_match("[%%$directory]", $page->page_name) )
+				if(preg_match("[%%$directory]", $page->page_name))
 				{
 					$value = str_replace("%%$directory", '', $page->page_name);
-					str_replace('/','_', $value, $count);
-					# every directory is also a page-name so we include only the 
-					# first node directly after this directory/
-					if('1' == $count)
-						$filter_array[] = ltrim($value, '/');
+					
+					if('validate' == $mode)
+					{
+						# to validate, we only want the names of
+						# files/folders within this immediate directory.
+						str_replace('/','_', $value, $count);
+						if('1' == $count)
+							$filter_array[$page->id] = ltrim($value, '/');
+					}
+					else
+					{
+						## this mode will list all true "page names" as children of the folder.
+						# as a flat represenation in order to change them.
+						# empty values mean this IS the folder, which we don't want.
+						if(!empty($value))
+							$filter_array[$page->id] = ltrim($value, '/');
+					}
 				}
 		
 		if($omit)
@@ -527,7 +536,41 @@ class Page_Controller extends Controller {
 		return $filter_array;
 	}
 
+/* cool code that builds an array to parse for children of pages
+this job is handle by the get_folder_filenames but we'll keep it here for
+coolio reference
+			
+		# Get all pages to look for children.
+		$pages_data = ORM::factory('page')
+			->where('fk_site', $this->site_id)
+			->orderby('page_name')
+			->find_all();
+
+			
+		$page_name_array = array();
+		$folders_array = array();
+		
 	
+		# create the page array
+		foreach($pages_data as $each_page)
+			$page_name_array[$each_page->page_name] = $each_page->id;
+	
+		# create array of all sub_directories	
+		foreach($page_name_array as $full_path => $data)
+		{
+			$node_array	= explode('/',$full_path);
+			$filename	= array_pop($node_array);
+			$directory	= implode('/', $node_array);
+
+			if(empty($directory))
+				$directory = 'ROOT';
+			
+			$folders_array[$directory][$filename] = $data;
+		}	
+		
+		echo kohana::debug($page_name_array);
+		echo kohana::debug($folders_array);		
+*/	
 	
 	/* ----- functions relative to MAIN-MENU handling ----- */
 	
