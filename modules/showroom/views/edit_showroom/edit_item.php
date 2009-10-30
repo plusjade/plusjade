@@ -23,24 +23,24 @@
 
 	<div class="common_full_panel">
 	
-		<div id="params" class="toggle fieldsets">
-			<b>Item Name</b>
-			<br><input type="text" name="name" value="<?php echo $item->name?>" rel="text_req" maxlength="50" style="width:275px">
-			<br>
-			<br><b>URL</b>
-			<br><input type="text" name="url" value="<?php echo $item->url?>" class="auto_filename" rel="text_req" maxlength="50" style="width:275px">
+		<div id="params" class="toggle fieldsets">	
+			<div class="common_half_left" style="background:#fff;">
+				<b>Category</b>		
+				<div id="category_wrapper">
+					<?php echo $categories?>
+				</div>
+			</div>
 			
-			<br/><br/>
-			<b>Category</b>
-			
-			<div id="category_wrapper">
-				<?php echo $categories?>
+			<div class="common_half_right">
+				<b>Item Name</b>
+				<br/><input type="text" name="name" value="<?php echo $item->name?>" rel="text_req" maxlength="50" style="width:275px">
+				<br/>
+				<br/><b>URL</b>
+				<br/><input type="text" name="url" value="<?php echo $item->url?>" class="auto_filename" rel="text_req" maxlength="50" style="width:275px">
 			</div>
 		</div>
 
-		<div id="images" class="toggle" style="display:none">	
-			
-			
+		<div id="images" class="toggle" style="display:none">			
 			<div class="common_left_panel aligncenter">
 				<a href="#" class="get_file_browser images" rel="albums" title="Add images">&#160; &#160;</a>
 				
@@ -52,8 +52,9 @@
 			<div id="sortable_images_wrapper" class="common_main_panel" style="height:350px; overflow:auto">	
 				<?php foreach($images as $image):?>
 					<div class="album_images">
-						<span class="handle"><b>edit</b> <em>drag</em></span>
-						<img src="<?php echo "$img_path/$image->thumb"?>" alt="<?php echo $image->path?>" title="<?php echo $image->caption?>">
+						<span class="icon move">&#160; &#160;</span>
+						<span class="icon cog">&#160; &#160;</span>
+						<img src="<?php echo "$img_path/$image->thumb"?>" width="75px" height="75px" alt="<?php echo $image->path?>" title="<?php echo $image->caption?>">
 					</div>
 				<?php endforeach;?>
 			</div>

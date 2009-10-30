@@ -218,24 +218,26 @@ class Files_Controller extends Controller {
 		{		
 			rename("$old_dir/$asset->name", "$new_dir/$asset->name");
 			
+			# only if this is an image do we try to move the thumbs.
 			if(!is_dir("$old_dir/$asset->name"))
 			{	
 				# is this an image?
 				$ext = (strrchr($asset->name, '.'));
-				if(array_key_exists($ext, $this->image_types))
+				
+				if(!empty($ext) AND array_key_exists($ext, $this->image_types))
 				{
 					if(!is_dir("$new_dir/_tmb"))
 						mkdir("$new_dir/_tmb");
 						
 					# get and recurse the old _tmb directory.
-					$thumb_dirs = Jdirectory::contents("{$old_dir}_tmb/", 'root', 'list_dir');
+					$thumb_dirs = Jdirectory::contents("$old_dir/_tmb/", 'root', 'list_dir');
 					foreach($thumb_dirs as $dir)	
-						if(file_exists("{$old_dir}_tmb/$dir/$asset->name"))
+						if(file_exists("$old_dir/_tmb/$dir/$asset->name"))
 						{
 							if(!is_dir("$new_dir/_tmb/$dir"))
 								mkdir("$new_dir/_tmb/$dir");	
 							
-							rename("{$old_dir}_tmb/$dir/$asset->name", "$new_dir/_tmb/$dir/$asset->name");				
+							rename("$old_dir/_tmb/$dir/$asset->name", "$new_dir/_tmb/$dir/$asset->name");				
 						}
 				
 				}
@@ -261,7 +263,7 @@ class Files_Controller extends Controller {
 		foreach($json as $asset)
 		{
  			$ext = (strrchr($asset->name, '.'));
-			$full_path = "$dir$asset->name";
+			$full_path = "$dir/$asset->name";
 			if(is_dir($full_path))
 			{	
 				if('_tmb' == $asset->name)

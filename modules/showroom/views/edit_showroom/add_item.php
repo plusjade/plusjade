@@ -21,23 +21,22 @@
 	<div class="common_full_panel">
 	
 		<div id="params" class="toggle fieldsets">
-			<b>Item Name</b>
-			<br/><input type="text" name="name" class="send_input" rel="text_req"  maxlength="50" style="width:275px">
-			<br/><br/>
-			<b>URL</b>
-			<br/><input type="text" name="url" class="auto_filename receive_input" rel="text_req" maxlength="50" style="width:275px">
-			
-			<br/><br/>
-			<b>Category</b>
-			<div id="category_wrapper">
-				<?php echo $categories?>
+			<div class="common_half_left" style="background:#fff;">
+				<b>Category</b>
+				<div id="category_wrapper">
+					<?php echo $categories?>
+				</div>
+			</div>			
+			<div class="common_half_right">	
+				<b>Item Name</b>
+				<br/><input type="text" name="name" class="send_input" rel="text_req"  maxlength="50" style="width:275px">
+				<br/><br/>
+				<b>URL</b>
+				<br/><input type="text" name="url" class="auto_filename receive_input" rel="text_req" maxlength="50" style="width:275px">
 			</div>
-			
 		</div>
 
-		<div id="images" class="toggle" style="display:none">	
-			
-			
+		<div id="images" class="toggle" style="display:none">			
 			<div class="common_left_panel aligncenter">
 				<a href="#" class="get_file_browser images" rel="albums" title="Add images">&#160; &#160;</a>
 				

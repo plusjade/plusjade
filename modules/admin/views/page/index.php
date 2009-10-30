@@ -1,40 +1,38 @@
 
+<style type="text/css">
+ul.page_list{list-style:none;}
+ul.page_list li{ display:inline; margin-right:15px;}
+</style>
 
 <div id="common_tool_header">
-	<div style="float:right;width:250px;">
-		<select id="page_builder_select" style="float:left">
+	<div style="float:right;">
+		 <button id="add_page_builder" class="jade_positive">Add Page Builder</button>
+		 
+		<select id="page_builder_select">
 			<?php foreach($page_builders as $tool):?>
 				<option value="<?php echo $tool->id?>"><?php echo $tool->name?></option>
 			<?php endforeach;?>	
-		</select>
-		 <button id="add_page_builder" class="jade_positive">Add Page Builder</button>
+		</select>	
 	</div>
 	<div id="common_title">Website Pages Browser</div>
 </div>
 	
-<div id="page_browser_wrapper">
-	
-	<div class="common_left_panel">
-		<h3 class="aligncenter">Add Blank Page</h3>
-		<img src="/_assets/images/admin/page_add.gif" alt="" class="new_page_drop">
-		<br/>
-		<i>Drag</i> +page icon into the desired directory window.
-		<br/><br/>
-		<h4>Key</h4>
-		<small style="line-height:1.7em">
-			<b>White:</b> Public - On Menu.
-			<br/><b style="color:#ccc">Gray:</b> Public - Not in menu.
-			<br/><b style="color:red">Red:</b> Private - No public access.
-		</small>
-		<p>
-			Page Count: <?php echo $page_count?>
-		</p>
-	</div>
-	
-	<div class="breadcrumb_wrapper" style="width:590px;float:right;">
+
+<div class="">	
+	<ul class="page_list">
+		<li>Pages: <?php echo $page_count?></li>
+		<li><img src="/_assets/images/admin/page_add.gif" width="20px" height="20px" alt="" class="new_page_drop"> Add Page</li>
+		<li><span class="icon edit_page">&nbsp; &nbsp; </span> <a href="#" class="rename_selected">Rename</a></li>
+		<li><span class="icon move">&nbsp; &nbsp; </span> <a href="#" class="move_selected">Move</a></li>			
+		<li><span class="icon cross">&nbsp; &nbsp; </span> <a href="#" class="delete_selected">Delete</a></li>	
+		<li><span class="icon add_folder">&nbsp; &nbsp; </span> <a href="#" class="delete_selected">Make Folder</a></li>		
+	</ul>
+</div>
+<div id="page_browser_wrapper">	
+	<div class="breadcrumb_wrapper">
 		<a href="#" rel="ROOT" class="open_folder"><?php echo trim(url::site(), '/')?></a><span id="breadcrumb" rel=""></span>
 	</div>
-	<div id="directory_window" class="common_main_panel" rel="ROOT">
+	<div id="directory_window" class="common_full_panel" rel="ROOT" style="overflow:auto">
 		<?php echo $files_structure?>
 	</div>
 

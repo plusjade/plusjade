@@ -61,6 +61,37 @@
 	<?php endif;?>
 
 	<div id="center_response" style="display:none">Server Response</div>
+
+		<style type="text/css">
+		#new_tool_wrapper {display:none; min-width:925px; width:87%;  margin:auto; overflow:auto; background:#def1fe; border:2px solid #a3d7f9; text-align:left;}
+		#tool_selector {height:90px; width:200px; float:left; margin:3px 10px 3px 3px; padding-left:10px; overflow:auto;}
+		.tool-jade-blah {margin:0;padding:0;line-height:10px !important;}
+		.tool-jade-blah li{margin:0;padding:0;}
+		#tool_selection_panel{height:90px; width:600px; margin:3px; float:left; overflow:auto;}
+		#tool_selection_panel div {height:80px; width:80px; float:left; margin:3px; border:1px solid #a3d7f9; background:#fff;}
+		#tool_description {clear:both; padding:2px; text-align:center; background:#fff;}
+		</style>
+	<div id="new_tool_wrapper">
+		<div id="tool_description">Manage blocks of textual and image based content using helpful templates.</div>	
+		<div id="tool_selector">
+			Content Tools
+			<ul class="tool-jade-blah">
+				<li>text</li>
+				<li>album</li>
+				<li>format</li>
+				<li>navigation</li>
+			</ul>
+		</div>
+		
+		<div id="tool_selection_panel">
+			<div></div>
+			<div></div>
+			<div></div>
+			<div></div>
+		</div>
+		
+	</div>
+	
 	
 	<div style="display:none">
 		<span id="global_css_path"><?php echo $global_css_path?></span>
@@ -87,6 +118,7 @@
 	</div>
 </div>
 <div id="shadow"><div></div></div>
+
 <noscript>Editing Your website requires Javascript to be enabled.</noscript>
 
 <div id="hide_link">

@@ -271,7 +271,7 @@ div.wysiwyg iframe {border:0; margin: 5px 0 0 0; clear: left;}
 /* --- ui tabs --- */	
 .ui-tabs-hide {display: none; }
 .ui-tabs-nav{list-style:none; margin:0; padding:0;	}
-ul.common_tabs_x{padding:5px 0 !important; margin:0;}
+ul.common_tabs_x{padding:5px 0 !important; margin:0; border-bottom:1px solid #000;}
 .common_tabs_x li{display:inline !important; margin-right:2px;}
 .common_tabs_x li a{text-decoration:none;padding:7px 15px; background:lightblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -110px; border-bottom:0; color:#fff !important;font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif; font-weight:bold;}
 .common_tabs_x li a:hover,
@@ -387,6 +387,7 @@ ul.common_tabs_x{padding:5px 0 !important; margin:0;}
 img.new_page_drop{cursor:move !important;padding:3px !important;border:1px dashed #333 !important}
 #page_browser_wrapper a{text-decoration:none;}
 #page_browser_wrapper img{display:block;margin:0 auto;}
+#page_browser_wrapper .asset div{text-align:center;}
 #page_browser_wrapper .enabled  div{ackground:#fff;}
 #page_browser_wrapper .hidden div{background:#f2f1f1;}
 #page_browser_wrapper .disabled div{background:#fbe2e2;}
@@ -400,7 +401,7 @@ img.new_page_drop{cursor:move !important;padding:3px !important;border:1px dashe
 #files_browser_wrapper ul.file_links{list-style:none; float:right; margin:0; padding:0;}
 #files_browser_wrapper ul.file_links li {display:inline; margin-left:15px;}
 #files_browser_wrapper div.asset{}
-#files_browser_wrapper div.asset span.info {position:absolute; height:16px; cursor:pointer; cursor:cursor;}
+#files_browser_wrapper div.asset span.info {position:relative; top:10px; height:16px; cursor:pointer; cursor:cursor;}
 #files_browser_wrapper .asset img {display:block; margin:auto}
 #files_browser_wrapper div.file_asset img {border:2px solid #ccc;}
 #files_browser_wrapper .asset span{display:block; text-align:center;}

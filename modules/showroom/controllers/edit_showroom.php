@@ -207,6 +207,138 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, NULL, 'render_edit_showroom');	
 		die($view);
 	}
+
+
+	public function bulk_add($parent_id=NULL)
+	{
+		valid::id_key($parent_id);
+
+		if($_POST)
+		{
+			if(empty($_POST['category_id']))
+				die('category id is required');
+			
+			# TODO: possibly validate that category id exists relative to
+			# the parent_id and this site.
+			
+			$max = ORM::factory('showroom_cat_item')
+				->select('MAX(position) as highest')
+				->where('showroom_cat_id', $_POST['category_id'])
+				->find();	
+				
+			$new_item = ORM::factory('showroom_cat_item');
+				
+			foreach($_POST['name'] as $key => $name)
+			{
+				if(empty($name))
+					continue;
+					
+				# jsonize the image string. what is coming
+				# is just the raw short-path. 
+				# clearly this only lets you put ONE image!!				
+				$images = '[{"path": "' . $_POST['images'][$key] . '", "caption": ""}]';
+				
+				$new_item->fk_site			= $this->site_id;
+				$new_item->showroom_cat_id	= $_POST['category_id'];						
+				$new_item->name				= $name;
+				$new_item->intro			= $_POST['intro'][$key];
+				$new_item->body				= $_POST['body'][$key];
+				$new_item->images			= $images;
+				$new_item->position			= ++$max->highest;
+				$new_item->save();
+				$new_item->clear();
+			}
+			die('Showroom items added');
+		}
+
+		# Get list of categories
+		$showroom = ORM::factory('showroom', $parent_id);
+
+		$view = new View("edit_showroom/bulk_add");
+		$view->parent_id	= $parent_id;
+		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, NULL, 'render_edit_showroom');	
+		die($view);
+	}
+
+	
+/*
+ * quick utility to check if specified images exist relative to the given path
+ */	
+	public function check_img()
+	{	
+		if($_POST['images'] AND is_array($_POST['images']))
+		{
+			$dir = $this->assets->assets_dir();
+			$results = array();
+			foreach($_POST['images'] as $key => $image)
+				if(file_exists("$dir/$image"))
+					$results[$key] = 'good';
+				else
+					$results[$key] = 'bad';
+					
+			$results = json_encode($results);
+			die($results);
+		}
+		
+		die();
+	}
+
+	
+/*
+ * get the item data in table form from a particular category
+ */
+	public function data()
+	{
+		valid::id_key($_GET['cat_id']);
+		if(!isset($_GET['cat_id']))
+			die('invalid category id');
+			
+		$items = ORM::factory('showroom_cat_item')
+			->where(array(
+				'fk_site'	=> $this->site_id,
+				'showroom_cat_id' => $_GET['cat_id']
+			))
+			->find_all();	
+		
+		$view = new View("edit_showroom/bulk_edit_data");
+		$view->items = $items;
+		die($view);		
+	}
+	
+/*
+ * edit lots of items at once. pure data view.
+ */ 
+	public function bulk_edit($parent_id=NULL)
+	{
+		valid::id_key($parent_id);
+
+		if($_POST)
+		{
+			# just edit the main data for now.
+			foreach($_POST['name'] as $key => $name)
+			{
+				$item = ORM::factory('showroom_cat_item')
+					->where('fk_site', $this->site_id)
+					->find($key);
+				if(!$item->loaded)
+					continue;
+					
+				$item->name		= $name;
+				$item->intro	= $_POST['intro'][$key];
+				$item->body		= $_POST['body'][$key];
+				$item->save();
+			}
+			die('Showroom items edited');
+		}
+
+		# Get list of categories
+		$showroom = ORM::factory('showroom', $parent_id);
+
+		$view = new View("edit_showroom/bulk_edit");
+		$view->parent_id	= $parent_id;
+		$view->categories	= Tree::display_tree('showroom', $showroom->showroom_cats, NULL, NULL, 'render_edit_showroom');	
+		die($view);
+	}	
 	
 	
 /*

@@ -168,7 +168,7 @@ class Page_Controller extends Controller {
 			die(View::factory('page/page_wrapper_html', array('vars' => $vars)));
 		}
 
-		# directory comes from all_pages javascript loader
+		# directory comes from pages browser via js
 		if(! isset($_GET['directory']) )
 			die('no directory selected');
 			
@@ -246,10 +246,8 @@ class Page_Controller extends Controller {
 
 			# init tool controller
 			$tool_controller = new Tool_Controller();
-			
 			# create the tool.
-			$tool = $tool_controller->_create_tool($system_tool_id, NULL, NULL, TRUE);
-	
+			$tool = $tool_controller->_create_tool($system_tool_id, NULL, NULL, TRUE);	
 			# add it to this page.
 			$tool_controller->_add_to_page($tool, $new_page);
 	
@@ -455,8 +453,8 @@ class Page_Controller extends Controller {
 	private function validate_page_name($label, $page_name, $directory='ROOT', $omit=NULL)
 	{
 		$label = trim($label);
-		if( empty($label) )
-			die('Name is required'); #error	
+		if(empty($label))
+			die('Name is required');
 		
 		$page_name = trim($page_name);
 		if(empty($page_name))
@@ -467,7 +465,7 @@ class Page_Controller extends Controller {
 
 		# Validate Unique Page_name relative to page directory		
 		$filter_array = self::get_filename_filter($directory, $omit);	
-		if( in_array($page_name, $filter_array) )
+		if(in_array($page_name, $filter_array))
 			die('Page name already exists');
 
 		return $page_name;
@@ -497,11 +495,12 @@ class Page_Controller extends Controller {
 		{
 			foreach($pages as $page)
 			{
+				# does name contain forward slash?
 				str_replace('/','_', $page->page_name, $count);
 				if('0' == $count)
 					$filter_array[] = ltrim($page->page_name, '%');
 			}
-			# Reserved page_names: add _assets, _data, index.php, get, file
+			# Reserved root page_names.
 			$filter_array[] = '_assets';
 			$filter_array[] = '_data';
 			$filter_array[] = 'get';
@@ -514,6 +513,8 @@ class Page_Controller extends Controller {
 				{
 					$value = str_replace("%%$directory", '', $page->page_name);
 					str_replace('/','_', $value, $count);
+					# every directory is also a page-name so we include only the 
+					# first node directly after this directory/
 					if('1' == $count)
 						$filter_array[] = ltrim($value, '/');
 				}

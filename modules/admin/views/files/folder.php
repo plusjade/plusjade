@@ -45,7 +45,7 @@ foreach ($files as $path => $data)
 ?>
 
 <script type="text/javascript">
-	$('#files_browser_wrapper').selectable({ filter: 'img', delay: 20});
+	$('.common_full_panel').selectable({ filter: 'img', delay: 20});
 </script>
 
 
