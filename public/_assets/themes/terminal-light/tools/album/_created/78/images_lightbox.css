@@ -1,0 +1,33 @@
+
+#album_wrapper_78{
+
+}
+
+	/* --- album images lightbox --- */
+
+#album_wrapper_78{
+	margin:5px;
+}
+#album_wrapper_78 ul.album_lightbox { 
+	list-style: none; 
+	margin:0;
+	padding:0;
+}
+#album_wrapper_78 ul.album_lightbox li { 
+	float:left;
+	height:90px;
+	margin:5px;
+}
+#album_wrapper_78 ul.album_lightbox img {
+
+}
+#album_wrapper_78 ul.album_lightbox img:hover {
+	padding:3px;
+	border:1px solid black;
+}
+#album_wrapper_78 ul.album_lightbox a:hover img {
+
+}
+#album_wrapper_78 ul.album_lightbox a:hover { 
+	color: #fff; 
+}

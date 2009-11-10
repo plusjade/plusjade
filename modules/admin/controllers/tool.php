@@ -163,7 +163,7 @@ class Tool_Controller extends Controller {
 		$tool->save();
 		
 		# generate tool_css file
-		self::_generate_tool_css($system_tool->name, $parent->id, $type, $view, $this->site_name, $this->theme);
+		#self::_generate_tool_css($system_tool->name, $parent->id, $type, $view, $this->site_name, $this->theme);
 		
 		# run _tool_adder
 		Load_Tool::factory($system_tool->name)->_tool_adder($parent->id, $this->site_id, $sample);
@@ -310,7 +310,7 @@ class Tool_Controller extends Controller {
 		
 
 		# DELETE the custom folder for this tool. (houses custom css files)
-		$custom_folder = $this->assets->themes_dir("$this->theme/tools/" . strtolower($tool->system_tool->name) . "/_created/$tool->parent_id");
+		$custom_folder = $this->assets->themes_dir("$this->theme/tools/" . strtolower($tool->system_tool->name) . "/$tool->parent_id");
 		if(is_dir($custom_folder))
 			Jdirectory::remove($custom_folder);
 			
@@ -569,10 +569,10 @@ class Tool_Controller extends Controller {
  * Custom files are auto created if none exists.
  * files are stored in /_data/ on a per theme basis, organized by tool/type/view
  */
-	public function css($system_tool_id=NULL, $tool_id=NULL)
+	public function css($system_tool_id=NULL, $parent_id=NULL)
 	{
 		valid::id_key($system_tool_id);	
-		valid::id_key($tool_id);		
+		valid::id_key($parent_id);		
 		
 		$system_tool = ORM::factory('system_tool')
 			->select('*, LOWER(name) AS name')
@@ -580,18 +580,17 @@ class Tool_Controller extends Controller {
 
 		$tool = ORM::factory($system_tool->name)
 			->where('fk_site', $this->site_id)
-			->find($tool_id);
-		
-		# type and view should be required to continue.
+			->find($parent_id);
 		
 		# Overwrite old file with new file contents;
 		if($_POST)
 		{
-			$tool->attributes = $_POST['attributes'];
-			$tool->save();
+			#$tool->attributes = $_POST['attributes'];
+			#$tool->save();
 
 			if(isset($_POST['save_template']))
 			{
+				#NOT WORKING.
 				$contents		= preg_replace("/_(\d+)/", '_++', $_POST['contents']);
 				$theme_template	= $this->assets->themes_dir("$this->theme/tools/$system_tool->name/$tool->type/{$tool->view}_template.css");
 				if(file_put_contents($theme_template, $contents))
@@ -599,144 +598,234 @@ class Tool_Controller extends Controller {
 
 				die('The was a problem saving the file.');
 			}
-				
-			$contents	 = self::replace_tokens($_POST['contents'], $this->site_name, $this->theme);
-			$custom_file = $this->assets->themes_dir("$this->theme/tools/$system_tool->name/_created/$tool_id/{$tool->type}_$tool->view.css");
-			if(file_put_contents($custom_file, $contents))
+
+			# save the css
+			$custom_file = $this->assets->themes_dir("$this->theme/tools/$system_tool->name/$tool->id/{$tool->type}_$tool->view.css");
+			if(file_put_contents($custom_file, $_POST['output']))
 				die('CSS Changes Saved.');
 
 			die('The was a problem saving the file.');	
 		}
 
-		$primary = new View('tool/edit_css');	
-		$primary->tool = $tool;
-		$primary->contents	= self::get_tool_css($system_tool->name, $tool_id, $tool->type, $tool->view);
-		$primary->stock		= self::get_tool_css($system_tool->name, $tool_id, $tool->type, $tool->view, 'stock');
-		$primary->template	= self::get_tool_css($system_tool->name, $tool_id, $tool->type, $tool->view, 'template');
-		$data = array(
-			'name_id'			=> $system_tool_id,
-			'toolname'			=> $system_tool->name,
-			'js_rel_command'	=> "update-$system_tool->name-$tool_id",
-		);
-		$primary->data = $data;
-		die($primary);
+		# get stock css?
+		#$stock = self::get_sass($system_tool->name, $tool_id, $tool->type, $tool->view, 'stock');
+		#echo kohana::debug($stock); die();
+		
+		$theme_sass = self::get_sass($system_tool->name, $tool->id, $tool->type, $tool->view, 'theme');
+
+		# testing !
+		$custom_sass = self::get_css($system_tool->name, $tool->id, $tool->type, $tool->view);
+		# $custom_sass = self::get_sass($system_tool->name, $tool_id, $tool->type, $tool->view, 'custom');
+		#echo kohana::debug($custom_sass); die();
+		
+		
+		$view = new View('tool/edit_css');	
+		$view->custom_sass = $custom_sass;
+		$view->tool = $tool;
+		$view->theme_sass = $theme_sass;
+		$view->name_id = $system_tool_id;
+		$view->toolname = $system_tool->name;
+		$view->js_rel_command = "update-$system_tool->name-$tool->id";
+		die($view);
 	}
 	
 	
-	
 /*
- * used @ tool->css for intelligently retrieving css file associated with a tool.
- * Cascades from theme specific , then to stock.
-	Types of css files in priority order
+ * intelligently retrievs sass specific to a tool.
+ * Cascades in priority order:
 		Custom file
 		Theme file template (as defined by user)
 		Theme file stock (as defined by them creator)
 		+Jade file stock (base styling)
-	
  *
  */
-	private function get_tool_css($toolname, $tool_id, $type, $view, $stock=FALSE)
+	private function get_sass($toolname, $parent_id, $type, $view, $file='custom')
 	{
-		$tools_folder	= $this->assets->themes_dir("$this->theme/tools");			
-		$custom_file	= "$tools_folder/$toolname/_created/$tool_id/{$type}_$view.css";
-		$theme_stock	= "$tools_folder/$toolname/$type/$view.css";
-		$theme_template	= "$tools_folder/$toolname/$type/{$view}_template.css";
-		$stock_file		= MODPATH . "$toolname/views/public_$toolname/$type/$view.css";
-		
+		$tools_folder	= $this->assets->themes_dir("$this->theme/tools");
+		$custom_file	= "$tools_folder/$toolname/$parent_id/{$type}_$view.sass";
+		$theme_stock	= "$tools_folder/_sass_templates/{$type}_$view.sass";
+		$custom_template = "$tools_folder/$toolname/$type/{$view}_template.sass";
+		$stock_file		= MODPATH . "$toolname/views/public_$toolname/$type/$view.sass";
+		$file = (empty($file)) ? 'custom' : $file;
+
 		ob_start();
-		# return contents of a template or +jade stock tool css file.
-		if(FALSE != $stock)
+		switch($file)
+		{
+			case 'custom':
+				if(!file_exists($custom_file))
+				{
+					#return self::_generate_tool_css($toolname, $parent_id, $type, $view, $this->site_name, $this->theme, TRUE);
+					return 'no custom sass exists for this tool';
+				}
+				readfile($custom_file);
+				break;
+				
+			case 'theme':
+				if(!file_exists($theme_stock))
+					return 'no theme sass exist for this tool.';
+				readfile($theme_stock);
+				break;
+
+			case 'template':
+				if(!file_exists($custom_template))
+					return 'no template has been set for this tool.';
+				readfile($custom_template);
+				break;
+				
+			case 'stock':
+				if(!file_exists($stock_file))
+					return 'no plusjade stock sass exists for this tool.';
+					
+				# replace the main wrapper with the specific tool_wrapper!
+				# IMPORTANT! all plusjade tool sass files must start at 2nd line =_=
+				#$file = file($stock_file);
+				#$file[1] = "#{$toolname}_wrapper_$parent_id";
+				readfile($stock_file);
+				break;
+		}
+			
+		return ob_get_clean();
+	}
+
+
+	
+	
+	
+/*
+ * intelligently retrievs css specific to a tool.
+ * Cascades in priority order:
+		Custom file
+		Theme file template (as defined by user)
+		Theme file stock (as defined by them creator)
+		+Jade file stock (base styling)
+ *
+ */
+	private function get_css($toolname, $parent_id, $type, $view, $stock=FALSE)
+	{
+		$tools_folder	= $this->assets->themes_dir("$this->theme/tools");
+		$custom_file	= "$tools_folder/$toolname/$parent_id/{$type}_$view.css";
+		$theme_stock	= "$tools_folder/$toolname/{$type}_$view.sass";
+		$theme_template = "$tools_folder/$toolname/$type/{$view}_template.sass";
+		$stock_file		= MODPATH . "$toolname/views/public_$toolname/$type/$view.sass";
+		
+		# return a theme template or +jade stock tool css file.
+		if($stock)
 		{
 			switch($stock)
 			{
 				case 'template':
-					if(file_exists($theme_template))
-						readfile($theme_template);
-					else
+					if(!file_exists($theme_template))
 						return NULL;
+					return file_get_contents($theme_template);
 					break;
 					
 				case 'stock':
-					if(file_exists($stock_file))
-						readfile($stock_file);
-					else
+					if(!file_exists($stock_file))
 						return NULL;
+					# replace the main wrapper with the specific tool_wrapper!
+					# IMPORTANT! all plusjade tool sass files must start at 2nd line =_=
+					$file = file($stock_file);
+					$file[1] = "#{$toolname}_wrapper_$parent_id";
+					return Kosass::factory('compact')->compile($file);
 					break;
-					
-				default:
-					return NULL;
 			}
-			return str_replace('++', $tool_id, ob_get_clean());
+			return NULL;
 		}
 		
 		# this file may not exist if the tool was added before user changes themes.
 		# always generate a file if it does not exist.
 		if(file_exists($custom_file))
 		{
+			ob_start();
 			readfile($custom_file);
 			return ob_get_clean();
 		}
-		# if it does not exist, generate a new one.
-		return self::_generate_tool_css($toolname, $tool_id, $type, $view, $this->site_name, $this->theme, TRUE);
 	}
-
-
-
+	
+/*
+ * Takes a string of valid css and turns it into an object so we can better handle
+ * and update elements/properties on the front-end interface.
+ */
+	private static function objectify_css($css)
+	{
+		$css = explode('}', $css);
+		
+		$parsed = new StdClass;
+		foreach($css as $line)
+		{
+			if(empty($line[0]))
+				continue;			
+			$line = explode('{', $line);
+			$element = trim($line[0]);
+			$parsed->$element = trim($line[1]);
+		}
+		return $parsed;
+	}
+	
+	
 /*
  * Generates a new css file for a tool based on tool type and view.
+ * Generate meaning we create a parsed file within the sites _data folder.
  * The method cascades down the available css tree as follows:
 	Theme template (TODO: template has not been implimented yet)
 	Theme stock
 	+Jade stock
 	static so public controllers can overt the login check.
-	used at tool_css_controller->live()
+	** used at tool_css_controller->live()
+	
+	# all parameters should be required.
  */
-	public static function _generate_tool_css($toolname, $tool_id, $type, $view, $site_name, $theme, $return_contents=FALSE)
+	public static function _generate_tool_css($toolname, $parent_id, $type, $view, $site_name, $theme, $return_contents=FALSE)
 	{
-		# all parameters should be required.
 		$tools_folder	= DATAPATH . "$site_name/themes/$theme/tools";
-		$theme_file		= "$tools_folder/$toolname/$type/$view.css";
-		$stock_file		= MODPATH . "$toolname/views/public_$toolname/$type/$view.css";
-		$place_file		= "$tools_folder/$toolname/_created/$tool_id/{$type}_$view.css";
+		$theme_file		= "$tools_folder/$toolname/$type/$view.sass";
+		$stock_file		= MODPATH . "$toolname/views/public_$toolname/$type/$view.sass";
+		$place_file		= "$tools_folder/$toolname/$parent_id/{$type}_$view.css";
 		$return			= FALSE;
 
+		# --- folder checks ---
 		# is this theme tools folder created?
 		if(!is_dir($tools_folder))
-			mkdir($tools_folder);
-			
+			mkdir($tools_folder);			
 		# is this specific toolname folder created?
 		if(!is_dir("$tools_folder/$toolname"))
-			mkdir("$tools_folder/$toolname");
-
-		# is the "_created" folder created within the toolname folder?
-		if(!is_dir("$tools_folder/$toolname/_created"))
-			mkdir("$tools_folder/$toolname/_created");
-			
+			mkdir("$tools_folder/$toolname");		
 		# is this specific tool_id folder created?
-		if(!is_dir("$tools_folder/$toolname/_created/$tool_id"))
-			mkdir("$tools_folder/$toolname/_created/$tool_id");
+		if(!is_dir("$tools_folder/$toolname/$parent_id"))
+			mkdir("$tools_folder/$toolname/$parent_id");
 
+			
+			
 		ob_start();
 		if(file_exists($theme_file))
-			readfile($theme_file);
+		{
+			$file = file($theme_file);
+			$file[1] = "#{$toolname}_wrapper_$parent_id";
+			echo Kosass::factory('compact')->compile($file);
+		}
 		elseif(file_exists($stock_file))
-			readfile($stock_file);
+		{
+			$file = file($stock_file);
+			$file[1] = "#{$toolname}_wrapper_$parent_id";
+			echo Kosass::factory('compact')->compile($file);
+		}
 		else
 			echo '/* No css available for this tool. */';
-			
-		$source_contents = str_replace('++', $tool_id , ob_get_clean());
-		# TODO: add this to the one above for efficiency
-		$source_contents = self::replace_tokens($source_contents, $site_name, $theme);
+
+		$source_contents = self::replace_tokens(ob_get_clean(), $site_name, $theme);
 		
 		if(file_put_contents($place_file, $source_contents))
 			$return = TRUE;
-		
+	
 		if($return_contents)
 			return $source_contents;
 		
 		return $return;
 	}
 	
+
+
+
 	
 /*
  * Replace any tokens with respective real-values.
@@ -754,6 +843,8 @@ class Tool_Controller extends Controller {
 		return str_replace($keys, $replacements , $contents);		
 	}
 	
+
+
 	
 } // end 
 

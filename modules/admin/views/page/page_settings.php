@@ -12,7 +12,7 @@ if($page->page_name == $this->homepage)
 	$readonly = 'DISABLED';
 }
 
-$add_slash = (empty($directory)) ? '' : '/';
+$add_slash = (empty($dir)) ? '' : '/';
 
 echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') );
 ?>
@@ -68,7 +68,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 		
 			<div id="new_page_url">
 				Link to this page
-				<br/><strong><?php echo url::site(),$directory,$add_slash?><span id="link_example"><?php echo $filename?></span></strong>
+				<br/><strong><?php echo url::site(),$dir,$add_slash?><span id="link_example"><?php echo $filename?></span></strong>
 			</div>
 			<b>Label Name</b>
 			<br/><input type="text" name="label" value="<?php echo $page->label?>" rel="text_req" style="width:350px" maxlength="50">
@@ -89,7 +89,7 @@ echo form::open( "page/settings/$page->id", array('class' => 'custom_ajaxForm') 
 	</div>
 	
 	<input type="hidden" name="old_page_name" value="<?php echo $filename?>">
-	<input type="hidden" name="directory" value="<?php echo $directory?>">
+	<input type="hidden" name="directory" value="<?php echo $dir?>">
 </form>
 
 <script type="text/javascript">

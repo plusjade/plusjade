@@ -15,10 +15,7 @@ class Utada_Controller extends Controller {
 	function __construct()
 	{
 		parent::__construct();
-		# $this->client->get_user()->id
-		# is the account_user who can_edit this site. 
-		# but checking on this requires that i first enter "can_edit" mode.
-		
+
 		if(ROOTACCOUNT != $this->site_name
 			OR !$this->client->can_edit($this->site_id)
 			OR 'jade' != $this->client->get_user()->username)
@@ -26,24 +23,29 @@ class Utada_Controller extends Controller {
 	}
 
 /*
- * Index view, everything loads via ajax into the index view.
+ * Index view, everything loads via ajax into the wrapper view.
  */	
 	public function _index()
 	{
-		$user = ORM::factory('account_user', $this->account_user->get_user()->id);
-		$primary = new View('utada/index');		
-		$primary->sites = $user->sites;		
+		$primary = new View('utada/wrapper');
 		return $primary;
 	}
+	
+	
 	
 /*
  * Display all users with attached websites.
  */	
 	public function all_users()
-	{			
+	{	
+		$sort = (isset($_GET['sort']) AND 'new' == $_GET['sort']) 
+			? array('id' => 'desc')
+			: array('username' => 'asc');
+		
 		$primary = new View('utada/all_users');
 		$primary->users = ORM::factory('account_user')
 			->where('fk_site', $this->site_id)
+			->orderby($sort)
 			->find_all();
 		die($primary);
 	}
@@ -53,12 +55,19 @@ class Utada_Controller extends Controller {
  * Display all websites with users having admin access
  */	
 	public function all_sites()
-	{			
+	{	
+		$sort = (isset($_GET['sort']) AND 'new' == $_GET['sort']) 
+			? array('id' => 'desc')
+			: array('subdomain' => 'asc');
+		
 		$primary = new View('utada/all_sites');
-		$primary->sites = ORM::factory('site')->find_all();
+		$primary->sites = ORM::factory('site')
+			->orderby($sort)
+			->find_all();
 		die($primary);
 	}
 
+	
 /*
  * Display a singular data-view of a given website
  */		
@@ -79,46 +88,66 @@ class Utada_Controller extends Controller {
 	{
 		valid::id_key($user_id);		
 		$primary = new View('utada/get_user');
-		$primary->user = ORM::factory('user', $user_id);
+		$primary->user = ORM::factory('account_user', $user_id);
 		die($primary);
 	}
 
-	
+
 /*
- * Allows the master account to grant himself temp access to another account.
+ * add site access to an existing user.
  * default access is not allowed. we use this as a better security measure
  * since this must accept a password not stored in the db/site.
  */
-	public function grant_access()
+	public function add_access()
 	{
-		if('supausah' === $_POST['password'])
-		{
-			# Create access row for the master account
-			$user = ORM::factory('account_user', $this->account_user->get_user()->id);
-			$user->add(ORM::factory('site', valid::id_key($_POST['site_id'])));
-			$user->save();
+		if(!isset($_POST['password']) OR 'supausah' !== $_POST['password'])
+			die('invalid password');
 			
-			$link	= '<a href="http://'."$_POST[site_name].". ROOTDOMAIN ."/get/auth/manage?tKn=$user->token".'">Go to site</a>';
-			die("access granted: Remember to delete when finished.<br>$link");
-		}
-		die('invalid');
-	}
+		$user_id = valid::id_key($_POST['user_id']);
+		$site_id = valid::id_key($_POST['site_id']);
 
+		# Create access row for the master account (jade)
+		$user = ORM::factory('account_user', $user_id);
+		if(!$user->loaded)
+			die('invalid user');
+		$user->add(ORM::factory('site', $site_id));
+		$user->save();
+
+		echo 'Access Granted! Remember to delete when finished';
+		die();
+	}
+	
+	
+	
 /*
  * Remove access roles from sites_users table
  * accepts site_id and optional $user_id
  */	
-	public function remove_access($site_id, $user_id=NULL)
+	public function remove_access()
 	{
-		valid::id_key($site_id);
-		$user_id = ((NULL === $user_id)) ?
-			$this->account_user->get_user()->id : $user_id;
+		$user_id = (isset($_GET['user_id'])) ? $_GET['user_id'] : die('invalid user id');
+		$site_id = (isset($_GET['site_id'])) ? $_GET['site_id'] : die('invalid site id');	
 		
 		$user = ORM::factory('account_user', $user_id);
 		$user->remove(ORM::factory('site', $site_id));
 		$user->save();
 		die('access removed');
 	}
+
+/*
+ * destroys a plusjade user account
+ */
+	public function destroy_user()
+	{
+		$user_id = (isset($_GET['user_id'])) ? $_GET['user_id'] : die('invalid user id');
+		$user = ORM::factory('account_user', $user_id);
+		if(!$user->loaded)
+			die('invalid user');
+		$user->delete();
+		die('user deleted.');
+	}
+	
+	
 	
 /*
  * Destroy a website's table and folder data.
@@ -126,35 +155,41 @@ class Utada_Controller extends Controller {
  * For now we specify only what we want to delete
  * enable user destory too (might remove later)	
  */	 
-	public function destroy_site($site_id = NULL, $site_name = NULL, $confirm = FALSE)
+	public function destroy_site()
 	{	
-		valid::id_key($site_id);
-		valid::url($site_name);
+		if($_POST)
+		{
+			if(!isset($_POST['confirm']) OR 'yes' != $_POST['confirm'])
+				die('Not Confirmed.');
+			if(!isset($_POST['password']) OR 'supausah' != $_POST['password'])
+				die('Invalid Password.');
+
+			$site_id	 = $_POST['site_id'];
+			$site_name = $_POST['site_name'];
 			
-		if(FALSE === $confirm)
-			die('add confirm to the url...');
+			# delete pages rows
+			ORM::factory('page')
+				->where('fk_site', $site_id)
+				->delete_all();
 
-		# delete pages rows
-		ORM::factory('page')
-			->where('fk_site', $site_id)
-			->delete_all();
-
-		# delete site rows.
-		$site = ORM::factory('site', $site_id);
-		#$site->remove(ORM::factory('site', $site_id));
-		$site->delete();
-		
-		#hack to remove access privelages to sites that dont exist.
-		$db = new Database;
-		$db->delete('account_users_sites', "site_id = '$site_id'");
-		
-		# NOTE (see the clean_db method in this class)
-
-		# DELETE DATA FOLDER		
-		if(Jdirectory::remove(DATAPATH . $site_name))
-			die('Site destroyed! =(');			
-		
-		die('Unable to destory data folder'); # error
+			# delete site rows.
+			$site = ORM::factory('site', $site_id);
+			$site->delete();
+			
+			# hack to remove access privaleges to sites that dont exist.
+			$db = new Database;
+			$db->delete('account_users_sites', "site_id = '$site_id'");
+			
+			# NOTE (see the clean_db method in this class)
+			# clean_db must called to remove all orphaned tool data.
+			
+			# DELETE DATA FOLDER		
+			if(Jdirectory::remove(DATAPATH . $site_name))
+				die('Site destroyed! =(');			
+			
+			die('Unable to destory data folder'); # error
+		}
+		die('Nothing sent.');
 	}
 
 /*
@@ -235,11 +270,6 @@ class Utada_Controller extends Controller {
 			else
 				$results[$table] = 'clean';
 		}
-
-		# troubleshoot
-		# echo $id_string;
-		# echo'<pre>'; print_r($table_names);echo '</pre>'; die();
-		#echo'<pre>'; print_r($results);echo '</pre>'; die();
 		
 		$primary->results = $results;
 		die($primary);

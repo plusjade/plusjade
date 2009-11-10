@@ -1,5 +1,3 @@
-
-/*   --- css_static_helpers  --- */
 .aligncenter{text-align:center !important;}
 .alignright{text-align:right !important;}
 .clearboth{clear:both !important;}
@@ -8,24 +6,16 @@
 .floatleft{float:left !important;}
 .floatright{float:right !important;}
 a img{border:0}
-
-/*   --- icons  --- */
 span.icon {font-size:14px; background-attachment:fixed; background: url(/_assets/images/admin/icons_sprite.png) no-repeat 0px 0px;}
 span.plus{background-position:0px -255px}
-
-/* live form status and error messages */
 .input_focus{background:#ffffcc; border:2px solid orange;}
-
 /* inline form error messages */
 fieldset.jade_error{background: #fad6d6 !important;}
 fieldset label .jade_required_star { font-weight:bold; color:red;}
 fieldset span.error_msg{ display:block; color:red;}
-
 /* return form results status box */
 div.jade_form_status_box{font-weight:bold; color:#000; font-size:1.2em; margin-bottom:10px; padding:10px; text-align:center; }
 div.jade_form_status_box.box_positive{background:lightgreen; border:1px solid green;}
 div.jade_form_status_box.box_negative{background:#fad6d6; border:1px solid #cc0000;}
 div.jade_form_status_box div.error_count { }
-
-/* ajax loader */
 div.ajax_loading{ width:100%; height:90px; background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%; text-align:center;}

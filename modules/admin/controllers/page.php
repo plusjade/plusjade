@@ -45,7 +45,9 @@ class Page_Controller extends Controller {
 		die($primary);
 	}
 	
-	
+/*
+ * Outputs all site pages into organized folders and sub-folders.
+ */ 
 	public function list_all()
 	{
 		$pages_data = ORM::factory('page')
@@ -303,7 +305,7 @@ class Page_Controller extends Controller {
 		
 		# is this page a folder with children?
 		# we can delete them all, OR just not allow parents to be deleted.
-		$children = self::get_folder_filenames($page->page_name, 'change', $page->page_name);
+		$children = self::get_folder_filenames($page->page_name, 'all_children');
 		if(0 < count($children))
 			die('A page must have no sub-pages before it can be deleted.');
 			#$id_set .= ','. implode(',', $folders_array[$page->page_name]);
@@ -415,7 +417,7 @@ class Page_Controller extends Controller {
 		$primary = new View("page/page_settings");	
 		$primary->page		= $page;	
 		$primary->filename	= $filename;	
-		$primary->directory	= $directory;				
+		$primary->dir		= $directory;				
 
 
 		# get available templates from theme.

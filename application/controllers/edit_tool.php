@@ -20,6 +20,10 @@ abstract class Edit_Tool_Controller extends Controller {
  * parses stored text/html for tool tokens and replaces those tokens with
  * appropriate HTML output.
  * the tokens are defined here.
+	Tokens: 
+		{newsletter}
+		{showroom_cats:parent_id:parameters}
+		
  */
 	public function parse_tokens($body)
 	{
@@ -77,6 +81,15 @@ abstract class Edit_Tool_Controller extends Controller {
 
 			$body = preg_replace($pattern, $categories, $body, 1);
 
+		}
+		
+		/* -------------------------------------------- */
+		# google map! format: {google_map:parent_id:parameters}
+		$pattern ='/{google_map:(\d+)\:(\w+)\}/';
+
+		if(0 < preg_match($pattern, $body, $match))
+		{		
+		
 		}
 		
 		return $body;

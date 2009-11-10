@@ -18,20 +18,24 @@ class Home_Controller extends Controller {
 /*
  * View for Create a new website.
  */	 
-	public static function index()
+	public static function _index()
 	{
-		echo 'hippo';
 		if($_POST)
 		{
 			# beta code
 			if('DOTHEDEW' != $_POST['beta'])
 				return self::display_create('The beta code is not valid', $_POST);
 
-			$site_name = 'beta-'.trim($_POST['site_name']);
+			$site_name = trim($_POST['site_name']);
+			$email = trim($_POST['email']);
+			
+			if(empty($site_name) OR empty($email))
+				return self::display_create('The beta code is not valid', $_POST);
+			
 			$theme = (empty($_POST['theme'])) ? 'base' : $_POST['theme'];
 			
 			# will redirect on success, else show error.
-			$show_error = Site_Controller::_create_website($site_name, $theme);
+			$show_error = Site_Controller::_create_website($site_name, $theme, null, $email);
 			return self::display_create($show_error, $_POST);
 		}
 		else

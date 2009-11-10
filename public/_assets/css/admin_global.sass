@@ -1,0 +1,2491 @@
+
+
+/* ------------ Overide theme styles for admin views  ------------*/
+
+noscript
+  position:fixed
+  top:40px
+  width:100%
+  padding:10px
+  text-align:center
+  background:#ffffcc
+  font-weight:bold
+  font-size:1.4em
+.popup_dialog
+display:none
+position:absolute
+background:#ffffcc
+border:1px solid blue
+padding:10px
+div.plusjade_ajax
+height:90px
+width:100%
+background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%
+text-align:center
+.admin_reset
+  img
+    border:0 
+  h1, h2, h3, h4, h5, h6
+    font-size:1em !important
+    padding:0 !important
+    margin:0 !important
+    margin-bottom:10px !important
+    background:none !important
+  h1
+    font-size:1.6em !important
+    color:#0c7ced !important
+  h2
+    font-size:1.4em !important
+    color:#7c78d3 !important
+  h3
+    font-size:1.2em !important
+    color:#7c78d3 !important
+  h4
+    font-size:1.1em !important
+    color:#000 !important
+  h5
+    font-size:1em !important
+    color:#7c78d3 !important
+  dt
+    font-weight:bold !important
+  color:#7c78d3 !important
+  p
+    margin:10px 0
+    padding:0
+  a, .jade_toolbar_wrapper a, .content a
+    color:blue
+    font-style:none !important
+  a:hover, .jade_toolbar_wrapper a:hover, .content a:hover
+    color:purple
+  label, label:hover
+    cursor:pointer
+    cursor:cursor
+  .on_close
+    display:none
+  .server_response, .facebox_response
+    width:85%
+    float:left
+    margin-left:2%
+    padding:6px
+    text-align:center
+    font-weight:bold
+    background:#ffffcc
+    border:1px solid #333
+    border-top:0
+  #lower_response
+    width:80%
+    border:1px solid #333
+  .show_submit
+    width:275px
+    height:25px
+    float:right
+    margin-right:10px
+    overflow:hidden
+    background: #ffffcc url('/_assets/images/admin/line_loader.gif') no-repeat 6% 50%
+    div
+      width:90px
+      height:25px
+      float:right
+      text-align:center
+      background: #ffffcc
+      color:#333
+      font-size:1em
+      padding:5px 10px 0 10px
+#admin_bar_wrapper a:visited, .jade_toolbar_wrapper a:visited, .facebox .content a:visited
+  color:purple
+
+#admin_bar_wrapper ul, .jade_toolbar_wrapper ul, .generic_tabs
+  margin:0
+  padding:0
+  list-style:none
+  line-height:24px 
+  background:transparent
+#admin_bar_wrapper ul li, ul.toolkit_dropdown li, .generic_tabs li  margin:0 !important
+  padding:0 !important
+  list-style:none !important
+  line-height:24px !important
+  background:transparent !important
+body.disable_body
+  margin: 0
+  padding: 0
+  border: 0
+  overflow: hidden
+span.icon
+  font-size:14px
+  background-attachment:fixed
+  background: url(/_assets/images/admin/icons_sprite.png) no-repeat 0px 0px
+
+span.cross
+  background-position:0px -12px 
+span.cog
+  background-position:0px -29px 
+span.wrench
+  background-position:0px -46px 
+span.edit_page
+  background-position:0px -65px 
+span.css
+  background-position:0px -81px 
+span.manage
+  background-position:0px -98px 
+span.add_page
+  background-position:0px -116px 
+span.page
+  background-position:0px -135px 
+span.shield
+  background-position:0px -152px 
+span.sitemap
+  background-position:0px -168px 
+span.tools
+  background-position:0px -187px 
+span.magnify
+  background-position:0px -203px 
+span.global
+  background-position:0px -219px 
+span.local
+  background-position:0px -239px 
+span.plus
+  background-position:0px -255px 
+span.palette
+  background-position:0px -293px 
+span.flag
+  background-position:0px -293px 
+span.folder
+  background-position:0px -311px 
+span.add_folder
+  background-position:0px -325px 
+span.asterisk
+  background-position:0px -343px 
+span.move
+  background-position:0px -361px 
+span.template
+  background-position:0px -380px 
+span.images
+  background-position:0px -398px 
+span.image
+  background-position:0px -420px 
+span.info
+  background-position:0px -435px 
+span.help
+  background-position:0px -452px 
+span.home
+  background-position:0px -471px 
+span.heart
+  background-position:0px -486px 
+span.date
+  background-position:0px -500px 
+span.save
+  background-position:0px -524px 
+
+/* --------------- facebox ---------------*/
+#facebox_base
+  z-index: 9997 !important 
+#facebox_base_overlay
+  z-index: 9996 !important 
+#facebox_2
+  z-index: 9999 !important 
+#facebox_2_overlay
+  z-index: 9998 !important 
+.facebox
+  position: absolute
+  top: 0
+  left: 0
+  z-index: 99
+  text-align: left
+  width:100%
+  font-size: 12px !important
+  font-family:verdana, arial, "sans serif" !important
+  color:#333 !important
+  z-index:9999 !important
+  .popup
+    position:relative
+    min-width:850px
+  .close_wrapper
+    position:relative
+    top:2px
+    margin:0 10px
+    overflow:hidden
+    .close
+      display:block
+      height:28px
+      width:70px
+      float:right
+      padding:5px 5px 0 5px
+      background:#fff
+      border:2px solid #ccc
+      border-bottom:0
+  .body
+    background:#fff
+    margin:0 10px
+    border:2px solid #ccc
+  .content
+    margin:0 auto
+    width:800px
+    background:#fff
+    overflow:hidden
+    padding-top:15px
+    color:#333 !important
+  .image
+    text-align: center
+  img
+    border: 0
+    margin: 0
+.loading
+  margin:0 auto
+  text-align: center
+  width:500px
+  height:200px
+  padding-top:30px
+  background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%
+.facebox_overlay
+  position: fixed
+  top: 0px
+  left: 0px
+  height:100%
+  width:100%
+ 
+.facebox_hide
+  z-index:-100 
+.facebox_overlayBG
+  background-color: #000
+  z-index: 999
+// ie6 hack 
+* html .facebox_overlay
+  position: absolute
+  height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px')
+// facebox custom class views
+.confirm_facebox
+  margin:0 auto
+  width:300px
+  height:200px
+  text-align:center
+  font-weight:bold
+  line-height:2em
+  padding:5px
+  overflow:hidden
+.facebox div.loading_msg, .load_tool_html
+  margin:0 auto
+  width:300px
+  height:200px
+  background: transparent url(/_assets/images/admin/load.gif) no-repeat 50% 50%
+  font-size:1.4em
+  font-weight:bold
+  line-height:2em
+  overflow:hidden
+  text-align:center
+div.styler_wrapper
+  position:fixed
+  top:0
+  width:100%
+  background:transparent
+  z-index:99999
+  font-size: 12px !important
+  font-family:verdana, arial, "sans serif" !important
+  color:#333 !important
+  text-align:left !important
+  .actions
+    position:relative
+    overflow:hidden
+    top:2px
+  a.hide, a.close
+    display:block
+    height:28px
+    width:70px
+    float:right
+    padding:5px 5px 0 5px
+    border:2px solid #a3d7f9
+    margin-left:7px
+    border-bottom:0
+    background:#def1fe
+    text-align:center
+    color:#000
+div.dialog_wrapper
+  background:#def1fe
+  border:2px solid #a3d7f9
+  border-bottom:0
+div.styler_dialog
+  height:370px
+  margin:0 auto
+  min-width:800px
+  width:80%
+  background:#def1fe
+  overflow:hidden
+  padding:0
+// --------------- Top Admin Panel --------------- */
+#admin_bar_wrapper
+  position:fixed
+  top:0
+  left:0
+  min-width:890px
+  width:100%
+  z-index:9995
+  margin:0
+  padding:0
+  font-size:12px !important
+  font-family: verdana !important
+  text-align:center
+#shadow
+  position:fixed
+  top:0
+  left:0
+  min-width:890px
+  height:40px
+  width:100%
+  margin:0
+  padding:0
+  div
+    min-width:888px
+    width:81%
+    height:40px
+    margin:0 auto
+#unclaimed_panel
+  min-width:750px
+  width:70%
+  margin:0 auto
+  padding:6px 10px
+  background:#ffffcc
+  color:#444
+  text-align:left
+  border:1px solid #000
+  a
+    display:block
+    float:right
+#center_response
+  min-width:750px
+  width:70%
+  margin:0 auto
+  padding:6px 10px
+  background:#ffffcc
+  color:#444
+  text-align:center
+  border:1px solid #000
+#tool_bar_wrapper
+  min-width:880px
+  width:80%
+  height:10px
+  margin:0 auto
+  padding:0
+ul#admin_bar
+  min-width:925px
+  width:87%
+  height:35px
+  margin:0 auto
+  padding:0
+  background:skyblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -500px !important
+  border:1px solid #333
+  border-top:0
+  color:#fff
+  text-align:left
+  list-style:none
+  a
+    font-style:normal !important
+  li
+    display:block
+    height:35px
+    width:9%
+    padding:0
+    margin:0
+    float:left
+    div, a.block_mode
+      display:block
+      height:31px
+      padding-top:4px
+      color:#fff
+      font-weight:bold
+      cursor:pointer
+      cursor:hand
+      text-align:center
+      border-right:1px dashed #fff
+    div:hover, div.dropdown_selected, ul li a:hover
+      background:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important
+      color:#fff !important
+  li.direct
+    background:orange url('/_assets/images/admin/gradients.jpg') repeat-x 0px -305px !important
+  li.jade
+    background:green url('/_assets/images/admin/gradients.jpg') repeat-x 0px -150px !important
+  li.floatright
+    background:#d52020 url('/_assets/images/admin/gradients.jpg') repeat-x 0px -465px !important
+    a
+      border:0
+  li.this_page
+    div
+      color:#000
+    a
+      color:red
+      font-weight:bold
+      text-decoration:none
+  li.direct
+    a
+      text-decoration:none
+  li.floatright a:hover, a.block_mode:hover
+    background:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important
+    color:#fff !important
+  li.dropdown
+    background:orange url('/_assets/images/admin/gradients.jpg') repeat-x 0px -305px !important
+    ul
+      display:none
+      position:absolute
+      top:37px
+      clear:both
+      width:118px
+      list-style:none
+      background:#fff
+      margin:0
+      overflow:hidden
+      border:1px solid #222
+      color:#999
+      li
+        display:block
+        width:118px
+        height:28px
+        a
+          display:block
+          width:110px
+          height:28px
+          padding:0 4px
+          text-decoration:none
+          background:#fff
+#hide_link
+  display:none
+  position:fixed
+  top:0
+  left:90%
+  width:100px
+  text-align:center
+  z-index: 9999
+  a
+    width:70px
+    display:block
+    padding:3px
+    background:#d52020 url('/_assets/images/admin/gradients.jpg') repeat-x 0px -465px
+    color:#fff
+    text-decoration:none
+    border:1px solid #333
+    border-top:0
+    &:hover
+      background:#fff
+      color:red
+//* --- Javascript Prepended red edit Tool Toolbar --- */
+.jade_toolbar_wrapper
+  clear:both
+  font-size:12px !important
+  font-family: verdana !important
+  margin-bottom:2px
+  position:relative !important
+  div.bar
+    height:30px
+    width:100%
+    background:#d52020 url(/_assets/images/admin/gradients.jpg) repeat-x 0px -465px
+    border-collapse:collapse
+    border:1px solid #777
+  div.name_wrapper
+    height:25px
+    float:left
+    padding-top:5px
+    padding-left:10px
+    padding-right:10px
+    color:#fff
+    font-weight:bold
+    cursor:move
+  div.actions_wrapper
+    float:right
+  a.actions_link
+    display:block
+    height:25px
+    padding:5px 10px 0 10px
+    color:white
+    text-align:right
+    text-decoration:none
+    font-style:normal !important
+  a.actions_link:hover, div.name_wrapper:hover
+    background:#000
+  .toolkit_wrapper
+    display:none
+    position:absolute !important
+    clear:both !important
+    margin-top:6px
+    background:transparent url('/_assets/images/admin/drop.png') no-repeat bottom right
+  ul.toolkit_dropdown
+    position:relative
+    top:-6px
+    left:-6px
+    width:100px !important
+    z-index:9000 !important
+    border:1px solid #333 !important
+    list-style:none !important
+    margin:0 !important
+    padding:5px !important
+    background:#fff !important
+    line-height:2em !important
+    li
+      display:block
+    &:hover
+      display:block
+  ul
+    a
+      color:#333 !important
+      text-decoration:none !important
+      font-style:normal !important
+      &:hover
+        color:red !important
+.jade_delete_tool  
+//*scope toggle*/
+div.CONTAINER_WRAPPER > span.global > div.jade_toolbar_wrapper  > div.bar
+  background:orange url(/_assets/images/admin/gradients.jpg) repeat-x 0px -310px
+  border:1px solid #cc6600 !important 
+//* --- blue Tool Item toolbar --- */	
+.jade_admin_item_edit
+  text-align:right
+  height:20px
+  padding:3px
+  background-attachment:fixed
+  background:lightblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -70px
+  a
+    color:#fff
+    &:hover
+      color:#000
+//* --------------- CONTAINER_WRAPPER on sort start --------------- */	
+.highlight_containers
+  border:1px solid #ccc !important
+  background:#eee !important
+  min-height:300px !important
+.CONTAINER_placeholder
+  background:#ffffcc
+  display:block
+  height:50px
+  border:1px solid orange
+.sort_active
+  width:200px !important
+  overflow:hidden !important
+  ul
+    display:none !important
+//* --------------- FORMS AND INPUT FIELDS --------------- */
+.fieldsets
+  padding-bottom:10px
+  margin-bottom:10px
+  overflow:hidden
+  b
+    font-size:1.2em
+    color:blue
+    font-family: 'Lucida Console', Monaco, monospace
+  input, select
+    padding:5px
+    font-weight:normal
+.full_width
+  width:98%
+.big
+  input
+    font-size:1.4em
+    padding:10px
+  b
+    font-size:1.4em
+.huge
+  input, b
+    font-size:2em
+    padding:10px
+.facebox form div.wysiwyg iframe, .facebox form div.wysiwyg, textarea
+width:98% !important
+ 
+
+textarea.render_html,
+textarea.render_css width:99% !important
+ height:300px
+ 
+textarea.render_css font-family: courier new
+ font-size:1.2em
+ 
+
+/* form validation messages */
+.input_error background:pink !important
+ border:1px solid red !important
+ 
+span.msg color:red
+ 
+.error_msg color:red
+ 
+
+/* --- FORM BUTTONS --- */
+.buttons margin-bottom:10px
+ overflow:auto
+ 
+button cursor:hand
+ cursor:pointer
+ 
+.buttons a, .buttons button display:block
+ background-attachment:fixed
+ background:lightblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -110px
+ border:1px solid #336699
+ color:#fff
+ font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif
+ font-size:1.4em
+ line-height:130%
+ text-decoration:none
+ font-weight:bold
+ cursor:pointer
+ padding:5px 10px 6px 7px
+ /* Links */ 
+.buttons button width:auto
+ overflow:visible
+ padding:4px 10px 3px 7px
+ /* IE6 */ 
+.buttons button[type] padding:5px 10px 5px 7px
+ /* Firefox */  line-height:17px
+ /* Safari */ 
+*:first-child+html button[type] padding:4px 10px 3px 7px
+ /* IE7 */ 
+.buttons button img, .buttons a img margin:0 3px -3px 0 !important
+ padding:0
+ border:none
+ width:16px
+  height:16px
+ 
+/* STANDARD */
+button:hover, .buttons a:hover border:1px solid #336699
+ color:#fff
+ background:#ccc
+ 
+.buttons a:active background-color:#6299c5
+ color:#fff
+ 
+/* POSITIVE */
+button.jade_positive, .buttons a.jade_positive color:#fff
+ background:lightgreen url(/_assets/images/admin/gradients.jpg) repeat-x 0px -205px
+ border:1px solid #7ebd40
+ 
+.buttons a.jade_positive:hover,
+button.jade_positive:hover,
+.buttons a.jade_positive:active background:orange url(/_assets/images/admin/gradients.jpg) repeat-x 0px -250px
+ border:1px solid orange
+  
+/* NEGATIVE */
+.buttons a.jade_negative, button.jade_negative background:#333 url(/_assets/images/admin/gradients.jpg) repeat-x 0px -15px
+ border:1px solid #000
+ color:#fff
+		 
+.buttons a.jade_negative:hover, button.jade_negative:hover background-attachment:fixed
+ background:#d52020 url(/_assets/images/admin/gradients.jpg) repeat-x 0px -465px
+ border:1px solid #cc0000
+ color:#fff
+ 
+.buttons a.jade_negative:active background-color:#d12f19
+ border:1px solid #d12f19
+ color:#fff
+ 
+
+/* --- jwysiwg_texteditor  --- */	
+div.wysiwyg   border: 1px solid #cccccc
+ padding: 5px
+ background-color: #ffffff
+  
+div.wysiwyg *   margin: 0
+ padding: 0
+  
+div.wysiwyg ul.panel   border-bottom: 1px solid #cccccc
+ float: left
+ width: 100%
+ padding: 0 0 4px 0
+  
+div.wysiwyg ul.panel li   list-style-type: none
+ float: left
+ margin: 0 2px
+  background: #ffffff
+ 
+div.wysiwyg ul.panel li.wysiwyg_separator   height: 16px
+ margin: 0 4px
+ border-left: 1px solid #cccccc
+  
+div.wysiwyg ul.panel li a   border:1px solid red
+ opacity: 0.6
+ display: block
+ width: 16px
+ height: 16px
+ background: url('/_assets/images/admin/jwysiwyg.gif') no-repeat -64px -80px
+ border: 0
+ cursor: pointer
+ padding: 1px
+  
+div.wysiwyg ul.panel li a:hover, div.wysiwyg ul.panel li a.active   opacity: 0.99
+  
+div.wysiwyg ul.panel li a.active   background-color: #f9f9f9
+ border: 1px solid #cccccc
+ border-left-color: #aaaaaa
+ border-top-color: #aaaaaa
+ padding: 0
+  
+div.wysiwyg ul.panel li a.bold   background-position: 0 -16px
+  
+div.wysiwyg ul.panel li a.italic   background-position: -16px -16px
+  
+div.wysiwyg ul.panel li a.strikeThrough   background-position: -32px -16px
+  
+div.wysiwyg ul.panel li a.underline   background-position: -48px -16px
+  
+div.wysiwyg ul.panel li a.justifyLeft   background-position: 0 0
+  
+div.wysiwyg ul.panel li a.justifyCenter   background-position: -16px 0
+  
+div.wysiwyg ul.panel li a.justifyRight   background-position: -32px 0
+  
+div.wysiwyg ul.panel li a.justifyFull   background-position: -48px 0
+  
+div.wysiwyg ul.panel li a.indent   background-position: -64px 0
+  
+div.wysiwyg ul.panel li a.outdent   background-position: -80px 0
+  
+div.wysiwyg ul.panel li a.subscript   background-position: -64px -16px
+  
+div.wysiwyg ul.panel li a.superscript   background-position: -80px -16px
+  
+div.wysiwyg ul.panel li a.undo   background-position: 0 -64px
+  
+div.wysiwyg ul.panel li a.redo   background-position: -16px -64px
+  
+div.wysiwyg ul.panel li a.insertOrderedList   background-position: -32px -48px
+  
+div.wysiwyg ul.panel li a.insertUnorderedList   background-position: -16px -48px
+  
+div.wysiwyg ul.panel li a.insertHorizontalRule   background-position: 0 -48px
+  
+div.wysiwyg ul.panel li a.h1   background-position: 0 -32px
+  
+div.wysiwyg ul.panel li a.h2   background-position: -16px -32px
+  
+div.wysiwyg ul.panel li a.h3   background-position: -32px -32px
+  
+div.wysiwyg ul.panel li a.h4   background-position: -48px -32px
+  
+div.wysiwyg ul.panel li a.h5   background-position: -64px -32px
+  
+div.wysiwyg ul.panel li a.h6   background-position: -80px -32px
+  
+div.wysiwyg ul.panel li a.cut   background-position: -32px -64px
+  
+div.wysiwyg ul.panel li a.copy   background-position: -48px -64px
+  
+div.wysiwyg ul.panel li a.paste   background-position: -64px -64px
+  
+div.wysiwyg ul.panel li a.increaseFontSize   background-position: -16px -80px
+  
+div.wysiwyg ul.panel li a.decreaseFontSize   background-position: -32px -80px
+  
+div.wysiwyg ul.panel li a.createLink   background-position: -80px -48px
+  
+div.wysiwyg ul.panel li a.insertImage   background-position: -80px -80px
+  
+div.wysiwyg ul.panel li a.html   background-position: -48px -48px
+  
+div.wysiwyg ul.panel li a.removeFormat   background-position: -80px -64px
+  
+div.wysiwyg ul.panel li a.empty   background-position: -64px -80px
+  
+div.wysiwyg iframe  border:0
+ margin: 5px 0 0 0
+ clear: left
+ 
+
+
+/* --------------- generic tabs and lists --------------- */
+/* --- ui tabs --- */	
+.ui-tabs-hide  display: none
+  
+.ui-tabs-nav list-style:none
+ margin:0
+ padding:0
+	 
+ul.common_tabs_x padding:5px 0 !important
+ margin:0
+ border-bottom:1px solid #000
+ 
+.common_tabs_x li display:inline !important
+ margin-right:2px
+ 
+.common_tabs_x li a text-decoration:none
+padding:7px 15px
+ background:lightblue url(/_assets/images/admin/gradients.jpg) repeat-x 0px -110px
+ border-bottom:0
+ color:#fff !important
+font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif
+ font-weight:bold
+ 
+.common_tabs_x li a:hover,
+.common_tabs_x li a.active  position:relative
+ top:1px
+ color:#fff !important
+ background:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important
+ /*purple*/ 
+.common_tabs_x div.field_title float:right
+ font-size:1.2em
+ font-weight:bold
+ color:blue
+ font-family: 'Lucida Console', Monaco, monospace
+ text-transform : capitalize
+ padding-right:10px
+ 
+
+/* sortable link menu lists  */
+.facebox #generic_sortable_list clear:both
+ 
+.facebox #generic_sortable_list li.root_entry margin:0
+padding:0
+margin-bottom:5px
+clear:both
+ 
+.facebox #generic_sortable_list ul.row_wrapper width:100%
+margin:0
+padding:0
+list-style:none
+background:#e3eff3
+overflow:auto
+ 
+.facebox #generic_sortable_list ul.row_wrapper li padding:8px
+ 
+.facebox #generic_sortable_list ul .drag_box width:60px
+float:left
+cursor:pointer
+cursor:cursor
+background:lightblue
+ 
+.facebox #generic_sortable_list ul .drag_box:hover background:#66cc66
+ 
+.facebox #generic_sortable_list ul .position width:20px
+float:left
+text-align:center
+ 
+.facebox #generic_sortable_list ul .data float:left
+ 
+.facebox #generic_sortable_list ul .delete_item width:75px
+float:right
+text-align:center
+ 
+.facebox #generic_sortable_list ul .delete_item:hover background:orange
+ 
+.facebox #generic_sortable_list .not_enabled ul background:#eee
+border:1px solid #ccc
+	 
+.facebox #generic_sortable_list .no_menu ul background:#eee
+ 
+.facebox #generic_sortable_list .no_access ul background:#ffcccc
+ 
+.facebox #generic_sortable_list li.root_entry a,
+.facebox #generic_sortable_list li a.root_entry color:#333
+padding:5px
+text-decoration:none
+ 
+.facebox #generic_sortable_list li a:hover,
+.facebox #generic_sortable_list li a.selected,
+.facebox #generic_sortable_list li.ui-tabs-selected a background:#ffffcc
+ 
+.facebox #generic_sortable_list li a small color:#999 
+
+
+/* --------------- common tool elements --------------- */
+/* this sets the width for most facebox containers using this header */
+#common_tool_header overflow:hidden
+margin-bottom:10px
+padding-bottom:10px
+border-bottom:1px dashed #999
+color:#333 !important
+ 
+#common_tool_header em color:green
+ 
+#common_tool_header button float:right
+ 
+#common_title font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif
+padding-top:9px
+font-weight:bold
+line-height:130%
+font-size:1.5em
+color:#000 !important
+ 
+#common_tool_info margin-bottom:10px
+text-align:center
+ 
+.facebox .common_sub_header font-size:1.2em
+padding:5px
+background:#555
+color:#fff
+margin-bottom:15px
+ 
+.facebox #common_module_menu_bar padding:5px
+background:#ccc
+margin-bottom:10px
+ 
+.common_left_panel width:180px
+float:left
+padding:5px
+color:#333 !important 
+.common_main_panel width:590px
+min-height:350px
+float:right
+padding:5px
+color:#333 !important
+ 
+.common_main_panel ul li color:#333 !important 
+.common_full_panel width:99%
+margin:0 auto
+ padding:10px 0
+ 
+.common_half_left background:#eee
+width:40%
+float:left
+padding:10px
+ 
+.common_half_right width:54%
+float:right
+padding:10px
+border:1px dashed #eee
+ 
+#common_view_toggle li margin-bottom:5px
+ 
+#common_view_toggle li a.selected,
+#common_view_toggle li a:hover color:#fff
+background:purple url('/_assets/images/admin/gradients.jpg') repeat-x 0px -415px !important
+ /*purple*/	 
+#common_view_toggle li a  display:block
+padding:5px 10px
+background:#eee
+color:blue
+text-decoration:none
+ 
+
+
+/* auth form views */
+
+/* auth create */
+#auth_form width:400px
+margin:10px auto
+padding:10px
+ 
+#auth_form div.fieldsets background:#fff
+padding:10px
+margin-bottom:10px
+ 
+#tagline padding:10px
+background:#fff
+text-align:center
+font-size:2em
+ 
+#tagline .text_logo  
+#tagline .text_logo b color:red 
+#auth_form input font-size:1.8em
+background:skyblue url('/_assets/images/admin/gradients.jpg') repeat-x 0px -500px
+border:1px solid #dedede
+width:99%
+ 
+#auth_form button width:100%
+ 
+#auth_form .buttons margin:0 auto
+width:300px 
+
+/* login prompt */
+#auth_form div.error text-align:center
+background:#fff
+color:red
+font-size:1.2em
+ 
+.login_help_toggle text-align:center
+padding:15px
+ 
+
+/*  --- dashboard.php --- */ 
+.indent line-height:2em
+ 
+#jade_welcome   	
+#jade_welcome span float:right
+ 
+#jade_welcome b font-size:1.4em
+color:blue
+ 
+#edit_website_link clear:both
+margin:20px auto
+width:220px
+ 
+#edit_website_link a font-size:2em
+ 
+
+/* --- ui tabs --- */	
+.ui-tabs-hide  display: none
+  
+.ui-tabs-nav list-style:none
+margin:0
+padding:0
+ 
+
+/* Vertical Tab Navigation  for auth*/
+#vertical_tabs margin:0
+padding:0
+width:15%
+float:left
+overflow:hidden
+min-height:400px
+ 
+#vertical_tabs li margin-bottom:10px
+ 
+#vertical_tabs li a display:block
+padding:8px 10px
+color:#333
+ 
+#vertical_tabs li a:hover, #vertical_tabs .ui-tabs-selected a color:red
+ 
+#vertical_content width:80%
+float:right
+line-height:2em
+ 
+.main_header color:#7ebd40
+font-size:1.2em
+font-weight:bold
+ 
+#auth_content_wrapper width:80%
+float:left
+margin-left:10px
+ 
+
+/* admin views ----------------------- */
+/* claim */
+.benefit_wrapper width:50%
+float:left
+padding:10px
+ 
+.create_wrapper width:44%
+float:left
+padding:10px
+ 
+#login_claim_wrapper padding:10px
+margin:15px 0
+background:#ffffcc
+text-align:center
+ 
+.login_response text-align:center
+ 
+.login_response div.success padding:7px
+background:lightgreen
+ 
+.login_response div.error padding:7px
+background:lightpink
+ 
+#why_claim margin-bottom:15px
+padding:10px
+border:1px dashed #ddd
+background:#eee
+line-height:1.4em 
+
+/* @page_settings */
+.enabled_yes border:2px solid green
+background:#d9f2d3 !important
+ 
+.enabled_no border:2px solid red
+background:#ffe2e3 !important
+ 
+
+/* pages, files, themes directory wrappers */
+#directory_window ackground:#e2effc
+ /*lightblue*/ 
+#directory_window div.sub_folders display:none
+ 
+#directory_window div.asset height:110px
+ width:90px
+ float:left
+margin:3px
+overflow:hidden
+font-size:0.9em
+ 
+#directory_window a  
+
+/* breadcrumb */ 
+.breadcrumb_wrapper padding:3px
+ background:#dde9fe
+ border:1px solid lightblue
+ 
+.breadcrumb_wrapper a text-decoration:underline
+ 
+.breadcrumb_wrapper a:hover  
+
+/* page browser */ 
+img.new_page_drop cursor:move !important
+padding:3px !important
+border:1px dashed #333 !important 
+#page_browser_wrapper a text-decoration:none
+ 
+#page_browser_wrapper img display:block
+margin:0 auto
+ 
+#page_browser_wrapper .asset div text-align:center
+ 
+#page_browser_wrapper .enabled  div ackground:#fff
+ 
+#page_browser_wrapper .hidden div background:#f2f1f1
+ 
+#page_browser_wrapper .disabled div background:#fbe2e2
+ 
+#page_browser_wrapper img,
+#page_browser_wrapper span.icon.page cursor:cursor
+cursor:pointer
+ 
+#page_browser_wrapper ul.option_list width:110px
+display:none
+position:absolute
+list-style:none
+line-height:1.7em
+margin:0
+padding:5px
+text-align:left !important
+background:#ffffcc
+font-size:0.9em
+border:1px solid orange
+-moz-border-radius: 10px
+-webkit-border-radius: 10px
+border-radius: 10px
+	 
+#page_browser_wrapper ul.option_list li  
+
+
+/* files browser */
+#files_browser_wrapper ul.file_links list-style:none
+ float:right
+ margin:0
+ padding:0
+ 
+#files_browser_wrapper ul.file_links li  display:inline
+ margin-left:15px
+ 
+#files_browser_wrapper div.asset  
+#files_browser_wrapper div.asset span.info  position:relative
+ top:10px
+ height:16px
+ cursor:pointer
+ cursor:cursor
+ 
+#files_browser_wrapper .asset img  display:block
+ margin:auto 
+#files_browser_wrapper div.file_asset img  border:2px solid #ccc
+ 
+#files_browser_wrapper .asset span display:block
+ text-align:center
+ 
+
+img.ui-selected border:2px solid orange!important
+ background:orange !important
+ 
+.ui-state-highlight background:lightgreen !important
+ 
+
+
+/* tools browser */ 
+#tools_browser_wrapper table width:99%
+ border:0
+ 
+#tools_browser_wrapper table th background:#333
+ color:#fff
+ text-align:center
+ font-weight:normal
+ 
+#tools_browser_wrapper table td padding:2px
+ 
+#tools_browser_wrapper table td input width:160px
+ padding:0
+ border:1px solid #eee
+ 
+#tools_browser_wrapper table td span.icon.save cursor:pointer
+ cursor:cursor
+ 
+#tools_browser_wrapper .has_pages background:#fff
+border:1px solid #99ccff
+ /* sky blue */ 
+#tools_browser_wrapper .no_pages background:#FBE3E4
+border:1px solid #ff9999
+color:#8a1f11
+ 
+#tools_browser_wrapper .global background:#ffffcc
+border:1px solid #FBC2C4
+color:#8a1f11
+ 
+
+
+
+/* common save pane */ 
+.save_pane position:absolute
+display:block
+width:350px
+z-index:5000
+background:transparent url('/_assets/images/admin/drop.png') repeat bottom right
+ 
+.save_pane .contents position:relative
+top:-6px
+left:-6px
+padding:10px
+background:#ffffcc
+border:2px solid orange
+ 
+.save_pane .icon.cross:hover cursor:cursor
+cursor:pointer
+ 
+
+a.get_file_browser.images display:block
+width:100px
+height:75px
+padding:5px
+margin:0 auto
+background:url('/_assets/images/admin/image_icon.jpg') no-repeat 5px 5px
+text-decoration:none
+ 
+a.get_file_browser.images:hover background:url('/_assets/images/admin/image_icon_over.jpg') no-repeat 5px 5px
+border:1px dashed green
+ 
+
+/* add new_page page */
+#new_page_wrapper .pane_left width:51%
+float:left
+	 
+.sub_options, .root_options background:#eee
+padding:10px
+ 
+#new_page_wrapper .pane_right width:42%
+float:right 
+
+#new_page_url text-align:center
+line-height:1.8em
+margin-bottom:10px
+ 
+#new_page_url b color:#333
+font-size:1.4em
+ 
+#link_example color:green
+ 	
+	
+
+/* tool/add @new_tool view */
+#tool_list_wrapper ul line-height:1.5em
+ 
+#tool_view_wrapper background:#eee
+border:1px solid #ccc
+ 
+#tool_view_wrapper div.each_tool display:none
+margin:5px
+	 
+#tool_view_wrapper div.each_tool div.desc margin-top:10px
+padding:10px
+background:#ffffcc
+ 
+
+/* tool manage */
+.window_tool height:280px
+display:none
+clear:both
+overflow:auto
+ 
+.window_header margin-bottom:10px 
+
+#tool_list_wrapper a:hover,
+#tool_list_wrapper a.active color: red !important
+ 
+.output_tool_html width:99%
+height:250px
+overflow:auto
+ border:1px solid #FBC2C4
+background:#fff
+ 
+
+
+/* theme manager */
+.theme_index_block margin-bottom:10px
+ padding:8px
+ border:1px dashed #ccc
+ 
+
+/* droppables and sortable images css */
+#sortable_images_wrapper overflow:auto
+ 
+#sortable_images_wrapper div float:left
+margin:3px
+background:#fff
+ 
+#sortable_images_wrapper div span.icon cursor:cursor
+ cursor:pointer
+position:relative
+top:10px
+ 
+#sortable_images_wrapper div span.icon.move  
+#sortable_images_wrapper div span.icon.cog left:45px
+ 
+
+#sortable_images_wrapper div img display:block
+ clear:both
+ border:2px solid #ccc
+ 
+#sortable_images_wrapper img.ui-selecting  background:#FECA40
+ 
+#sortable_images_wrapper img.ui-selected background:orange
+ 	
+.ui-selectable-helper z-index:999999 !important
+border:2px dashed green !important
+ 
+
+/* -- swf uploader styles ------------------------------- */
+#swf_wrapper  
+#swf_wrapper div.fieldset  border:1px solid #afe14c
+margin: 10px 0
+padding: 20px 10px 
+#swf_wrapper span.legend  font-weight:bold
+font: 700 14px Arial, Helvetica, sans-serif
+color: #73b304
+ 
+#swf_wrapper div.flash  width: 450px
+height:200px
+overflow:auto
+margin: 10px 5px
+border-color: #D9E4FF
+-moz-border-radius:5px
+-webkit-border-radius:5px
+ 
+#swf_wrapper button, #swf_wrapper input, #swf_wrapper select,
+#swf_wrapper textarea  border-width: 1px
+ margin-bottom: 10px
+padding: 2px 3px
+ 
+#swf_wrapper input[disabled]  border: 1px solid #ccc   /* FF 2 Fix */
+#swf_wrapper label   width: 150px
+ text-align: right
+ display:block
+margin-right: 5px
+ 
+#swf_wrapper #btnSubmit   margin: 0 0 0 155px 
+  
+
+/* -- Table Styles ------------------------------- */
+#swf_wrapper td  font: 10pt Helvetica, Arial, sans-serif
+vertical-align: top
+ 
+#swf_wrapper .progressWrapper  width: 440px
+overflow: hidden
+ 
+#swf_wrapper .progressContainer  margin: 5px
+padding: 4px
+border: solid 1px #E8E8E8
+background-color: #F7F7F7
+overflow: hidden
+ 
+/* Message */
+#swf_wrapper .message  margin: 1em 0
+padding: 10px 20px
+border: solid 1px #FFDD99
+background-color: #FFFFCC
+overflow: hidden
+ 
+/* Error */
+#swf_wrapper .red  border: solid 1px #B50000
+background-color: #FFEBEB 
+/* Current */
+#swf_wrapper .green  border: solid 1px #DDF0DD
+background-color: #EBFFEB
+ 
+/* Complete */
+#swf_wrapper .blue  border: solid 1px #CEE2F2
+background-color: #F0F5FF
+ 
+#swf_wrapper .progressName  font-size: 8pt
+font-weight: 700
+color: #555
+width: 323px
+height: 14px
+text-align: left
+white-space: nowrap
+overflow: hidden
+ 
+#swf_wrapper .progressBarInProgress,
+#swf_wrapper .progressBarComplete,
+#swf_wrapper .progressBarError  font-size: 0
+width: 0%
+height: 2px
+background-color: blue
+margin-top: 2px
+ 
+#swf_wrapper .progressBarComplete  width: 100%
+background-color: green
+visibility: hidden
+ 
+#swf_wrapper .progressBarError  width: 100%
+background-color: red
+visibility: hidden 
+#swf_wrapper .progressBarStatus  margin-top: 2px
+width: 337px
+font-size: 7pt
+font-family: Arial
+text-align: left
+white-space: nowrap
+ 
+#swf_wrapper a.progressCancel  font-size: 0
+display: block
+height: 14px
+width: 14px
+background-image: url(../images/cancelbutton.gif)
+background-repeat: no-repeat
+background-position: -14px 0px
+float: right
+ 
+#swf_wrapper a.progressCancel:hover  background-position: 0px 0px
+ 
+/* -- SWFUpload Object Styles ------------------------------- */
+#swf_wrapper .swfupload  vertical-align: top
+ 
+
+
+/* simpleTree css */
+/* --------------------- --------------------------*/
+.simpleTree margin:0
+padding:0
+ 
+.simpleTree li list-style: none
+margin:0
+padding:0 0 0 34px
+line-height: 2em
+ 
+.simpleTree li span display:inline
+clear: left
+white-space: nowrap
+color:#333 !important
+ 
+.simpleTree li span:hover cursor:move
+ 
+.simpleTree ul margin:0
+ padding:0
+ 
+.simpleTree .root margin-left:-16px
+background: url(/_assets/images/navigation/root.gif) no-repeat 16px 0 #ffffff
+ 
+.simpleTree .line,
+.simpleTree .line-last,
+.simpleTree .line-over,
+.simpleTree .line-over-last margin:0 0 0 -16px
+line-height: 3px
+font-size:3px
+height:3px
+ 
+.simpleTree .line-expand height:10px
+padding:3px 0
+margin:2px
+border:1px solid green
+background:lightgreen
+ 
+
+.simpleTree .line background: #ffffcc url(/_assets/images/navigation/line_bg.gif) 0 0 no-repeat transparent
+ 
+.simpleTree .line-last  
+.simpleTree .line-over background:orange !important
+border:1px solid orange !important
+ 
+.simpleTree .line-over-last background:orange !important
+border:1px solid orange !important
+ 
+.simpleTree .folder-open margin-left:-16px
+background: url(/_assets/images/navigation/collapsable.gif) 0 -2px no-repeat #fff
+ 
+.simpleTree .folder-open-last margin-left:-16px
+background: url(/_assets/images/navigation/collapsable-last.gif) 0 -2px no-repeat #fff
+ 
+.simpleTree .folder-close margin-left:-16px
+background: url(/_assets/images/navigation/expandable.gif) 0 -2px no-repeat #fff
+ 
+.simpleTree .folder-close-last margin-left:-16px
+background: url(/_assets/images/navigation/expandable-last.gif) 0 -2px no-repeat #fff
+ 
+.simpleTree .doc margin-left:-16px
+background: url(/_assets/images/navigation/leaf.gif) 0 -1px no-repeat #fff
+ 
+.simpleTree .doc-last margin-left:-16px
+background: url(/_assets/images/navigation/leaf-last.gif) 0 -1px no-repeat #fff
+ 
+.simpleTree .ajax background: url(/_assets/images/navigation/spinner.gif) no-repeat 0 0 #ffffff
+height: 16px
+display:none
+ 
+.simpleTree .ajax li display:none
+margin:0
+padding:0
+ 
+.simpleTree .trigger display:inline
+margin-left:-32px
+width: 28px
+height: 11px
+cursor:pointer
+ 
+.simpleTree .text cursor: default
+ 
+.simpleTree .active,
+.simpleTree li span.text:hover cursor: move
+background-color:#F7BE77
+padding:0px 2px
+border: 1px dashed #444
+ 
+#drag_container z-index:9999
+background:#ffffff
+color:#000
+font: normal 11px arial, tahoma, helvetica, sans-serif
+border: 1px dashed #767676
+ 
+#drag_container ul list-style: none
+padding:0
+margin:0
+ 
+#drag_container li list-style: none
+background-color:#ffffff
+line-height:18px
+white-space: nowrap
+padding:1px 1px 0px 16px
+margin:0
+ 
+#drag_container li span padding:0
+ 
+#drag_container li.doc, 
+#drag_container li.doc-last background: url(/_assets/images/navigation/leaf.gif) no-repeat -17px 0 #ffffff
+ 
+#drag_container .folder-close, 
+#drag_container .folder-close-last background: url(/_assets/images/navigation/expandable.gif) no-repeat -17px 0 #ffffff
+ 
+#drag_container .folder-open,
+#drag_container .folder-open-last background: url(/_assets/images/navigation/collapsable.gif) no-repeat -17px 0 #ffffff
+ 
+.contextMenu display:none
+ 
+/* end */
+
+/*
+* jQuery UI CSS Framework
+* Copyright (c) 2009 AUTHORS.txt (http://jqueryui.com/about)
+* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+*/
+/* Layout helpers
+----------------------------------*/
+.ui-helper-hidden   display: none
+  
+.ui-helper-hidden-accessible   position: absolute
+ left: -99999999px
+  
+.ui-helper-reset   margin: 0
+ padding: 0
+ border: 0
+ outline: 0
+ line-height: 1.3
+ text-decoration: none
+ font-size: 100%
+ list-style: none
+  
+.ui-helper-clearfix:after   content: "."
+ display: block
+ height: 0
+ clear: both
+ visibility: hidden
+  
+.ui-helper-clearfix   display: inline-block
+  
+/* required comment for clearfix to work in Opera \*/
+* html .ui-helper-clearfix   height:1%
+  
+.ui-helper-clearfix   display:block
+  
+/* end clearfix */
+.ui-helper-zfix   width: 100%
+ height: 100%
+ top: 0
+ left: 0
+ position: absolute
+ opacity: 0
+ filter:Alpha(Opacity=0)
+  
+/* Interaction Cues
+----------------------------------*/
+.ui-state-disabled   cursor: default !important
+  
+/* Icons----------------------------------*/
+/* states and images */
+.ui-icon   display: block
+ text-indent: -99999px
+ overflow: hidden
+ background-repeat: no-repeat
+  
+/* Misc visuals----------------------------------*/
+/* Overlays */
+.ui-widget-overlay   position: absolute
+ top: 0
+ left: 0
+ width: 100%
+ height: 100%
+  
+/*
+* jQuery UI CSS Framework
+* Copyright (c) 2009 AUTHORS.txt (http://jqueryui.com/about)
+* Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+* To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Trebuchet%20MS,%20Tahoma,%20Verdana,%20Arial,%20sans-serif&fwDefault=bold&fsDefault=1.1em&cornerRadius=4px&bgColorHeader=f6a828&bgTextureHeader=12_gloss_wave.png&bgImgOpacityHeader=35&borderColorHeader=e78f08&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=eeeeee&bgTextureContent=03_highlight_soft.png&bgImgOpacityContent=100&borderColorContent=dddddd&fcContent=333333&iconColorContent=222222&bgColorDefault=f6f6f6&bgTextureDefault=02_glass.png&bgImgOpacityDefault=100&borderColorDefault=cccccc&fcDefault=1c94c4&iconColorDefault=ef8c08&bgColorHover=fdf5ce&bgTextureHover=02_glass.png&bgImgOpacityHover=100&borderColorHover=fbcb09&fcHover=c77405&iconColorHover=ef8c08&bgColorActive=ffffff&bgTextureActive=02_glass.png&bgImgOpacityActive=65&borderColorActive=fbd850&fcActive=eb8f00&iconColorActive=ef8c08&bgColorHighlight=ffe45c&bgTextureHighlight=03_highlight_soft.png&bgImgOpacityHighlight=75&borderColorHighlight=fed22f&fcHighlight=363636&iconColorHighlight=228ef1&bgColorError=b81900&bgTextureError=08_diagonals_thick.png&bgImgOpacityError=18&borderColorError=cd0a0a&fcError=ffffff&iconColorError=ffd27a&bgColorOverlay=666666&bgTextureOverlay=08_diagonals_thick.png&bgImgOpacityOverlay=20&opacityOverlay=50&bgColorShadow=000000&bgTextureShadow=01_flat.png&bgImgOpacityShadow=10&opacityShadow=20&thicknessShadow=5px&offsetTopShadow=-5px&offsetLeftShadow=-5px&cornerRadiusShadow=5px
+*/
+/* Component containers----------------------------------*/
+.ui-widget   font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif
+ font-size: 1.1em
+  
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button   font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif
+ font-size: 1em
+  
+.ui-widget-content   border: 1px solid #dddddd
+ background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x
+ color: #333333
+  
+.ui-widget-content a   color: #333333
+  
+.ui-widget-header   border: 1px solid #e78f08
+ background: #f6a828 url(images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x
+ color: #ffffff
+ font-weight: bold
+  
+.ui-widget-header a   color: #ffffff
+  
+/* Interaction states----------------------------------*/
+.ui-state-default, .ui-widget-content .ui-state-default   border: 1px solid #cccccc
+ background: #f6f6f6 url(images/ui-bg_glass_100_f6f6f6_1x400.png) 50% 50% repeat-x
+ font-weight: bold
+ color: #1c94c4
+ outline: none
+  
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited   color: #1c94c4
+ text-decoration: none
+ outline: none
+  
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus   border: 1px solid #fbcb09
+ background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x
+ font-weight: bold
+ color: #c77405
+ outline: none
+  
+.ui-state-hover a, .ui-state-hover a:hover   color: #c77405
+ text-decoration: none
+ outline: none
+  
+.ui-state-active, .ui-widget-content .ui-state-active   border: 1px solid #fbd850
+ background: #ffffff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x
+ font-weight: bold
+ color: #eb8f00
+ outline: none
+  
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited   color: #eb8f00
+ outline: none
+ text-decoration: none
+  
+/* Interaction Cues----------------------------------*/
+.ui-state-highlight, .ui-widget-content .ui-state-highlight  border: 1px solid #fed22f
+ background: #ffe45c url(images/ui-bg_highlight-soft_75_ffe45c_1x100.png) 50% top repeat-x
+ color: #363636
+  
+.ui-state-highlight a, .ui-widget-content .ui-state-highlight a   color: #363636
+  
+.ui-state-error, .ui-widget-content .ui-state-error  border: 1px solid #cd0a0a
+ background: #b81900 url(images/ui-bg_diagonals-thick_18_b81900_40x40.png) 50% 50% repeat
+ color: #ffffff
+  
+.ui-state-error a, .ui-widget-content .ui-state-error a   color: #ffffff
+  
+.ui-state-error-text, .ui-widget-content .ui-state-error-text   color: #ffffff
+  
+.ui-state-disabled, .ui-widget-content .ui-state-disabled   opacity: .35
+ filter:Alpha(Opacity=35)
+ background-image: none
+  
+.ui-priority-primary, .ui-widget-content .ui-priority-primary   font-weight: bold
+  
+.ui-priority-secondary, .ui-widget-content .ui-priority-secondary   opacity: .7
+ filter:Alpha(Opacity=70)
+ font-weight: normal
+  
+
+/* Icons----------------------------------*/
+/* states and images */
+.ui-icon   width: 16px
+ height: 16px
+ background-image: url(images/ui-icons_222222_256x240.png)
+  
+.ui-widget-content .ui-icon  background-image: url(images/ui-icons_222222_256x240.png)
+  
+.ui-widget-header .ui-icon  background-image: url(images/ui-icons_ffffff_256x240.png)
+  
+.ui-state-default .ui-icon   background-image: url(images/ui-icons_ef8c08_256x240.png)
+  
+.ui-state-hover .ui-icon, .ui-state-focus .ui-icon  background-image: url(images/ui-icons_ef8c08_256x240.png)
+  
+.ui-state-active .ui-icon  background-image: url(images/ui-icons_ef8c08_256x240.png)
+  
+.ui-state-highlight .ui-icon  background-image: url(images/ui-icons_228ef1_256x240.png)
+  
+.ui-state-error .ui-icon, .ui-state-error-text .ui-icon  background-image: url(images/ui-icons_ffd27a_256x240.png)
+  
+
+/* positioning */
+.ui-icon-carat-1-n   background-position: 0 0
+  
+.ui-icon-carat-1-ne   background-position: -16px 0
+  
+.ui-icon-carat-1-e   background-position: -32px 0
+  
+.ui-icon-carat-1-se   background-position: -48px 0
+  
+.ui-icon-carat-1-s   background-position: -64px 0
+  
+.ui-icon-carat-1-sw   background-position: -80px 0
+  
+.ui-icon-carat-1-w   background-position: -96px 0
+  
+.ui-icon-carat-1-nw   background-position: -112px 0
+  
+.ui-icon-carat-2-n-s   background-position: -128px 0
+  
+.ui-icon-carat-2-e-w   background-position: -144px 0
+  
+.ui-icon-triangle-1-n   background-position: 0 -16px
+  
+.ui-icon-triangle-1-ne   background-position: -16px -16px
+  
+.ui-icon-triangle-1-e   background-position: -32px -16px
+  
+.ui-icon-triangle-1-se   background-position: -48px -16px
+  
+.ui-icon-triangle-1-s   background-position: -64px -16px
+  
+.ui-icon-triangle-1-sw   background-position: -80px -16px
+  
+.ui-icon-triangle-1-w   background-position: -96px -16px
+  
+.ui-icon-triangle-1-nw   background-position: -112px -16px
+  
+.ui-icon-triangle-2-n-s   background-position: -128px -16px
+  
+.ui-icon-triangle-2-e-w   background-position: -144px -16px
+  
+.ui-icon-arrow-1-n   background-position: 0 -32px
+  
+.ui-icon-arrow-1-ne   background-position: -16px -32px
+  
+.ui-icon-arrow-1-e   background-position: -32px -32px
+  
+.ui-icon-arrow-1-se   background-position: -48px -32px
+  
+.ui-icon-arrow-1-s   background-position: -64px -32px
+  
+.ui-icon-arrow-1-sw   background-position: -80px -32px
+  
+.ui-icon-arrow-1-w   background-position: -96px -32px
+  
+.ui-icon-arrow-1-nw   background-position: -112px -32px
+  
+.ui-icon-arrow-2-n-s   background-position: -128px -32px
+  
+.ui-icon-arrow-2-ne-sw   background-position: -144px -32px
+  
+.ui-icon-arrow-2-e-w   background-position: -160px -32px
+  
+.ui-icon-arrow-2-se-nw   background-position: -176px -32px
+  
+.ui-icon-arrowstop-1-n   background-position: -192px -32px
+  
+.ui-icon-arrowstop-1-e   background-position: -208px -32px
+  
+.ui-icon-arrowstop-1-s   background-position: -224px -32px
+  
+.ui-icon-arrowstop-1-w   background-position: -240px -32px
+  
+.ui-icon-arrowthick-1-n   background-position: 0 -48px
+  
+.ui-icon-arrowthick-1-ne   background-position: -16px -48px
+  
+.ui-icon-arrowthick-1-e   background-position: -32px -48px
+  
+.ui-icon-arrowthick-1-se   background-position: -48px -48px
+  
+.ui-icon-arrowthick-1-s   background-position: -64px -48px
+  
+.ui-icon-arrowthick-1-sw   background-position: -80px -48px
+  
+.ui-icon-arrowthick-1-w   background-position: -96px -48px
+  
+.ui-icon-arrowthick-1-nw   background-position: -112px -48px
+  
+.ui-icon-arrowthick-2-n-s   background-position: -128px -48px
+  
+.ui-icon-arrowthick-2-ne-sw   background-position: -144px -48px
+  
+.ui-icon-arrowthick-2-e-w   background-position: -160px -48px
+  
+.ui-icon-arrowthick-2-se-nw   background-position: -176px -48px
+  
+.ui-icon-arrowthickstop-1-n   background-position: -192px -48px
+  
+.ui-icon-arrowthickstop-1-e   background-position: -208px -48px
+  
+.ui-icon-arrowthickstop-1-s   background-position: -224px -48px
+  
+.ui-icon-arrowthickstop-1-w   background-position: -240px -48px
+  
+.ui-icon-arrowreturnthick-1-w   background-position: 0 -64px
+  
+.ui-icon-arrowreturnthick-1-n   background-position: -16px -64px
+  
+.ui-icon-arrowreturnthick-1-e   background-position: -32px -64px
+  
+.ui-icon-arrowreturnthick-1-s   background-position: -48px -64px
+  
+.ui-icon-arrowreturn-1-w   background-position: -64px -64px
+  
+.ui-icon-arrowreturn-1-n   background-position: -80px -64px
+  
+.ui-icon-arrowreturn-1-e   background-position: -96px -64px
+  
+.ui-icon-arrowreturn-1-s   background-position: -112px -64px
+  
+.ui-icon-arrowrefresh-1-w   background-position: -128px -64px
+  
+.ui-icon-arrowrefresh-1-n   background-position: -144px -64px
+  
+.ui-icon-arrowrefresh-1-e   background-position: -160px -64px
+  
+.ui-icon-arrowrefresh-1-s   background-position: -176px -64px
+  
+.ui-icon-arrow-4   background-position: 0 -80px
+  
+.ui-icon-arrow-4-diag   background-position: -16px -80px
+  
+.ui-icon-extlink   background-position: -32px -80px
+  
+.ui-icon-newwin   background-position: -48px -80px
+  
+.ui-icon-refresh   background-position: -64px -80px
+  
+.ui-icon-shuffle   background-position: -80px -80px
+  
+.ui-icon-transfer-e-w   background-position: -96px -80px
+  
+.ui-icon-transferthick-e-w   background-position: -112px -80px
+  
+.ui-icon-folder-collapsed   background-position: 0 -96px
+  
+.ui-icon-folder-open   background-position: -16px -96px
+  
+.ui-icon-document   background-position: -32px -96px
+  
+.ui-icon-document-b   background-position: -48px -96px
+  
+.ui-icon-note   background-position: -64px -96px
+  
+.ui-icon-mail-closed   background-position: -80px -96px
+  
+.ui-icon-mail-open   background-position: -96px -96px
+  
+.ui-icon-suitcase   background-position: -112px -96px
+  
+.ui-icon-comment   background-position: -128px -96px
+  
+.ui-icon-person   background-position: -144px -96px
+  
+.ui-icon-print   background-position: -160px -96px
+  
+.ui-icon-trash   background-position: -176px -96px
+  
+.ui-icon-locked   background-position: -192px -96px
+  
+.ui-icon-unlocked   background-position: -208px -96px
+  
+.ui-icon-bookmark   background-position: -224px -96px
+  
+.ui-icon-tag   background-position: -240px -96px
+  
+.ui-icon-home   background-position: 0 -112px
+  
+.ui-icon-flag   background-position: -16px -112px
+  
+.ui-icon-calendar   background-position: -32px -112px
+  
+.ui-icon-cart   background-position: -48px -112px
+  
+.ui-icon-pencil   background-position: -64px -112px
+  
+.ui-icon-clock   background-position: -80px -112px
+  
+.ui-icon-disk   background-position: -96px -112px
+  
+.ui-icon-calculator   background-position: -112px -112px
+  
+.ui-icon-zoomin   background-position: -128px -112px
+  
+.ui-icon-zoomout   background-position: -144px -112px
+  
+.ui-icon-search   background-position: -160px -112px
+  
+.ui-icon-wrench   background-position: -176px -112px
+  
+.ui-icon-gear   background-position: -192px -112px
+  
+.ui-icon-heart   background-position: -208px -112px
+  
+.ui-icon-star   background-position: -224px -112px
+  
+.ui-icon-link   background-position: -240px -112px
+  
+.ui-icon-cancel   background-position: 0 -128px
+  
+.ui-icon-plus   background-position: -16px -128px
+  
+.ui-icon-plusthick   background-position: -32px -128px
+  
+.ui-icon-minus   background-position: -48px -128px
+  
+.ui-icon-minusthick   background-position: -64px -128px
+  
+.ui-icon-close   background-position: -80px -128px
+  
+.ui-icon-closethick   background-position: -96px -128px
+  
+.ui-icon-key   background-position: -112px -128px
+  
+.ui-icon-lightbulb   background-position: -128px -128px
+  
+.ui-icon-scissors   background-position: -144px -128px
+  
+.ui-icon-clipboard   background-position: -160px -128px
+  
+.ui-icon-copy   background-position: -176px -128px
+  
+.ui-icon-contact   background-position: -192px -128px
+  
+.ui-icon-image   background-position: -208px -128px
+  
+.ui-icon-video   background-position: -224px -128px
+  
+.ui-icon-script   background-position: -240px -128px
+  
+.ui-icon-alert   background-position: 0 -144px
+  
+.ui-icon-info   background-position: -16px -144px
+  
+.ui-icon-notice   background-position: -32px -144px
+  
+.ui-icon-help   background-position: -48px -144px
+  
+.ui-icon-check   background-position: -64px -144px
+  
+.ui-icon-bullet   background-position: -80px -144px
+  
+.ui-icon-radio-off   background-position: -96px -144px
+  
+.ui-icon-radio-on   background-position: -112px -144px
+  
+.ui-icon-pin-w   background-position: -128px -144px
+  
+.ui-icon-pin-s   background-position: -144px -144px
+  
+.ui-icon-play   background-position: 0 -160px
+  
+.ui-icon-pause   background-position: -16px -160px
+  
+.ui-icon-seek-next   background-position: -32px -160px
+  
+.ui-icon-seek-prev   background-position: -48px -160px
+  
+.ui-icon-seek-end   background-position: -64px -160px
+  
+.ui-icon-seek-first   background-position: -80px -160px
+  
+.ui-icon-stop   background-position: -96px -160px
+  
+.ui-icon-eject   background-position: -112px -160px
+  
+.ui-icon-volume-off   background-position: -128px -160px
+  
+.ui-icon-volume-on   background-position: -144px -160px
+  
+.ui-icon-power   background-position: 0 -176px
+  
+.ui-icon-signal-diag   background-position: -16px -176px
+  
+.ui-icon-signal   background-position: -32px -176px
+  
+.ui-icon-battery-0   background-position: -48px -176px
+  
+.ui-icon-battery-1   background-position: -64px -176px
+  
+.ui-icon-battery-2   background-position: -80px -176px
+  
+.ui-icon-battery-3   background-position: -96px -176px
+  
+.ui-icon-circle-plus   background-position: 0 -192px
+  
+.ui-icon-circle-minus   background-position: -16px -192px
+  
+.ui-icon-circle-close   background-position: -32px -192px
+  
+.ui-icon-circle-triangle-e   background-position: -48px -192px
+  
+.ui-icon-circle-triangle-s   background-position: -64px -192px
+  
+.ui-icon-circle-triangle-w   background-position: -80px -192px
+  
+.ui-icon-circle-triangle-n   background-position: -96px -192px
+  
+.ui-icon-circle-arrow-e   background-position: -112px -192px
+  
+.ui-icon-circle-arrow-s   background-position: -128px -192px
+  
+.ui-icon-circle-arrow-w   background-position: -144px -192px
+  
+.ui-icon-circle-arrow-n   background-position: -160px -192px
+  
+.ui-icon-circle-zoomin   background-position: -176px -192px
+  
+.ui-icon-circle-zoomout   background-position: -192px -192px
+  
+.ui-icon-circle-check   background-position: -208px -192px
+  
+.ui-icon-circlesmall-plus   background-position: 0 -208px
+  
+.ui-icon-circlesmall-minus   background-position: -16px -208px
+  
+.ui-icon-circlesmall-close   background-position: -32px -208px
+  
+.ui-icon-squaresmall-plus   background-position: -48px -208px
+  
+.ui-icon-squaresmall-minus   background-position: -64px -208px
+  
+.ui-icon-squaresmall-close   background-position: -80px -208px
+  
+.ui-icon-grip-dotted-vertical   background-position: 0 -224px
+  
+.ui-icon-grip-dotted-horizontal   background-position: -16px -224px
+  
+.ui-icon-grip-solid-vertical   background-position: -32px -224px
+  
+.ui-icon-grip-solid-horizontal   background-position: -48px -224px
+  
+.ui-icon-gripsmall-diagonal-se   background-position: -64px -224px
+  
+.ui-icon-grip-diagonal-se   background-position: -80px -224px
+  
+/* Misc visuals
+----------------------------------*/
+/* Corner radius */
+.ui-corner-tl   -moz-border-radius-topleft: 4px
+ -webkit-border-top-left-radius: 4px
+  
+.ui-corner-tr   -moz-border-radius-topright: 4px
+ -webkit-border-top-right-radius: 4px
+  
+.ui-corner-bl   -moz-border-radius-bottomleft: 4px
+ -webkit-border-bottom-left-radius: 4px
+  
+.ui-corner-br   -moz-border-radius-bottomright: 4px
+ -webkit-border-bottom-right-radius: 4px
+  
+.ui-corner-top   -moz-border-radius-topleft: 4px
+ -webkit-border-top-left-radius: 4px
+ -moz-border-radius-topright: 4px
+ -webkit-border-top-right-radius: 4px
+  
+.ui-corner-bottom   -moz-border-radius-bottomleft: 4px
+ -webkit-border-bottom-left-radius: 4px
+ -moz-border-radius-bottomright: 4px
+ -webkit-border-bottom-right-radius: 4px
+  
+.ui-corner-right    -moz-border-radius-topright: 4px
+ -webkit-border-top-right-radius: 4px
+ -moz-border-radius-bottomright: 4px
+ -webkit-border-bottom-right-radius: 4px
+  
+.ui-corner-left   -moz-border-radius-topleft: 4px
+ -webkit-border-top-left-radius: 4px
+ -moz-border-radius-bottomleft: 4px
+ -webkit-border-bottom-left-radius: 4px
+  
+.ui-corner-all   -moz-border-radius: 4px
+ -webkit-border-radius: 4px
+  
+
+/* Overlays */
+.ui-widget-overlay   background: #666666 url(images/ui-bg_diagonals-thick_20_666666_40x40.png) 50% 50% repeat
+ opacity: .50
+filter:Alpha(Opacity=50)
+  
+.ui-widget-shadow   margin: -5px 0 0 -5px
+ padding: 5px
+ background: #000000 url(images/ui-bg_flat_10_000000_40x100.png) 50% 50% repeat-x
+ opacity: .20
+filter:Alpha(Opacity=20)
+ -moz-border-radius: 5px
+ -webkit-border-radius: 5px
+  
+/* Accordion----------------------------------*/
+.ui-accordion .ui-accordion-header   cursor: pointer
+ position: relative
+ margin-top: 1px
+ zoom: 1
+  
+.ui-accordion .ui-accordion-li-fix   display: inline
+  
+.ui-accordion .ui-accordion-header-active   border-bottom: 0 !important
+  
+.ui-accordion .ui-accordion-header a   display: block
+ font-size: 1em
+ padding: .5em .5em .5em 2.2em
+  
+.ui-accordion .ui-accordion-header .ui-icon   position: absolute
+ left: .5em
+ top: 50%
+ margin-top: -8px
+  
+.ui-accordion .ui-accordion-content   padding: 1em 2.2em
+ border-top: 0
+ margin-top: -2px
+ position: relative
+ top: 1px
+ margin-bottom: 2px
+ overflow: auto
+ display: none
+  
+.ui-accordion .ui-accordion-content-active   display: block
+  
+/* Datepicker----------------------------------*/
+.ui-datepicker   width: 17em
+ padding: .2em .2em 0
+  
+.ui-datepicker .ui-datepicker-header   position:relative
+ padding:.2em 0
+  
+.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next   position:absolute
+ top: 2px
+ width: 1.8em
+ height: 1.8em
+  
+.ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover   top: 1px
+  
+.ui-datepicker .ui-datepicker-prev   left:2px
+  
+.ui-datepicker .ui-datepicker-next   right:2px
+  
+.ui-datepicker .ui-datepicker-prev-hover   left:1px
+  
+.ui-datepicker .ui-datepicker-next-hover   right:1px
+  
+.ui-datepicker .ui-datepicker-prev span, .ui-datepicker .ui-datepicker-next span   display: block
+ position: absolute
+ left: 50%
+ margin-left: -8px
+ top: 50%
+ margin-top: -8px
+   
+.ui-datepicker .ui-datepicker-title   margin: 0 2.3em
+ line-height: 1.8em
+ text-align: center
+  
+.ui-datepicker .ui-datepicker-title select   float:left
+ font-size:1em
+ margin:1px 0
+  
+.ui-datepicker select.ui-datepicker-month-year  width: 100%
+ 
+.ui-datepicker select.ui-datepicker-month, 
+.ui-datepicker select.ui-datepicker-year   width: 49%
+ 
+.ui-datepicker .ui-datepicker-title select.ui-datepicker-year   float: right
+  
+.ui-datepicker table  width: 100%
+ font-size: .9em
+ border-collapse: collapse
+ margin:0 0 .4em
+  
+.ui-datepicker th   padding: .7em .3em
+ text-align: center
+ font-weight: bold
+ border: 0
+   
+.ui-datepicker td   border: 0
+ padding: 1px
+  
+.ui-datepicker td span, .ui-datepicker td a   display: block
+ padding: .2em
+ text-align: right
+ text-decoration: none
+  
+.ui-datepicker .ui-datepicker-buttonpane   background-image: none
+ margin: .7em 0 0 0
+ padding:0 .2em
+ border-left: 0
+ border-right: 0
+ border-bottom: 0
+  
+.ui-datepicker .ui-datepicker-buttonpane button   float: right
+ margin: .5em .2em .4em
+ cursor: pointer
+ padding: .2em .6em .3em .6em
+ width:auto
+ overflow:visible
+  
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current   float:left
+  
+
+/* with multiple calendars */
+.ui-datepicker.ui-datepicker-multi   width:auto
+  
+.ui-datepicker-multi .ui-datepicker-group   float:left
+  
+.ui-datepicker-multi .ui-datepicker-group table   width:95%
+ margin:0 auto .4em
+  
+.ui-datepicker-multi-2 .ui-datepicker-group   width:50%
+  
+.ui-datepicker-multi-3 .ui-datepicker-group   width:33.3%
+  
+.ui-datepicker-multi-4 .ui-datepicker-group   width:25%
+  
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header   border-left-width:0
+  
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header   border-left-width:0
+  
+.ui-datepicker-multi .ui-datepicker-buttonpane   clear:left
+  
+.ui-datepicker-row-break   clear:both
+ width:100%
+  
+
+/* RTL support */
+.ui-datepicker-rtl   direction: rtl
+  
+.ui-datepicker-rtl .ui-datepicker-prev   right: 2px
+ left: auto
+  
+.ui-datepicker-rtl .ui-datepicker-next   left: 2px
+ right: auto
+  
+.ui-datepicker-rtl .ui-datepicker-prev:hover   right: 1px
+ left: auto
+  
+.ui-datepicker-rtl .ui-datepicker-next:hover   left: 1px
+ right: auto
+  
+.ui-datepicker-rtl .ui-datepicker-buttonpane   clear:right
+  
+.ui-datepicker-rtl .ui-datepicker-buttonpane button   float: left
+  
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current   float:right
+  
+.ui-datepicker-rtl .ui-datepicker-group   float:right
+  
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header   border-right-width:0
+ border-left-width:1px
+  
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header   border-right-width:0
+ border-left-width:1px
+  
+
+/* IE6 IFRAME FIX (taken from datepicker 1.5.3 */
+.ui-datepicker-cover  
+    display: none
+ /*sorry for IE5*/
+    display/**/: block
+ /*sorry for IE5*/
+    position: absolute
+ /*must have*/
+    z-index: -1
+ /*must have*/
+    filter: mask()
+ /*must have*/
+    top: -4px
+ /*must have*/
+    left: -4px
+ /*must have*/
+    width: 200px
+ /*must have*/
+    height: 200px
+ /*must have*/
+ /* Dialog
+----------------------------------*/
+.ui-dialog   position: relative
+ padding: .2em
+ width: 300px
+  
+.ui-dialog .ui-dialog-titlebar   padding: .5em .3em .3em 1em
+ position: relative
+   
+.ui-dialog .ui-dialog-title   float: left
+ margin: .1em 0 .2em
+   
+.ui-dialog .ui-dialog-titlebar-close   position: absolute
+ right: .3em
+ top: 50%
+ width: 19px
+ margin: -10px 0 0 0
+ padding: 1px
+ height: 18px
+  
+.ui-dialog .ui-dialog-titlebar-close span   display: block
+ margin: 1px
+  
+.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus   padding: 0
+  
+.ui-dialog .ui-dialog-content   border: 0
+ padding: .5em 1em
+ background: none
+ overflow: auto
+ zoom: 1
+  
+.ui-dialog .ui-dialog-buttonpane   text-align: left
+ border-width: 1px 0 0 0
+ background-image: none
+ margin: .5em 0 0 0
+ padding: .3em 1em .5em .4em
+  
+.ui-dialog .ui-dialog-buttonpane button   float: right
+ margin: .5em .4em .5em 0
+ cursor: pointer
+ padding: .2em .6em .3em .6em
+ line-height: 1.4em
+ width:auto
+ overflow:visible
+  
+.ui-dialog .ui-resizable-se   width: 14px
+ height: 14px
+ right: 3px
+ bottom: 3px
+  
+.ui-draggable .ui-dialog-titlebar   cursor: move
+  
+/* Progressbar
+----------------------------------*/
+.ui-progressbar   height:2em
+ text-align: left
+  
+.ui-progressbar .ui-progressbar-value  margin: -1px
+ height:100%
+  
+/* Resizable ----------------------------------*/
+.ui-resizable   position: relative
+ 
+.ui-resizable-handle   position: absolute
+font-size: 0.1px
+z-index: 99999
+ display: block
+ 
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle   display: none
+  
+.ui-resizable-n   cursor: n-resize
+ height: 7px
+ width: 100%
+ top: -5px
+ left: 0px
+  
+.ui-resizable-s   cursor: s-resize
+ height: 7px
+ width: 100%
+ bottom: -5px
+ left: 0px
+  
+.ui-resizable-e   cursor: e-resize
+ width: 7px
+ right: -5px
+ top: 0px
+ height: 100%
+  
+.ui-resizable-w   cursor: w-resize
+ width: 7px
+ left: -5px
+ top: 0px
+ height: 100%
+  
+.ui-resizable-se   cursor: se-resize
+ width: 12px
+ height: 12px
+ right: 1px
+ bottom: 1px
+  
+.ui-resizable-sw   cursor: sw-resize
+ width: 9px
+ height: 9px
+ left: -5px
+ bottom: -5px
+  
+.ui-resizable-nw   cursor: nw-resize
+ width: 9px
+ height: 9px
+ left: -5px
+ top: -5px
+  
+.ui-resizable-ne   cursor: ne-resize
+ width: 9px
+ height: 9px
+ right: -5px
+ top: -5px
+ 
+/* Slider----------------------------------*/
+.ui-slider   position: relative
+ text-align: left
+  
+.ui-slider .ui-slider-handle   position: absolute
+ z-index: 2
+ width: 1.2em
+ height: 1.2em
+ cursor: default
+  
+.ui-slider .ui-slider-range   position: absolute
+ z-index: 1
+ font-size: .7em
+ display: block
+ border: 0
+  
+
+.ui-slider-horizontal   height: .8em
+  
+.ui-slider-horizontal .ui-slider-handle   top: -.3em
+ margin-left: -.6em
+  
+.ui-slider-horizontal .ui-slider-range   top: 0
+ height: 100%
+  
+.ui-slider-horizontal .ui-slider-range-min   left: 0
+  
+.ui-slider-horizontal .ui-slider-range-max   right: 0
+  
+
+.ui-slider-vertical   width: .8em
+ height: 100px
+  
+.ui-slider-vertical .ui-slider-handle   left: -.3em
+ margin-left: 0
+ margin-bottom: -.6em
+  
+.ui-slider-vertical .ui-slider-range   left: 0
+ width: 100%
+  
+.ui-slider-vertical .ui-slider-range-min   bottom: 0
+  
+.ui-slider-vertical .ui-slider-range-max   top: 0
+ 
+ /* Tabs ----------------------------------*/
+.ui-tabs   padding: .2em
+ zoom: 1
+  
+.ui-tabs .ui-tabs-nav   list-style: none
+ position: relative
+ padding: .2em .2em 0
+  
+.ui-tabs .ui-tabs-nav li   position: relative
+ float: left
+ border-bottom-width: 0 !important
+ margin: 0 .2em -1px 0
+ padding: 0
+  
+.ui-tabs .ui-tabs-nav li a   float: left
+ text-decoration: none
+ padding: .5em 1em
+  
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected   padding-bottom: 1px
+ border-bottom-width: 0
+  
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a   cursor: text
+  
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a   cursor: pointer
+   /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+.ui-tabs .ui-tabs-panel   padding: 1em 1.4em
+ display: block
+ border-width: 0
+ background: none
+  
+.ui-tabs .ui-tabs-hide   display: none !important
+  

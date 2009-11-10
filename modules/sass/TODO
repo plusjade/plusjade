@@ -1,0 +1,8 @@
+
+
+comments cannot be within any nested sass. need to fix this.
+
+#parent
+  #child
+  
+  this throws an error because it expects attributes after selectors.

@@ -1,17 +1,21 @@
 
-<h3>Listing all websites with admin users.</h3>
-
 <p>Total Sites: <b><?php echo $sites->count()?></b></p>
-<ul style="line-height:1.6em">
-	<?php
 
-	foreach($sites as $site)
-	{
-		echo "<li><div><a href=\"/get/utada/get_site/$site->id\">$site->subdomain</a></div>";
-		echo '<ul style="font-size:0.9em">';
-		foreach($site->account_users as $user)
-			echo "<li>$user->username</li>";
-		echo '</ul></li>';
-	}
+<ul class="sorters">
+	<li><a href="/get/utada/all_sites?sort=alpha">Alphabetical</a></li>
+	<li><a href="/get/utada/all_sites?sort=new">Newest</a></li>
+</ul>
+
+<ul class="main_list data_list" style="line-height:1.6em">
+	<?php foreach($sites as $site):
+		$domain = (empty($site->custom_domain)) ? '' : "http://$site->custom_domain";
 	?>
+		<li>
+			<div>
+				<a href="/get/utada/get_site/<?php echo $site->id?>"><?php echo $site->subdomain?></a>
+				 <?php echo $domain?>
+				  <small>(<?php echo $site->account_users->count()?>)</small>
+			</div>
+	</li>
+	<?php endforeach;?>
 </ul>

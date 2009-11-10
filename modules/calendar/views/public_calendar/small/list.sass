@@ -1,0 +1,49 @@
+
+#calendar_wrapper_xx
+  .phpajaxcalendar_wrapper
+    table#calendar
+      margin:0 auto
+      background:#eee
+      width:60%
+      tr
+      text-align: center
+        td
+          div.event_count
+            text-align:center
+          div.day_simple
+            display:block
+            text-align:center
+            padding:10px
+          a.day_link_simple
+            display:block
+            text-align:center
+            padding:10px
+            &:hover
+              background:orange
+          a.selected
+            background:orange
+      .month
+        width:auto/* stupid IE */
+      tr.daynames
+        td
+          width: 50px
+          background: #666
+          color: #fff
+      tr.week
+        td
+          background:#fff
+          border:1px solid #ccc
+          text-align:left
+      td.today
+        font-weight: bold !important
+        background: lightblue !important
+      td.has_events
+        background: #ffffcc !important
+  #calendar_event_details
+    margin-top:10px
+    padding-top:10px
+  .calendar_item
+    padding:10px 
+    border:1px solid #ccc 
+    margin:10px
+  

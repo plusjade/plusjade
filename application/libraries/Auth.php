@@ -100,10 +100,17 @@ class Auth_Core {
 	public function can_edit($site_id)
 	{
 		# if site has not been claimed, enable based on cookie.
-		if(empty($this->claimed))
+		if('true' != $this->claimed)
 		{
+			if(isset($_SESSION['unclaimed']) AND $this->claimed === $_SESSION['unclaimed'])
+				return TRUE;
+			
+			#by cookie
+			/*
 			if(sha1("r-A-n_$site_id-D-o:m") == cookie::get("unclaimed_$site_id"))
 				return TRUE;
+			*/
+			
 			return FALSE;
 		}
 		

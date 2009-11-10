@@ -1,0 +1,30 @@
+body{
+	position:relative;
+}
+
+#about-nav-home{
+	position:relative;
+	top:150px;
+}
+
+#work-nav-contact{
+	display:block;
+	position:relative;
+	height:80px;
+	width:300px;
+	left:300px;
+	top:30px;
+	}
+	
+.slide-block{
+	margin:2px;
+	}
+	
+#slideshow{
+	margin:0 auto;
+	width:100%;
+	}
+
+#rightControl {
+	right:40px;
+}

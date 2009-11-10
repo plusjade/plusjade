@@ -53,10 +53,10 @@
 	</ul>
 	
 	
-	<?php if(empty($this->claimed)):?>
+	<?php if('true' != $this->claimed):?>
 		<div id="unclaimed_panel">
-			<a href="/get/auth/claim" class="block_mode" rel="facebox">Claim My Website</a>
-			*<u>All updates are saved</u>*, but your website is <b>unclaimed</b> and expires in <b><?php echo $expires['days']?> days, <?php echo $expires['hours']?> hours, <?php echo $expires['mins']?> mins</b>.
+			<a href="/get/site/claim" class="block_mode" rel="facebox">Password Protect My Website.</a>
+			** You website is not password protected!
 		</div>
 	<?php endif;?>
 

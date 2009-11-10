@@ -1,0 +1,27 @@
+
+#album_wrapper_77{
+
+}
+
+	/* --- album albums gallery --- */
+
+#album_wrapper_77 .galleryview{
+	margin:0 auto;
+}
+.nav-next,
+.nav-prev,
+.nav-overlay,
+.pointer_img{
+	width:20px;
+	height:20px;
+}
+.nav-next{
+	background: url(/_assets/tools/album/light/next.png) no-repeat 0 0;
+}
+.nav-prev{
+	background: url(/_assets/tools/album/light/prev.png) no-repeat 0 0;
+}
+
+.pointer_img{
+	background: url(/_assets/tools/album/light/pointer.png) no-repeat 0 0;
+}

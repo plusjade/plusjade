@@ -40,19 +40,17 @@ abstract class Public_Tool_Controller extends Controller {
 		# should we modularize the CSS ?
 		if($this->client->can_edit($this->site_id) OR TRUE === $sub_tool)
 		{
-			$custom_css	= $this->assets->themes_dir("$this->theme/tools/$toolname/_created/$tool->id/{$tool->type}_$tool->view.css");
-
-			# switching themes while in admin mode, will require
-			# new per tool_css files relative to new theme.
-			$css = (file_exists($custom_css))
-				? file_get_contents($custom_css)
-				: Tool_Controller::_generate_tool_css($toolname, $tool->id, $tool->type, $tool->view, $this->site_name, $this->theme, TRUE);
-
+			# load any custom tool css.
+			$custom_file	= $this->assets->themes_dir("$this->theme/tools/$toolname/$tool->id/{$tool->type}_$tool->view.css");
+			$css = (file_exists($custom_file))
+				? file_get_contents($custom_file)
+				: '';
 			$this->wrapper->custom_css = "
 				<style type=\"text/css\" id=\"$toolname-$tool->id-style\">
 					$css
 				</style>
 			";
+
 		}
 		return $this->wrapper;
 	}

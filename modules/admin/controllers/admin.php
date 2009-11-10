@@ -27,16 +27,49 @@ class Admin_Controller extends Controller {
 	public function index()
 	{
 		if($this->client->can_edit($this->site_id))
-			die('Already Logged In');
-
+			url::redirect();
+			
 		$view = new View('admin/wrapper');			
 		$view->linkCSS("/_assets/css/wrapper.css");
 		$view->admin_linkJS('get/js/live?v=1.0');
-		$view->primary = new View('admin/login');
-		$values = array(
-			'username'	=> '',
-			'password'	=> ''
-		);
+		
+		# is this website claimed?
+		if(FALSE === strpos($this->claimed, '@'))
+		{			
+			# full login.
+			$view->primary = new View('admin/login');
+			$values = array(
+				'username'	=> '',
+				'password'	=> ''
+			);
+		
+		}
+		else
+		{
+			# email only login.
+			if(isset($_POST['email']) OR isset($_GET['email']))
+			{
+				$email = (isset($_POST['email']))
+					? trim($_POST['email'])
+					: trim($_GET['email']);
+					
+				if($this->claimed === $email)
+				{
+					# grant access
+					$_SESSION['unclaimed'] = $this->claimed;
+					url::redirect();
+				}
+				else
+					die('invalid email');
+			}
+
+			$view->primary = new View('admin/email_only');
+			$values = array(
+				'username'	=> '',
+				'password'	=> ''
+			);		
+		}
+
 		
 		if($_POST)
 		{
@@ -85,6 +118,9 @@ class Admin_Controller extends Controller {
 	}
 	
 
+/* 
+ * yc b.s.
+ */
 	public function yc($pw=NULL)
 	{
 		if($pw !== 'aLlwEnEedIsaNinterVieW' OR $this->site_name != 'demo')
@@ -159,7 +195,7 @@ class Admin_Controller extends Controller {
  */ 
 	public function logout()
 	{
-		$this->client->logout();
+		$this->client->logout(TRUE);
 		url::redirect();
 	}
 	

@@ -9,18 +9,29 @@
  
 class Build_Page_Controller extends Controller {
 
-	public $serve_cache = TRUE;
-	public $serve_plusjade_home = FALSE;
+	public $page_cache = FALSE;
+	# only set to false for debugging,
+	public $css_cache = false;
+	public $cache_dir;
+	public $cache_url;
 	
 	function __construct()
 	{
 		parent::__construct();
 		# $this->profiler = new Profiler;		
 		$this->template = new View('shell');	
+			
+		$this->cache_dir =  $this->assets->themes_dir("$this->theme/cache");
+		$this->cache_url = "/_data/$this->site_name/themes/$this->theme/cache";
 		
-		# Global CSS for live pages only		
-		#if(!$this->client->can_edit($this->site_id))
-		$this->template->linkCSS("_data/$this->site_name/themes/$this->theme/css/global.css?v=1.0", 'global-sheet');
+		# Global CSS 
+		# if global.css cache does not exist, create it.
+		if(!$this->css_cache OR !file_exists("$this->cache_dir/global.css"))
+		{
+			$css = new Css_Controller();
+			$css->master();
+		}
+		$this->template->linkCSS("$this->cache_url/global.css?v=1.0", 'global-sheet');
 	}
  
 /*
@@ -35,7 +46,7 @@ class Build_Page_Controller extends Controller {
 			Event::run('system.404');
 				
 		# can we serve a cached page?
-		if($this->serve_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
+		if($this->page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
 		{
 			header('Content-Type: text/html; charset=iso-8859-1');
 			readfile(DATAPATH."$this->site_name/cache/$page->id.html");
@@ -69,14 +80,14 @@ class Build_Page_Controller extends Controller {
 		
 		# Load Admin CSS and Javascript (if logged in)
 		$admin_mode = $this->load_admin($page->id, $page->page_name);
-		
+
 		
 		# plusjade rootsite account hook functionality
 		if(ROOTACCOUNT === $this->site_name)
 		{
 			# do we serve plusjade homepage?
 			# do we serve plusjade utada controller?
-			if($this->serve_plusjade_home AND $this->homepage == $page->page_name)
+			if('start' == $page->page_name)
 			{
 				$home = new Home_Controller();
 				$data['1'] = $home->_index();	
@@ -145,8 +156,16 @@ class Build_Page_Controller extends Controller {
 		}
 		else
 		{
-			# load tool css.
-			$this->template->linkCSS("get/tool_css/live/$page->id");
+			# load page css with tool css instances.
+			# if {page_id}.css cache does not exist, create it.
+			if(!$this->css_cache OR !file_exists("$this->cache_dir/$page->id.css"))
+			{
+				$css = new Css_Controller();
+				$css->page($page->id);
+			}
+			$this->template->linkCSS("$this->cache_url/$page->id.css?v=1.0");
+		
+			# load the global javascript.
 			$this->template->admin_linkJS('get/js/live?v=1.0');
 			
 			# Add requested javascript files if any are valid.
@@ -189,8 +208,8 @@ class Build_Page_Controller extends Controller {
 		}
 		$this->template->set_global('title', 'Page Not Found.');
 		
-		# can we serve a cached page?
-		if($this->serve_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/404_not_found.html"))
+		# can we serve the cached 404 page?
+		if($this->page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/404_not_found.html"))
 		{
 			header('Content-Type: text/html; charset=iso-8859-1');
 			readfile(DATAPATH."$this->site_name/cache/404_not_found.html");
@@ -215,6 +234,7 @@ class Build_Page_Controller extends Controller {
 		$banner		= View::factory('_global/banner');
 		$menu		= View::factory('_global/menu');
 		$path		= $this->assets->themes_dir("$this->theme/templates");
+		$template = (empty($template)) ? 'master' : $template;
 		
 		ob_start();
 		# fetch the template
@@ -304,7 +324,12 @@ class Build_Page_Controller extends Controller {
 		if($this->client->can_edit($this->site_id))
 		{			
 			# load admin global css and javascript.
-			$this->template->linkCSS('get/tool_css/admin');
+			if(!$this->css_cache OR !file_exists(DOCROOT . '_assets/css/admin.css'))
+			{
+				$css = new Css_Controller();
+				$css->admin();
+			}
+			$this->template->linkCSS('/_assets/css/admin.css');
 			$this->template->admin_linkJS('get/js/admin?v=1.1');
 
 			# get list of protected tools to compare against so we can omit scope link			

@@ -154,7 +154,11 @@ class Jdirectory_Core {
 		if(substr($dir, -1) != "/")
 			$dir .= "/"; # add trailing slash if missing 	 	
 		# open pointer to directory and read list of files 
-		$d = @dir($dir) or die("Jdirectory::contents: Failed opening directory $dir for reading");
+		if(!is_dir($dir))
+			return array();
+		
+		$d = dir($dir);
+		#or die("Jdirectory::contents: Failed opening directory $dir for reading");
 		
 		while(false !== ($entry = $d->read())) 
 		{ 

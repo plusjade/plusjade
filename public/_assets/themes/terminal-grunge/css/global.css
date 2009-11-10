@@ -1,0 +1,38 @@
+html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, em, font, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td{margin:0; padding:0; border:0; outline:0; font-size:100%; vertical-align:baseline; background:transparent; font-family:"Gill Sans MT",verdana,sans-serif; color:#ddd; font-weight:normal; }
+body{line-height:1; font-size:14px; background:#2b1f11 url('../images/bg_grunge.jpg') repeat-x fixed center 46px; }
+ol, ul{list-style:none; }
+blockquote, q{quotes:none; blockquote:before, blockquote:after, q:before, q:after; content:''; content:none; }
+ins{text-decoration:none; }
+del{text-decoration:line-through; }
+table{border-collapse:collapse; border-spacing:0; }
+a{color:#eee; text-decoration:none; font-style:italic; }
+a:hover{color:#fff; text-decoration:underline; }
+strong{color:#fff; font-weight:bold; }
+em{color:#fff; font-style:italic; }
+h1{font-size:36px; margin:20px 0; }
+h2{font-size:30px; margin:15px 0; }
+h3{font-size:24px; margin:10px 0; }
+p{font-size:15px; line-height:23px; }
+img{margin:0; padding:0; }
+img.left{float:left; margin:15px 15px 15px 0; padding:2px; }
+img.right{float:right; margin:15px 0 15px 15px; padding:2px; }
+ul{margin:10px 0; list-style:disc inside none; }
+ul li{padding:4px 0; }
+ol{margin:10px 0; list-style:decimal inside none; }
+ol li{padding:4px 0; }
+blockquote{margin:10px 0; border-top:1px dashed #444; border-bottom:1px dashed #444; padding:4px 0; }
+#header{background:url('../images/nav_bg.jpg') repeat-x center top; -moz-background-clip:border; -moz-background-inline-policy:continuous; -moz-background-origin:padding; height:46px; position:fixed; top:0; left:0; width:100%; z-index:999; }
+#logo{float:left; margin-top:10px; }
+#MAIN_MENU{float:right; }
+#MAIN_MENU ul{list-style-type:none; margin:0; }
+#MAIN_MENU ul li{float:left; line-height:13px; padding:0 0px; }
+#MAIN_MENU ul li a{display:block; font-size:14px; margin:0; padding:16px 20px; text-decoration:none; font-style:normal; a:hover, a.selected; background-color:#2B1F11; }
+#content{position:relative; min-height:600px; margin-top:100px; }
+#footer{background:url('../images/footer_copyright-trans.png') no-repeat; -moz-background-clip:border; -moz-background-inline-policy:continuous; -moz-background-origin:padding; height:29px; position:fixed; bottom:0; left:0; width:196px; z-index:999; }
+#footer span{display:block; text-indent:-9999px; font-size:1%; }
+.left{float:left; }
+.right{float:right; }
+.border{border:1px #ccc solid; padding:2px; }
+.center{width:950px; margin:0 auto; background-color:transparent; position:relative; }
+.title{font-size:36px; color:#fff; width:700px; line-height:1.5em; }
+.subtitle{font-size:30px; color:#fff; margin:30px 0; line-height:1.5em; }

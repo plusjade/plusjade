@@ -1,4 +1,9 @@
 
+<div class="category_intro">
+	<?php echo $category->intro;?>
+</div>
+
+
 <div class="showroom_breadcrumb">
 	<b>You are in:</b> <a href="<?php echo url::site($page_name)?>"><?php echo $page_name?></a> &#8594; 
 <?php

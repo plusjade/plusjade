@@ -130,6 +130,7 @@ class Edit_Showroom_Controller extends Edit_Tool_Controller {
 		
 			$category->url = valid::filter_php_url($url);
 			$category->name = trim($_POST['category']);
+			$category->intro = $_POST['intro'];
 			$category->save();
 			die('Showroom category updated.');
 		}

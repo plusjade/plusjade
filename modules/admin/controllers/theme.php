@@ -167,7 +167,7 @@ class Theme_Controller extends Controller {
 			die('You are in safe-mode. Cannot edit this theme.');
 			
 		$allowed = array('stylesheets', 'templates');
-		if(! in_array($type, $allowed) )
+		if(!in_array($type, $allowed))
 			die('invalid type');
 		
 		$primary	= new View("theme/$type");
@@ -177,14 +177,18 @@ class Theme_Controller extends Controller {
 		{
 			case 'templates':
 				$primary->templates = Jdirectory::contents("$theme_path/templates", 'root');
-				$primary->contents	= (file_exists("$theme_path/templates/master.html")) ?
-					file_get_contents("$theme_path/templates/master.html") : 'master.html not found' ;
+				$primary->contents	= 
+					(file_exists("$theme_path/templates/master.html")) 
+					? file_get_contents("$theme_path/templates/master.html") 
+					: 'master.html not found' ;
 				break;
 				
 			case 'stylesheets':
 				$primary->css_files = Jdirectory::contents("$theme_path/css");
-				$primary->contents	= (file_exists("$theme_path/css/global.css")) ?
-					file_get_contents("$theme_path/css/global.css") : 'global.css not found' ;			
+				$primary->contents	= 
+					(file_exists("$theme_path/css/global.sass"))
+					? file_get_contents("$theme_path/css/global.sass")
+					: 'global.sass not found' ;			
 				break;
 				
 			default:
@@ -226,15 +230,18 @@ class Theme_Controller extends Controller {
 		if(empty($file))
 			die('filename is required');
 			
-		$ext	= ('templates' == $folder) ? '.html' : '.css';
+		$ext	= ('templates' == $folder) ? '.html' : '.sass';
 		$file	= valid::filter_php_filename($file) . '%';
 		$file	= str_ireplace("$ext%", '', $file) . $ext;
 		
-		if(! file_exists($this->assets->themes_dir("$this->theme/$folder").$file) AND !isset($_POST['contents']) )
+		if(!file_exists($this->assets->themes_dir("$this->theme/$folder").$file) AND !isset($_POST['contents']) )
 			die('Invalid File');	
 
 		if($_POST)
-			die(self::parse_and_save($this->theme, $folder, $file, $_POST['contents']));
+		{
+			$dest = $this->assets->themes_dir("$this->theme/$folder/$file");
+			file_put_contents($dest, $_POST['contents']);
+		}
 	}
 
 	

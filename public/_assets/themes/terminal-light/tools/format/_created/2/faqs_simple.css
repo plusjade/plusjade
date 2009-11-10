@@ -1,0 +1,14 @@
+
+
+#format_wrapper_2{
+
+}
+	/*  --- faqs simple view  --- */
+#format_wrapper_2  dt.minus{
+	padding-left:20px;
+	background:transparent url('/_assets/tools/format/faq/delete.png') no-repeat 0% 50%;
+}
+#format_wrapper_2 dt.plus{
+	padding-left:20px;
+	background:transparent url('/_assets/tools/format/faq/add.png') no-repeat 0% 50%;
+}

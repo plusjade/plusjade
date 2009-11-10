@@ -108,6 +108,7 @@ $config['modules'] = array
 	MODPATH.'account',
 	MODPATH.'review',
 	MODPATH.'forum',
-	MODPATH.'newsletter'
+	MODPATH.'newsletter',
+	MODPATH.'sass'
 
 );

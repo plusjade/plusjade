@@ -6,7 +6,7 @@
 			files: <select name="files" class="files_list">
 				<?php
 				foreach($css_files as $file)
-					if('global.css' == $file)
+					if('global.sass' == $file)
 						echo "<option value=\"$file\" selected=\"selected\">$file</option>";
 					else
 						echo "<option value=\"$file\">$file</option>";
@@ -17,7 +17,6 @@
 		</div>	
 
 		<button class="show_theme_save jade_positive" rel="css" >Save as ...</button>
-		- <a href="#" class="show_orig">Reset</a>
 	</div>
 
 	<div class="common_full_panel" style="border:0;clear:both; margin:0;padding:0">
@@ -35,7 +34,7 @@
 				
 				<div>	
 					<h3><button class="new_theme_file jade_positive floatright" rel="css" >Save as New</button> As New</h3>
-					filename: <input type="text" name="new_file" class="auto_filename">.css
+					filename: <input type="text" name="new_file" class="auto_filename">.sass
 				</div>
 			</div>
 		</div>
@@ -44,17 +43,9 @@
 		<br/><textarea id="edit_css" name="contents" style="height:270px"><?php echo $contents?></textarea>
 
 	</div>
-		
-	<div id="stock_contents" style="display:none"><?php echo $contents?></div>
 </div>
 		
 
 <script type="text/javascript">	
-  // store the original
-	var original = $('textarea#edit_css').val();
-  // revert original css into the textarea
-	$('.show_orig').click(function(){
-		$('textarea#edit_css').val(original);
-		return false;
-	});
+
 </script>

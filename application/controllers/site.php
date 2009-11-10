@@ -23,7 +23,7 @@ class Site_Controller extends Controller {
 	2. in user panel for registered users.
  *
  */ 
-	public static function _create_website($site_name, $theme='base', $user_id=NULL)
+	public static function _create_website($site_name, $theme='base', $user_id=NULL, $email=NULL)
 	{
 		# Make sure the site_name is unique.
 		$site_name = valid::filter_php_url($site_name);	
@@ -53,9 +53,12 @@ class Site_Controller extends Controller {
 		# Establish user access and claim status.
 		if(empty($user_id))
 		{
-			# by cookie if no_register
-			cookie::set("unclaimed_$new_site->id", sha1("r-A-n_$new_site->id-D-o:m"));
-			$claimed = null;
+			# by given email address 
+			$claimed = $email;
+			
+				# by cookie if no_register
+				# cookie::set("unclaimed_$new_site->id", sha1("r-A-n_$new_site->id-D-o:m"));
+				# $claimed = null;
 		}
 		else
 		{
@@ -124,7 +127,7 @@ class Site_Controller extends Controller {
 		
 		
 		if(empty($user_id))
-			url::redirect("http://$site_name.". ROOTDOMAIN);
+			url::redirect("http://$site_name.". ROOTDOMAIN . "/get/admin?email=$email");
 		
 		return 'Website Created!';
 	}

@@ -24,11 +24,10 @@ class yaml_Core {
 */
 	public static function parse($site_name, $filename, $full_path=NULL)
 	{
-		if(NULL == $full_path)
+		if(empty($full_path))
 			$config_path = DATAPATH . "$site_name/protected/$filename.yml";
 		else
-			$config_path = DATAPATH . "$site_name/$full_path.yml";
-		
+			$config_path = DATAPATH . "$site_name/$full_path/$filename.yml";
 		
 		$yaml_array = array();
 		if('site_config' == $filename)

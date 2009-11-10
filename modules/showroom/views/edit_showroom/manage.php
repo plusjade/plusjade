@@ -117,15 +117,17 @@ $(document).ready(function()
 		},
 		
 		// edit active element
-		"a#edit_node": function(e){
+		"a#edit_node": function(e) {
 			var el_id = get_active_node();
 			if(! el_id ){alert('Select an item to edit.');return false}
 			else if(ROOT == el_id){alert('You cannot edit the root node.');return false}
-			var name = $('li span.active b').html();
-			var url = $('li span.active b').attr('rel');
-			$("input[name='edit_name']").val(name);
-			$("input[name='edit_url']").val(url);
-			$('#edit_category').show();
+
+			$.facebox(function(){
+				$.get('/get/edit_showroom/edit_category/' + el_id, 
+					function(data){$.facebox(data, false, "facebox_2");}
+				)
+			}, false, 'facebox_2');			
+			
 			return false;
 		},
 		
