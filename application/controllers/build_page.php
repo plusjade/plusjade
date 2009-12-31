@@ -5,33 +5,43 @@
  * this is the interface from which full html pages are sent to the browser.
  * data, css, js, and admin resources are all bundled up HERE for output.
  * 
+ * it also here where everything is cached and cache management happens in general.
  */
  
 class Build_Page_Controller extends Controller {
 
-	public $page_cache = FALSE;
-	# only set to false for debugging,
-	public $css_cache = false;
+	# currently non-protected pages can be fully cached.
+	# should only be set to false for debugging.
+	public $serve_page_cache;
+	public $reset_css_cache;
 	public $cache_dir;
 	public $cache_url;
+	public $tool_dir;
 	
 	function __construct()
 	{
 		parent::__construct();
+		# define settings
 		# $this->profiler = new Profiler;		
-		$this->template = new View('shell');	
+		$this->template		= new View('shell');
+		#$this->serve_page_cache	= Kohana::config('core.serve_page_cache');
+		#$this->reset_css_cache = Kohana::config('core.reset_css_cache');	
+		$this->serve_page_cache	= FALSE;
+		$this->reset_css_cache = FALSE;		
+		$this->cache_dir	=  $this->assets->themes_dir("$this->theme/cache");
+		$this->cache_url	= "/_data/$this->site_name/themes/$this->theme/cache";
+		$this->tool_dir		= $this->assets->themes_dir("$this->theme/tools");	
+
+		# make sure the cache dir exists.
+		if(!is_dir($this->cache_dir))
+			mkdir($this->cache_dir);
 			
-		$this->cache_dir =  $this->assets->themes_dir("$this->theme/cache");
-		$this->cache_url = "/_data/$this->site_name/themes/$this->theme/cache";
-		
 		# Global CSS 
-		# if global.css cache does not exist, create it.
-		if(!$this->css_cache OR !file_exists("$this->cache_dir/global.css"))
-		{
-			$css = new Css_Controller();
-			$css->master();
-		}
 		$this->template->linkCSS("$this->cache_url/global.css?v=1.0", 'global-sheet');
+		
+		# if global.css cache does not exist, create it.
+		if($this->reset_css_cache OR !file_exists("$this->cache_dir/global.css"))
+			$this->cache_global_css();
 	}
  
 /*
@@ -46,13 +56,27 @@ class Build_Page_Controller extends Controller {
 			Event::run('system.404');
 				
 		# can we serve a cached page?
-		if($this->page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
+		if($this->serve_page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
 		{
 			header('Content-Type: text/html; charset=iso-8859-1');
 			readfile(DATAPATH."$this->site_name/cache/$page->id.html");
 			die();
 		}
 			
+		$build_css = FALSE;
+		# do we have the cached page css?
+		if($this->reset_css_cache OR !file_exists("$this->cache_dir/$page->id.css"))
+		{
+			# parse custom page sass file if it exists.
+			$page_sass	= $this->assets->themes_dir("$this->theme/pages/$page->id.sass");
+			ob_start();
+			if(file_exists($page_sass))
+				echo Kosass::factory('compact')->compile(file($page_sass));
+			
+			$build_css = TRUE;
+		}
+
+	
 		$db	= new Database;
 		$data					= array(' ',' ',' ',' ',' ',' ');
 		$tools_array			= array();
@@ -68,7 +92,7 @@ class Build_Page_Controller extends Controller {
 		# Grab tools for this page referencing the pivot table: "pages_tools"
 		# 0-10 are reserved for global tools. we only use 1-5 
 		$tools = $db->query("
-			SELECT *, LOWER(system_tools.name) AS name, pages_tools.id AS instance_id
+			SELECT *, LOWER(system_tools.name) AS name, system_tools.protected, pages_tools.id AS instance_id
 			FROM pages_tools 
 			JOIN tools ON pages_tools.tool_id = tools.id
 			JOIN system_tools ON tools.system_tool_id = system_tools.id
@@ -85,8 +109,7 @@ class Build_Page_Controller extends Controller {
 		# plusjade rootsite account hook functionality
 		if(ROOTACCOUNT === $this->site_name)
 		{
-			# do we serve plusjade homepage?
-			# do we serve plusjade utada controller?
+			# does plusjade need anything special on this page?
 			if('start' == $page->page_name)
 			{
 				$home = new Home_Controller();
@@ -108,6 +131,7 @@ class Build_Page_Controller extends Controller {
 				$parent = ORM::factory($tool->name)
 					->where('fk_site', $this->site_id)
 					->find($tool->parent_id);	
+					
 				if($parent->loaded)
 				{
 					# If Logged in wrap classes around tools for Javascript
@@ -129,10 +153,27 @@ class Build_Page_Controller extends Controller {
 						);
 					}
 				
-					# build tool output
-					$tool_object  = $prepend;				
-					$tool_object .= Load_Tool::factory($tool->name)->_index($parent);
-					$tool_object .= $append;
+					# build tool output		
+					$tool_object = $prepend . Load_Tool::factory($tool->name)->_index($parent) . $append;
+				
+					# if we need to build the page_css file get the tool css.
+					if($build_css)
+					{
+						# Is tool protected?
+						if('yes' == $tool->protected)
+						{
+							# does a theme css template exist?
+							$theme_templates	= $this->assets->themes_dir("$this->theme/css/tool_templates");
+							#$templates = yaml::parse($this->site_name, 'config', "themes/$this->theme/css/tool_templates");
+							if(file_exists("$theme_templates/{$parent->type}_$parent->view.sass"))
+								echo Kosass::factory('compact')->compile(file("$theme_templates/{$parent->type}_$parent->view.sass"));
+						
+						}
+						# does custom css file exist for tool?
+						$custom_file = "$this->tool_dir/$tool->name/$tool->parent_id/{$parent->type}_$parent->view.css";
+						if(file_exists($custom_file))
+							readfile($custom_file);
+					}
 				}
 				elseif($this->client->can_edit($this->site_id))
 				{
@@ -149,22 +190,18 @@ class Build_Page_Controller extends Controller {
 			}
 		}
 		
-		# Drop Tool array into admin Panel if logged in
+		# cache the css for this page if set.
+		if($build_css)
+			file_put_contents("$this->cache_dir/$page->id.css", ob_get_clean());
+		
+		# Tool array into admin Panel if logged in
 		if($admin_mode)
-		{
 			$this->template->set_global('tools_array', $tools_array);
-		}
 		else
 		{
 			# load page css with tool css instances.
-			# if {page_id}.css cache does not exist, create it.
-			if(!$this->css_cache OR !file_exists("$this->cache_dir/$page->id.css"))
-			{
-				$css = new Css_Controller();
-				$css->page($page->id);
-			}
 			$this->template->linkCSS("$this->cache_url/$page->id.css?v=1.0");
-		
+
 			# load the global javascript.
 			$this->template->admin_linkJS('get/js/live?v=1.0');
 			
@@ -179,17 +216,12 @@ class Build_Page_Controller extends Controller {
 		# Renew Javascript file requests
 		unset($_SESSION['js_files']);	
 	
-		# Can we cache this page?
-		# TODO need a good way to properly regulate this.
+		# Should we cache this page?
+		# always cache IF no existing cache, live and non-protected page
 		$cache = FALSE;
 		if(!$this->client->can_edit($this->site_id) AND !file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
 			if(FALSE === yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
-			{
-				if(!is_dir(DATAPATH . "$this->site_name/cache"))
-					mkdir(DATAPATH . "$this->site_name/cache");
-					
 				$cache = $page->id;
-			}
 		
 		$this->wrapper($data, $page->template, $cache);
 	}
@@ -209,7 +241,7 @@ class Build_Page_Controller extends Controller {
 		$this->template->set_global('title', 'Page Not Found.');
 		
 		# can we serve the cached 404 page?
-		if($this->page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/404_not_found.html"))
+		if($this->serve_page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/404_not_found.html"))
 		{
 			header('Content-Type: text/html; charset=iso-8859-1');
 			readfile(DATAPATH."$this->site_name/cache/404_not_found.html");
@@ -224,7 +256,7 @@ class Build_Page_Controller extends Controller {
 
 /*
  * data is composed of tools data sent from build_page.php or other admin data
- * from auth/utada.php that needs to be wrapped in a theme-based shell.	
+ * from utada controller that needs to be wrapped in a theme-based shell.	
  * the final step for the plusjade pages. inputs $data into the site template.
  * expects a an array matching the appropriate containers
  * $exists = does this page exist? set to false for 404 not found wrapper.
@@ -232,8 +264,8 @@ class Build_Page_Controller extends Controller {
 	private function wrapper($data, $template, $cache=FALSE, $exists=TRUE)
 	{
 		$banner		= View::factory('_global/banner');
-		$menu		= View::factory('_global/menu');
-		$path		= $this->assets->themes_dir("$this->theme/templates");
+		$menu			= View::factory('_global/menu');
+		$path			= $this->assets->themes_dir("$this->theme/templates");
 		$template = (empty($template)) ? 'master' : $template;
 		
 		ob_start();
@@ -309,7 +341,10 @@ class Build_Page_Controller extends Controller {
 			$date = date('m.d.y g:ia e');
 			if(!is_dir(DATAPATH . "$this->site_name/cache"))
 				mkdir(DATAPATH . "$this->site_name/cache");
-			file_put_contents(DATAPATH . "$this->site_name/cache/$cache.html", $this->template->render() . "\n<!-- cached $date -->");
+			file_put_contents(
+				DATAPATH . "$this->site_name/cache/$cache.html",
+				$this->template->render() . "\n<!-- cached $date -->"
+			);
 		}
 		
 		die($this->template);		
@@ -321,71 +356,104 @@ class Build_Page_Controller extends Controller {
  */ 
 	private function load_admin($page_id, $page_name)
 	{	
-		if($this->client->can_edit($this->site_id))
-		{			
-			# load admin global css and javascript.
-			if(!$this->css_cache OR !file_exists(DOCROOT . '_assets/css/admin.css'))
-			{
-				$css = new Css_Controller();
-				$css->admin();
-			}
-			$this->template->linkCSS('/_assets/css/admin.css');
-			$this->template->admin_linkJS('get/js/admin?v=1.1');
-
-			# get list of protected tools to compare against so we can omit scope link			
-			$protected_tools = ORM::factory('system_tool')
-				->where('protected', 'yes')
-				->find_all();
-			$protected_array = array();
-			foreach($protected_tools as $tool)
-				$protected_array[] = $tool->id;
-
-			# Log in the $account_user admin account.
-			#if(!$this->account_user->logged_in($this->site_id))
-			#	$this->account_user->force_login('admin', (int)$this->site_id);
+		if(!$this->client->can_edit($this->site_id))
+			return FALSE;
 			
-			
-			# is this website claimed?
-			$days	= 0;
-			$hours	= 0;
-			$mins	= 0;
-			/*
-			if(empty($this->claimed) AND !empty($_SESSION['created']))
+		# load admin global css and javascript.
+		if(!file_exists(DOCROOT . '_assets/css/admin.css'))
+		{
+			$css = new Css_Controller();
+			$css->admin();
+		}
+		$this->template->linkCSS('/_assets/css/admin.css');
+		$this->template->admin_linkJS('get/js/admin?v=1.1');
+
+		# get list of protected tools to compare against so we can omit scope link			
+		$protected_tools = ORM::factory('system_tool')
+			->where('protected', 'yes')
+			->find_all();
+		$protected_array = array();
+		foreach($protected_tools as $tool)
+			$protected_array[] = $tool->id;
+
+		# Log in the $account_user admin account.
+		#if(!$this->account_user->logged_in($this->site_id))
+		#	$this->account_user->force_login('admin', (int)$this->site_id);
+		
+		
+		# is this website claimed?
+		$days	= 0;
+		$hours	= 0;
+		$mins	= 0;
+		/*
+		if(empty($this->claimed) AND !empty($_SESSION['created']))
+		{
+			$expires = $_SESSION['created'] + (86400*7);
+			$diff = $expires - time();
+			if($diff > 0)
 			{
-				$expires = $_SESSION['created'] + (86400*7);
-				$diff = $expires - time();
+				$days = floor($diff/86400);
+				$diff = $diff - ($days*86400);
 				if($diff > 0)
 				{
-					$days = floor($diff/86400);
-					$diff = $diff - ($days*86400);
+					$hours = floor($diff/3600);
+					$diff = $diff - ($hours*3600);
 					if($diff > 0)
-					{
-						$hours = floor($diff/3600);
-						$diff = $diff - ($hours*3600);
-						if($diff > 0)
-							$mins = floor($diff/60);
-					}
+						$mins = floor($diff/60);
 				}
 			}
-			*/
-			
-			# activate admin_panel view.
-			$this->template->admin_panel =
-				view::factory(
-					'admin/admin_panel',
-					array(
-						'protected_array'	=> $protected_array,
-						'page_id'			=> $page_id,
-						'page_name'			=> $page_name,
-						'global_css_path'	=> "/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-",
-						'expires'			=> array('days' => $days, 'hours' => $hours, 'mins' => $mins)
-					)
-				);
-			return TRUE;
 		}
-		return FALSE;
+		*/
+		
+		# activate admin_panel view.
+		$this->template->admin_panel =
+			view::factory(
+				'admin/admin_panel',
+				array(
+					'protected_array'	=> $protected_array,
+					'page_id'					=> $page_id,
+					'page_name'				=> $page_name,
+					'global_css_path'	=> "/_data/$this->site_name/themes/$this->theme/css/global.css?v=23094823-",
+					'expires'					=> array('days' => $days, 'hours' => $hours, 'mins' => $mins)
+				)
+			);
+		return TRUE;
 	}
 
+	
+
+	
+/*
+ * build a new global css for the website
+ * generate everything as new and overwrite the current cache.
+ * outputs css and saves as global.css in the theme cache folder.
+ */
+	private function cache_global_css()
+	{
+		ob_start();
+		# get the global sass file.
+		$global_sass	= $this->assets->themes_dir("$this->theme/css/global.sass");
+		if(file_exists($global_sass))
+			echo Kosass::factory('compact')->compile(file($global_sass));
+		
+		# add the static helpers.
+		$static_helpers = DOCROOT . '_assets/css/static_helpers.css';
+		if (file_exists($static_helpers))
+			readfile($static_helpers);	
+			
+		# Load any tool-css needed for javascript functionality.
+			# provide a way to automatically load stuff based on tool config file?
+			# for now the only instance is the lightbox css.
+			# so blah just always load it.
+		if(file_exists(DOCROOT . "_assets/js/lightbox/style.css"))
+			readfile(DOCROOT . "_assets/js/lightbox/style.css");
+	
+		# cache the full result as the live global css file.
+		file_put_contents("$this->cache_dir/global.css", ob_get_clean());
+		
+		return TRUE;
+	}
+	
 	
 }
 /* -- end of application/controllers/build_page.php -- */

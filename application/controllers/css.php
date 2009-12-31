@@ -36,6 +36,7 @@ class Css_Controller extends Controller {
 		if(file_exists($global_sass))
 			echo Kosass::factory('compact')->compile(file($global_sass));
 		
+		/*
 		# attempt to get the theme templates for tools.
 		$theme_templates	= $this->assets->themes_dir("$this->theme/css/tool_templates");
 		
@@ -48,7 +49,7 @@ class Css_Controller extends Controller {
 				if('yes' == $add AND file_exists("$theme_templates/$file.sass"))
 					echo Kosass::factory('compact')->compile(file("$theme_templates/$file.sass"));
 		}
-		
+		*/
 		# add the static helpers.
 		$static_helpers = DOCROOT . '_assets/css/static_helpers.css';
 		if (file_exists($static_helpers))
@@ -175,48 +176,8 @@ class Css_Controller extends Controller {
 	}
 
 	
-	public function update()
-	{
-		$sites = ORM::factory('site')->find_all();
-		foreach($sites as $site)
-		{
-			# $theme_dir = $this->assets->themes_dir();
-			$theme_dir = DATAPATH . "$site->subdomain/themes";
 
-			$themes = Jdirectory::contents($theme_dir,'root', 'list_dir'); 	
-			foreach($themes as $theme)
-			{
-				$tool_dir = "$theme_dir/$theme/tools";
-				if(!is_dir($tool_dir))
-					continue;
-				$toolnames = Jdirectory::contents($tool_dir,'root', 'list_dir'); 
-				foreach($toolnames as $toolname)
-				{
-					$created = "$theme_dir/$theme/tools/$toolname/_created";
-					if(!is_dir($created))
-						continue;
-					
-					$instances = Jdirectory::contents($created,'root', 'list_dir');
-					foreach($instances as $instance)
-					{
-						$path = "$theme_dir/$theme/tools/$toolname/_created/$instance";
-						if(is_dir($path))
-						{
-							rename($path, "$theme_dir/$theme/tools/$toolname/$instance");
-						}		
-					}
-					if(is_dir($created))
-					rmdir($created);	
-				}
-			
-			}
-		}
-		echo 'done';
-		die();
-		
-		
-		echo kohana::debug($themes);die();
-	}
+	
 	
 }
 

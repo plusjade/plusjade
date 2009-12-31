@@ -28,6 +28,7 @@
 <div id="master_wrapper">
 
 	<ul class="common_tabs_x ui-tabs-nav">
+		<li><a href="/get/utada/settings">Settings</a></li>
 		<li><a href="/get/utada/all_users">All Users</a></li>	
 		<li><a href="/get/utada/all_sites">All Websites</a></li>	
 		<li><a href="/get/utada/clean_db">Clean Database</a></li>	

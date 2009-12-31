@@ -32,6 +32,33 @@ class Utada_Controller extends Controller {
 	}
 	
 	
+
+/*
+ * display and handle plusjade settings
+ */	
+	public function settings()
+	{
+		if($_POST)
+		{
+			# DOESNT WORK. "have to set at runtime ??"
+			# defaults should be "true".
+			$page_cache = (isset($_POST['serve_page_cache']) AND 'no' == $_POST['serve_page_cache'])
+				? FALSE
+				:	TRUE;
+			$css_cache = (isset($_POST['reset_css_cache']) AND 'no' == $_POST['reset_css_cache'])
+				? FALSE
+				:	TRUE;				
+				
+			#Kohana::config_set('core.serve_page_cache', $page_cache); 
+			#Kohana::config_set('core.reset_css_cache', $css_cache); 
+			
+			die('settings updated.');
+		}
+		
+		$view = new View('utada/settings');
+		die($view);
+	}
+
 	
 /*
  * Display all users with attached websites.
@@ -198,7 +225,7 @@ class Utada_Controller extends Controller {
  * And must have id field named "id"
  * Only one exception @ pages_tools where id = guid
  */
-	function clean_db()
+	public function clean_db()
 	{
 		$db = new Database;
 		$primary = new View('utada/clean_db');
@@ -275,5 +302,102 @@ class Utada_Controller extends Controller {
 		die($primary);
 	}
 	
+/*
+ * clears all full-page caches from every site on plusjade.
+ * useful for when we make updates that may alter links, or views. etc.
+ */
+	public function clear_all_cache()
+	{
+		$sites = ORM::factory('site')->find_all();
+		$x = 0;
+		foreach($sites as $site)
+		{
+			$cache_dir = DATAPATH ."$site->subdomain/cache";
+			if(is_dir($cache_dir))
+				Jdirectory::remove($cache_dir);	
+			mkdir($cache_dir);
+			++$x;
+		}
+		die("Page cache cleared from <b>$x</b> sites.");
+	}
+	
+	
+/*
+ * clears all full-page caches from every site on plusjade.
+ * useful for when we make updates that may alter links, or views. etc.
+ */
+	public function clear_all_css()
+	{
+		$sites = ORM::factory('site')->find_all();
+		$x = 0;
+		foreach($sites as $site)
+		{
+			$theme_dir = DATAPATH . "$site->subdomain/themes";
+			$themes = Jdirectory::contents($theme_dir,'root', 'list_dir'); 
+			foreach($themes as $theme)
+			{
+				$cache_dir = "$theme_dir/$theme/cache";
+				if(is_dir($cache_dir))
+					Jdirectory::remove($cache_dir);	
+				mkdir($cache_dir);			
+			}
 
+			++$x;
+		}
+		die("CSS cache cleared from <b>$x</b> sites.");
+	}	
+	
+	
+	
+/*
+	# turning this off but keeping the logic.
+	useful function which moved tool custom css files for all sites
+	to their new location.
+	*/
+	private function update()
+	{
+		$sites = ORM::factory('site')->find_all();
+		foreach($sites as $site)
+		{
+			# $theme_dir = $this->assets->themes_dir();
+			$theme_dir = DATAPATH . "$site->subdomain/themes";
+
+			$themes = Jdirectory::contents($theme_dir,'root', 'list_dir'); 	
+			foreach($themes as $theme)
+			{
+				$tool_dir = "$theme_dir/$theme/tools";
+				if(!is_dir($tool_dir))
+					continue;
+				$toolnames = Jdirectory::contents($tool_dir,'root', 'list_dir'); 
+				foreach($toolnames as $toolname)
+				{
+					$created = "$theme_dir/$theme/tools/$toolname/_created";
+					if(!is_dir($created))
+						continue;
+					
+					$instances = Jdirectory::contents($created,'root', 'list_dir');
+					foreach($instances as $instance)
+					{
+						$path = "$theme_dir/$theme/tools/$toolname/_created/$instance";
+						if(is_dir($path))
+						{
+							rename($path, "$theme_dir/$theme/tools/$toolname/$instance");
+						}		
+					}
+					if(is_dir($created))
+					rmdir($created);	
+				}
+			
+			}
+		}
+		echo 'done';
+		die();
+		
+		
+		echo kohana::debug($themes);die();
+	}
+	
+
+	
+	
 } # End Utada Master Controller

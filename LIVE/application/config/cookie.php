@@ -6,7 +6,8 @@
  * you are encouraged to set this option. An empty setting allows the cookie
  * to be read by any website domain.
  */
-$config['domain'] = '.plusjade.com';
+$config['domain'] = '';
+#$config['domain'] = '.localhost.com';
 
 /**
  * Restrict cookies to a specific path, typically the installation directory.

@@ -273,7 +273,6 @@ class Kosass_Core
 		# get the first character on this line.
 		$line = trim($line);
 		$first = substr($line, 0, 1); 
-		#echo $first; die();
 
 		# this means we are parsing data within a mixin definition.
 		if ($this->in_mixin)
@@ -468,23 +467,30 @@ class Kosass_Core
 	 */
 	private function attribute()
 	{
-		# split the attribute on the ":"
-		preg_match('/:?([\w-]+?) *[ |:|=] *(.+)$/', $this->line, $m);
+		#echo kohana::debug($this->line);die();
+		$parsed_line = $this->parse_value($this->line);
+		#echo $parsed_line ;die();
+		
+		# split the attribute intelligently. can be :, =, etc.
+		# TODO: optimize this, it only accepts words, which i guess it shoud?
+		preg_match('/:?([\w-]+?) *[ |:|=] *(.+)$/', $parsed_line, $m);
+		#preg_match('/:?([\w-]+?) *[ |:|=] *(.+)$/', $this->line, $m);
 		
 		# if $m is not formatted correctly throw error.
 		if(empty($m) OR empty($m[1]))
 			$this->raise_error('improperly formed attribute line.');
+		
 
 		// parse content for constants.
-		$value = trim($this->parse_value($m[2]));
+		#$value = trim($this->parse_value($m[2]));
 		
 		# output line based on style.
 		if('nested' == $this->style)
-			$this->line = $this->indent . $m[1] . ': ' . $value . ';';
+			$this->line = $this->indent . $m[1] . ': ' . $m[2] . ';';
 		elseif('expanded' == $this->style)
-			$this->line = '  ' . $m[1] . ': ' . $value . ';';
+			$this->line = '  ' . $m[1] . ': ' . $m[2] . ';';
 		else
-			$this->line = $m[1] . ':' . $value . '; ';		
+			$this->line = $m[1] . ':' . $m[2] . '; ';		
 
 	}
 
@@ -503,12 +509,9 @@ class Kosass_Core
 	private function parse_value($value)
 	{
 		// if equal sign not present no need to check for constants
-		if (($this->skip) OR (!strpos($this->line, '=')))
+		if (($this->skip) OR ((!strpos($this->line, '=')) AND (!strpos($this->line, '{'))))
 			return $value;
-		
-		
-		
-		
+
 		
 		// set class variable value
 		$this->value = $value;
@@ -517,17 +520,31 @@ class Kosass_Core
 		// set for nested after
 		$this->nested_value = $this->value;
 		// check for nested () and process
+		
+		# omit the paranthesis cuz it conflicts with background: url ()
+		/*
 		while (strpos($this->value, '(') !== FALSE)
 		{
 			$this->process_nested();
 			// update nested value
 			$this->nested_value = $this->value;
 		}
-		
+		*/
+		# causes conflict with - in attribute settings eg: repeat-x
+		/*
 		// search for arithmetic
 		if (preg_match('/%|\*|\/|\+|\-/', $this->value))
 		{
 			$this->value = $this->arithmetic($this->value);
+		}
+		*/
+		
+		
+		# get rid of the interpolation markers.
+		$this->value = str_replace('}','', $this->value, $match);
+		if(0 < $match)
+		{
+			$this->value =str_replace('#{','', $this->value);
 		}
 		
 		return $this->value;
@@ -546,6 +563,8 @@ class Kosass_Core
 		// compile replacements
 		foreach ($c[1] as $constant)
 		{
+			if('important' == $constant)
+				continue;
 			// add rule for find and replace then do it
 			$find[] = '!'.$constant;
 			$replace[] = $this->constants[$constant];

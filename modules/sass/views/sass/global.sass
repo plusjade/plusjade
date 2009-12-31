@@ -1,173 +1,367 @@
 
 
-!image_path = ../images
-!judo = TEE-HEEE!
+!img_path = /_data/larasgift/themes/chocolate/images
+!main_font = tahoma,Arial,Helvetica,sans-serif
+// this is the main blue text for our theme.
+!blue_text = #52bbe2
 
-html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre,a, abbr, acronym, address, big, cite, code,del, dfn, em, font, img, ins, kbd, q, s, samp,small, strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt, dd, ol, ul, li,fieldset, form, label, legend,table, caption, tbody, tfoot, thead, tr, th, td 
-  margin: 0
-  padding: 0
-  border: 0
-  outline: 0
-  font-size: 100%
-  vertical-align: baseline
-  background: transparent
-  font-family:"Gill Sans MT",verdana,sans-serif
-  color:#ddd
-  font-weight:normal
-body
-	lala = !judo
-  line-height: 1
-  font-size:14px
-  background:#2b1f11 url('=!image_path/bg_grunge.jpg') repeat-x fixed center 46px
-  
-ol, ul 
-  list-style: none
-blockquote, q 
-  quotes: none
-blockquote:before, blockquote:after, q:before, q:after 
-    content: ''
-    content: none
-
-// remember to define focus styles!
-//:focus
-//  outline: 0
-// remember to highlight inserts somehow!
-ins 
-  text-decoration: none
-del 
-  text-decoration: line-through
-
-// tables still need 'cellspacing="0"' in the markup
-table 
-  border-collapse: collapse
-  border-spacing: 0
-
-//******General Elements***
-
+body 
+  font: 12px #{!main_font}
+  line-height: 1.5em
+  margin: 0px
+  padding: 0px
+  color: #241a10
+  background:#000000 url(#{!img_path}/page_bg.gif)
 a
-  color:#eee
-  text-decoration:none
-  font-style:italic
-  &:hover
-    color:#fff
-    text-decoration:underline
-strong
-  color:#fff
-  font-weight:bold
-em
-  color:#fff
-  font-style:italic
-h1
-  font-size:36px
-  margin:20px 0
-h2
-  font-size:30px
-  margin:15px 0
-h3
-  font-size:24px
-  margin:10px 0
-p
-  font-size:15px
-  line-height:23px
-img
-  margin:0
-  padding:0
-img.left
+  color: #605646
+  &:link, &:active, &:visited
+    color: #605646
+  &:hover 
+    text-decoration:none
+#page_bg 
+  background:url(#{!img_path}/ribbon.gif) no-repeat center 88px
+#container 
+  width:850px
+  margin: 20px auto
+  padding:0px
+#header 
+  height: 88px
+  padding: 0px
+  background:url(#{!img_path}/header_bg.jpg) no-repeat top left
+#header_logo 
   float:left
-  margin:15px 15px 15px 0
-  padding:2px
-img.right
+  margin:10px 0px 0px 35px
+#header_number 
+  padding:7px 0
   float:right
-  margin:15px 0 15px 15px
-  padding:2px
-ul
-  margin:10px 0
-  list-style:disc inside none
-  li
-    padding:4px 0
-ol
-  margin:10px 0
-  list-style:decimal inside none
-  li
-    padding:4px 0
-blockquote
-  margin:10px 0
-  border-top:1px dashed #444
-  border-bottom:1px dashed #444
-  padding:4px 0
-
-// fixed keeps the header attached to top of the window
-#header
-  background:url('../images/nav_bg.jpg') repeat-x center top
-  -moz-background-clip:border
-  -moz-background-inline-policy:continuous
-  -moz-background-origin:padding
-  height:46px
-  position:fixed
-  top:0
-  left:0
-  width:100%
-  z-index:999
-#logo
+  margin:25px 25px 0px 0px
+  color:#fee1b7
+  font-size:22px
+  letter-spacing:2px
+#mainContent 
+  padding:0px
+  background:#f2ede7 url(#{!img_path}/body_top_shadow.jpg) repeat-x top left
+  min-height:400px
+#left_side 
+  width:142px
   float:left
+  margin-left:6px
+#right_side 
+  width:666px
+  float:right
+  margin-right:10px
   margin-top:10px
-#MAIN_MENU
+  padding-bottom:30px
+.inner_right 
   float:right
-  ul
-    list-style-type:none
-    margin:0
-    li
+  width:160px
+  height:300px
+  padding:4px 0 0 7px
+#footer 
+  padding: 10px
+  height:15px
+  margin:0px auto
+  clear:both
+  font-size:10px
+  color:#7e6f4e
+  font-family:Verdana, Arial, Helvetica, sans-serif
+  a
+    color: #7e6f4e
+    text-decoration:none
+    &:hover 
+      color: #fff
+      text-decoration:underline
+    &:active 
+      color: #f8e6e6
+      text-decoration:none
+#MAIN_MENU 
+  height:44px
+  ul  
+    float:right
+    position:relative
+    z-index:30
+    margin:2px 50px 0 0
+    padding:0
+    li 
       float:left
-      line-height:13px
-      padding:0 0px
+      list-style:none
+      display:inline
+      margin:0 0 0 0px
+      padding:0
+      a
+        float:left
+        color:#241a10
+        padding:12px 16px
+        display:block
+        text-decoration:none
+        font:13px #{!main_font}
+        text-transform:uppercase
+        border-right:1px solid #ba8f4d
+        &:hover
+          color:#FFFFFF
+          background-color:#ba8f4d
+    li.last a
+      border-right:0
+    li a.selected, li.hover a, a.active
+      color:#FFFFFF
+      background-color:#ba8f4d
+    &:hover
+      position:relative
+      color:#FFFFFF
+      a
+        color:#FFFFFF
+        background-color:#ba8f4d
+        background:#926d3d
+      ul.second-level
+        display:block
+    li.hover
+      position:relative
+      color:#FFFFFF
+      background:#926d3d
+    li.hover ul.second-level
+      display:block
+    ul.second-level 
+      position:absolute
+      top:40px
+      left:-1px
+      margin:0
+      padding:0
+      width:160px
+      display:none
+      background-color:#ba8f4d
+      li
+        width:160px
+        margin:0
       a
         display:block
-        font-size:14px
-        margin:0
-        padding:16px 20px
-        text-decoration:none
-        font-style:normal
-      a:hover, a.selected
-        background-color:#2B1F11
-#content
-  position:relative
-  min-height:600px
-  margin-top:100px
-#footer
-  background:url('../images/footer_copyright-trans.png') no-repeat
-  -moz-background-clip:border
-  -moz-background-inline-policy:continuous
-  -moz-background-origin:padding
-  height:29px
-  position:fixed
-  bottom:0
-  left:0
-  width:196px
-  z-index:999
-  span
+        float:none
+        width:140px
+        border-top: 1px solid #926d3d
+        border-right:0
+        padding:4px 10px
+        background:none
+        font:12px/20px #{!main_font}
+        color:#241a10
+.tag 
+  background:url(#{!img_path}/tag_bottom.gif) no-repeat 0px bottom
+  width:148px
+  margin-bottom:20px
+  padding-bottom:30px
+  p 
+    padding:0px 5px
+  ul 
+    padding:0 0 13px 0
+    margin:0px
+  li 
+    list-style:none
+    padding:0 0 0 6px
+    margin:0px 0px 0px 8px
+    line-height:22px
+    background:url(#{!img_path}/tag_line.gif) no-repeat 0 bottom
+  a
+    background:url(#{!img_path}/tag_icon.gif) no-repeat left
     display:block
-    text-indent:-9999px
-    font-size:1%
-// Common Classes
-.left
+    padding:0px 0 2px 12px
+    color:#644d38
+    text-decoration:none
+    font-family = !main_font
+    font-size:13px
+    font-weight:bold
+    &:hover 
+      text-decoration:underline
+      color:#605646
+#search_box 
+  width:142px
+  height:30px
+  margin:0 0 16px 3px
+  input 
+    font-family:"Times New Roman", Times, serif
+    font-size:12px
+    color:#605646
+  p
+    padding:0px 5px
+#search_box_inner 
+  margin-left:0px
+  padding:0px
+  width:105px
+  height:21px
   float:left
-.right
-  float:right
-.border
-  border:1px #ccc solid
-  padding:2px
-.center
-  width:950px
-  margin:0 auto
-  background-color:transparent
+#search_query 
+  border:0px
+  padding:3px 0px 0px 6px
+  margin:0px 0px 0px 5px
+  background:url(#{!img_path}/search.gif) no-repeat left
+  width:105px
+  height:20px
+#search_box_go 
+  float:left
+  padding-top:0px
+#shopping_cart_summary 
+  background:url(#{!img_path}/we_accept.gif) no-repeat
+  width:142px
+  height:71px
+  color:#8f6637
+  padding:24px 0 0 0
+  font-family = !main_font
+  font-size:11px
+  margin:0 0 0 4px
+  div
+    text-align:center
+  a
+    color:#8f6637
+    text-decoration:none
+    &:hover 
+      color:#8f6637
+      text-decoration:underline
+h1, h1, h3, h4, h5
+  font-family:Georgia, "Times New Roman", Times, serif
+h1 
+  font-size:18px
+  color:#241a10
+  font-weight:normal
+h2 
+  font-size:16px
+  color:#936a39
+  font-weight:normal
+h3 
+  font-size:14px
+  color:#634f34
+h4 
+  font-size:12px
+  color:#634f34
+form 
+  margin:0px
+  padding:0px
+.image_border 
+  border: 1px solid #dfd0be
+  margin: 3px 10px
+  padding: 3px
+hr 
+  border: 0
+  color: #dfd0be
+  background-color: #dfd0be
+  height: 1px
+  width: 100%
+  text-align: left
+  clear:both
+hr.clear 
+  margin-top:10px
+  margin:0px
+  clear:both
+  visibility:hidden
+.size9 
+  font-size:9px
+.size10 
+  font-size:10px
+.size11 
+  font-size:11px
+.size12 
+  font-size:12px
+.size14 
+  font-size:14px
+.size20 
+  font-size:20px
+.size22 
+  font-size:22px
+.slide 
+  width:666px
+  height:226px
+ul.ticklist 
+  padding:0px 0px 0px 15px
+  li 
+    list-style:none
+    background:url(#{!img_path}/icon_tick.gif) no-repeat left 3px
+    margin:0px 0px 5px 0px
+    padding:0px
+    padding-left:20px
+    line-height:normal
+//*About Page*/
+.service_table td 
+  padding:3px 8px
+  color:#624f34
+  font-size:12px
+  height:28px
+//*top row of the table*/
+th
+  background-color:#dfd0be
+  color:#FFFFFF
+  font-weight:bold
+  border-bottom:1px solid #ffffff
+  height:28px
+.row1 
+  background-color:#f7f3ed
+.row2 
+  background-color:#FFFFFF
+//*140px minus padding*/
+.product_box 
+  width:132px
+  height:137px
+  float:left
+  background-color:#FFFFFF
+  border:1px solid #e2dacf
+  padding:4px
+  margin:0px 9px 25px 9px
+  text-align:center
+  font-family:"Times New Roman", Times, serif
+  font-size:13px
+  p
+    margin:0px
+    padding:0px 0px 5px 0px
+#tag_top
   position:relative
-.title
-  font-size:36px
-  color:#fff
-  width:700px
-  line-height:1.5em
-.subtitle
-  font-size:30px
-  color:#fff
-  margin:30px 0
-  line-height:1.5em
+  margin-top:-47px
+  width:147px
+  height:93px
+  background:url(#{!img_path}/tag_top.gif)
+//*Contact Page*/
+.left_details 
+  float:left
+  width:190px
+.photo_contact 
+  width:470px
+  height:320px
+  float:right
+iframe
+  width:470px
+  height:320px
+  overflow-x: hidden
+  border:0
+.contact_title 
+  color:#936a39
+  font-weight:bold
+  float:left
+  width:70px
+.contact_detail 
+  float:left
+  width:100px
+  clear:right
+//*the important gets rid of the yellow google toolbar field style*/
+.forms 
+  background-color:#FFFFFF !important
+  border:1px solid #dfd0be !important
+  margin:3px 0px
+  padding:4px
+.brown 
+  color:#936a39
+#contact 
+  border:0
+  width:480px
+  label 
+    float:left
+    width:80px
+    margin-right:15px
+    clear:left
+    color:#936a39
+    font-weight:bold
+    text-align:right
+    height:32px
+  input, textarea 
+    margin-right:40px
+  #submit 
+    clear:left
+    margin-left:95px
+div.ajax_loading
+  text-align:center !important
+  background: transparent url('#{!img_path}/ajax-load.gif') no-repeat 50% 50% !important
+  width:100% !important
+  height:90px !important

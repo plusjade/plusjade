@@ -65,7 +65,7 @@ class Site_Controller extends Controller {
 			# or by user_id if user is registered.
 			$new_site->add(ORM::factory('account_user', $user_id));
 			$new_site->claimed = 'yes';
-			$claimed = 'TRUE';			
+			$claimed = 'true';			
 		}
 
 		# save the site.

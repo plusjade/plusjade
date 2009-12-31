@@ -15,7 +15,7 @@ fieldset label .jade_required_star { font-weight:bold; color:red;}
 fieldset span.error_msg{ display:block; color:red;}
 /* return form results status box */
 div.jade_form_status_box{font-weight:bold; color:#000; font-size:1.2em; margin-bottom:10px; padding:10px; text-align:center; }
-div.jade_form_status_box.box_positive{background:lightgreen; border:1px solid green;}
+div.jade_form_status_box.box_positive{background:green; border:1px solid green;}
 div.jade_form_status_box.box_negative{background:#fad6d6; border:1px solid #cc0000;}
 div.jade_form_status_box div.error_count { }
 div.ajax_loading{ width:100%; height:90px; background: transparent url('/_assets/images/admin/load.gif') no-repeat 50% 50%; text-align:center;}
