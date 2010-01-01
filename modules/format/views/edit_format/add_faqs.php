@@ -1,7 +1,7 @@
 
 <span class="on_close"><?php echo $js_rel_command?></span>
 
-<form action="/get/edit_format/add/<?php echo $parent_id?>" method="POST" class="ajaxForm">	
+<form action="/get/edit_format/add?pid=<?php echo $this->pid?>" method="POST" class="ajaxForm">	
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_images" class="jade_positive">Add Question</button>

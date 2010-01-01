@@ -18,7 +18,7 @@ $generic = array(
 ?>
 <span class="on_close"><?php echo $js_rel_command?></span>
 
-<form action="/get/edit_format/add/<?php echo $parent_id?>" method="POST" class="custom_ajaxForm">	
+<form action="/get/edit_format/add?pid=<?php echo $this->pid?>" method="POST" class="custom_ajaxForm">	
 	<input type="hidden" name="meta" value="">
 	
 	<div id="common_tool_header" class="buttons">

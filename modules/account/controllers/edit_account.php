@@ -1,79 +1,75 @@
-<?php
-
-class Edit_Account_Controller extends Edit_Tool_Controller {
-
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 /*
  * control how account tool functions.
  */
-	function __construct()
-	{
-		parent::__construct();	
-	}
-	
+class Edit_Account_Controller extends Edit_Tool_Controller {
+
+  function __construct()
+  {
+    parent::__construct();  
+  }
+
+  
 /*
  * manage user accounts
  */
-	public function manage($id=NULL)
-	{
-		$primary = new View("edit_account/manage");
-		$primary->users = ORM::factory('account_user')
-							->where('fk_site', $this->site_id)
-							->find_all();
-		die($primary);
-	}
+  public function manage($id=NULL)
+  {
+    $view = new View("edit_account/manage");
+    $view->users = ORM::factory('account_user')
+              ->where('fk_site', $this->site_id)
+              ->find_all();
+    die($view);
+  }
 
+  
+  
 /*
  * get a singular view of a user.
- */	
-	function user($user_id=NULL)
-	{
-		valid::id_key($user_id);
-		$account_user = ORM::factory('account_user', $user_id);
+ */  
+  public function user()
+  {
+    $account_user = $this->get_item('account_user');
+    $view = new View('edit_account/user_view');
+    $view->user = $account_user;
+    die($view);
+  }
+  
+  
+  
+  public function delete_user()
+  {
+    valid::id_key($this->item_id);
+    ORM::factory('account_user')
+    ->where('fk_site', $this->site_id)
+    ->delete($this->item_id);
+    die('User deleted');
+  }
+  
+  
+  
+  public function settings()
+  {
+    $account = $this->get_parent('account');
+    if($_POST)
+    {
+      $account->login_title  = $_POST['login_title'];
+      $account->create_title = $_POST['create_title'];
+      $account->save();
+      die('account settings saved');
+    }
+    
+    $view = new View('edit_account/settings');
+    $view->account = $account;
+    $view->js_rel_command = "update-account-$account->id";
+    die($view);
+  }
+  
 
-		if(FALSE == $account_user->loaded)
-			die('invalid user');
-		
-		$primary = new View('edit_account/user_view');
-		$primary->user = $account_user;
-		die($primary);
-	}
-	
-	public function delete_user($user_id=NULL)
-	{
-		valid::id_key($user_id);
-		ORM::factory('account_user')
-		->where('fk_site', $this->site_id)
-		->delete($user_id);
-		die('User deleted');
-	}
-	
-	public function settings($tool_id)
-	{
-		$account = ORM::factory('account')
-			->where('fk_site', $this->site_id)
-			->find($tool_id);
-		if(!$account->loaded)
-			die('invalid account id');
-			
-		if($_POST)
-		{
-			$account->login_title = $_POST['login_title'];
-			$account->create_title = $_POST['create_title'];
-			$account->save();
-			die('account settings saved');
-		}
-		
-		$primary = new View('edit_account/settings');
-		$primary->account = $account;
-		$primary->js_rel_command = "update-account-$account->id";
-		die($primary);
-	}
-	
-
-	public static function _tool_deleter($tool_id, $site_id)
-	{
-		return true;
-	}
+  public static function _tool_deleter($tool_id, $site_id)
+  {
+    return true;
+  }
 }
 
 /* -- end -- */

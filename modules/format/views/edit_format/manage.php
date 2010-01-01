@@ -1,5 +1,5 @@
 
-<span class="on_close">update-format-<?php echo $parent_id?></span>
+<span class="on_close">update-format-<?php echo $this->pid?></span>
 
 <div id="common_tool_header" class="buttons">
 	<button type="submit" id="save_sort" class="jade_positive">Save Order</button>
