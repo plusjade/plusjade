@@ -1,13 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
-class Edit_Text_Controller extends Edit_Tool_Controller {
 /*
  * stores and displays text.
  */
- 
+class Edit_Text_Controller extends Edit_Tool_Controller {
+
   function __construct()
   {
-    parent::__construct();  
+    parent::__construct();
   }
   
 /*
@@ -34,7 +33,9 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
   
   
 /*
- * edit a single item, uses the same logic as add so we're all good.
+ * edit a single item, 
+ * Name is easier to put on the toolbar 
+ * even though it does the same thing as add.
  */
   public function edit()
   {
@@ -42,10 +43,6 @@ class Edit_Text_Controller extends Edit_Tool_Controller {
   }
   
 
-  public static function _tool_deleter($parent_id, $site_id)
-  {
-    return true;
-  }
 }
 
-/* -- end of application/controllers/showroom.php -- */
+/* -- end text tool editor -- */

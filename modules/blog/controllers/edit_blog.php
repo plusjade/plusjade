@@ -252,32 +252,6 @@ class Edit_Blog_Controller extends Edit_Tool_Controller {
     die($view);
   }
 
-
-/*
- * logic executed after this blog tool is deleted from site.
- */  
-  public static function _tool_deleter($tool_id, $site_id)
-  {
-    ORM::factory('blog_post')
-      ->where(array(
-        'fk_site'  => $site_id,
-        'blog_id'  => $tool_id,
-      ))
-      ->delete_all();
-      
-    ORM::factory('blog_post_tag')
-      ->where(array(
-        'fk_site'  => $site_id,
-        'blog_id'  => $tool_id,
-      ))
-      ->delete_all();
-
-    ORM::factory('blog_post_comment')
-      ->where(array(
-        'fk_site'  => $site_id,
-        'blog_id'  => $tool_id,
-      ))
-      ->delete_all();
-    return TRUE;
-  }
+  
+ 
 }

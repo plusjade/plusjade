@@ -64,12 +64,8 @@ class Edit_Account_Controller extends Edit_Tool_Controller {
     $view->js_rel_command = "update-account-$account->id";
     die($view);
   }
-  
 
-  public static function _tool_deleter($tool_id, $site_id)
-  {
-    return true;
-  }
+
 }
 
 /* -- end -- */

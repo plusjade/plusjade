@@ -42,40 +42,34 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
 /*
  * Edit single Item
  */
-  public function edit($id=NULL)
+  public function edit()
   {
-    valid::id_key($id);
-
-    $item = ORM::factory('calendar_item')
-      ->where('fk_site', $this->site_id)
-      ->find($id);
-    if(FALSE === $item->loaded)
-      die('invalid calendar item.');
+    $item = $this->get_item('calendar_item');
 
     if($_POST)
     {
       $item->title = $_POST['title'];
-      $item->desc = $_POST['desc'];
+      $item->desc  = $_POST['desc'];
       $item->save();
       die('Event Saved');
     }
 
-    $primary = new View("edit_calendar/edit_item");
-    $primary->item = $item;
-    $primary->js_rel_command = "update-calendar-$item->calendar_id";
-    die($primary);
+    $view = new View("edit_calendar/edit_item");
+    $view->item = $item;
+    $view->js_rel_command = "update-calendar-$item->calendar_id";
+    die($view);
   }
 
 /*
  * delete a calendar item.
  */
-  public function delete($id=NULL)
+  public function delete()
   {
-    valid::id_key($id);
+    valid::id_key($this->item_id);
     
     ORM::factory('calendar_item')
       ->where('fk_site', $this->site_id)
-      ->delete($id);
+      ->delete($this->item_id);
       
     die('Calendar item deleted.');
   }
@@ -90,16 +84,5 @@ class Edit_Calendar_Controller extends Edit_Tool_Controller {
   
 
 
-  
-  public static function _tool_deleter($tool_id, $site_id)
-  {
-    ORM::factory('calendar_item')
-      ->where(array(
-        'fk_site'    => $site_id,
-        'calendar_id'  => $tool_id,
-        ))
-      ->delete_all();  
+} // end
 
-    return TRUE;
-  }
-}

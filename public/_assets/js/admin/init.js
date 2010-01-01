@@ -980,7 +980,7 @@ $(document).bind('server_response.plusjade', function(e, data){
       if(!json){alert('Nothing to save.'); return false;}
       //console.log(json); return false;
       $(document).trigger('show_submit.plusjade');
-      $.post('/get/edit_'+ tool +'/save_tree/' + parent_id,
+      $.post('/get/edit_'+ tool +'/save_tree?pid=' + parent_id,
         {json: json},
         function(data){
           $(document).trigger('server_response.plusjade', data);        

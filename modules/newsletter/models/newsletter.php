@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class Newsletter_Model extends ORM {
+class Newsletter_Model extends Tool {
 	
 	#protected $has_many = array('review_items');
 	

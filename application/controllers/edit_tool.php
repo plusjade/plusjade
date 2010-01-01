@@ -1,11 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
-abstract class Edit_Tool_Controller extends Controller {
 /*
  * All edit_tool controllers extend this class.
  * used to factor common functionality 
- * and provide an interface and overloading access point.
+ * and provide strcuture and overloading access point.
  */
+abstract class Edit_Tool_Controller extends Controller {
+
 
   public function __construct()
   {
@@ -137,16 +137,6 @@ abstract class Edit_Tool_Controller extends Controller {
     return $body;
   }
 
-  
-/*
- * callback function when deleting a tool.
- * useful for cleaning up assets generated with a tool.
- 
- */  
-  public static function _tool_deleter($parent_id, $site_id)
-  {
-    # delete items_meta (items)
-    return TRUE;  
-  }
-  
+
 } # End edit_tool_Controller
+

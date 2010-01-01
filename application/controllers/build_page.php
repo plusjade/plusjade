@@ -12,20 +12,23 @@ class Build_Page_Controller extends Controller {
 
   # currently non-protected pages can be fully cached.
   # should only be set to false for debugging.
-  public $serve_page_cache = FALSE;
-  public $reset_css_cache = FALSE;
+  public $serve_page_cache = TRUE;
+  public $reset_css_cache  = FALSE;
   public $cache_dir;
   public $cache_url;
   public $tool_dir;
+  public $page_css = ''; #holder to build the page_css if not exists
+  public $build_css = FALSE;
+  public $save_page_cache_as = FALSE;
+  
   
   function __construct()
   {
     parent::__construct();
-    # define settings
-    # $this->profiler = new Profiler;    
+
     $this->template    = new View('shell');
-    $this->cache_dir  =  $this->assets->themes_dir("$this->theme/cache");
-    $this->cache_url  = "/_data/$this->site_name/themes/$this->theme/cache";
+    $this->cache_dir   =  $this->assets->themes_dir("$this->theme/cache");
+    $this->cache_url   = "/_data/$this->site_name/themes/$this->theme/cache";
     $this->tool_dir    = $this->assets->themes_dir("$this->theme/tools");  
 
     # make sure the cache dir exists.
@@ -33,13 +36,10 @@ class Build_Page_Controller extends Controller {
       mkdir($this->cache_dir);
       
     # Global CSS 
-    $this->template->linkCSS("$this->cache_url/global.css?v=1.0", 'global-sheet');
-    
-    # if global.css cache does not exist, create it.
-    if($this->reset_css_cache OR !file_exists("$this->cache_dir/global.css"))
-      $this->cache_global_css();
+    $this->load_global_css();
   }
- 
+
+
 /*
  * gets tools associated with a page, and formats them properly for inclusion
  * into the page wrapper.
@@ -50,35 +50,17 @@ class Build_Page_Controller extends Controller {
     # is the page public?
     if('no' == $page->enable AND !$this->client->can_edit($this->site_id))
       Event::run('system.404');
-        
-    # can we serve a cached page?
-    if($this->serve_page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
-    {
-      header('Content-Type: text/html; charset=iso-8859-1');
-      readfile(DATAPATH."$this->site_name/cache/$page->id.html");
-      die;
-    }
-      
-    $build_css = FALSE;
-    # do we have the cached page css?
-    if($this->reset_css_cache OR !file_exists("$this->cache_dir/$page->id.css"))
-    {
-      # parse custom page sass file if it exists.
-      $page_sass  = $this->assets->themes_dir("$this->theme/pages/$page->id.sass");
-      ob_start();
-      if(file_exists($page_sass))
-        echo Kosass::factory('compact')->compile(file($page_sass));
-      
-      $build_css = TRUE;
-    }
-
+    
+    $this->serve_page_cache($page->id);
+    
+    $this->page_css_cache($page->id);
   
     $db  = Database::Instance();
+    $_SESSION['js_files']  = array();
     $data          = array(' ',' ',' ',' ',' ',' ');
     $tools_array   = array();
-    $_SESSION['js_files']  = array();
-    $prepend  = '';
-    $append   = '';
+    $prepend       = '';
+    $append        = '';
     
 
     $this->template->set_global('title', $page->title);
@@ -138,11 +120,14 @@ class Build_Page_Controller extends Controller {
             );
           }
         
-          # build tool output    
-          $tool_object = $prepend . Load_Tool::factory($tool->name)->_index($parent) . $append;
+          # build tool output
+          $c_name = ucfirst($tool->name).'_Controller';
+          $controller = new $c_name();
+          $output = $controller->_index($parent); 
+          $tool_view = "$prepend$output$append";
         
           # if we need to build the page_css file get the tool css.
-          if($build_css)
+          if($this->build_css)
           {
             # Is tool protected?
             if('yes' == $tool->protected)
@@ -151,19 +136,19 @@ class Build_Page_Controller extends Controller {
               $theme_templates  = $this->assets->themes_dir("$this->theme/css/tool_templates");
               #$templates = yaml::parse($this->site_name, 'config', "themes/$this->theme/css/tool_templates");
               if(file_exists("$theme_templates/{$parent->type}_$parent->view.sass"))
-                echo Kosass::factory('compact')->compile(file("$theme_templates/{$parent->type}_$parent->view.sass"));
+                $this->page_css .= Kosass::factory('compact')->compile(file("$theme_templates/{$parent->type}_$parent->view.sass"));
             
             }
             # does custom css file exist for tool?
             $custom_file = "$this->tool_dir/$tool->name/$tool->parent_id/{$parent->type}_$parent->view.css";
             if(file_exists($custom_file))
-              readfile($custom_file);
+              $this->page_css .= file_get_contents($custom_file);
           }
         }
         elseif($this->client->can_edit($this->site_id))
         {
           # show the tool error when logged in.
-          $tool_object = "$tool->name with id: $tool->parent_id could not be loaded.";
+          $tool_view = "$tool->name with id: $tool->parent_id could not be loaded.";
         }
         
         # Add output to correct container.
@@ -171,13 +156,14 @@ class Build_Page_Controller extends Controller {
         (int) $index = (5 <= $tool->page_id)
           ? $tool->container
           : $tool->page_id ;
-        $data[$index] .= $tool_object;
+        $data[$index] .= $tool_view;
       }
     }
     
     # cache the css for this page if set.
-    if($build_css)
-      file_put_contents("$this->cache_dir/$page->id.css", ob_get_clean());
+    if($this->build_css)
+      file_put_contents("$this->cache_dir/$page->id.css", $this->page_css);
+    
     
     # Tool array into admin Panel if logged in
     if($admin_mode)
@@ -203,12 +189,11 @@ class Build_Page_Controller extends Controller {
   
     # Should we cache this page?
     # always cache IF no existing cache, live and non-protected page
-    $cache = FALSE;
     if(!$this->client->can_edit($this->site_id) AND !file_exists(DATAPATH."$this->site_name/cache/$page->id.html"))
       if(FALSE === yaml::does_key_exist($this->site_name, 'pages_config', $page->page_name))
-        $cache = $page->id;
+        $this->save_page_cache_as = $page->id;
     
-    $this->wrapper($data, $page->template, $cache);
+    $this->wrapper($data, $page->template);
   }
 
   
@@ -219,24 +204,58 @@ class Build_Page_Controller extends Controller {
  */
   public function _custom_404($message=NULL)
   {
+    header("HTTP/1.0 404 Not Found");
+    $this->serve_page_cache('404_not_found');
+    
     if(empty($message))
       $message = 'This Page does not exist<br/>Please ensure the page name was spelled correctly. Thank you!';
       
     $this->template->set_global('title', 'Page Not Found.');
-    
-    # can we serve the cached 404 page?
-    if($this->serve_page_cache AND !$this->client->can_edit($this->site_id) AND file_exists(DATAPATH."$this->site_name/cache/404_not_found.html"))
-    {
-      header('Content-Type: text/html; charset=iso-8859-1');
-      readfile(DATAPATH."$this->site_name/cache/404_not_found.html");
-      die;
-    }
-    
-    header("HTTP/1.0 404 Not Found");
-    $this->wrapper($message, 'master', '404_not_found', FALSE);
+    $this->save_page_cache_as = '404_not_found';
+    $this->wrapper($message, 'master', FALSE);
   }
   
 
+
+
+#----------------------------------------------------
+# private methods 
+#----------------------------------------------------
+
+
+/*
+ * Serve a cached page if we are allowed to and it exists.
+ */
+  private function serve_page_cache($page_name)
+  {
+    $file = DATAPATH."$this->site_name/cache/$page_name.html";
+    if($this->serve_page_cache AND !$this->client->can_edit($this->site_id) AND file_exists($file))
+    {
+      header('Content-Type: text/html; charset=iso-8859-1');
+      readfile($file);
+      die;
+    }
+  }
+  
+  private function page_css_cache($page_id)
+  {
+    # if we don't have a file, build it with $this->page_css;
+    if($this->reset_css_cache OR !file_exists("$this->cache_dir/$page_id.css"))
+    {
+      # parse custom page sass file if it exists.
+      $page_sass  = $this->assets->themes_dir("$this->theme/pages/$page_id.sass");
+      if(file_exists($page_sass))
+        $this->page_css =  Kosass::factory('compact')->compile(file($page_sass));
+      
+      $this->build_css = TRUE;
+    }
+    $this->build_css = FALSE;
+  }
+  
+  
+  
+  
+  
 /*
  * data is composed of tools data sent from build_page.php or other admin data
  * from utada controller that needs to be wrapped in a theme-based shell.  
@@ -244,7 +263,7 @@ class Build_Page_Controller extends Controller {
  * expects a an array matching the appropriate containers
  * $exists = does this page exist? set to false for 404 not found wrapper.
  */
-  private function wrapper($data, $template, $cache=FALSE, $exists=TRUE)
+  private function wrapper($data, $template, $exists=TRUE)
   {
     $banner    = View::factory('_global/banner');
     $menu      = View::factory('_global/menu');
@@ -318,20 +337,34 @@ class Build_Page_Controller extends Controller {
       $this->template->end_body = ob_get_clean();
     }
     
-    # do we cache the fully rendered page?
-    if($cache)
+    $this->save_page_cache();
+    die($this->template);
+  }
+  
+  
+  
+/* 
+ * save the entire page cache if applicable.
+ * save_page_cache_as defaults to FALSE, but will be 
+ * set to a page_name if that page can be cached.
+ */
+  private function save_page_cache()
+  {
+    if($this->save_page_cache_as)
     {
       $date = date('m.d.y g:ia e');
       if(!is_dir(DATAPATH . "$this->site_name/cache"))
         mkdir(DATAPATH . "$this->site_name/cache");
       file_put_contents(
-        DATAPATH . "$this->site_name/cache/$cache.html",
+        DATAPATH . "$this->site_name/cache/$this->save_page_cache_as.html",
         $this->template->render() . "\n<!-- cached $date -->"
       );
-    }
-    
-    die($this->template);    
+    } 
   }
+  
+  
+
+  
   
   
 /*
@@ -385,8 +418,14 @@ class Build_Page_Controller extends Controller {
  * generate everything as new and overwrite the current cache.
  * outputs css and saves as global.css in the theme cache folder.
  */
-  private function cache_global_css()
+  private function load_global_css()
   {
+    $this->template->linkCSS("$this->cache_url/global.css?v=1.0", 'global-sheet');
+   
+    if(!$this->reset_css_cache AND file_exists("$this->cache_dir/global.css"))
+      return TRUE;
+
+    # create the global css cache file.
     ob_start();
     # get the global sass file.
     $global_sass  = $this->assets->themes_dir("$this->theme/css/global.sass");

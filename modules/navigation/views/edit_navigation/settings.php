@@ -1,7 +1,7 @@
 
 <span class="on_close"><?php echo $js_rel_command?></span>
 
-<?php echo form::open_multipart("edit_navigation/settings/$navigation->id", array( 'class' => 'ajaxForm') )?>
+<?php echo form::open_multipart("edit_navigation/settings?pid=$navigation->id", array( 'class' => 'ajaxForm') )?>
 
 	<div id="common_tool_header" class="buttons">
 		<button type="submit" name="add_item" class="jade_positive" accesskey="enter">Save Settings</button>

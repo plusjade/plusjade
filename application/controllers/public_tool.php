@@ -3,11 +3,17 @@
 /*
  * All public_tool controllers extend this class.
  * used to factor common functionality 
- * and provide an interface and overloading access point.
+ * and provide structure and overloading access point.
  */
  
 abstract class Public_Tool_Controller extends Controller {
 
+
+  # required to output the tools rendered view.
+  # accepts the parent tool as object.
+  abstract public function _index($parent, $sub_tool=FALSE);
+  
+  
   public function __construct()
   {
     parent::__construct();
@@ -116,22 +122,7 @@ abstract class Public_Tool_Controller extends Controller {
     die('not a valid ajax request.');
   }
   
-  
-/*
- * is called when a tool gets added to the system.
- */
-  public static function _tool_adder($parent_id, $site_id, $sample=FALSE)
-  {
-    if($sample)
-    {
-      /* do some stuff to create sample assets */
-    }
 
-    return 'add';
-  }  
-  
-  
-  
 
 } # End
 

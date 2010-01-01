@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class Forum_Model extends ORM {
+class Forum_Model extends Tool {
 
 	// Relationships
 	protected $has_many = array('forum_cat');

@@ -159,22 +159,6 @@ class Edit_Format_Controller extends Edit_Tool_Controller {
     die($view);
   }
 
-
-/*
- * callback function when this tool is deleted.
- * cleans up extra data
- */   
-  public static function _tool_deleter($parent_id, $site_id)
-  {
-    ORM::factory('format_item')
-      ->where(array(
-        'fk_site'  => $site_id,
-        'format_id'  => $parent_id,
-        ))
-      ->delete_all();
-
-    return TRUE;
-  }
   
 } /* end */
 
