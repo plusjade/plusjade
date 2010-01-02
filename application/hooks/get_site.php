@@ -6,9 +6,9 @@
  
  * 1. Fetches appropriate site from URL.
  * 2. Routes URL to appropriate controller based on config for site name.
- *   Cases:
+ *    Cases:
     a. is ajax request:    Fetch raw data.
-    b. is page_name:    grab tools, Build page, render the page.
+    b. is page_name:       grab tools, Build page, render the page.
     c. is get/controller:  Admin, map to appropriate controller.
  */
  
@@ -21,7 +21,7 @@ function get_site()
   if(in_array(ROOTNAME, $domain_array))
   {
     $field_name  = 'subdomain';
-    $site_name  = $domain_array['0'];
+    $site_name   = $domain_array['0'];
     
     # if no subdomain, set the site_name to the admin account 
     if('2' == count($domain_array))
@@ -29,18 +29,14 @@ function get_site()
   }
   else
   {
-    # custom domain
-    #if ( isset($_SESSION['site_name']) )
-      #return TRUE;
-      
     $field_name  = 'custom_domain';
-    $site_name  = $_SERVER['HTTP_HOST'];
+    $site_name   = $_SERVER['HTTP_HOST'];
   }
   
   $site = ORM::factory('site')
     ->where(array($field_name => $site_name))
     ->find();
-  if (!$site->loaded)
+  if(!$site->loaded)
   {
     header("HTTP/1.0 404 Not Found");
     die('site does not exist');
@@ -48,8 +44,7 @@ function get_site()
   
   # IMPORTANT: sets the site name & non-sensitive site_data.
   $_SESSION['site_name']  = $site->subdomain;
-  $_SESSION['created']  = $site->created;
-  
+
   # Make sure site_config file exists
   # the site_config file is parsed in the root Controller_Core library file.
   $site_config_path = DATAPATH . "$site->subdomain/protected/site_config.yml";
@@ -70,11 +65,11 @@ function get_site()
    --- Route the URL ---
    ---------------------
    * The URL will tell us how to build the page.
-        a. is ajax request
-       b. is page_name
-        is protected page?
-      c. is file request
-        d. is /get/
+       a. is /get/
+       b. is file request     
+       c. is ajax request
+       d. is page_name
+          is protected page?
    */
 
   # Get page_name
@@ -129,7 +124,7 @@ function get_site()
     $page_name = ltrim($page_name, '/');
   }
   
-  # Grab the page row
+
   $page = ORM::factory('page')
     ->where(array(
       'fk_site'   => $site->id,
