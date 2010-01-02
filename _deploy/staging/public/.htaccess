@@ -1,0 +1,17 @@
+
+#Header unset ETag
+	FileETag None
+
+
+	RewriteEngine On
+	
+# remove www from domains	  
+	RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
+	RewriteRule ^(.*)$ http://%1/$1 [R=301,NC,L]
+
+	RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
+	RewriteRule ^(.*)$ http://%1 [R=301,NC,L]
+	
+# Rewrite all other URLs to index.php/URL
+	RewriteCond $1 !^(index\.php|robots\.txt|_data|_assets)
+	RewriteRule ^(.*)$ /index.php/$1 [L]	

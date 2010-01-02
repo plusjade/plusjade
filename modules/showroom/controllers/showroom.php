@@ -24,7 +24,7 @@ class Showroom_Controller extends Public_Tool_Controller {
     categories: mysite.com/page_name/cat_id/category/n-sub-cat/n2-sub-cat
     items: mysite.com/page_name/item_id/item-url-name
  */ 
-  public function _index($showroom)
+  public function _index($showroom, $sub_tool=FALSE)
   {
     $url_array  = uri::url_array();
     list($page_name, $first_node, $item) = $url_array;

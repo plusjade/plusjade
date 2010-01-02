@@ -16,7 +16,7 @@ class Format_Controller extends Public_Tool_Controller {
  * index handler
  * expects the parent format table object
  */ 
-  public function _index($format)
+  public function _index($format, $sub_tool=FALSE)
   {    
     # determine the correct type.
     $which_type = (empty($format->type)) ? 'people' :  $format->type;
