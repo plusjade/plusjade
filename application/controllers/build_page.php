@@ -268,15 +268,19 @@ class Build_Page_Controller extends Controller {
 
     # create the global css cache file.
     ob_start();
-    # get the global sass file.
-    $global_sass  = $this->assets->themes_dir("$this->theme/css/global.sass");
-    if(file_exists($global_sass))
-      echo Kosass::factory('compact')->compile(file($global_sass));
     
     # add the static helpers.
     $static_helpers = DOCROOT . '_assets/css/static_helpers.css';
     if (file_exists($static_helpers))
       readfile($static_helpers);  
+      
+    # get the global sass file.
+    $global_sass  = $this->assets->themes_dir("$this->theme/css/global.sass");
+    if(file_exists($global_sass))
+      echo Kosass::factory('compact')->compile(file($global_sass));
+    elseif(file_exists($this->assets->themes_dir("$this->theme/css/global.css")))
+      readfile($this->assets->themes_dir("$this->theme/css/global.css"));
+      
       
     # Load any tool-css needed for javascript functionality.
       # provide a way to automatically load stuff based on tool config file?
@@ -301,14 +305,19 @@ class Build_Page_Controller extends Controller {
     # if we don't have a file, build it with $this->page_css;
     if($this->reset_css_cache OR !file_exists("$this->css_cache_dir/$this->page_id.css"))
     {
+      $css_path = $this->assets->themes_dir("$this->theme/pages");
+      
       # parse custom page sass file if it exists.
-      $page_sass  = $this->assets->themes_dir("$this->theme/pages/$this->page_id.sass");
-      if(file_exists($page_sass))
-        $this->page_css =  Kosass::factory('compact')->compile(file($page_sass));
+      if(file_exists("$css_path/$this->page_id.sass"))
+        $this->page_css =  Kosass::factory('compact')->compile(file("$css_path/$this->page_id.sass"));
+      elseif(file_exists("$css_path/$this->page_id.css"))
+        $this->page_css = file_get_contents("$css_path/$this->page_id.css");
       
       $this->build_page_css = TRUE;
+      return TRUE;
     }
     $this->build_page_css = FALSE;
+    return FALSE;
   }
   
 

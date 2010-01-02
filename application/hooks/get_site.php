@@ -73,7 +73,7 @@ function get_site()
    */
 
   # Get page_name
-  $url_array = Uri::url_array();
+  $url_array = URI::url_array();
   $page_name = (empty($url_array['0'])) 
     ? $site->homepage
     : $url_array['0'];
