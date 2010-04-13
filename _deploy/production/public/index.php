@@ -2,7 +2,7 @@
 # ROOT/Parent +Jade domain name
 define('ROOTNAME', 'plusjade');
 define('ROOTACCOUNT', 'jade');
-define('ROOTDOMAIN', 'plusjade.com');
+define('ROOTDOMAIN', 'plusjade.org');
 define('ROOTSITEID', 5);
 
 /**

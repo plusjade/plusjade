@@ -17,7 +17,7 @@ function get_site()
   $session = Session::instance();
   $domain_array = explode('.', $_SERVER['HTTP_HOST']);  
   
-  # if the url = [subdomain].plusjade.com
+  # if the url = [subdomain].plusjade.org
   if(in_array(ROOTNAME, $domain_array))
   {
     $field_name  = 'subdomain';
