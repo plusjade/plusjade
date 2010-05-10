@@ -64,4 +64,10 @@ class Forum_Model extends Tool {
 		return parent::unique_key($id);
 	}
 
+  # do this!!
+  public function delete_tool()
+  {
+  
+  
+  }
 } // End Account User Model

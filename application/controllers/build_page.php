@@ -16,7 +16,7 @@ class Build_Page_Controller extends Controller {
   
   # currently non-protected pages can be fully cached.
   # should only be set to false for debugging.
-  private $serve_page_cache = FALSE;
+  private $serve_page_cache = TRUE;
   private $reset_css_cache  = FALSE;
   private $build_page_css   = FALSE;
   private $save_page_as     = FALSE;
