@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <title>Google Maps JavaScript API Example</title>
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAATl3ouz6mDWUryXLiBg_56hTaRle_T4ihdSUpL4p8Tw_T5cVK1RQVO3SKhybAmz1Hb7JecRXQiqnSUA&sensor=false" type="text/javascript"></script>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAUhbI-v33nQCIumEh0uh07BRfRaT_3hF2-W10lxSfbrmRu69qGBSt1sVoe8EwMIXq_CRNAK7PmWHkCA&sensor=false" type="text/javascript"></script>
 	<style type="text/css">
 		body {padding:0;margin:0; width:<?php echo $width?>px; font-size:10px; font-family:verdana, serif;}
 		#map_canvas{border:1px solid #333;}
