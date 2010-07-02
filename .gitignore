@@ -14,4 +14,5 @@ public/index.php
 public/.htaccess
 public/_data/*
 public/_assets/images/_upload*
+_deploy/capistrano/config/deploy.rb
 
